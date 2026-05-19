@@ -1,0 +1,255 @@
+# ─────────────────────────────────────────────────────────────
+# CI/CD Pipeline — 美食食谱网站
+# 自动触发：push 到 main / develop 分支，或 Pull Request
+#
+# 流程：代码检查 → 单元测试 → 构建 Docker 镜像 → 推送镜像仓库 → 部署
+#
+# 所需 Secrets（在 GitHub repo Settings → Secrets 中配置）：
+#   DOCKER_USERNAME         Docker Hub 用户名
+#   DOCKER_PASSWORD          Docker Hub 访问令牌
+#   SSH_PRIVATE_KEY          服务器 SSH 私钥（用于部署阶段）
+#   SSH_HOST                 服务器 IP 或域名
+#   SSH_USER                 SSH 用户名
+# ─────────────────────────────────────────────────────────────
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME_BACKEND: ${{ github.repository_owner }}/food-website-backend
+  IMAGE_NAME_FRONTEND: ${{ github.repository_owner }}/food-website-frontend
+  NODE_VERSION: 18
+
+jobs:
+
+  # ───────────────────────────────────────────────────────────
+  # Job 1: 代码检查（lint）
+  # ───────────────────────────────────────────────────────────
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            **/package-lock.json
+
+      # 安装根目录 devDependencies（concurrently 等）
+      - name: Install dependencies
+        run: npm ci
+
+      # 后端 lint
+      - name: Backend ESLint
+        run: npm run lint --workspace=backend || true
+
+      # 前端 lint（如果有）
+      - name: Frontend ESLint
+        run: npm run lint --workspace=frontend || true
+
+  # ───────────────────────────────────────────────────────────
+  # Job 2: 单元测试
+  # ───────────────────────────────────────────────────────────
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            tests/package-lock.json
+
+      # ── 后端测试（独立环境：SQLite 内存数据库）──────────
+      - name: Backend tests
+        run: |
+          cd tests
+          npm ci
+          npm run test:backend
+        env:
+          NODE_ENV: test
+          DB_DIALECT: sqlite
+          DB_STORAGE: ':memory:'
+
+      # ── 前端测试（jsdom 环境）─────────────────────────────
+      - name: Frontend tests
+        run: |
+          cd tests
+          npm ci
+          npm run test:frontend
+        env:
+          NODE_ENV: test
+          VITE_API_BASE_URL: http://localhost:3001
+
+      # ── 上传测试覆盖率报告 ─────────────────────────────
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: ./tests/coverage/lcov.info
+          fail_ci_if_error: false
+          verbose: true
+
+  # ───────────────────────────────────────────────────────────
+  # Job 3: 构建前端 Docker 镜像
+  # ───────────────────────────────────────────────────────────
+  build-frontend:
+    name: Build Frontend Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Frontend Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          dockerfile: ../Dockerfile.frontend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_API_BASE_URL=${{ vars.API_BASE_URL || 'https://api.example.com' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # ───────────────────────────────────────────────────────────
+  # Job 4: 构建后端 Docker 镜像
+  # ───────────────────────────────────────────────────────────
+  build-backend:
+    name: Build Backend Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Backend Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          dockerfile: ../Dockerfile.backend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # ───────────────────────────────────────────────────────────
+  # Job 5: 部署到服务器（仅 main 分支 push 时执行）
+  # ───────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    needs: [build-frontend, build-backend]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: IMAGE_NAME_BACKEND,IMAGE_NAME_FRONTEND,REGISTRY
+          script: |
+            set -e
+
+            BACKEND_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest"
+            FRONTEND_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest"
+
+            echo "=== 拉取最新镜像 ==="
+            docker pull $BACKEND_IMAGE
+            docker pull $FRONTEND_IMAGE
+
+            echo "=== 拉取最新代码 ==="
+            cd ~/food-website
+            git pull origin main
+
+            echo "=== 重启服务 ==="
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+            echo "=== 健康检查 ==="
+            sleep 15
+            curl -sf http://localhost/api/health || { echo "后端健康检查失败"; exit 1; }
+            curl -sf http://localhost/health || { echo "前端健康检查失败"; exit 1; }
+
+            echo "=== 清理旧镜像 ==="
+            docker image prune -f
+
+            echo "=== 部署完成 ==="
+            docker ps --format "table {{.Names}}\t{{.Status}}"

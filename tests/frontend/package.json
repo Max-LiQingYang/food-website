@@ -1,0 +1,40 @@
+{
+  "name": "food-website-frontend-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/vue3-jest": "^29.2.6",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "vue": "^3.4.21"
+  },
+  "jest": {
+    "preset": "@vue/vue3-jest",
+    "testEnvironment": "jsdom",
+    "moduleFileExtensions": ["js", "json", "vue"],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1",
+      "\\.api\\.js$": "<rootDir>/__mocks__/api.js"
+    },
+    "transform": {
+      "^.+\\.vue$": "@vue/vue3-jest",
+      "^.+\\.js$": "babel-jest"
+    },
+    "setupFilesAfterFramework": ["<rootDir>/jest.setup.js"],
+    "collectCoverageFrom": [
+      "**/*.vue",
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**"
+    ],
+    "coverageDirectory": "coverage",
+    "verbose": true
+  }
+}
