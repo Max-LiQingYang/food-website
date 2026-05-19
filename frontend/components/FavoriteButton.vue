@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { addFavorite, removeFavorite } from './api'
+import { addFavorite, removeFavorite } from '../api'
 
 export default {
   name: 'FavoriteButton',

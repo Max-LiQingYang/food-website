@@ -90,7 +90,7 @@ async function removeFavorite(req, res) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// GET /api/favorites/status/:recipeId — 查询单食谱收藏状态
+// GET /api/favorites/:recipeId/status — 查询单食谱收藏状态
 // ─────────────────────────────────────────────────────────────────
 async function getFavoriteStatus(req, res) {
   try {
@@ -110,7 +110,7 @@ async function getFavoriteStatus(req, res) {
       })
     )
   } catch (err) {
-    console.error('[GET /api/favorites/status/:recipeId] Error:', err)
+    console.error('[GET /api/favorites/:recipeId/status] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 }

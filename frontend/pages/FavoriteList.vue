@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { getFavoriteList, removeFavorite } from './api'
+import { getFavoriteList, removeFavorite } from '../api'
 
 export default {
   name: 'FavoriteList',
