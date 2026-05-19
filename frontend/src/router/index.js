@@ -20,7 +20,7 @@ const router = createRouter({
     {
       path: '/favorites',
       name: 'favorites',
-      component: defineAsyncComponent(() => import('../pages/FavoriteList.vue'))
+      component: defineAsyncComponent(() => import('../../pages/FavoriteList.vue'))
     }
   ]
 })

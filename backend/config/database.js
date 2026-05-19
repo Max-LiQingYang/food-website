@@ -28,8 +28,6 @@ const dbConfig = {
   }
 }
 
-// SQLite 使用 better-sqlite3（预编译二进制，避免 node-gyp 编译问题）
-const sqliteModule = dialect === 'sqlite' ? require('better-sqlite3') : undefined
 
 // ── SQLite（本地开发）───────────────────────────────────────
 if (dialect === 'sqlite') {
@@ -79,7 +77,7 @@ switch (dialect) {
   case 'sqlite': {
     const path = require('path')
     const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'database.sqlite')
-    sequelize = new Sequelize({ ...dbConfig, storage: dbPath, dialect: 'sqlite', dialectModule: sqliteModule })
+    sequelize = new Sequelize({ ...dbConfig, storage: dbPath, dialect: 'sqlite' })
     break
   }
   case 'mysql': {
