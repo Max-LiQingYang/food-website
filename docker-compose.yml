@@ -1,11 +1,8 @@
 # ─────────────────────────────────────────────────────────────
-# Docker Compose — 美食食谱网站（开发 & 生产通用）
+# Docker Compose — 美食食谱网站（生产部署）
 #
-# 用法:
-#   开发:  docker-compose up          （文件变更自动重载）
-#   生产:  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-#   测试:  docker-compose run backend npm test
-#   清理:  docker-compose down -v
+# 镜像由 CI/CD 构建并推送至 ghcr.io，服务器直接拉取运行
+# 数据库使用宿主机 MariaDB（172.17.0.1），Redis 未使用
 # ─────────────────────────────────────────────────────────────
 
 services:
@@ -14,11 +11,7 @@ services:
   # 前端 — Nginx 托管 Vue SPA，代理 /api 到后端
   # ───────────────────────────────────────────────────────────
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
-      args:
-        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-/api}
+    image: ghcr.io/max-liqingyang/food-website-frontend:latest
     container_name: food-frontend
     restart: unless-stopped
     ports:
@@ -26,8 +19,7 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV:-production}
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     networks:
       - food-network
     healthcheck:
@@ -40,25 +32,22 @@ services:
   # 后端 — Node.js + Express API 服务
   # ───────────────────────────────────────────────────────────
   backend:
-    build:
-      context: ./backend
-      dockerfile: ./Dockerfile
+    image: ghcr.io/max-liqingyang/food-website-backend:latest
     container_name: food-backend
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT:-3001}:${PORT:-3001}"
     environment:
-      # 通用配置（见 .env.example）
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3001}
 
-      # 数据库
+      # 数据库（连接宿主机 MariaDB）
       DB_DIALECT: ${DB_DIALECT:-mysql}
-      DB_HOST: ${DB_HOST:-mysql}
+      DB_HOST: ${DB_HOST:-172.17.0.1}
       DB_PORT: ${DB_PORT:-3306}
       DB_NAME: ${DB_NAME:-food_website}
-      DB_USER: ${DB_USER:-${MYSQL_USER:-food_user}}
-      DB_PASS: ${DB_PASS:-${MYSQL_PASSWORD}}
+      DB_USER: ${DB_USER:-food_user}
+      DB_PASS: ${DB_PASS:-food_password}
       DB_POOL_MAX: ${DB_POOL_MAX:-10}
       DB_POOL_MIN: ${DB_POOL_MIN:-2}
       DB_POOL_ACQUIRE: ${DB_POOL_ACQUIRE:-30000}
@@ -74,9 +63,6 @@ services:
 
       # CORS
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
-    depends_on:
-      mysql:
-        condition: service_healthy
     networks:
       - food-network
     healthcheck:
@@ -86,68 +72,9 @@ services:
       retries: 3
       start_period: 30s
 
-  # ───────────────────────────────────────────────────────────
-  # MySQL 数据库（生产建议使用云数据库，此处仅本地开发使用）
-  # ───────────────────────────────────────────────────────────
-  mysql:
-    image: mysql:8.0
-    container_name: food-mysql
-    restart: unless-stopped
-    ports:
-      - "${MYSQL_PORT:-3306}:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
-      MYSQL_DATABASE: ${DB_NAME:-food_website}
-      MYSQL_USER: ${MYSQL_USER:-food_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-food_password}
-    volumes:
-      # 持久化数据
-      - mysql_data:/var/lib/mysql
-      # 初始化 SQL 脚本（首次启动自动执行）
-      - ./backend/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --default-authentication-plugin=mysql_native_password
-      - --skip-log-bin
-    networks:
-      - food-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_secret}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ───────────────────────────────────────────────────────────
-  # Redis（可选，收藏计数缓存 / Session 存储）
-  # ───────────────────────────────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: food-redis
-    restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    networks:
-      - food-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
 # ─────────────────────────────────────────────────────────────
 # 网络
 # ─────────────────────────────────────────────────────────────
 networks:
   food-network:
     driver: bridge
-
-# ─────────────────────────────────────────────────────────────
-# 持久化卷
-# ─────────────────────────────────────────────────────────────
-volumes:
-  mysql_data:
-  redis_data:

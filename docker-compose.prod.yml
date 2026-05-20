@@ -35,29 +35,3 @@ services:
       options:
         max-size: '5m'
         max-file: '3'
-
-  mysql:
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '10m'
-        max-file: '3'
-
-  redis:
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '0.25'
-          memory: 256M
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '5m'
-        max-file: '3'

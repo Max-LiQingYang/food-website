@@ -240,8 +240,7 @@ jobs:
             git pull origin main
 
             echo "=== 重启服务 ==="
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
             echo "=== 健康检查 ==="
             sleep 15
