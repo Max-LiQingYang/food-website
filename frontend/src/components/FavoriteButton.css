@@ -1,0 +1,81 @@
+.favorite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 20px;
+  background: #fff;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  user-select: none;
+}
+
+.favorite-btn:hover:not(:disabled) {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+}
+
+.favorite-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+/* 已收藏状态 */
+.favorite-btn.is-favorited {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+  background: #fff1f0;
+}
+
+.favorite-btn.is-favorited:hover:not(:disabled) {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+/* 加载状态 */
+.favorite-btn.is-loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.favorite-btn__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #d9d9d9;
+  border-top-color: #ff4d4f;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.favorite-btn__icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.favorite-btn__text {
+  font-weight: 500;
+}
+
+/* ── 心形缩放弹跳动画 ── */
+.favorite-btn.is-heart-burst .favorite-btn__icon {
+  animation: heartBurst 0.6s ease;
+}
+
+@keyframes heartBurst {
+  0% { transform: scale(1); }
+  15% { transform: scale(0.5); }
+  30% { transform: scale(1.4); }
+  45% { transform: scale(0.85); }
+  60% { transform: scale(1.15); }
+  75% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
