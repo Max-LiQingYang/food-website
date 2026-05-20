@@ -237,6 +237,7 @@ jobs:
 
             echo "=== 拉取最新代码 ==="
             cd ~/food-website
+            git reset --hard HEAD
             git pull origin main
 
             echo "=== 重启服务 ==="
