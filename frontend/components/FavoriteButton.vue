@@ -1,11 +1,11 @@
 <template>
   <button
-    :class="['favorite-btn', { 'is-favorited': localFavorited, 'is-loading': loading }]"
+    :class="['favorite-btn', { 'is-favorited': localFavorited, 'is-loading': loading, 'is-heart-burst': heartAnimating }]"
     :disabled="loading"
-    @click="handleClick"
     :title="localFavorited ? '取消收藏' : '收藏'"
     :aria-label="localFavorited ? '取消收藏' : '收藏'"
     :aria-pressed="localFavorited"
+    @click="handleClick"
   >
     <!-- 加载中状态 -->
     <span v-if="loading" class="favorite-btn__spinner" aria-hidden="true" />
@@ -42,7 +42,8 @@ export default {
   data() {
     return {
       loading: false,
-      localFavorited: false
+      localFavorited: false,
+      heartAnimating: false
     }
   },
 
@@ -84,7 +85,9 @@ export default {
           await removeFavorite(this.recipeId)
           this.$message.success('已取消收藏')
         } else {
-          // 添加收藏
+          // 添加收藏：触发心形动画
+          this.heartAnimating = true
+          setTimeout(() => { this.heartAnimating = false }, 600)
           await addFavorite(this.recipeId)
           this.$message.success('收藏成功 ❤️')
         }
@@ -174,5 +177,20 @@ export default {
 
 .favorite-btn__text {
   font-weight: 500;
+}
+
+/* ── 心形缩放弹跳动画 ── */
+.favorite-btn.is-heart-burst .favorite-btn__icon {
+  animation: heartBurst 0.6s ease;
+}
+
+@keyframes heartBurst {
+  0% { transform: scale(1); }
+  15% { transform: scale(0.5); }
+  30% { transform: scale(1.4); }
+  45% { transform: scale(0.85); }
+  60% { transform: scale(1.15); }
+  75% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 </style>

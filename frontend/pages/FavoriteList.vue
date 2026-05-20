@@ -26,47 +26,65 @@
     </div>
 
     <!-- 食谱列表 -->
-    <div v-else class="favorite-list__grid">
+    <div v-else ref="listTop" class="favorite-list__grid">
       <div
         v-for="item in list"
         :key="item.id"
         class="recipe-card"
-        @click="$router.push(`/recipe/${item.recipe.id}`)"
+        @click="item.recipe && $router.push(`/recipe/${item.recipe.id}`)"
       >
-        <!-- 封面图 -->
-        <div class="recipe-card__cover">
-          <img
-            :src="item.recipe.coverImage || '/images/default-recipe.jpg'"
-            :alt="item.recipe.title"
-            loading="lazy"
-          />
-          <!-- 烹饪时间角标 -->
-          <span class="recipe-card__cooktime">
-            ⏱ {{ item.recipe.cookTime || '—' }} 分钟
-          </span>
-        </div>
+        <!-- 食谱已被删除的兜底展示 -->
+        <template v-if="!item.recipe">
+          <div class="recipe-card__cover recipe-card__cover--deleted">
+            <div class="recipe-card__deleted-icon">🍽️</div>
+            <span class="recipe-card__deleted-badge">已删除</span>
+          </div>
+          <div class="recipe-card__info">
+            <h3 class="recipe-card__title recipe-card__title--deleted">食谱已不存在</h3>
+            <p class="recipe-card__author">该食谱已被作者删除</p>
+            <p class="recipe-card__date">
+              收藏于 {{ formatDate(item.createdAt) }}
+            </p>
+          </div>
+        </template>
 
-        <!-- 食谱信息 -->
-        <div class="recipe-card__info">
-          <h3 class="recipe-card__title">{{ item.recipe.title }}</h3>
-          <p class="recipe-card__author">
-            👨‍🍳 {{ item.recipe.author || '未知作者' }}
-          </p>
-          <p class="recipe-card__date">
-            收藏于 {{ formatDate(item.createdAt) }}
-          </p>
-        </div>
+        <!-- 正常食谱卡片 -->
+        <template v-else>
+          <!-- 封面图 -->
+          <div class="recipe-card__cover">
+            <img
+              :src="item.recipe.coverImage || '/images/default-recipe.jpg'"
+              :alt="item.recipe.title"
+              loading="lazy"
+            />
+            <!-- 烹饪时间角标 -->
+            <span class="recipe-card__cooktime">
+              ⏱ {{ item.recipe.cookTime || '—' }} 分钟
+            </span>
+          </div>
 
-        <!-- 取消收藏按钮（浮于封面右上角） -->
-        <button
-          class="recipe-card__unfav"
-          :disabled="item.removing"
-          :aria-label="'取消收藏：' + item.recipe.title"
-          @click.stop="unfavorite(item)"
-        >
-          <span v-if="item.removing">⋯</span>
-          <span v-else>❤️</span>
-        </button>
+          <!-- 食谱信息 -->
+          <div class="recipe-card__info">
+            <h3 class="recipe-card__title">{{ item.recipe.title }}</h3>
+            <p class="recipe-card__author">
+              👨‍🍳 {{ item.recipe.author || '未知作者' }}
+            </p>
+            <p class="recipe-card__date">
+              收藏于 {{ formatDate(item.createdAt) }}
+            </p>
+          </div>
+
+          <!-- 取消收藏按钮（浮于封面右上角） -->
+          <button
+            class="recipe-card__unfav"
+            :disabled="item.removing"
+            :aria-label="'取消收藏：' + item.recipe.title"
+            @click.stop="unfavorite(item)"
+          >
+            <span v-if="item.removing">⋯</span>
+            <span v-else>❤️</span>
+          </button>
+        </template>
       </div>
     </div>
 
@@ -169,10 +187,19 @@ export default {
     },
 
     /** 翻页 */
-    goPage(page) {
+    async goPage(page) {
       this.pagination.page = page
-      this.fetchList()
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      await this.fetchList()
+      // 翻页后滚动到列表顶部
+      this.$nextTick(() => {
+        const el = this.$refs.listTop
+        if (el && typeof el.scrollIntoView === 'function') {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        } else if (el) {
+          // jsdom 测试环境中 scrollIntoView 不可用，降级为 scrollTop
+          window.scrollTo({ top: el.offsetTop, behavior: 'smooth' })
+        }
+      })
     },
 
     /** 格式化收藏时间 */
@@ -273,6 +300,35 @@ export default {
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: #f5f5f5;
+}
+
+/* 已删除食谱占位封面 */
+.recipe-card__cover--deleted {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+  cursor: default;
+}
+
+.recipe-card__deleted-icon {
+  font-size: 48px;
+  opacity: 0.4;
+  margin-bottom: 8px;
+}
+
+.recipe-card__deleted-badge {
+  font-size: 12px;
+  color: #999;
+  background: #e0e0e0;
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+
+.recipe-card__title--deleted {
+  color: #bbb;
+  font-style: italic;
 }
 
 .recipe-card__cover img {
@@ -433,5 +489,75 @@ export default {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── 移动端响应式（375px 宽度）── */
+@media (max-width: 480px) {
+  .favorite-list {
+    padding: 16px 12px;
+  }
+
+  .favorite-list__title {
+    font-size: 18px;
+  }
+
+  .favorite-list__count {
+    font-size: 12px;
+  }
+
+  .favorite-list__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .recipe-card__info {
+    padding: 10px 12px 12px;
+  }
+
+  .recipe-card__title {
+    font-size: 15px;
+  }
+
+  .recipe-card__author {
+    font-size: 12px;
+  }
+
+  .recipe-card__date {
+    font-size: 11px;
+  }
+
+  .recipe-card__unfav {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    top: 8px;
+    right: 8px;
+  }
+
+  .favorite-list__pagination {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pagination-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .pagination-info {
+    font-size: 13px;
+  }
+
+  .favorite-list__empty {
+    padding: 40px 0;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+  }
+
+  .empty-text {
+    font-size: 16px;
+  }
 }
 </style>

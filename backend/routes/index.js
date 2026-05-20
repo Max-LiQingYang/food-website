@@ -27,5 +27,6 @@ router.get('/', favoriteRoutes.getFavorites)
 router.post('/', favoriteRoutes.addFavorite)
 router.delete('/:recipeId', favoriteRoutes.removeFavorite)
 router.get('/:recipeId/status', favoriteRoutes.getFavoriteStatus)
+router.get('/:recipeId/count', favoriteRoutes.getFavoriteCount)
 
 module.exports = router

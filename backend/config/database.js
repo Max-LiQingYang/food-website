@@ -33,7 +33,7 @@ const dbConfig = {
 if (dialect === 'sqlite') {
   const path = require('path')
   const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'database.sqlite')
-  // eslint-disable-next-line no-new
+   
   new Sequelize({
     ...dbConfig,
     storage: dbPath,
@@ -43,7 +43,7 @@ if (dialect === 'sqlite') {
 
 // ── MySQL ────────────────────────────────────────────────────
 if (dialect === 'mysql') {
-  // eslint-disable-next-line no-new
+   
   new Sequelize({
     ...dbConfig,
     host: process.env.DB_HOST || 'localhost',
@@ -58,7 +58,7 @@ if (dialect === 'mysql') {
 
 // ── PostgreSQL ───────────────────────────────────────────────
 if (dialect === 'postgres' || dialect === 'postgresql') {
-  // eslint-disable-next-line no-new
+   
   new Sequelize({
     ...dbConfig,
     host: process.env.DB_HOST || 'localhost',

@@ -31,7 +31,22 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const message = error.response?.data?.message || error.message || '网络异常，请稍后重试'
+    let message
+
+    if (!error.response) {
+      // 网络异常（断网、超时、DNS 解析失败等）
+      if (error.code === 'ECONNABORTED') {
+        message = '请求超时，请检查网络后重试'
+      } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+        message = '网络连接失败，请检查网络设置'
+      } else {
+        message = '网络异常，请稍后重试'
+      }
+    } else {
+      // 服务端错误
+      message = error.response?.data?.message || `请求失败 (${error.response.status})`
+    }
+
     console.error('[API Error]', message)
     return Promise.reject(new Error(message))
   }

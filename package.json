@@ -18,12 +18,24 @@
     "test:backend": "npm run test:backend --workspace=tests",
     "test:frontend": "npm run test:frontend --workspace=tests",
     "test:coverage": "npm run test:coverage --workspace=tests",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@eslint/js": "^10.0.1",
+    "babel-plugin-import-meta": "^0.0.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.9.1",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3",
+    "vue-eslint-parser": "^10.4.0"
   }
 }

@@ -74,6 +74,22 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 
 // ─────────────────────────────────────────────────────────────────
+// 4.5 请求耗时日志中间件
+// 记录每个请求的方法、路径、状态码和响应时间
+// ─────────────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  const start = Date.now()
+  res.on('finish', () => {
+    const duration = Date.now() - start
+    const timestamp = new Date().toISOString()
+    console.log(
+      `[${timestamp}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`
+    )
+  })
+  next()
+})
+
+// ─────────────────────────────────────────────────────────────────
 // 5. 健康检查端点
 // ─────────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
@@ -84,6 +100,10 @@ app.get('/health', (req, res) => {
 // 6. 路由（API 入口统一前缀 /api）
 // ─────────────────────────────────────────────────────────────────
 app.use('/api/favorites', require('./routes'))
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' })
+})
 
 // ─────────────────────────────────────────────────────────────────
 // 7. 404（路由未匹配）

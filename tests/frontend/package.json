@@ -16,25 +16,27 @@
     "vue": "^3.4.21"
   },
   "jest": {
-    "preset": "@vue/vue3-jest",
+    "rootDir": "../..",
     "testEnvironment": "jsdom",
+    "testMatch": ["**/tests/frontend/**/*.test.js"],
     "moduleFileExtensions": ["js", "json", "vue"],
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/$1",
-      "\\.api\\.js$": "<rootDir>/__mocks__/api.js"
+      "^@/(.*)$": "<rootDir>/frontend/$1",
+      "^frontend/(.*)$": "<rootDir>/frontend/$1",
+      "\\.(css|less|scss|sass)$": "<rootDir>/tests/frontend/__mocks__/styleMock.js"
     },
     "transform": {
-      "^.+\\.vue$": "@vue/vue3-jest",
-      "^.+\\.js$": "babel-jest"
+      "^.+\\.vue$": "<rootDir>/tests/frontend/vue-transform-wrapper.js",
+      "^.+\\.js$": "<rootDir>/tests/frontend/js-transform-wrapper.js"
     },
-    "setupFilesAfterFramework": ["<rootDir>/jest.setup.js"],
+    "setupFilesAfterEnv": ["<rootDir>/tests/frontend/jest.setup.js"],
     "collectCoverageFrom": [
-      "**/*.vue",
-      "**/*.js",
+      "frontend/components/**/*.vue",
+      "frontend/pages/**/*.vue",
       "!**/node_modules/**",
       "!**/coverage/**"
     ],
-    "coverageDirectory": "coverage",
+    "coverageDirectory": "tests/frontend/coverage",
     "verbose": true
   }
 }

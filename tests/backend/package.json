@@ -17,15 +17,16 @@
     "supertest": "^6.3.4"
   },
   "jest": {
+    "rootDir": "../..",
     "testEnvironment": "node",
-    "setupFilesAfterFramework": [],
-    "testMatch": ["**/__tests__/**/*.test.js", "**/*.test.js"],
+    "setupFilesAfterEnv": [],
+    "testMatch": ["**/tests/backend/**/*.test.js"],
     "collectCoverageFrom": [
-      "index.js",
-      "routes/**/*.js",
-      "services/**/*.js"
+      "backend/**/*.js",
+      "!backend/node_modules/**"
     ],
-    "coverageDirectory": "coverage",
+    "coverageProvider": "v8",
+    "coverageDirectory": "tests/backend/coverage",
     "verbose": true
   }
 }

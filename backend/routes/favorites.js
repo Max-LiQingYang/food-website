@@ -115,9 +115,35 @@ async function getFavoriteStatus(req, res) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// GET /api/favorites/:recipeId/count — 获取食谱收藏总数
+// ─────────────────────────────────────────────────────────────────
+async function getFavoriteCount(req, res) {
+  try {
+    const { recipeId } = req.params
+
+    if (!recipeId) {
+      return res.status(400).json(resJSON(400, 'recipeId 不能为空', null))
+    }
+
+    const count = await favoriteService.countFavorites(recipeId)
+
+    return res.status(200).json(
+      resJSON(0, 'success', {
+        recipeId,
+        count
+      })
+    )
+  } catch (err) {
+    console.error('[GET /api/favorites/:recipeId/count] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+}
+
 module.exports = {
   getFavorites,
   addFavorite,
   removeFavorite,
-  getFavoriteStatus
+  getFavoriteStatus,
+  getFavoriteCount
 }

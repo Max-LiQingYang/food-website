@@ -36,7 +36,7 @@ function auth(req, res, next) {
 
   try {
     // jsonwebtoken 延迟 require（package.json 已声明依赖）
-    // eslint-disable-next-line global-require
+     
     const jwt = require('jsonwebtoken')
 
     const secret = process.env.JWT_SECRET

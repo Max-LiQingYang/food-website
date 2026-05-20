@@ -36,4 +36,4 @@ EXPOSE ${PORT}
 ENTRYPOINT ["dumb-init", "--"]
 
 # 启动命令
-CMD ["node", "index.js"]
+CMD ["node", "server.js"]

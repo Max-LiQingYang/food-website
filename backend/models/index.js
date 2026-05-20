@@ -28,7 +28,7 @@ const modelFiles = fs.readdirSync(__dirname).filter(
 )
 
 for (const file of modelFiles) {
-  // eslint-disable-next-line global-require, import/no-dynamic-require
+  // eslint-disable-next-line import/no-dynamic-require
   const defineModel = require(path.join(__dirname, file))
   const model = defineModel(sequelize, Sequelize.DataTypes)
   const modelName = model.name // e.g. 'Favorite', 'Recipe', 'User'

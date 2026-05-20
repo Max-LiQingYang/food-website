@@ -74,17 +74,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
-            tests/package-lock.json
+          cache-dependency-path: ./package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
 
       # ── 后端测试（独立环境：SQLite 内存数据库）──────────
       - name: Backend tests
-        run: |
-          cd tests
-          npm ci
-          npm run test:backend
+        run: npm run test:backend
         env:
           NODE_ENV: test
           DB_DIALECT: sqlite
@@ -92,10 +89,7 @@ jobs:
 
       # ── 前端测试（jsdom 环境）─────────────────────────────
       - name: Frontend tests
-        run: |
-          cd tests
-          npm ci
-          npm run test:frontend
+        run: npm run test:frontend
         env:
           NODE_ENV: test
           VITE_API_BASE_URL: http://localhost:3001
@@ -148,7 +142,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
-          dockerfile: ../Dockerfile.frontend
+          dockerfile: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -197,7 +191,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./backend
-          dockerfile: ../Dockerfile.backend
+          dockerfile: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
