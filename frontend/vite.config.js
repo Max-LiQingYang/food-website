@@ -5,8 +5,8 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   plugins: [vue()],
 
-  // 相对基础路径，支持部署在任意子路径
-  base: './',
+  // 部署在根路径，使用绝对路径 base
+  base: '/',
 
   resolve: {
     alias: {
