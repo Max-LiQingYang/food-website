@@ -7,7 +7,7 @@ WORKDIR /app
 
 # 安装依赖（利用 Docker 缓存）
 COPY package.json package-lock.json* ./
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # 复制源码（排除 node_modules）
 COPY . .
