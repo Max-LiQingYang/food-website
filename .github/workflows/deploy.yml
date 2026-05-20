@@ -25,6 +25,10 @@ env:
   IMAGE_NAME_FRONTEND: ${{ github.repository_owner }}/${{ github.event.repository.name }}-frontend
   NODE_VERSION: 18
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
 
   # ───────────────────────────────────────────────────────────
