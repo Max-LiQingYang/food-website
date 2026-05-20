@@ -228,6 +228,9 @@ jobs:
             BACKEND_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest"
             FRONTEND_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest"
 
+            echo "=== 登录 ghcr.io ==="
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
             echo "=== 拉取最新镜像 ==="
             docker pull $BACKEND_IMAGE
             docker pull $FRONTEND_IMAGE
