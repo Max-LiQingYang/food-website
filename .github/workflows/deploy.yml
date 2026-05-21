@@ -221,6 +221,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 5m
           envs: IMAGE_NAME_BACKEND,IMAGE_NAME_FRONTEND,REGISTRY
           script: |
             set -e
