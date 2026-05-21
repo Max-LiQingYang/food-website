@@ -90,9 +90,9 @@ jobs:
           DB_DIALECT: sqlite
           DB_STORAGE: ':memory:'
 
-      # ── 前端测试（jsdom 环境）─────────────────────────────
+      # ── 前端测试（Vitest + React Testing Library）─────────────────
       - name: Frontend tests
-        run: npm run test:frontend
+        run: npm run test --workspace=frontend
         env:
           NODE_ENV: test
           VITE_API_BASE_URL: http://localhost:3001
