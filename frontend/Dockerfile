@@ -17,7 +17,7 @@ COPY . .
 ARG VITE_API_BASE_URL=https://api.example.com
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-RUN npm run build
+RUN npx vite build
 
 # ─────────────────────────────────────────────────────────────
 # Stage 2: Production — Nginx 托管静态资源 + 反向代理 API
