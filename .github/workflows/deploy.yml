@@ -92,7 +92,7 @@ jobs:
 
       # ── 前端测试（Vitest + React Testing Library）─────────────────
       - name: Frontend tests
-        run: npm run test --workspace=frontend
+        run: npm run --workspace=frontend test
         env:
           NODE_ENV: test
           VITE_API_BASE_URL: http://localhost:3001
