@@ -99,7 +99,7 @@ app.get('/health', (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 // 6. 路由（API 入口统一前缀 /api）
 // ─────────────────────────────────────────────────────────────────
-app.use('/api/favorites', require('./routes'))
+app.use('/api', require('./routes'))
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' })

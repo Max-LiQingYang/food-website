@@ -5,6 +5,22 @@
   padding: 0;
 }
 
+:root {
+  --color-primary: #ff4d4f;
+  --color-primary-light: #ff7875;
+  --color-primary-bg: #fff1f0;
+  --color-bg: #fafafa;
+  --color-white: #ffffff;
+  --color-text: #1a1a1a;
+  --color-text-secondary: #666;
+  --color-text-muted: #999;
+  --color-border: #d9d9d9;
+  --font-size-title: 24px;
+  --font-size-body: 16px;
+  --font-size-small: 14px;
+  --spacing-unit: 8px;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #1a1a1a;
@@ -31,7 +47,11 @@ body {
   white-space: nowrap;
 }
 
-.qclaw-toast--success { background: #52c41a; }
+/* auth loading */
+.auth-loading {
+  min-height: 100vh;
+  background: #fafafa;
+}
 .qclaw-toast--error   { background: #ff4d4f; }
 .qclaw-toast--warning { background: #faad14; color: #1a1a1a; }
 .qclaw-toast--info    { background: #1890ff; }

@@ -1,0 +1,354 @@
+.detail-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  min-height: calc(100vh - 56px);
+}
+
+.detail-container {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ── 返回按钮 ── */
+.detail-back {
+  display: inline-block;
+  margin: 16px;
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid #d9d9d9;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail-back:hover {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+}
+
+/* ── 封面图 ── */
+.detail-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.detail-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-cover__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 80px;
+  background: linear-gradient(135deg, #fce4ec 0%, #f8e8e0 100%);
+  color: rgba(0, 0, 0, 0.12);
+}
+
+/* ── 收藏按钮 ── */
+.detail-fav-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.detail-fav-btn:hover:not(:disabled) {
+  background: #fff;
+  transform: scale(1.05);
+}
+
+.detail-fav-btn.is-favorited {
+  color: #ff4d4f;
+}
+
+.detail-fav-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── 基本信息 ── */
+.detail-header {
+  padding: 24px 24px 0;
+}
+
+.detail-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+.detail-author {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 16px;
+}
+
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.detail-tag {
+  padding: 4px 12px;
+  background: #fff1f0;
+  color: #ff4d4f;
+  font-size: 13px;
+  border-radius: 14px;
+  font-weight: 500;
+}
+
+.detail-desc {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+  margin: 0 0 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* ── 区块 ── */
+.detail-section {
+  padding: 0 24px 24px;
+}
+
+.detail-section__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #ff4d4f;
+  display: inline-block;
+}
+
+/* ── 食材列表 ── */
+.detail-ingredients {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detail-ingredient {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed #f0f0f0;
+  gap: 12px;
+}
+
+.detail-ingredient:last-child {
+  border-bottom: none;
+}
+
+.ingredient-name {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.ingredient-divider {
+  flex: 1;
+  height: 1px;
+  border-bottom: 1px dotted #e0e0e0;
+}
+
+.ingredient-amount {
+  font-size: 14px;
+  color: #999;
+  flex-shrink: 0;
+}
+
+/* ── 步骤列表 ── */
+.detail-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-step {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-content {
+  flex: 1;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #333;
+  margin: 4px 0 0;
+  min-width: 200px;
+}
+
+.step-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+/* ── 404 ── */
+.detail-notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px;
+  gap: 12px;
+}
+
+.detail-notfound__icon {
+  font-size: 64px;
+  margin-bottom: 8px;
+}
+
+.detail-notfound h2 {
+  font-size: 22px;
+  color: #333;
+  margin: 0;
+}
+
+.detail-notfound p {
+  font-size: 14px;
+  color: #999;
+  margin: 0 0 16px;
+}
+
+/* ── 骨架屏 ── */
+.skeleton-box {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+
+.skeleton-heading {
+  height: 28px;
+  width: 60%;
+  margin-bottom: 16px;
+}
+
+.skeleton-line {
+  height: 16px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.skeleton-line.short {
+  width: 50%;
+}
+
+.skeleton-cover {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+}
+
+.skeleton-body {
+  padding: 24px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── 通用按钮 ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn--primary {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: #ff7875;
+}
+
+/* ── 移动端 ── */
+@media (max-width: 480px) {
+  .detail-page {
+    padding: 0 0 32px;
+  }
+
+  .detail-container {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .detail-header {
+    padding: 20px 16px 0;
+  }
+
+  .detail-title {
+    font-size: 20px;
+  }
+
+  .detail-section {
+    padding: 0 16px 20px;
+  }
+
+  .detail-step {
+    padding: 12px;
+  }
+
+  .detail-back {
+    margin: 12px;
+  }
+}

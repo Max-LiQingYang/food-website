@@ -1,4 +1,4 @@
-.home-page {
+.search-page {
   max-width: 960px;
   margin: 0 auto;
   padding: 24px 16px 48px;
@@ -6,13 +6,13 @@
 }
 
 /* ── 搜索栏 ── */
-.home-search {
+.search-bar {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
 }
 
-.home-search__input {
+.search-input {
   flex: 1;
   padding: 10px 16px;
   border: 1px solid #d9d9d9;
@@ -23,12 +23,12 @@
   transition: border-color 0.2s;
 }
 
-.home-search__input:focus {
+.search-input:focus {
   border-color: #ff4d4f;
   box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
 }
 
-.home-search__btn {
+.search-btn {
   padding: 10px 24px;
   background: #ff4d4f;
   color: #fff;
@@ -40,90 +40,26 @@
   transition: background 0.2s;
 }
 
-.home-search__btn:hover {
+.search-btn:hover {
   background: #ff7875;
 }
 
-/* ── 分类标签 ── */
-.home-categories {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.home-category {
-  padding: 6px 18px;
-  border: 1px solid #d9d9d9;
-  border-radius: 20px;
-  background: #fff;
+/* ── 结果信息 ── */
+.search-result-info {
   font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+  color: #999;
+  margin: 0 0 20px;
 }
 
-.home-category:hover {
-  border-color: #ff4d4f;
-  color: #ff4d4f;
-}
-
-.home-category.active {
-  background: #ff4d4f;
-  border-color: #ff4d4f;
-  color: #fff;
-}
-
-/* ── 食谱网格 ── */
-.home-grid {
+/* ── 结果网格 ── */
+.search-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
 }
 
-/* ── 骨架屏 ── */
-.home-card-skeleton {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.skeleton-box {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 6px;
-}
-
-.skeleton-cover {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 0;
-}
-
-.skeleton-body {
-  padding: 12px 14px 14px;
-}
-
-.skeleton-title {
-  height: 18px;
-  width: 70%;
-  margin-bottom: 8px;
-}
-
-.skeleton-meta {
-  height: 14px;
-  width: 45%;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
 /* ── 空状态 ── */
-.home-empty {
+.search-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -131,26 +67,26 @@
   gap: 12px;
 }
 
-.home-empty__icon {
+.search-empty__icon {
   font-size: 64px;
   margin-bottom: 8px;
 }
 
-.home-empty__text {
+.search-empty__text {
   font-size: 18px;
   font-weight: 600;
   color: #333;
   margin: 0;
 }
 
-.home-empty__hint {
+.search-empty__hint {
   font-size: 14px;
   color: #999;
   margin: 0;
 }
 
 /* ── 分页 ── */
-.home-pagination {
+.search-pagination {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,31 +120,58 @@
   color: #666;
 }
 
-/* ── 移动端 ── */
+/* ── 骨架屏 ── */
+.skeleton-box {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.recipe-card--skeleton {
+  pointer-events: none;
+}
+
+.recipe-card--skeleton .recipe-card__cover {
+  aspect-ratio: 4 / 3;
+  border-radius: 12px 12px 0 0;
+}
+
+.recipe-card--skeleton .recipe-card__info {
+  padding: 12px 14px 14px;
+}
+
+.skeleton-box--title {
+  height: 18px;
+  width: 70%;
+  margin-bottom: 8px;
+}
+
+.skeleton-box--meta {
+  height: 14px;
+  width: 45%;
+}
+
 @media (max-width: 480px) {
-  .home-page {
+  .search-page {
     padding: 16px 12px 32px;
   }
 
-  .home-grid {
+  .search-grid {
     grid-template-columns: 1fr;
     gap: 14px;
   }
 
-  .home-categories {
-    gap: 6px;
-  }
-
-  .home-category {
-    padding: 5px 14px;
-    font-size: 13px;
-  }
-
-  .home-empty__icon {
+  .search-empty__icon {
     font-size: 48px;
   }
 
-  .home-empty__text {
+  .search-empty__text {
     font-size: 16px;
   }
 }

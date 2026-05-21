@@ -73,6 +73,15 @@ export interface Recipe {
   coverImage?: string
   author?: string
   cookTime?: number
+  description?: string
+  category?: string
+  difficulty?: string
+  servings?: number
+}
+
+export interface RecipeDetail extends Recipe {
+  ingredients?: Array<{name: string, amount: number, unit: string}>
+  steps?: Array<{stepNumber: number, content: string, image?: string}>
 }
 
 export interface FavoriteListResponse {
@@ -128,9 +137,71 @@ export function getFavoriteStatus(recipeId: string): Promise<FavoriteStatusRespo
   return apiClient.get(`/favorites/${recipeId}/status`)
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Auth API
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * 用户注册
+ * POST /api/auth/register
+ */
+export function register(data: {username: string; password: string; email?: string}) {
+  return apiClient.post('/auth/register', data)
+}
+
+/**
+ * 用户登录
+ * POST /api/auth/login
+ */
+export function login(data: {username: string; password: string}) {
+  return apiClient.post('/auth/login', data)
+}
+
+/**
+ * 获取当前用户信息
+ * GET /api/auth/me
+ */
+export function getMe() {
+  return apiClient.get('/auth/me')
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Recipes API
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * 获取食谱列表（分页、分类）
+ * GET /api/recipes?page=1&pageSize=20&category=中餐
+ */
+export function getRecipes(params: {page?: number; pageSize?: number; category?: string}) {
+  return apiClient.get('/recipes', { params: { page: 1, pageSize: 20, ...params } })
+}
+
+/**
+ * 获取食谱详情
+ * GET /api/recipes/:id
+ */
+export function getRecipeById(id: string) {
+  return apiClient.get(`/recipes/${id}`)
+}
+
+/**
+ * 搜索食谱
+ * GET /api/recipes/search?q=关键词&page=1&pageSize=20
+ */
+export function searchRecipes(params: {q: string; page?: number; pageSize?: number}) {
+  return apiClient.get('/recipes/search', { params: { page: 1, pageSize: 20, ...params } })
+}
+
 export default {
   addFavorite,
   removeFavorite,
   getFavoriteList,
-  getFavoriteStatus
+  getFavoriteStatus,
+  register,
+  login,
+  getMe,
+  getRecipes,
+  getRecipeById,
+  searchRecipes,
 }

@@ -5,28 +5,29 @@
  * 路由总入口
  *
  * 职责：
- *   - 统一挂载 auth 中间件（JWT 认证）
- *   - 挂载 favorites 路由
- *   - 导出合并后的 router
+ *   - 挂载 auth 路由（/api/auth）    → 无需认证
+ *   - 挂载 recipes 路由（/api/recipes） → 无需认证
+ *   - 挂载 favorites 路由（/api/favorites） → 需认证
  */
 
 const express = require('express')
 const router = express.Router()
 
 const auth = require('../middleware/auth')
+const authRoutes = require('./auth')
+const recipeRoutes = require('./recipes')
 const favoriteRoutes = require('./favorites')
 
-/**
- * 所有 /api/favorites 路由先经过 JWT 认证
- * 认证通过后：req.userId 已由 auth 中间件注入
- */
-router.use(auth)
+// 不需要 auth 的路由
+router.use('/auth', authRoutes)
+router.use('/recipes', recipeRoutes)
 
-// 挂载收藏相关路由
-router.get('/', favoriteRoutes.getFavorites)
-router.post('/', favoriteRoutes.addFavorite)
-router.delete('/:recipeId', favoriteRoutes.removeFavorite)
-router.get('/:recipeId/status', favoriteRoutes.getFavoriteStatus)
-router.get('/:recipeId/count', favoriteRoutes.getFavoriteCount)
+// 需要 auth 的路由（favorites）
+router.use('/favorites', auth)
+router.get('/favorites', favoriteRoutes.getFavorites)
+router.post('/favorites', favoriteRoutes.addFavorite)
+router.delete('/favorites/:recipeId', favoriteRoutes.removeFavorite)
+router.get('/favorites/:recipeId/status', favoriteRoutes.getFavoriteStatus)
+router.get('/favorites/:recipeId/count', favoriteRoutes.getFavoriteCount)
 
 module.exports = router

@@ -37,10 +37,45 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: '烹饪时长（分钟）'
       },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '食谱简介'
+      },
+      category: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: '分类: chinese, western, dessert, japanese, korean, other'
+      },
+      ingredients: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '食材 JSON 数组: [{name, amount, unit}]'
+      },
+      steps: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '步骤 JSON 数组: [{stepNumber, content, image?}]'
+      },
+      servings: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: '份数'
+      },
+      difficulty: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: '难度: easy, medium, hard'
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
         comment: '创建时间'
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        comment: '更新时间'
       }
     },
     {
@@ -50,6 +85,10 @@ module.exports = (sequelize, DataTypes) => {
         {
           name: 'idx_recipe_title',
           fields: ['title']
+        },
+        {
+          name: 'idx_recipe_category',
+          fields: ['category']
         }
       ]
     }
