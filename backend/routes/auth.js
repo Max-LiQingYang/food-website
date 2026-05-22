@@ -63,7 +63,7 @@ router.post('/register', async (req, res) => {
       username,
       password: hashedPassword,
       email: email || null,
-      nickname: nickname || null
+      nickname: nickname || null,
     })
 
     // 生成 JWT
@@ -82,8 +82,8 @@ router.post('/register', async (req, res) => {
           email: user.email,
           nickname: user.nickname,
           role: user.role,
-          createdAt: user.createdAt
-        }
+          createdAt: user.createdAt,
+        },
       })
     )
   } catch (err) {
@@ -97,14 +97,17 @@ router.post('/register', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 router.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body
+    const { username, password, email } = req.body
 
-    if (!username || !password) {
+    // 兼容两个字段名：前端可能传 email 也可能传 username
+    const identifier = email || username
+
+    if (!identifier || !password) {
       return res.status(400).json(resJSON(400, '用户名和密码不能为空', null))
     }
 
     // 查找用户：支持用邮箱或用户名登录
-    const where = username.includes('@') ? { email: username } : { username }
+    const where = identifier.includes('@') ? { email: identifier } : { username: identifier }
     const user = await User.findOne({ where })
     if (!user) {
       return res.status(401).json(resJSON(4002, '用户名或密码错误', null))
@@ -132,8 +135,8 @@ router.post('/login', async (req, res) => {
           email: user.email,
           nickname: user.nickname,
           role: user.role,
-          createdAt: user.createdAt
-        }
+          createdAt: user.createdAt,
+        },
       })
     )
   } catch (err) {
@@ -148,7 +151,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findByPk(req.userId, {
-      attributes: ['id', 'username', 'email', 'nickname', 'role', 'createdAt']
+      attributes: ['id', 'username', 'email', 'nickname', 'role', 'createdAt'],
     })
 
     if (!user) {
@@ -162,7 +165,7 @@ router.get('/me', auth, async (req, res) => {
         email: user.email,
         nickname: user.nickname,
         role: user.role,
-        createdAt: user.createdAt
+        createdAt: user.createdAt,
       })
     )
   } catch (err) {

@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     setLoading(true)
     try {
-      const res: any = await loginApi({ username: username.trim(), password })
+      const res: any = await loginApi({ email: username.trim(), password })
       // 兼容两种响应格式：{data: {token, user}} 或 {token, user}
       const token = res.data?.token || res.token
       const user = res.data?.user || res.user || res
@@ -53,7 +53,12 @@ export default function LoginPage() {
 
     setLoading(true)
     try {
-      await registerApi({ username: username.trim(), password, email: email.trim() || undefined, nickname: nickname.trim() || undefined })
+      await registerApi({
+        username: username.trim(),
+        password,
+        email: email.trim() || undefined,
+        nickname: nickname.trim() || undefined,
+      })
       toast.success('注册成功，请登录')
       setMode('login')
       setEmail('')
@@ -72,21 +77,26 @@ export default function LoginPage() {
         <div className="login-tabs">
           <button
             className={`login-tab ${mode === 'login' ? 'active' : ''}`}
-            onClick={() => { setMode('login'); setEmail(''); setNickname(''); }}
+            onClick={() => {
+              setMode('login')
+              setEmail('')
+              setNickname('')
+            }}
           >
             登录
           </button>
           <button
             className={`login-tab ${mode === 'register' ? 'active' : ''}`}
-            onClick={() => { setMode('register'); setPassword(''); }}
+            onClick={() => {
+              setMode('register')
+              setPassword('')
+            }}
           >
             注册
           </button>
         </div>
 
-        <h2 className="login-card__title">
-          {mode === 'login' ? '欢迎回来' : '加入美食社区'}
-        </h2>
+        <h2 className="login-card__title">{mode === 'login' ? '欢迎回来' : '加入美食社区'}</h2>
         <p className="login-card__subtitle">
           {mode === 'login' ? '开始美食之旅' : '注册后即可收藏和分享食谱'}
         </p>
@@ -106,9 +116,7 @@ export default function LoginPage() {
           )}
 
           <div className="form-group">
-            <label htmlFor="username">
-              {mode === 'login' ? '用户名 / 邮箱' : '用户名'}
-            </label>
+            <label htmlFor="username">{mode === 'login' ? '用户名 / 邮箱' : '用户名'}</label>
             <input
               id="username"
               type="text"
@@ -145,25 +153,36 @@ export default function LoginPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="login-submit"
-            disabled={loading}
-          >
+          <button type="submit" className="login-submit" disabled={loading}>
             {loading ? '处理中...' : mode === 'login' ? '登录' : '注册'}
           </button>
         </form>
 
         <p className="login-card__footer">
           {mode === 'login' ? (
-            <>还没有账号？{' '}
-              <button className="login-link-btn" onClick={() => { setMode('register'); setPassword(''); }}>
+            <>
+              还没有账号？{' '}
+              <button
+                className="login-link-btn"
+                onClick={() => {
+                  setMode('register')
+                  setPassword('')
+                }}
+              >
                 立即注册
               </button>
             </>
           ) : (
-            <>已有账号？{' '}
-              <button className="login-link-btn" onClick={() => { setMode('login'); setEmail(''); setNickname(''); }}>
+            <>
+              已有账号？{' '}
+              <button
+                className="login-link-btn"
+                onClick={() => {
+                  setMode('login')
+                  setEmail('')
+                  setNickname('')
+                }}
+              >
                 去登录
               </button>
             </>

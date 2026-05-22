@@ -158,14 +158,13 @@ router.get('/recommend', async (req, res) => {
       return res.status(400).json(resJSON(400, '请输入有效的食材名称', null))
     }
 
-    // 1. 数据库模糊匹配
+    // 1. 数据库模糊匹配（OR 逻辑：匹配任意一种食材即可，按匹配数量排序）
     const dbRecipes = await Recipe.findAll({
       where: {
-        [Op.and]: inputList.map(name => ({
+        [Op.or]: inputList.map(name => ({
           ingredients: { [Op.like]: `%${name}%` },
         })),
       },
-      order: [['createdAt', 'DESC']],
       attributes: LIST_ATTRIBUTES.concat(['ingredients']),
     })
 
