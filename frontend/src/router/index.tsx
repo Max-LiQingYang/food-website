@@ -1,5 +1,6 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
+import Navbar from '../components/Navbar'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))
@@ -9,46 +10,27 @@ const SearchPage = lazy(() => import('../pages/SearchPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
+function Layout() {
+  return (
+    <>
+      <Navbar />
+      <Suspense fallback={<Fallback />}>
+        <Outlet />
+      </Suspense>
+    </>
+  )
+}
+
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: (
-      <Suspense fallback={<Fallback />}>
-        <HomePage />
-      </Suspense>
-    )
-  },
-  {
-    path: '/login',
-    element: (
-      <Suspense fallback={<Fallback />}>
-        <LoginPage />
-      </Suspense>
-    )
-  },
-  {
-    path: '/favorites',
-    element: (
-      <Suspense fallback={<Fallback />}>
-        <FavoriteList />
-      </Suspense>
-    )
-  },
-  {
-    path: '/recipe/:id',
-    element: (
-      <Suspense fallback={<Fallback />}>
-        <RecipeDetailPage />
-      </Suspense>
-    )
-  },
-  {
-    path: '/search',
-    element: (
-      <Suspense fallback={<Fallback />}>
-        <SearchPage />
-      </Suspense>
-    )
+    element: <Layout />,
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/favorites', element: <FavoriteList /> },
+      { path: '/recipe/:id', element: <RecipeDetailPage /> },
+      { path: '/search', element: <SearchPage /> },
+    ]
   }
 ])
 
