@@ -1,0 +1,299 @@
+[
+  {
+    "title": "东坡肉",
+    "description": "苏东坡传世名菜，五花肉慢炖至入口即化，色泽红亮，肥而不腻。",
+    "category": "chinese",
+    "difficulty": "hard",
+    "servings": 4,
+    "cookTime": 150,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/800000/white?text=东坡肉",
+    "ingredients": [
+      { "name": "五花肉", "amount": 500, "unit": "g" },
+      { "name": "绍兴黄酒", "amount": 200, "unit": "ml" },
+      { "name": "生抽", "amount": 3, "unit": "勺" },
+      { "name": "老抽", "amount": 2, "unit": "勺" },
+      { "name": "冰糖", "amount": 30, "unit": "g" },
+      { "name": "葱", "amount": 4, "unit": "根" },
+      { "name": "姜", "amount": 5, "unit": "片" },
+      { "name": "八角", "amount": 2, "unit": "个" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "五花肉切成5厘米方块，焯水去血沫" },
+      { "stepNumber": 2, "content": "砂锅底铺葱段和姜片" },
+      { "stepNumber": 3, "content": "五花肉皮朝下码入锅中" },
+      { "stepNumber": 4, "content": "倒入黄酒、生抽、老抽和冰糖" },
+      { "stepNumber": 5, "content": "大火烧开转小火炖2小时" },
+      { "stepNumber": 6, "content": "将肉翻面皮朝上，继续炖30分钟" },
+      { "stepNumber": 7, "content": "大火收汁，即可上桌" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "炖", "cuisine": "苏菜", "flavor": "咸鲜", "price": "中档" }
+  },
+  {
+    "title": "大盘鸡",
+    "description": "新疆硬菜代表，鸡肉土豆炖至酥烂，配宽面蘸汤汁，大口吃肉超过瘾。",
+    "category": "chinese",
+    "difficulty": "medium",
+    "servings": 4,
+    "cookTime": 50,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/B22222/white?text=大盘鸡",
+    "ingredients": [
+      { "name": "鸡腿", "amount": 4, "unit": "个" },
+      { "name": "土豆", "amount": 3, "unit": "个" },
+      { "name": "青椒", "amount": 2, "unit": "个" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "干辣椒", "amount": 5, "unit": "个" },
+      { "name": "八角", "amount": 2, "unit": "个" },
+      { "name": "郫县豆瓣酱", "amount": 2, "unit": "勺" },
+      { "name": "宽面", "amount": 200, "unit": "g" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鸡腿剁块焯水去血沫" },
+      { "stepNumber": 2, "content": "土豆去皮切滚刀块，青椒洋葱切块" },
+      { "stepNumber": 3, "content": "热锅冷油，下豆瓣酱炒出红油" },
+      { "stepNumber": 4, "content": "放入鸡块翻炒上色，加八角、干辣椒" },
+      { "stepNumber": 5, "content": "加水没过鸡块，大火烧开转小火炖20分钟" },
+      { "stepNumber": 6, "content": "放入土豆继续炖15分钟至软烂" },
+      { "stepNumber": 7, "content": "加入青椒和洋葱煮2分钟" },
+      { "stepNumber": 8, "content": "宽面煮熟捞出铺盘底，浇上大盘鸡" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "炖", "cuisine": "西北菜", "flavor": "香辣", "price": "普通家常" }
+  },
+  {
+    "title": "蚝油生菜",
+    "description": "三分钟快手菜，生菜脆嫩爽口，蚝油酱汁咸鲜回甘，简单健康。",
+    "category": "chinese",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 5,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/228B22/white?text=蚝油生菜",
+    "ingredients": [
+      { "name": "生菜", "amount": 2, "unit": "颗" },
+      { "name": "蒜", "amount": 3, "unit": "瓣" },
+      { "name": "蚝油", "amount": 2, "unit": "勺" },
+      { "name": "生抽", "amount": 1, "unit": "勺" },
+      { "name": "糖", "amount": 1, "unit": "茶匙" },
+      { "name": "食用油", "amount": 1, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "生菜洗净，蒜剁成蒜蓉" },
+      { "stepNumber": 2, "content": "锅中烧水，水开后加少许油和盐" },
+      { "stepNumber": 3, "content": "生菜焯水10秒捞出装盘" },
+      { "stepNumber": 4, "content": "调汁：蚝油、生抽、糖加少许水搅匀" },
+      { "stepNumber": 5, "content": "锅中放油，爆香蒜蓉，倒入酱汁煮至冒泡" },
+      { "stepNumber": 6, "content": "将酱汁浇在生菜上即可" }
+    ],
+    "categoryTags": { "ingredient": "蔬菜类", "method": "煮", "cuisine": "家常菜", "flavor": "咸鲜", "price": "经济实惠" }
+  },
+  {
+    "title": "东北乱炖",
+    "description": "东北豪爽代表菜，多种蔬菜和猪肉一锅炖，原汁原味，暖身暖胃。",
+    "category": "chinese",
+    "difficulty": "easy",
+    "servings": 4,
+    "cookTime": 30,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/8B6914/white?text=东北乱炖",
+    "ingredients": [
+      { "name": "五花肉", "amount": 200, "unit": "g" },
+      { "name": "土豆", "amount": 2, "unit": "个" },
+      { "name": "茄子", "amount": 1, "unit": "根" },
+      { "name": "豆角", "amount": 150, "unit": "g" },
+      { "name": "番茄", "amount": 2, "unit": "个" },
+      { "name": "青椒", "amount": 1, "unit": "个" },
+      { "name": "葱姜蒜", "amount": 15, "unit": "g" },
+      { "name": "生抽", "amount": 2, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "五花肉切片，土豆切块，茄子切块，豆角掰段" },
+      { "stepNumber": 2, "content": "热锅放油，下五花肉煸至出油" },
+      { "stepNumber": 3, "content": "加入葱姜蒜爆香，下番茄炒出汁" },
+      { "stepNumber": 4, "content": "放入土豆、豆角、茄子翻炒" },
+      { "stepNumber": 5, "content": "加热水没过菜，加生抽和盐" },
+      { "stepNumber": 6, "content": "大火烧开转小火炖20分钟" },
+      { "stepNumber": 7, "content": "加入青椒炖2分钟，大火收汁出锅" }
+    ],
+    "categoryTags": { "ingredient": "蔬菜类", "method": "炖", "cuisine": "东北菜", "flavor": "咸鲜", "price": "经济实惠" }
+  },
+  {
+    "title": "干煸四季豆",
+    "description": "川菜经典素菜，四季豆干煸至表皮起皱，配干辣椒和花椒，咸香微辣。",
+    "category": "chinese",
+    "difficulty": "medium",
+    "servings": 2,
+    "cookTime": 15,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/556B2F/white?text=干煸四季豆",
+    "ingredients": [
+      { "name": "四季豆", "amount": 300, "unit": "g" },
+      { "name": "猪肉末", "amount": 50, "unit": "g" },
+      { "name": "干辣椒", "amount": 5, "unit": "个" },
+      { "name": "花椒", "amount": 1, "unit": "茶匙" },
+      { "name": "蒜", "amount": 3, "unit": "瓣" },
+      { "name": "生抽", "amount": 1, "unit": "勺" },
+      { "name": "盐", "amount": 1, "unit": "茶匙" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "四季豆去筋掰段，沥干水分" },
+      { "stepNumber": 2, "content": "多油烧热，下四季豆炸至表面起皱捞出" },
+      { "stepNumber": 3, "content": "锅中留底油，下肉末炒至变色" },
+      { "stepNumber": 4, "content": "加干辣椒、花椒、蒜片爆香" },
+      { "stepNumber": 5, "content": "倒入四季豆翻炒，加生抽和盐调味" },
+      { "stepNumber": 6, "content": "翻炒均匀出锅" }
+    ],
+    "categoryTags": { "ingredient": "蔬菜类", "method": "炒", "cuisine": "川菜", "flavor": "麻辣", "price": "经济实惠" }
+  },
+  {
+    "title": "啤酒鸭",
+    "description": "啤酒炖鸭去腥增香，鸭肉酥烂入味，汤汁浓郁，佐酒下饭两相宜。",
+    "category": "chinese",
+    "difficulty": "medium",
+    "servings": 3,
+    "cookTime": 50,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/8B0000/white?text=啤酒鸭",
+    "ingredients": [
+      { "name": "鸭腿", "amount": 2, "unit": "只" },
+      { "name": "啤酒", "amount": 1, "unit": "罐" },
+      { "name": "姜", "amount": 4, "unit": "片" },
+      { "name": "蒜", "amount": 4, "unit": "瓣" },
+      { "name": "八角", "amount": 2, "unit": "个" },
+      { "name": "桂皮", "amount": 1, "unit": "块" },
+      { "name": "生抽", "amount": 2, "unit": "勺" },
+      { "name": "老抽", "amount": 1, "unit": "勺" },
+      { "name": "糖", "amount": 1, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鸭腿剁块，冷水下锅焯去血水" },
+      { "stepNumber": 2, "content": "捞出洗净沥干" },
+      { "stepNumber": 3, "content": "热锅放油，下鸭块煸至微黄出油" },
+      { "stepNumber": 4, "content": "加姜蒜八角桂皮炒香" },
+      { "stepNumber": 5, "content": "倒入整罐啤酒，加生抽老抽和糖" },
+      { "stepNumber": 6, "content": "大火烧开转小火炖30分钟至鸭肉酥烂" },
+      { "stepNumber": 7, "content": "大火收汁即可" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "炖", "cuisine": "家常菜", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "鱼头豆腐汤",
+    "description": "奶白浓郁的鱼汤，鱼肉鲜嫩豆腐滑嫩，暖胃又营养，是秋冬季节的暖心汤品。",
+    "category": "chinese",
+    "difficulty": "medium",
+    "servings": 4,
+    "cookTime": 30,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/CCCCFF/white?text=鱼头豆腐汤",
+    "ingredients": [
+      { "name": "胖头鱼头", "amount": 1, "unit": "个" },
+      { "name": "豆腐", "amount": 1, "unit": "盒" },
+      { "name": "姜", "amount": 5, "unit": "片" },
+      { "name": "葱", "amount": 2, "unit": "根" },
+      { "name": "料酒", "amount": 2, "unit": "勺" },
+      { "name": "盐", "amount": 1, "unit": "茶匙" },
+      { "name": "白胡椒粉", "amount": 1, "unit": "茶匙" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鱼头对半切开，去腮洗净，用厨房纸吸干" },
+      { "stepNumber": 2, "content": "豆腐切块，姜切片，葱切段" },
+      { "stepNumber": 3, "content": "热锅冷油，下鱼头煎至两面微黄" },
+      { "stepNumber": 4, "content": "淋入料酒，加姜片和葱段" },
+      { "stepNumber": 5, "content": "倒入足量开水，大火煮10分钟至汤色奶白" },
+      { "stepNumber": 6, "content": "放入豆腐块，中火煮8分钟" },
+      { "stepNumber": 7, "content": "加盐和白胡椒粉调味，撒葱花出锅" }
+    ],
+    "categoryTags": { "ingredient": "海鲜类", "method": "煲汤", "cuisine": "家常菜", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "麻酱凉面",
+    "description": "夏日消暑利器，芝麻酱浓香裹住劲道面条，黄瓜丝清脆爽口，简单一拌就开胃。",
+    "category": "chinese",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 15,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/DAA520/white?text=麻酱凉面",
+    "ingredients": [
+      { "name": "面条", "amount": 200, "unit": "g" },
+      { "name": "芝麻酱", "amount": 3, "unit": "勺" },
+      { "name": "黄瓜", "amount": 1, "unit": "根" },
+      { "name": "蒜", "amount": 3, "unit": "瓣" },
+      { "name": "醋", "amount": 2, "unit": "勺" },
+      { "name": "生抽", "amount": 2, "unit": "勺" },
+      { "name": "芝麻油", "amount": 1, "unit": "勺" },
+      { "name": "辣椒油", "amount": 1, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "芝麻酱用温水慢慢调开，加生抽、醋、蒜末搅匀" },
+      { "stepNumber": 2, "content": "黄瓜切细丝，蒜捣成泥" },
+      { "stepNumber": 3, "content": "面条煮熟捞出，过凉水沥干" },
+      { "stepNumber": 4, "content": "面条加少许芝麻油拌匀防粘连" },
+      { "stepNumber": 5, "content": "面条盛碗，放黄瓜丝，淋上调好的麻酱" },
+      { "stepNumber": 6, "content": "加辣椒油拌匀食用" }
+    ],
+    "categoryTags": { "ingredient": "主食类", "method": "凉拌", "cuisine": "家常菜", "flavor": "咸鲜", "price": "经济实惠" }
+  },
+  {
+    "title": "红烧牛腩",
+    "description": "牛腩炖至酥烂入味，萝卜吸满肉汁，是冬日暖身的硬菜首选。",
+    "category": "chinese",
+    "difficulty": "hard",
+    "servings": 4,
+    "cookTime": 120,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/CD5C5C/white?text=红烧牛腩",
+    "ingredients": [
+      { "name": "牛腩", "amount": 500, "unit": "g" },
+      { "name": "白萝卜", "amount": 1, "unit": "根" },
+      { "name": "姜", "amount": 5, "unit": "片" },
+      { "name": "葱", "amount": 3, "unit": "根" },
+      { "name": "八角", "amount": 3, "unit": "个" },
+      { "name": "桂皮", "amount": 1, "unit": "块" },
+      { "name": "生抽", "amount": 3, "unit": "勺" },
+      { "name": "老抽", "amount": 1, "unit": "勺" },
+      { "name": "料酒", "amount": 2, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "牛腩切3厘米块，冷水泡30分钟去血水" },
+      { "stepNumber": 2, "content": "冷水下锅焯水，捞出洗净" },
+      { "stepNumber": 3, "content": "热锅放油，下牛腩煸至表面微黄" },
+      { "stepNumber": 4, "content": "加姜片、葱段、八角、桂皮炒香" },
+      { "stepNumber": 5, "content": "加料酒、生抽、老抽翻炒上色" },
+      { "stepNumber": 6, "content": "加热水没过牛腩，大火烧开转小火炖1.5小时" },
+      { "stepNumber": 7, "content": "白萝卜切滚刀块，放入锅中继续炖20分钟" },
+      { "stepNumber": 8, "content": "大火收汁出锅" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "炖", "cuisine": "家常菜", "flavor": "咸鲜", "price": "中档" }
+  },
+  {
+    "title": "扬州炒饭",
+    "description": "淮扬名点，米饭粒粒分明，配料丰富色彩缤纷，看似简单实则考验功力。",
+    "category": "chinese",
+    "difficulty": "medium",
+    "servings": 2,
+    "cookTime": 15,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/F5DEB3/white?text=扬州炒饭",
+    "ingredients": [
+      { "name": "米饭", "amount": 2, "unit": "碗" },
+      { "name": "鸡蛋", "amount": 2, "unit": "个" },
+      { "name": "虾仁", "amount": 50, "unit": "g" },
+      { "name": "火腿", "amount": 30, "unit": "g" },
+      { "name": "青豆", "amount": 30, "unit": "g" },
+      { "name": "玉米粒", "amount": 30, "unit": "g" },
+      { "name": "葱", "amount": 1, "unit": "根" },
+      { "name": "盐", "amount": 1, "unit": "茶匙" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鸡蛋打散，虾仁切丁，火腿切丁" },
+      { "stepNumber": 2, "content": "青豆和玉米粒焯水沥干" },
+      { "stepNumber": 3, "content": "热锅多油，倒入蛋液快速搅散" },
+      { "stepNumber": 4, "content": "加入虾仁丁和火腿丁翻炒" },
+      { "stepNumber": 5, "content": "倒入米饭大火翻炒，用锅铲打散" },
+      { "stepNumber": 6, "content": "加入青豆玉米粒，加盐调味" },
+      { "stepNumber": 7, "content": "翻炒均匀，撒葱花出锅" }
+    ],
+    "categoryTags": { "ingredient": "主食类", "method": "炒", "cuisine": "苏菜", "flavor": "咸鲜", "price": "普通家常" }
+  }
+]

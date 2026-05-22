@@ -1,0 +1,290 @@
+[
+  {
+    "title": "韩式泡菜炒五花肉",
+    "description": "韩国经典家常菜，辣白菜与五花肉同炒，酸辣咸香，是韩式餐桌的常驻选手。",
+    "category": "korean",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 12,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FF4500/white?text=泡菜炒五花肉",
+    "ingredients": [
+      { "name": "五花肉", "amount": 200, "unit": "g" },
+      { "name": "韩式泡菜", "amount": 200, "unit": "g" },
+      { "name": "洋葱", "amount": 0.5, "unit": "个" },
+      { "name": "葱", "amount": 1, "unit": "根" },
+      { "name": "韩式辣酱", "amount": 1, "unit": "勺" },
+      { "name": "糖", "amount": 1, "unit": "茶匙" },
+      { "name": "芝麻油", "amount": 1, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "五花肉切薄片，泡菜切段，洋葱切丝" },
+      { "stepNumber": 2, "content": "热锅不放油，下五花肉煸至出油金黄" },
+      { "stepNumber": 3, "content": "加入洋葱丝炒至透明" },
+      { "stepNumber": 4, "content": "加入泡菜大火翻炒" },
+      { "stepNumber": 5, "content": "加辣酱和糖调味" },
+      { "stepNumber": 6, "content": "淋芝麻油，撒葱段翻匀出锅" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "炒", "cuisine": "韩料", "flavor": "酸辣", "price": "普通家常" }
+  },
+  {
+    "title": "韩式炒年糕",
+    "description": "韩国街头小吃代表，年糕Q弹软糯，辣酱甜辣浓郁，鱼饼和蔬菜丰富口感。",
+    "category": "korean",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 15,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FF0000/white?text=韩式炒年糕",
+    "ingredients": [
+      { "name": "韩式年糕", "amount": 300, "unit": "g" },
+      { "name": "鱼饼", "amount": 100, "unit": "g" },
+      { "name": "洋葱", "amount": 0.5, "unit": "个" },
+      { "name": "大葱", "amount": 1, "unit": "根" },
+      { "name": "韩式辣酱", "amount": 2, "unit": "勺" },
+      { "name": "辣椒粉", "amount": 1, "unit": "勺" },
+      { "name": "糖", "amount": 1, "unit": "勺" },
+      { "name": "水", "amount": 200, "unit": "ml" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "年糕泡水10分钟，鱼饼切三角片，洋葱切丝，大葱斜切段" },
+      { "stepNumber": 2, "content": "锅中加水，下辣酱和辣椒粉搅匀煮开" },
+      { "stepNumber": 3, "content": "加糖调味，放入年糕中火煮5分钟" },
+      { "stepNumber": 4, "content": "加入鱼饼和洋葱丝煮3分钟" },
+      { "stepNumber": 5, "content": "汤汁收至浓稠时加入葱段" },
+      { "stepNumber": 6, "content": "翻炒均匀出锅" }
+    ],
+    "categoryTags": { "ingredient": "主食类", "method": "煮", "cuisine": "韩料", "flavor": "甜辣", "price": "经济实惠" }
+  },
+  {
+    "title": "韩式烤五花肉",
+    "description": "韩国烤肉经典，五花肉烤至焦香，蘸酱包生菜，肥而不腻，聚会必备。",
+    "category": "korean",
+    "difficulty": "easy",
+    "servings": 3,
+    "cookTime": 20,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/DC143C/white?text=韩式烤五花肉",
+    "ingredients": [
+      { "name": "五花肉", "amount": 400, "unit": "g" },
+      { "name": "生菜", "amount": 1, "unit": "颗" },
+      { "name": "蒜", "amount": 5, "unit": "瓣" },
+      { "name": "韩式辣酱", "amount": 2, "unit": "勺" },
+      { "name": "芝麻油", "amount": 2, "unit": "勺" },
+      { "name": "盐", "amount": 1, "unit": "茶匙" },
+      { "name": "黑胡椒", "amount": 1, "unit": "茶匙" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "五花肉切厚片约0.5厘米，用盐和黑胡椒腌制" },
+      { "stepNumber": 2, "content": "平底锅或烤盘烧热，不用放油" },
+      { "stepNumber": 3, "content": "放上五花肉片，中火烤至两面金黄微焦" },
+      { "stepNumber": 4, "content": "蒜切片，酱碟备好韩式辣酱和芝麻油" },
+      { "stepNumber": 5, "content": "生菜洗净沥干" },
+      { "stepNumber": 6, "content": "用生菜包肉，加蒜片和酱料食用" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "烤", "cuisine": "韩料", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "泰式绿咖喱鸡",
+    "description": "泰式经典咖喱，椰奶的醇厚与绿咖喱的清香微辣完美平衡，异域风味浓郁。",
+    "category": "thai",
+    "difficulty": "medium",
+    "servings": 3,
+    "cookTime": 25,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/228B22/white?text=泰式绿咖喱鸡",
+    "ingredients": [
+      { "name": "鸡胸肉", "amount": 300, "unit": "g" },
+      { "name": "椰奶", "amount": 400, "unit": "ml" },
+      { "name": "绿咖喱酱", "amount": 3, "unit": "勺" },
+      { "name": "茄子", "amount": 1, "unit": "根" },
+      { "name": "青椒", "amount": 1, "unit": "个" },
+      { "name": "泰式罗勒", "amount": 10, "unit": "g" },
+      { "name": "鱼露", "amount": 2, "unit": "勺" },
+      { "name": "糖", "amount": 1, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鸡胸肉切片，茄子切块，青椒切块" },
+      { "stepNumber": 2, "content": "锅中倒少许椰奶，加绿咖喱酱小火炒香" },
+      { "stepNumber": 3, "content": "倒入鸡肉翻炒至表面变色" },
+      { "stepNumber": 4, "content": "加入剩余椰奶煮开" },
+      { "stepNumber": 5, "content": "放入茄子煮至软烂" },
+      { "stepNumber": 6, "content": "加青椒、鱼露、糖调味" },
+      { "stepNumber": 7, "content": "关火前放入罗勒叶翻匀" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "炖", "cuisine": "东南亚菜", "flavor": "香辣", "price": "普通家常" }
+  },
+  {
+    "title": "泰式酸辣鸡爪",
+    "description": "泰式街头小吃，鸡爪Q弹，酸辣开胃，柠檬和鱼露的清香让人停不下嘴。",
+    "category": "thai",
+    "difficulty": "easy",
+    "servings": 4,
+    "cookTime": 30,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FFD700/white?text=泰式酸辣鸡爪",
+    "ingredients": [
+      { "name": "鸡爪", "amount": 500, "unit": "g" },
+      { "name": "青柠", "amount": 3, "unit": "个" },
+      { "name": "鱼露", "amount": 3, "unit": "勺" },
+      { "name": "小米椒", "amount": 5, "unit": "个" },
+      { "name": "蒜", "amount": 4, "unit": "瓣" },
+      { "name": "香菜", "amount": 10, "unit": "g" },
+      { "name": "糖", "amount": 1, "unit": "勺" },
+      { "name": "洋葱", "amount": 0.5, "unit": "个" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鸡爪剪去指甲，洗净" },
+      { "stepNumber": 2, "content": "冷水下锅加姜片料酒煮15分钟至熟" },
+      { "stepNumber": 3, "content": "捞出冲凉，放入冰水中浸泡10分钟" },
+      { "stepNumber": 4, "content": "调汁：青柠汁、鱼露、糖、蒜末、小米椒碎搅匀" },
+      { "stepNumber": 5, "content": "洋葱切丝放入大碗，倒入鸡爪和酱汁" },
+      { "stepNumber": 6, "content": "加香菜段拌匀，冷藏2小时以上入味" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "凉拌", "cuisine": "东南亚菜", "flavor": "酸辣", "price": "普通家常" }
+  },
+  {
+    "title": "印式咖喱角",
+    "description": "印度经典开胃小吃，酥脆外皮包裹土豆和香料内馅，搭配薄荷酱或甜辣酱。",
+    "category": "indian",
+    "difficulty": "hard",
+    "servings": 4,
+    "cookTime": 40,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/DAA520/white?text=印式咖喱角",
+    "ingredients": [
+      { "name": "饺子皮", "amount": 20, "unit": "张" },
+      { "name": "土豆", "amount": 3, "unit": "个" },
+      { "name": "豌豆", "amount": 50, "unit": "g" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "咖喱粉", "amount": 2, "unit": "勺" },
+      { "name": "孜然粒", "amount": 1, "unit": "茶匙" },
+      { "name": "姜", "amount": 10, "unit": "g" },
+      { "name": "食用油", "amount": 300, "unit": "ml" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "土豆煮熟压成泥" },
+      { "stepNumber": 2, "content": "锅中放油炒香孜然粒和洋葱碎，加咖喱粉炒香" },
+      { "stepNumber": 3, "content": "加入土豆泥和豌豆拌匀，加盐调味" },
+      { "stepNumber": 4, "content": "饺子皮一切两半，卷成锥形填入馅料" },
+      { "stepNumber": 5, "content": "封口捏紧" },
+      { "stepNumber": 6, "content": "油温170°C炸至金黄酥脆" }
+    ],
+    "categoryTags": { "ingredient": "主食类", "method": "炸", "cuisine": "东南亚菜", "flavor": "五香", "price": "经济实惠" }
+  },
+  {
+    "title": "班尼迪克蛋",
+    "description": "经典西式早午餐代表，英式松饼上放水波蛋和火腿，淋上丝滑荷兰酱。",
+    "category": "western",
+    "difficulty": "hard",
+    "servings": 2,
+    "cookTime": 20,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FFD700/white?text=班尼迪克蛋",
+    "ingredients": [
+      { "name": "鸡蛋", "amount": 2, "unit": "个" },
+      { "name": "英式松饼", "amount": 2, "unit": "个" },
+      { "name": "火腿片", "amount": 4, "unit": "片" },
+      { "name": "蛋黄", "amount": 3, "unit": "个" },
+      { "name": "黄油", "amount": 80, "unit": "g" },
+      { "name": "柠檬汁", "amount": 1, "unit": "勺" },
+      { "name": "白醋", "amount": 1, "unit": "勺" },
+      { "name": "盐", "amount": 1, "unit": "茶匙" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "制作荷兰酱：黄油融化，蛋黄加柠檬汁隔水搅打至浓稠，慢慢加入黄油" },
+      { "stepNumber": 2, "content": "松饼切半烤至微脆" },
+      { "stepNumber": 3, "content": "放上火腿片" },
+      { "stepNumber": 4, "content": "烧水加白醋，水开后搅出旋涡，打入鸡蛋煮2分钟至蛋白凝固" },
+      { "stepNumber": 5, "content": "水波蛋捞出放在火腿上" },
+      { "stepNumber": 6, "content": "淋上荷兰酱，撒少许盐和胡椒" }
+    ],
+    "categoryTags": { "ingredient": "蛋奶类", "method": "煮", "cuisine": "西餐", "flavor": "咸鲜", "price": "中档" }
+  },
+  {
+    "title": "越南牛肉河粉",
+    "description": "越南国民美食，清澈牛肉汤底搭配鲜嫩牛肉和弹牙河粉，加新鲜香草和青柠。",
+    "category": "vietnamese",
+    "difficulty": "hard",
+    "servings": 2,
+    "cookTime": 120,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/D2691E/white?text=越南牛肉河粉",
+    "ingredients": [
+      { "name": "河粉", "amount": 200, "unit": "g" },
+      { "name": "牛腱子", "amount": 300, "unit": "g" },
+      { "name": "牛骨", "amount": 300, "unit": "g" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "姜", "amount": 5, "unit": "片" },
+      { "name": "八角", "amount": 3, "unit": "个" },
+      { "name": "鱼露", "amount": 3, "unit": "勺" },
+      { "name": "青柠", "amount": 1, "unit": "个" },
+      { "name": "薄荷叶", "amount": 10, "unit": "g" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "牛骨牛腱焯水洗净" },
+      { "stepNumber": 2, "content": "洋葱和姜烤至表面焦黑" },
+      { "stepNumber": 3, "content": "大锅加水，放入牛骨牛腱、烤洋葱姜和八角，小火炖1.5小时" },
+      { "stepNumber": 4, "content": "取出牛腱切薄片，汤底加鱼露调味" },
+      { "stepNumber": 5, "content": "河粉用开水烫熟放入碗中" },
+      { "stepNumber": 6, "content": "铺上牛肉片，浇上滚烫的汤底" },
+      { "stepNumber": 7, "content": "挤青柠汁，加薄荷叶和豆芽食用" }
+    ],
+    "categoryTags": { "ingredient": "主食类", "method": "煲汤", "cuisine": "东南亚菜", "flavor": "清淡", "price": "普通家常" }
+  },
+  {
+    "title": "芒果糯米饭",
+    "description": "泰国经典甜品，椰奶浸润的糯米饭搭配新鲜芒果，香甜软糯，热带风情满满。",
+    "category": "thai",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 40,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FFD700/white?text=芒果糯米饭",
+    "ingredients": [
+      { "name": "糯米", "amount": 200, "unit": "g" },
+      { "name": "芒果", "amount": 1, "unit": "个" },
+      { "name": "椰奶", "amount": 150, "unit": "ml" },
+      { "name": "糖", "amount": 30, "unit": "g" },
+      { "name": "盐", "amount": 1, "unit": "撮" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "糯米提前浸泡4小时，蒸熟" },
+      { "stepNumber": 2, "content": "椰奶加糖和盐小火加热至糖融化" },
+      { "stepNumber": 3, "content": "将2/3椰奶倒入糯米饭中拌匀，焖15分钟吸收" },
+      { "stepNumber": 4, "content": "芒果去皮切片" },
+      { "stepNumber": 5, "content": "糯米饭盛盘，摆上芒果片" },
+      { "stepNumber": 6, "content": "淋上剩余椰奶即可" }
+    ],
+    "categoryTags": { "ingredient": "主食类", "method": "蒸", "cuisine": "东南亚菜", "flavor": "酸甜", "price": "普通家常" }
+  },
+  {
+    "title": "冬阴功汤",
+    "description": "酸辣鲜香的泰国国汤，椰奶的醇厚与柠檬草的清新完美平衡，开胃醒神。",
+    "category": "thai",
+    "difficulty": "medium",
+    "servings": 3,
+    "cookTime": 25,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FF6347/white?text=冬阴功汤",
+    "ingredients": [
+      { "name": "大虾", "amount": 200, "unit": "g" },
+      { "name": "椰奶", "amount": 200, "unit": "ml" },
+      { "name": "冬阴功酱", "amount": 2, "unit": "勺" },
+      { "name": "柠檬草", "amount": 2, "unit": "根" },
+      { "name": "青柠", "amount": 2, "unit": "个" },
+      { "name": "蘑菇", "amount": 100, "unit": "g" },
+      { "name": "鱼露", "amount": 2, "unit": "勺" },
+      { "name": "辣椒", "amount": 2, "unit": "个" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "柠檬草拍扁切段，蘑菇切片，虾去虾线" },
+      { "stepNumber": 2, "content": "锅中加水煮开，放入柠檬草和冬阴功酱" },
+      { "stepNumber": 3, "content": "煮5分钟出香味后加入椰奶" },
+      { "stepNumber": 4, "content": "放入蘑菇和虾，煮至虾变红" },
+      { "stepNumber": 5, "content": "加鱼露和青柠汁调味" },
+      { "stepNumber": 6, "content": "放辣椒装饰，趁热食用" }
+    ],
+    "categoryTags": { "ingredient": "海鲜类", "method": "煲汤", "cuisine": "东南亚菜", "flavor": "酸辣", "price": "中档" }
+  }
+]

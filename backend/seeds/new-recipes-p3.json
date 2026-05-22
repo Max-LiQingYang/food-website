@@ -1,0 +1,291 @@
+[
+  {
+    "title": "意大利肉酱面",
+    "description": "经典意式家常面，番茄肉酱浓郁，帕玛森芝士增香，是家庭西餐的首选。",
+    "category": "western",
+    "difficulty": "medium",
+    "servings": 3,
+    "cookTime": 35,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/DC143C/white?text=意式肉酱面",
+    "ingredients": [
+      { "name": "意大利面", "amount": 300, "unit": "g" },
+      { "name": "牛肉末", "amount": 200, "unit": "g" },
+      { "name": "番茄罐头", "amount": 1, "unit": "罐" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "胡萝卜", "amount": 1, "unit": "根" },
+      { "name": "芹菜", "amount": 1, "unit": "根" },
+      { "name": "蒜", "amount": 3, "unit": "瓣" },
+      { "name": "橄榄油", "amount": 3, "unit": "勺" },
+      { "name": "帕玛森芝士", "amount": 30, "unit": "g" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "洋葱、胡萝卜、芹菜切碎，蒜切末" },
+      { "stepNumber": 2, "content": "橄榄油入锅，炒香蒜末和洋葱碎" },
+      { "stepNumber": 3, "content": "加牛肉末炒至变色，加入胡萝卜和芹菜碎" },
+      { "stepNumber": 4, "content": "倒入番茄罐头，小火慢炖20分钟" },
+      { "stepNumber": 5, "content": "大锅水烧开加盐，下面煮至弹牙" },
+      { "stepNumber": 6, "content": "面捞出拌入肉酱，撒帕玛森芝士" }
+    ],
+    "categoryTags": { "ingredient": "主食类", "method": "煮", "cuisine": "西餐", "flavor": "酸甜", "price": "普通家常" }
+  },
+  {
+    "title": "罗宋汤",
+    "description": "俄式经典浓汤，牛肉与蔬菜长时间炖煮，酸甜浓郁，寒冬暖身首选。",
+    "category": "western",
+    "difficulty": "medium",
+    "servings": 4,
+    "cookTime": 60,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FF6347/white?text=罗宋汤",
+    "ingredients": [
+      { "name": "牛腩", "amount": 300, "unit": "g" },
+      { "name": "番茄", "amount": 3, "unit": "个" },
+      { "name": "土豆", "amount": 2, "unit": "个" },
+      { "name": "胡萝卜", "amount": 1, "unit": "根" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "卷心菜", "amount": 100, "unit": "g" },
+      { "name": "番茄酱", "amount": 3, "unit": "勺" },
+      { "name": "黄油", "amount": 20, "unit": "g" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "牛腩切块焯水，加足量水炖40分钟" },
+      { "stepNumber": 2, "content": "番茄、土豆、胡萝卜切块，洋葱、卷心菜切丝" },
+      { "stepNumber": 3, "content": "黄油炒香洋葱，加番茄块和番茄酱炒软" },
+      { "stepNumber": 4, "content": "将炒好的蔬菜倒入牛肉汤中" },
+      { "stepNumber": 5, "content": "加入土豆和胡萝卜，中小火煮20分钟" },
+      { "stepNumber": 6, "content": "加卷心菜煮5分钟，盐和胡椒调味" },
+      { "stepNumber": 7, "content": "可加少许酸奶油或酸奶提味" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "煲汤", "cuisine": "西餐", "flavor": "酸甜", "price": "普通家常" }
+  },
+  {
+    "title": "法式洋葱汤",
+    "description": "法式经典浓汤，焦糖化洋葱的甜与牛肉汤的鲜融合，表面覆盖焗烤芝士。",
+    "category": "western",
+    "difficulty": "medium",
+    "servings": 2,
+    "cookTime": 50,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/D4A017/white?text=法式洋葱汤",
+    "ingredients": [
+      { "name": "洋葱", "amount": 4, "unit": "个" },
+      { "name": "黄油", "amount": 30, "unit": "g" },
+      { "name": "牛肉汤", "amount": 600, "unit": "ml" },
+      { "name": "法棍面包", "amount": 4, "unit": "片" },
+      { "name": "格鲁耶尔芝士", "amount": 80, "unit": "g" },
+      { "name": "白葡萄酒", "amount": 50, "unit": "ml" },
+      { "name": "百里香", "amount": 2, "unit": "枝" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "洋葱切薄丝" },
+      { "stepNumber": 2, "content": "黄油入锅融化，放入洋葱丝小火慢炒30分钟至焦糖色" },
+      { "stepNumber": 3, "content": "加入白葡萄酒收干" },
+      { "stepNumber": 4, "content": "倒入牛肉汤和百里香，小火煮15分钟" },
+      { "stepNumber": 5, "content": "汤盛入烤碗，放上面包片，铺上芝士丝" },
+      { "stepNumber": 6, "content": "入200°C烤箱烤5分钟至芝士金黄冒泡" }
+    ],
+    "categoryTags": { "ingredient": "蔬菜类", "method": "煲汤", "cuisine": "西餐", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "奶油培根意面",
+    "description": "简单又快手的经典意面，奶油酱汁裹着培根的咸香，每根面条都丝滑入味。",
+    "category": "western",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 15,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FFF8DC/white?text=奶油培根意面",
+    "ingredients": [
+      { "name": "意大利面", "amount": 200, "unit": "g" },
+      { "name": "培根", "amount": 100, "unit": "g" },
+      { "name": "淡奶油", "amount": 150, "unit": "ml" },
+      { "name": "蛋黄", "amount": 1, "unit": "个" },
+      { "name": "帕玛森芝士", "amount": 30, "unit": "g" },
+      { "name": "黑胡椒", "amount": 1, "unit": "茶匙" },
+      { "name": "蒜", "amount": 2, "unit": "瓣" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "培根切小条，蒜切片" },
+      { "stepNumber": 2, "content": "大锅烧水加盐，下意面煮至弹牙" },
+      { "stepNumber": 3, "content": "平底锅不放油，下培根煎至焦脆" },
+      { "stepNumber": 4, "content": "加蒜片炒香，倒入淡奶油煮微沸" },
+      { "stepNumber": 5, "content": "蛋黄打散加帕玛森碎，关火后倒入奶油酱快速搅匀" },
+      { "stepNumber": 6, "content": "拌入煮好的意面，撒黑胡椒食用" }
+    ],
+    "categoryTags": { "ingredient": "蛋奶类", "method": "煮", "cuisine": "西餐", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "凯撒沙拉",
+    "description": "经典西式沙拉，生菜爽脆，面包丁酥香，凯撒酱浓郁丝滑，健康轻食。",
+    "category": "western",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 15,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/228B22/white?text=凯撒沙拉",
+    "ingredients": [
+      { "name": "罗马生菜", "amount": 1, "unit": "颗" },
+      { "name": "面包丁", "amount": 50, "unit": "g" },
+      { "name": "帕玛森芝士", "amount": 30, "unit": "g" },
+      { "name": "橄榄油", "amount": 3, "unit": "勺" },
+      { "name": "柠檬汁", "amount": 1, "unit": "勺" },
+      { "name": "蒜", "amount": 1, "unit": "瓣" },
+      { "name": "蛋黄酱", "amount": 2, "unit": "勺" },
+      { "name": "黑胡椒", "amount": 1, "unit": "茶匙" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "罗马生菜洗净沥干，撕成大片" },
+      { "stepNumber": 2, "content": "面包切丁，橄榄油拌匀后烤至金黄酥脆" },
+      { "stepNumber": 3, "content": "调凯撒酱：蛋黄酱加蒜末、柠檬汁、帕玛森碎、黑胡椒拌匀" },
+      { "stepNumber": 4, "content": "生菜铺盘，淋上凯撒酱" },
+      { "stepNumber": 5, "content": "撒上面包丁和帕玛森芝士薄片" }
+    ],
+    "categoryTags": { "ingredient": "蔬菜类", "method": "凉拌", "cuisine": "西餐", "flavor": "清淡", "price": "普通家常" }
+  },
+  {
+    "title": "奶油蘑菇汤",
+    "description": "法式经典浓汤，蘑菇鲜香与奶油丝滑完美融合，温暖治愈。",
+    "category": "western",
+    "difficulty": "easy",
+    "servings": 4,
+    "cookTime": 30,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/D2B48C/white?text=奶油蘑菇汤",
+    "ingredients": [
+      { "name": "白蘑菇", "amount": 300, "unit": "g" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "黄油", "amount": 30, "unit": "g" },
+      { "name": "面粉", "amount": 2, "unit": "勺" },
+      { "name": "淡奶油", "amount": 100, "unit": "ml" },
+      { "name": "鸡汤", "amount": 500, "unit": "ml" },
+      { "name": "盐", "amount": 1, "unit": "茶匙" },
+      { "name": "黑胡椒", "amount": 1, "unit": "茶匙" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "蘑菇切片，洋葱切碎" },
+      { "stepNumber": 2, "content": "黄油入锅融化，炒香洋葱至透明" },
+      { "stepNumber": 3, "content": "加入蘑菇翻炒至出水变软" },
+      { "stepNumber": 4, "content": "撒入面粉翻炒1分钟" },
+      { "stepNumber": 5, "content": "倒入鸡汤，搅拌均匀小火煮15分钟" },
+      { "stepNumber": 6, "content": "用料理机打成细腻浓汤" },
+      { "stepNumber": 7, "content": "倒回锅中加淡奶油，盐和胡椒调味" }
+    ],
+    "categoryTags": { "ingredient": "蔬菜类", "method": "煲汤", "cuisine": "西餐", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "德州烤排骨",
+    "description": "美式经典BBQ，排骨腌制后慢烤至脱骨，刷上烧烤酱，外焦里嫩，肉香四溢。",
+    "category": "western",
+    "difficulty": "hard",
+    "servings": 4,
+    "cookTime": 120,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/8B0000/white?text=德州烤排骨",
+    "ingredients": [
+      { "name": "猪肋排", "amount": 800, "unit": "g" },
+      { "name": "烧烤酱", "amount": 100, "unit": "ml" },
+      { "name": "蜂蜜", "amount": 2, "unit": "勺" },
+      { "name": "蒜粉", "amount": 1, "unit": "勺" },
+      { "name": "洋葱粉", "amount": 1, "unit": "勺" },
+      { "name": "辣椒粉", "amount": 1, "unit": "勺" },
+      { "name": "盐", "amount": 1, "unit": "勺" },
+      { "name": "黑胡椒", "amount": 1, "unit": "勺" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "肋排撕去背膜，用盐、黑胡椒、蒜粉、洋葱粉、辣椒粉抹匀" },
+      { "stepNumber": 2, "content": "包上锡纸，冷藏腌制4小时以上" },
+      { "stepNumber": 3, "content": "烤箱预热150°C，排骨包锡纸烤1.5小时" },
+      { "stepNumber": 4, "content": "烧烤酱加蜂蜜调匀" },
+      { "stepNumber": 5, "content": "取出排骨刷上酱汁" },
+      { "stepNumber": 6, "content": "烤箱升温至200°C，揭开锡纸再烤15分钟表面焦香" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "烤", "cuisine": "西餐", "flavor": "五香", "price": "中档" }
+  },
+  {
+    "title": "日式照烧鸡腿",
+    "description": "日式便当经典菜，照烧酱汁咸甜交织，鸡腿外皮焦香，肉质嫩滑多汁。",
+    "category": "japanese",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 20,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/CD853F/white?text=照烧鸡腿",
+    "ingredients": [
+      { "name": "鸡腿", "amount": 2, "unit": "只" },
+      { "name": "酱油", "amount": 3, "unit": "勺" },
+      { "name": "味醂", "amount": 3, "unit": "勺" },
+      { "name": "糖", "amount": 1, "unit": "勺" },
+      { "name": "姜", "amount": 3, "unit": "片" },
+      { "name": "清酒", "amount": 1, "unit": "勺" },
+      { "name": "白芝麻", "amount": 5, "unit": "g" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鸡腿去骨，用叉子在皮面戳孔便于入味" },
+      { "stepNumber": 2, "content": "调照烧汁：酱油、味醂、糖、清酒搅匀" },
+      { "stepNumber": 3, "content": "平底锅不放油，鸡皮面朝下煎至金黄" },
+      { "stepNumber": 4, "content": "翻面煎至变色，倒出多余油脂" },
+      { "stepNumber": 5, "content": "倒入照烧汁，小火收至浓稠挂裹鸡肉" },
+      { "stepNumber": 6, "content": "切块装盘，淋上锅中剩余酱汁，撒白芝麻" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "煎", "cuisine": "日料", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "日式咖喱饭",
+    "description": "日本国民料理，咖喱浓郁柔和，土豆胡萝卜牛肉炖至软烂，拌饭吃满足感爆棚。",
+    "category": "japanese",
+    "difficulty": "easy",
+    "servings": 3,
+    "cookTime": 35,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/FF8C00/white?text=日式咖喱饭",
+    "ingredients": [
+      { "name": "鸡腿肉", "amount": 300, "unit": "g" },
+      { "name": "土豆", "amount": 2, "unit": "个" },
+      { "name": "胡萝卜", "amount": 1, "unit": "根" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "咖喱块", "amount": 4, "unit": "块" },
+      { "name": "米饭", "amount": 3, "unit": "碗" },
+      { "name": "黄油", "amount": 10, "unit": "g" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "鸡腿肉切块，土豆胡萝卜切滚刀块，洋葱切块" },
+      { "stepNumber": 2, "content": "热锅加少许油，下鸡块煎至表面变色" },
+      { "stepNumber": 3, "content": "加洋葱炒至透明" },
+      { "stepNumber": 4, "content": "加胡萝卜和土豆翻炒" },
+      { "stepNumber": 5, "content": "加水没过食材，大火烧开去浮沫，转中火炖15分钟" },
+      { "stepNumber": 6, "content": "关火加入咖喱块搅拌至融化，开小火炖5分钟至浓稠" },
+      { "stepNumber": 7, "content": "加一小块黄油增香，浇在热米饭上" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "炖", "cuisine": "日料", "flavor": "咸鲜", "price": "普通家常" }
+  },
+  {
+    "title": "日式牛丼",
+    "description": "吉野家同款牛肉饭，肥牛搭配洋葱在甘甜酱汁中煮制，盖在热米饭上太美味。",
+    "category": "japanese",
+    "difficulty": "easy",
+    "servings": 2,
+    "cookTime": 10,
+    "author": "家常美食",
+    "coverImage": "https://placehold.co/400x300/8B4513/white?text=日式牛丼",
+    "ingredients": [
+      { "name": "肥牛片", "amount": 200, "unit": "g" },
+      { "name": "洋葱", "amount": 1, "unit": "个" },
+      { "name": "酱油", "amount": 3, "unit": "勺" },
+      { "name": "味醂", "amount": 2, "unit": "勺" },
+      { "name": "清酒", "amount": 1, "unit": "勺" },
+      { "name": "糖", "amount": 1, "unit": "勺" },
+      { "name": "米饭", "amount": 2, "unit": "碗" },
+      { "name": "红姜丝", "amount": 10, "unit": "g" }
+    ],
+    "steps": [
+      { "stepNumber": 1, "content": "洋葱切丝" },
+      { "stepNumber": 2, "content": "调汁：酱油、味醂、清酒、糖加水搅匀" },
+      { "stepNumber": 3, "content": "锅中倒入酱汁煮开，下洋葱丝煮软" },
+      { "stepNumber": 4, "content": "一片片放入肥牛，煮至变色断生" },
+      { "stepNumber": 5, "content": "大火收一下汁" },
+      { "stepNumber": 6, "content": "米饭盛碗，铺上牛肉和洋葱，淋入汤汁，配红姜丝" }
+    ],
+    "categoryTags": { "ingredient": "肉类", "method": "煮", "cuisine": "日料", "flavor": "咸鲜", "price": "普通家常" }
+  }
+]
