@@ -3,7 +3,7 @@
 /**
  * models/user.js
  * User 模型
- * 字段：id(UUID主键), username(唯一), email(唯一/nullable), password(nullable), createdAt
+ * 字段：id(UUID主键), username(唯一), email(唯一/nullable), password(nullable), nickname, role, createdAt
  * tableName: 'users', timestamps: false
  */
 
@@ -68,22 +68,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   )
 
+  User.associate = function (models) {
+    User.hasMany(models.Recipe, { foreignKey: 'userId', as: 'recipes' })
+  }
+
   return User
 }
-
-/**
- * 原始 SQL（供 DBA / migration 参考）
- *
- * CREATE TABLE `users` (
- *   `id`         CHAR(36)     NOT NULL DEFAULT (UUID()),
- *   `username`   VARCHAR(64)  NOT NULL COMMENT '用户名（唯一）',
- *   `email`      VARCHAR(255) NULL COMMENT '邮箱（唯一）',
- *   `password`   VARCHAR(255) NULL COMMENT '密码（哈希存储）',
- *   `nickname`   VARCHAR(64)  NULL COMMENT '昵称',
- *   `role`       VARCHAR(32)  NOT NULL DEFAULT 'user' COMMENT '角色, user/admin',
- *   `createdAt`  DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '注册时间',
- *   PRIMARY KEY (`id`),
- *   UNIQUE INDEX `idx_user_username` (`username`),
- *   UNIQUE INDEX `idx_user_email` (`email`)
- * ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
- */

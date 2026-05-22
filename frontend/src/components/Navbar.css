@@ -64,6 +64,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.navbar__username:hover {
+  color: var(--color-primary, #E8663E);
+}
+
+.navbar__link--create {
+  background: var(--color-primary-bg, #FFF3ED);
+  color: var(--color-primary, #E8663E) !important;
+  font-weight: 600;
+}
+
+.navbar__link--create:hover {
+  background: var(--color-primary, #E8663E) !important;
+  color: #fff !important;
 }
 
 .navbar__login-btn,

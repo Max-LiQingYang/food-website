@@ -7,6 +7,8 @@ const FavoriteList = lazy(() => import('../pages/FavoriteList'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const RecipeDetailPage = lazy(() => import('../pages/RecipeDetailPage'))
 const SearchPage = lazy(() => import('../pages/SearchPage'))
+const UserProfilePage = lazy(() => import('../pages/UserProfilePage'))
+const CreateRecipePage = lazy(() => import('../pages/CreateRecipePage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -29,7 +31,10 @@ const router = createBrowserRouter([
       { path: '/login', element: <LoginPage /> },
       { path: '/favorites', element: <FavoriteList /> },
       { path: '/recipe/:id', element: <RecipeDetailPage /> },
+      { path: '/recipe/:id/edit', element: <CreateRecipePage /> },
+      { path: '/recipe/new', element: <CreateRecipePage /> },
       { path: '/search', element: <SearchPage /> },
+      { path: '/user/:id', element: <UserProfilePage /> },
     ]
   }
 ])

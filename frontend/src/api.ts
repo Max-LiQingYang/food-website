@@ -193,6 +193,75 @@ export function searchRecipes(params: {q: string; page?: number; pageSize?: numb
   return apiClient.get('/recipes/search', { params: { page: 1, pageSize: 20, ...params } })
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Users API
+// ─────────────────────────────────────────────────────────────────
+
+export interface UserProfile {
+  id: string
+  username: string
+  nickname?: string
+  createdAt: string
+}
+
+/**
+ * 获取用户信息
+ * GET /api/users/:id/profile
+ */
+export function getUserProfile(id: string): Promise<UserProfile> {
+  return apiClient.get(`/users/${id}/profile`)
+}
+
+/**
+ * 获取用户发布的食谱
+ * GET /api/users/:id/recipes?page=1&pageSize=20
+ */
+export function getUserRecipes(params: {userId: string; page?: number; pageSize?: number}) {
+  return apiClient.get(`/users/${params.userId}/recipes`, {
+    params: { page: params.page || 1, pageSize: params.pageSize || 20 }
+  })
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Recipe CRUD API
+// ─────────────────────────────────────────────────────────────────
+
+export interface CreateRecipeData {
+  title: string
+  description?: string
+  category?: string
+  ingredients?: Array<{name: string; amount: number; unit: string}>
+  steps?: Array<{stepNumber: number; content: string; image?: string}>
+  coverImage?: string
+  servings?: number
+  difficulty?: string
+  cookTime?: number
+}
+
+/**
+ * 创建食谱
+ * POST /api/recipes
+ */
+export function createRecipe(data: CreateRecipeData) {
+  return apiClient.post('/recipes', data)
+}
+
+/**
+ * 更新食谱
+ * PUT /api/recipes/:id
+ */
+export function updateRecipe(id: string, data: Partial<CreateRecipeData>) {
+  return apiClient.put(`/recipes/${id}`, data)
+}
+
+/**
+ * 删除食谱
+ * DELETE /api/recipes/:id
+ */
+export function deleteRecipe(id: string) {
+  return apiClient.delete(`/recipes/${id}`)
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -204,4 +273,9 @@ export default {
   getRecipes,
   getRecipeById,
   searchRecipes,
+  getUserProfile,
+  getUserRecipes,
+  createRecipe,
+  updateRecipe,
+  deleteRecipe,
 }

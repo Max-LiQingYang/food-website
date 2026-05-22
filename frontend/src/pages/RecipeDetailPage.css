@@ -333,6 +333,62 @@
   background: var(--color-primary-light, #F0946E);
 }
 
+/* ── 作者操作栏 ── */
+.detail-author-actions {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.detail-btn-edit,
+.detail-btn-delete {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+}
+
+.detail-btn-edit {
+  color: var(--color-primary, #E8663E);
+}
+
+.detail-btn-edit:hover {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+}
+
+.detail-btn-delete {
+  color: #e55;
+}
+
+.detail-btn-delete:hover:not(:disabled) {
+  background: #e55;
+  color: #fff;
+}
+
+.detail-btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.detail-author-link {
+  color: var(--color-primary, #E8663E);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.detail-author-link:hover {
+  text-decoration: underline;
+}
+
 /* ── 移动端 ── */
 @media (max-width: 480px) {
   .detail-page {

@@ -1,0 +1,196 @@
+.profile-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+  min-height: calc(100vh - 56px);
+  animation: fadeIn 0.3s ease;
+}
+
+/* ── 个人信息区 ── */
+.profile-header {
+  text-align: center;
+  padding: 32px 0 24px;
+  border-bottom: 1px solid var(--color-border, #E8E0D8);
+  margin-bottom: 32px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.profile-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0 0 4px;
+}
+
+.profile-username {
+  font-size: 14px;
+  color: var(--color-text-muted, #999);
+  margin: 0 0 8px;
+}
+
+.profile-joined {
+  font-size: 13px;
+  color: var(--color-text-muted, #999);
+  margin: 0;
+}
+
+/* ── 食谱区 ── */
+.profile-recipes-section {
+  padding: 0;
+}
+
+.profile-section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0 0 20px;
+}
+
+.profile-count {
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-text-muted, #999);
+}
+
+/* ── 网格 ── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* ── 骨架 ── */
+.profile-skeleton {
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.profile-card-skeleton {
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0, 0, 0, 0.06));
+}
+
+.profile-card-skeleton .skeleton-cover {
+  border-radius: 0;
+}
+
+/* ── 空状态 ── */
+.profile-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 0;
+  gap: 8px;
+}
+
+.profile-empty__icon {
+  font-size: 48px;
+}
+
+.profile-empty__text {
+  font-size: 16px;
+  color: var(--color-text-muted, #999);
+  margin: 0;
+}
+
+/* ── 404 ── */
+.profile-notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 0;
+  gap: 12px;
+}
+
+.profile-notfound__icon {
+  font-size: 64px;
+}
+
+.profile-notfound h2 {
+  font-size: 24px;
+  color: var(--color-text, #333);
+  margin: 0;
+}
+
+.profile-notfound p {
+  font-size: 14px;
+  color: var(--color-text-muted, #999);
+  margin: 0;
+}
+
+.profile-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.pagination-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--color-border, #E8E0D8);
+  border-radius: 20px;
+  background: var(--color-card, #fff);
+  font-size: 14px;
+  color: var(--color-text, #333);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: var(--color-primary, #E8663E);
+  color: var(--color-primary, #E8663E);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    padding: 24px 12px 32px;
+  }
+  .profile-header {
+    padding: 24px 0 16px;
+  }
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
+  }
+  .profile-name {
+    font-size: 20px;
+  }
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}

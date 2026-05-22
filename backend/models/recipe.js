@@ -3,7 +3,7 @@
 /**
  * models/recipe.js
  * Recipe 模型
- * 字段：id(UUID/主键), title, coverImage(nullable), author(nullable), cookTime(nullable), createdAt
+ * 字段：id(UUID/主键), title, coverImage, author, cookTime, userId(FK), createdAt
  * tableName: 'recipes', timestamps: false
  */
 
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       author: {
         type: DataTypes.STRING,
         allowNull: true,
-        comment: '作者/发布者'
+        comment: '作者/发布者显示名'
       },
       cookTime: {
         type: DataTypes.INTEGER,
@@ -67,6 +67,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: '难度: easy, medium, hard'
       },
+      userId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: '创建者用户 ID（FK 至 users）'
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
@@ -89,25 +94,18 @@ module.exports = (sequelize, DataTypes) => {
         {
           name: 'idx_recipe_category',
           fields: ['category']
+        },
+        {
+          name: 'idx_recipe_userId',
+          fields: ['userId']
         }
       ]
     }
   )
 
+  Recipe.associate = function (models) {
+    Recipe.belongsTo(models.User, { foreignKey: 'userId', as: 'user' })
+  }
+
   return Recipe
 }
-
-/**
- * 原始 SQL（供 DBA / migration 参考）
- *
- * CREATE TABLE `recipes` (
- *   `id`          CHAR(36)      NOT NULL DEFAULT (UUID()),
- *   `title`       VARCHAR(255)  NOT NULL COMMENT '食谱标题',
- *   `coverImage`  VARCHAR(512)  NULL COMMENT '封面图片 URL',
- *   `author`      VARCHAR(128)  NULL COMMENT '作者/发布者',
- *   `cookTime`    INT           NULL COMMENT '烹饪时长（分钟）',
- *   `createdAt`   DATETIME(3)   NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
- *   PRIMARY KEY (`id`),
- *   INDEX `idx_recipe_title` (`title`)
- * ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='食谱表';
- */

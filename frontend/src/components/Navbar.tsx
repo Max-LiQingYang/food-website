@@ -32,12 +32,15 @@ export default function Navbar() {
         <div className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}>
           <Link to="/" className="navbar__link" onClick={handleNavClick}>首页</Link>
           <Link to="/favorites" className="navbar__link" onClick={handleNavClick}>我的收藏</Link>
+          {isAuthenticated && (
+            <Link to="/recipe/new" className="navbar__link navbar__link--create" onClick={handleNavClick}>发布食谱</Link>
+          )}
         </div>
 
         <div className="navbar__auth">
           {isAuthenticated ? (
             <div className="navbar__user">
-              <span className="navbar__username" title={user?.username}>{displayName}</span>
+              <Link to={`/user/${user?.id}`} className="navbar__username" title={user?.username} onClick={handleNavClick}>{displayName}</Link>
               <button
                 className="navbar__logout-btn"
                 onClick={logout}

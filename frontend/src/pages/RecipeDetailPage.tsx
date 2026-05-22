@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { getRecipeById } from '../api'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { getRecipeById, deleteRecipe } from '../api'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
 import { useToast } from '../context/ToastContext'
+import { useAuth } from '../context/AuthContext'
 import type { RecipeDetail } from '../api'
 import './RecipeDetailPage.css'
 
@@ -10,12 +11,16 @@ export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const toast = useToast()
+  const { isAuthenticated, user } = useAuth()
 
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)
   const [favLoading, setFavLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const isAuthor = isAuthenticated && user && recipe && recipe.userId === user.id
 
   useEffect(() => {
     if (!id) {
@@ -65,6 +70,22 @@ export default function RecipeDetailPage() {
       toast.error(err?.message || '操作失败')
     } finally {
       setFavLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!id || !isAuthor || deleting) return
+    if (!window.confirm('确定要删除这份食谱吗？此操作不可撤销。')) return
+
+    setDeleting(true)
+    try {
+      await deleteRecipe(id)
+      toast.success('食谱已删除')
+      navigate('/')
+    } catch (err: any) {
+      toast.error(err?.message || '删除失败')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -121,19 +142,42 @@ export default function RecipeDetailPage() {
           ) : (
             <div className="detail-cover__placeholder">🍽️</div>
           )}
-          <button
-            className={`detail-fav-btn ${isFavorited ? 'is-favorited' : ''}`}
-            onClick={handleFavoriteToggle}
-            disabled={favLoading}
-          >
-            {favLoading ? '⋯' : isFavorited ? '❤️ 已收藏' : '🤍 收藏'}
-          </button>
+
+          {/* 作者操作栏 */}
+          {isAuthor && (
+            <div className="detail-author-actions">
+              <Link to={`/recipe/${id}/edit`} className="detail-btn-edit">
+                ✏️ 编辑
+              </Link>
+              <button
+                className="detail-btn-delete"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                🗑️ {deleting ? '删除中…' : '删除'}
+              </button>
+            </div>
+          )}
+
+          {!isAuthor && (
+            <button
+              className={`detail-fav-btn ${isFavorited ? 'is-favorited' : ''}`}
+              onClick={handleFavoriteToggle}
+              disabled={favLoading}
+            >
+              {favLoading ? '⋯' : isFavorited ? '❤️ 已收藏' : '🤍 收藏'}
+            </button>
+          )}
         </div>
 
         {/* 基本信息 */}
         <div className="detail-header">
           <h1 className="detail-title">{recipe.title}</h1>
-          <p className="detail-author">👨‍🍳 {recipe.author || '未知作者'}</p>
+          <p className="detail-author">
+            👨‍🍳 {recipe.userId && isAuthenticated ? (
+              <Link to={`/user/${recipe.userId}`} className="detail-author-link">{recipe.author || '未知作者'}</Link>
+            ) : recipe.author || '未知作者'}
+          </p>
 
           <div className="detail-meta">
             {recipe.category && (

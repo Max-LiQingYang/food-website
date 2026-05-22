@@ -6,7 +6,8 @@
  *
  * 职责：
  *   - 挂载 auth 路由（/api/auth）    → 无需认证
- *   - 挂载 recipes 路由（/api/recipes） → 无需认证
+ *   - 挂载 recipes 路由（/api/recipes） → 混合（列表公开，增删改需认证）
+ *   - 挂载 users 路由（/api/users）   → 无需认证
  *   - 挂载 favorites 路由（/api/favorites） → 需认证
  */
 
@@ -16,11 +17,13 @@ const router = express.Router()
 const auth = require('../middleware/auth')
 const authRoutes = require('./auth')
 const recipeRoutes = require('./recipes')
+const userRoutes = require('./users')
 const favoriteRoutes = require('./favorites')
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
 router.use('/recipes', recipeRoutes)
+router.use('/users', userRoutes)
 
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)
