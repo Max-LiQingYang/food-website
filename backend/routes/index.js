@@ -19,9 +19,13 @@ const authRoutes = require('./auth')
 const recipeRoutes = require('./recipes')
 const userRoutes = require('./users')
 const favoriteRoutes = require('./favorites')
+const commentRoutes = require('./comments')
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
+
+// 评论路由必须在食谱路由之前，确保 /recipes/:recipeId/comments 不被 /recipes/:id 拦截
+router.use('/', commentRoutes)
 router.use('/recipes', recipeRoutes)
 router.use('/users', userRoutes)
 

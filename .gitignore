@@ -57,3 +57,6 @@ Desktop.ini
 *.key
 credentials.json
 service-account.json
+
+# WorkBuddy workspace
+.workbuddy/

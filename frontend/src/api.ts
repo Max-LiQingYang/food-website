@@ -228,6 +228,82 @@ export function getUserRecipes(params: { userId: string; page?: number; pageSize
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Comments API
+// ─────────────────────────────────────────────────────────────────
+
+export interface CommentUser {
+  id: string
+  username: string
+  nickname?: string
+}
+
+export interface Comment {
+  id: number
+  content: string
+  rating: number | null
+  userId: string
+  recipeId: string
+  createdAt: string
+  user?: CommentUser
+}
+
+export interface CommentStats {
+  total: number
+  ratedCount: number
+  averageRating: number
+  distribution: Record<number, number>
+}
+
+export interface CommentListResponse {
+  data: {
+    list: Comment[]
+    total: number
+    page: number
+    pageSize: number
+  }
+}
+
+/**
+ * 获取食谱评论列表
+ * GET /api/recipes/:recipeId/comments
+ */
+export function getComments(
+  recipeId: string,
+  params?: { page?: number; pageSize?: number }
+): Promise<CommentListResponse> {
+  return apiClient.get(`/recipes/${recipeId}/comments`, {
+    params: { page: 1, pageSize: 20, ...params }
+  })
+}
+
+/**
+ * 获取评分统计
+ * GET /api/recipes/:recipeId/comments/stats
+ */
+export function getCommentStats(recipeId: string): Promise<{ data: CommentStats }> {
+  return apiClient.get(`/recipes/${recipeId}/comments/stats`)
+}
+
+/**
+ * 发表评论
+ * POST /api/recipes/:recipeId/comments
+ */
+export function createComment(
+  recipeId: string,
+  data: { content: string; rating?: number }
+): Promise<{ data: Comment }> {
+  return apiClient.post(`/recipes/${recipeId}/comments`, data)
+}
+
+/**
+ * 删除评论
+ * DELETE /api/comments/:id
+ */
+export function deleteComment(id: number): Promise<void> {
+  return apiClient.delete(`/comments/${id}`)
+}
+
+// ─────────────────────────────────────────────────────────────────
 // Recipe CRUD API
 // ─────────────────────────────────────────────────────────────────
 
@@ -325,4 +401,8 @@ export default {
   createRecipe,
   updateRecipe,
   deleteRecipe,
+  getComments,
+  getCommentStats,
+  createComment,
+  deleteComment,
 }

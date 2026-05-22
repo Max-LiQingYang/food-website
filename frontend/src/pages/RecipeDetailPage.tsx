@@ -4,6 +4,7 @@ import { getRecipeById, deleteRecipe } from '../api'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
+import CommentSection from '../components/CommentSection'
 import type { RecipeDetail } from '../api'
 import './RecipeDetailPage.css'
 
@@ -234,6 +235,9 @@ export default function RecipeDetailPage() {
             </ol>
           </section>
         )}
+
+        {/* 评论区 */}
+        {id && <CommentSection recipeId={id} />}
       </div>
     </div>
   )
