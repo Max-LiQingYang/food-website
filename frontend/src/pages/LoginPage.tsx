@@ -27,7 +27,10 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const res: any = await loginApi({ username: username.trim(), password })
-      login(res.token, { id: res.user?.id || res.id, username: res.user?.username || res.username, nickname: res.user?.nickname })
+      // 兼容两种响应格式：{data: {token, user}} 或 {token, user}
+      const token = res.data?.token || res.token
+      const user = res.data?.user || res.user || res
+      login(token, { id: user?.id, username: user?.username, nickname: user?.nickname })
       toast.success('登录成功')
       navigate('/')
     } catch (err: any) {
