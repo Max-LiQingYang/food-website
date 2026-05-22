@@ -96,17 +96,92 @@
   cursor: not-allowed;
 }
 
-/* ─── 快捷标签 ─── */
+.recommend-submit--loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 
-.recommend-samples {
+/* ─── 搜索历史 ─── */
+
+.recommend-history {
+  max-width: 680px;
+  margin: 16px auto 0;
+  text-align: left;
+}
+
+.recommend-history__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.recommend-history__label {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.recommend-history__clear {
+  border: none;
+  background: none;
+  color: #bbb;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.recommend-history__clear:hover {
+  color: var(--color-primary, #e8663e);
+}
+
+.recommend-history__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recommend-history__tag {
+  padding: 4px 14px;
+  background: #f5f5f5;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+
+.recommend-history__tag:hover {
+  background: var(--color-bg, #fdf8f4);
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+/* ─── 热门食材 ─── */
+
+.recommend-hot {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
-  margin-top: 14px;
+  margin-top: 12px;
+  align-items: center;
 }
 
-.recommend-sample-tag {
+.recommend-hot__label {
+  font-size: 0.85rem;
+  color: #999;
+  margin-right: 4px;
+}
+
+.recommend-hot__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 5px 14px;
   background: var(--color-bg, #fdf8f4);
   border: 1px solid var(--color-border, #e8e0d8);
@@ -115,12 +190,27 @@
   color: var(--color-primary, #e8663e);
   cursor: pointer;
   transition: all 0.2s;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-.recommend-sample-tag:hover {
+.recommend-hot__tag:hover {
   background: var(--color-primary, #e8663e);
   color: #fff;
   border-color: var(--color-primary, #e8663e);
+}
+
+.recommend-hot__tag--lg {
+  padding: 8px 20px;
+  font-size: 0.95rem;
+}
+
+.recommend-hot__icon {
+  font-size: 1rem;
+}
+
+.recommend-hot__tag:hover .recommend-hot__icon {
+  filter: brightness(10);
 }
 
 /* ─── 结果区 ─── */
@@ -140,10 +230,88 @@
   border-bottom-color: var(--color-primary, #e8663e);
 }
 
+.recommend-section-title--loading {
+  border-bottom: none;
+}
+
+.skeleton-title-pulse {
+  display: inline-block;
+  height: 20px;
+  width: 200px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+
 .recommend-ai-hint {
   color: var(--color-text-secondary, #888);
   font-size: 0.9rem;
   margin: -8px 0 16px;
+}
+
+/* ─── 加载进度条 ─── */
+
+.recommend-loading-bar {
+  max-width: 320px;
+  height: 4px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin: 20px auto 8px;
+  overflow: hidden;
+}
+
+.recommend-loading-bar__inner {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, var(--color-primary, #e8663e), var(--color-accent, #ff8c42));
+  border-radius: 4px;
+  animation: loadingBar 1.5s ease-in-out infinite;
+}
+
+@keyframes loadingBar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.recommend-loading-text {
+  text-align: center;
+  color: #999;
+  font-size: 0.85rem;
+  margin: 0 0 20px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ─── Spinner ─── */
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─── 卡片网格 ─── */
@@ -157,6 +325,7 @@
 .recommend-card-link {
   text-decoration: none;
   color: inherit;
+  display: block;
 }
 
 .recommend-card {
@@ -169,6 +338,7 @@
     box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .recommend-card:hover {
@@ -180,6 +350,10 @@
   border: 1px dashed var(--color-primary, #e8663e);
 }
 
+.recommend-card--skeleton {
+  pointer-events: none;
+}
+
 .recommend-card__cover {
   height: 160px;
   overflow: hidden;
@@ -187,6 +361,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .recommend-card__cover img {
@@ -201,6 +376,52 @@
 
 .recommend-card__placeholder {
   font-size: 2.4rem;
+}
+
+/* ─── 收藏按钮 ─── */
+
+.recommend-card__fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+}
+
+.recommend-card__fav:hover {
+  transform: scale(1.15);
+  background: #fff;
+}
+
+.recommend-card__fav--active {
+  animation: heartPop 0.35s ease;
+}
+
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.25);
+  }
+  60% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .recommend-card__body {
@@ -271,6 +492,33 @@
   margin-bottom: 10px;
 }
 
+/* ─── 推荐理由 ─── */
+
+.recommend-card__reason {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #777;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.recommend-card__reason-icon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.recommend-card__reason strong {
+  color: var(--color-primary, #e8663e);
+  font-weight: 600;
+}
+
+/* ─── 食材标签 ─── */
+
 .recommend-card__tags {
   display: flex;
   flex-wrap: wrap;
@@ -288,30 +536,6 @@
 .recommend-tag--ai {
   background: #f3e5f5;
   color: #7b1fa2;
-}
-
-/* ─── 空状态 ─── */
-
-.recommend-empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-}
-
-.recommend-empty__icon {
-  font-size: 3rem;
-  margin-bottom: 12px;
-}
-
-.recommend-empty__text {
-  font-size: 1.1rem;
-  margin: 0 0 6px;
-  color: #666;
-}
-
-.recommend-empty__hint {
-  font-size: 0.9rem;
-  margin: 0;
 }
 
 /* ─── 骨架屏 ─── */
@@ -332,20 +556,122 @@
   }
 }
 
-.recipe-card--skeleton .recipe-card__cover {
+.recommend-card--skeleton .recommend-card__cover {
   height: 160px;
   background: #f0f0f0;
 }
 
-.recipe-card--skeleton .skeleton-box--title {
+.recommend-card--skeleton .skeleton-box--badge {
+  height: 18px;
+  width: 80px;
+  margin-bottom: 8px;
+}
+
+.recommend-card--skeleton .skeleton-box--title {
   height: 16px;
   width: 70%;
   margin-bottom: 10px;
 }
 
-.recipe-card--skeleton .skeleton-box--meta {
+.recommend-card--skeleton .skeleton-box--desc {
+  height: 32px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.recommend-card--skeleton .skeleton-box--meta {
   height: 12px;
   width: 50%;
+  margin-bottom: 10px;
+}
+
+.recommend-card--skeleton .skeleton-box--tags {
+  height: 22px;
+  width: 60%;
+}
+
+/* ─── 空状态 ─── */
+
+.recommend-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.recommend-empty--guide {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.recommend-empty__icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.recommend-empty__text {
+  font-size: 1.1rem;
+  margin: 0 0 6px;
+  color: #666;
+}
+
+.recommend-empty__hint {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #aaa;
+}
+
+/* ─── 引导空状态 ─── */
+
+.recommend-empty__banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #fff8f4, #fdf8f4);
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.recommend-empty__banner-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.recommend-empty__steps {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.recommend-empty__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #888;
+}
+
+.recommend-empty__step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.recommend-empty__cta-hint {
+  font-size: 0.85rem;
+  color: #bbb;
+  margin: 0 0 8px;
 }
 
 /* ─── 响应式 ─── */
@@ -371,6 +697,22 @@
   .recommend-grid {
     grid-template-columns: 1fr;
   }
+
+  .recommend-hot__tag--lg {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+  }
+
+  .recommend-empty__steps {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .recommend-empty__step {
+    flex-direction: row;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -380,5 +722,13 @@
 
   .recommend-hero__title {
     font-size: 1.3rem;
+  }
+
+  .recommend-card__cover {
+    height: 140px;
+  }
+
+  .recommend-card__body {
+    padding: 12px;
   }
 }
