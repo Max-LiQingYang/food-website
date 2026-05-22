@@ -305,6 +305,422 @@ const recipes = [
       { stepNumber: 7, content: '倒入模具，水浴法150°C烤40分钟' },
       { stepNumber: 8, content: '冷却后冷藏4小时，脱模食用' }
     ])
+  },
+
+  // ── 新增食谱：扩充分类覆盖 ──
+
+  // 中餐补充
+  {
+    id: uuidv4(),
+    title: '鱼香肉丝',
+    coverImage: 'https://placehold.co/400x300/E74C3C/white?text=鱼香肉丝',
+    author: '川味厨房',
+    cookTime: 20,
+    description: '酸甜微辣的经典川菜，肉丝嫩滑，配菜爽脆，鱼香汁浓郁下饭。',
+    category: 'chinese',
+    difficulty: 'medium',
+    servings: 3,
+    ingredients: JSON.stringify([
+      { name: '猪里脊肉', amount: 250, unit: 'g' },
+      { name: '木耳', amount: 50, unit: 'g' },
+      { name: '胡萝卜', amount: 1, unit: '根' },
+      { name: '青椒', amount: 1, unit: '个' },
+      { name: '泡椒', amount: 3, unit: '个' },
+      { name: '葱姜蒜', amount: 15, unit: 'g' },
+      { name: '醋', amount: 2, unit: '勺' },
+      { name: '糖', amount: 2, unit: '勺' },
+      { name: '生抽', amount: 2, unit: '勺' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '猪里脊切丝，用料酒、生抽、淀粉腌制10分钟' },
+      { stepNumber: 2, content: '木耳泡发切丝，胡萝卜、青椒切丝' },
+      { stepNumber: 3, content: '调鱼香汁：醋2勺、糖2勺、生抽2勺、淀粉1勺、水适量搅匀' },
+      { stepNumber: 4, content: '热锅冷油，下肉丝滑炒至变色盛出' },
+      { stepNumber: 5, content: '锅中留底油，爆香泡椒、葱姜蒜' },
+      { stepNumber: 6, content: '下配菜翻炒至断生' },
+      { stepNumber: 7, content: '倒入肉丝和鱼香汁，大火翻炒均匀即可' }
+    ])
+  },
+  {
+    id: uuidv4(),
+    title: '糖醋排骨',
+    coverImage: 'https://placehold.co/400x300/CD5C5C/white?text=糖醋排骨',
+    author: '家常菜师傅',
+    cookTime: 40,
+    description: '色泽红亮、酸甜适口的经典家常菜，外酥里嫩，大人小孩都爱吃。',
+    category: 'chinese',
+    difficulty: 'medium',
+    servings: 3,
+    ingredients: JSON.stringify([
+      { name: '小排', amount: 500, unit: 'g' },
+      { name: '醋', amount: 3, unit: '勺' },
+      { name: '糖', amount: 3, unit: '勺' },
+      { name: '生抽', amount: 2, unit: '勺' },
+      { name: '料酒', amount: 2, unit: '勺' },
+      { name: '姜', amount: 3, unit: '片' },
+      { name: '白芝麻', amount: 5, unit: 'g' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '小排冷水下锅焯水，捞出洗净' },
+      { stepNumber: 2, content: '锅中放油，下排骨煎至两面金黄' },
+      { stepNumber: 3, content: '加入姜片、料酒、生抽翻炒上色' },
+      { stepNumber: 4, content: '加热水没过排骨，大火烧开转小火炖25分钟' },
+      { stepNumber: 5, content: '加入醋和糖，大火收汁至浓稠' },
+      { stepNumber: 6, content: '撒上白芝麻出锅' }
+    ])
+  },
+  {
+    id: uuidv4(),
+    title: '水煮牛肉',
+    coverImage: 'https://placehold.co/400x300/B22222/white?text=水煮牛肉',
+    author: '川菜小馆',
+    cookTime: 30,
+    description: '麻辣鲜香的川菜经典，牛肉嫩滑入味，汤底红亮，辣而不燥。',
+    category: 'chinese',
+    difficulty: 'hard',
+    servings: 3,
+    ingredients: JSON.stringify([
+      { name: '牛里脊', amount: 300, unit: 'g' },
+      { name: '豆芽', amount: 200, unit: 'g' },
+      { name: '郫县豆瓣酱', amount: 2, unit: '勺' },
+      { name: '干辣椒', amount: 15, unit: '个' },
+      { name: '花椒', amount: 2, unit: '勺' },
+      { name: '蒜末', amount: 2, unit: '勺' },
+      { name: '生抽', amount: 2, unit: '勺' },
+      { name: '淀粉', amount: 1, unit: '勺' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '牛里脊逆纹切薄片，用蛋清、淀粉、料酒腌制15分钟' },
+      { stepNumber: 2, content: '豆芽焯水铺在碗底' },
+      { stepNumber: 3, content: '热锅冷油，下豆瓣酱炒出红油，加蒜末爆香' },
+      { stepNumber: 4, content: '加水烧开，下牛肉片滑散煮至变色' },
+      { stepNumber: 5, content: '将牛肉和汤汁倒在豆芽上' },
+      { stepNumber: 6, content: '另起锅烧热油，下干辣椒和花椒炸香' },
+      { stepNumber: 7, content: '将热油浇在牛肉上，滋啦一声即成' }
+    ])
+  },
+  {
+    id: uuidv4(),
+    title: '清蒸鲈鱼',
+    coverImage: 'https://placehold.co/400x300/4682B4/white?text=清蒸鲈鱼',
+    author: '粤菜大厨',
+    cookTime: 20,
+    description: '原汁原味的粤式经典，鱼肉鲜嫩，豉油提味，清淡而不寡淡。',
+    category: 'chinese',
+    difficulty: 'easy',
+    servings: 2,
+    ingredients: JSON.stringify([
+      { name: '鲈鱼', amount: 1, unit: '条' },
+      { name: '葱', amount: 3, unit: '根' },
+      { name: '姜', amount: 5, unit: '片' },
+      { name: '蒸鱼豉油', amount: 3, unit: '勺' },
+      { name: '料酒', amount: 1, unit: '勺' },
+      { name: '红椒丝', amount: 10, unit: 'g' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '鲈鱼处理干净，两面各划三刀' },
+      { stepNumber: 2, content: '鱼身抹料酒，塞入姜片，腌制10分钟' },
+      { stepNumber: 3, content: '盘底铺葱段和姜片，放上鱼' },
+      { stepNumber: 4, content: '水开后上锅大火蒸8分钟，关火焖2分钟' },
+      { stepNumber: 5, content: '倒掉盘中蒸汁，铺上葱丝和红椒丝' },
+      { stepNumber: 6, content: '淋上蒸鱼豉油，浇上一勺热油激香' }
+    ])
+  },
+
+  // 西餐补充
+  {
+    id: uuidv4(),
+    title: '凯撒沙拉',
+    coverImage: 'https://placehold.co/400x300/228B22/white?text=凯撒沙拉',
+    author: '西餐爱好者',
+    cookTime: 15,
+    description: '经典西式沙拉，生菜爽脆，面包丁酥香，凯撒酱浓郁丝滑。',
+    category: 'western',
+    difficulty: 'easy',
+    servings: 2,
+    ingredients: JSON.stringify([
+      { name: '罗马生菜', amount: 1, unit: '颗' },
+      { name: '面包丁', amount: 50, unit: 'g' },
+      { name: '帕玛森芝士', amount: 30, unit: 'g' },
+      { name: '橄榄油', amount: 3, unit: '勺' },
+      { name: '柠檬汁', amount: 1, unit: '勺' },
+      { name: '蒜', amount: 1, unit: '瓣' },
+      { name: '蛋黄酱', amount: 2, unit: '勺' },
+      { name: '黑胡椒', amount: 1, unit: '茶匙' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '罗马生菜洗净沥干，撕成大片' },
+      { stepNumber: 2, content: '面包切丁，橄榄油拌匀后烤至金黄酥脆' },
+      { stepNumber: 3, content: '调凯撒酱：蛋黄酱+蒜末+柠檬汁+帕玛森碎+黑胡椒拌匀' },
+      { stepNumber: 4, content: '生菜铺盘，淋上凯撒酱' },
+      { stepNumber: 5, content: '撒上面包丁和帕玛森芝士薄片' }
+    ])
+  },
+  {
+    id: uuidv4(),
+    title: '奶油蘑菇汤',
+    coverImage: 'https://placehold.co/400x300/D2B48C/white?text=蘑菇汤',
+    author: '法餐大厨',
+    cookTime: 30,
+    description: '法式经典浓汤，蘑菇鲜香与奶油丝滑完美融合，温暖治愈。',
+    category: 'western',
+    difficulty: 'easy',
+    servings: 4,
+    ingredients: JSON.stringify([
+      { name: '白蘑菇', amount: 300, unit: 'g' },
+      { name: '洋葱', amount: 1, unit: '个' },
+      { name: '黄油', amount: 30, unit: 'g' },
+      { name: '面粉', amount: 2, unit: '勺' },
+      { name: '淡奶油', amount: 100, unit: 'ml' },
+      { name: '鸡汤', amount: 500, unit: 'ml' },
+      { name: '盐', amount: 1, unit: '茶匙' },
+      { name: '黑胡椒', amount: 1, unit: '茶匙' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '蘑菇切片，洋葱切碎' },
+      { stepNumber: 2, content: '黄油入锅融化，炒香洋葱至透明' },
+      { stepNumber: 3, content: '加入蘑菇翻炒至出水变软' },
+      { stepNumber: 4, content: '撒入面粉翻炒1分钟' },
+      { stepNumber: 5, content: '倒入鸡汤，搅拌均匀，小火煮15分钟' },
+      { stepNumber: 6, content: '用料理机打成细腻浓汤' },
+      { stepNumber: 7, content: '倒回锅中加淡奶油，盐和胡椒调味' }
+    ])
+  },
+
+  // 日料补充
+  {
+    id: uuidv4(),
+    title: '日式炸猪排',
+    coverImage: 'https://placehold.co/400x300/DAA520/white?text=炸猪排',
+    author: '日式料理屋',
+    cookTime: 25,
+    description: '外酥里嫩的日式经典，面包糠裹出金黄脆壳，搭配猪排酱和卷心菜丝。',
+    category: 'japanese',
+    difficulty: 'medium',
+    servings: 2,
+    ingredients: JSON.stringify([
+      { name: '猪里脊', amount: 300, unit: 'g' },
+      { name: '鸡蛋', amount: 2, unit: '个' },
+      { name: '面粉', amount: 50, unit: 'g' },
+      { name: '面包糠', amount: 80, unit: 'g' },
+      { name: '卷心菜', amount: 100, unit: 'g' },
+      { name: '猪排酱', amount: 3, unit: '勺' },
+      { name: '食用油', amount: 300, unit: 'ml' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '猪里脊用刀背拍松至1厘米厚，撒盐和黑胡椒' },
+      { stepNumber: 2, content: '依次裹面粉→蛋液→面包糠，按压紧实' },
+      { stepNumber: 3, content: '油温170°C，下猪排炸3分钟至金黄' },
+      { stepNumber: 4, content: '捞出沥油，静置2分钟后切条' },
+      { stepNumber: 5, content: '卷心菜切细丝铺盘，放上猪排' },
+      { stepNumber: 6, content: '搭配猪排酱和柠檬角食用' }
+    ])
+  },
+  {
+    id: uuidv4(),
+    title: '亲子丼',
+    coverImage: 'https://placehold.co/400x300/FFD700/white?text=亲子丼',
+    author: '日式料理屋',
+    cookTime: 15,
+    description: '鸡肉和鸡蛋的经典搭配，滑嫩的蛋液包裹鸡肉，浇在热米饭上。',
+    category: 'japanese',
+    difficulty: 'easy',
+    servings: 2,
+    ingredients: JSON.stringify([
+      { name: '鸡腿肉', amount: 200, unit: 'g' },
+      { name: '鸡蛋', amount: 3, unit: '个' },
+      { name: '洋葱', amount: 0.5, unit: '个' },
+      { name: '米饭', amount: 2, unit: '碗' },
+      { name: '出汁', amount: 150, unit: 'ml' },
+      { name: '酱油', amount: 2, unit: '勺' },
+      { name: '味醂', amount: 2, unit: '勺' },
+      { name: '葱花', amount: 10, unit: 'g' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '鸡腿肉切小块，洋葱切丝' },
+      { stepNumber: 2, content: '鸡蛋打散（不要完全打匀，保留蛋白蛋黄层次）' },
+      { stepNumber: 3, content: '锅中倒入出汁、酱油、味醂煮开' },
+      { stepNumber: 4, content: '放入鸡肉和洋葱，中火煮5分钟至鸡肉熟透' },
+      { stepNumber: 5, content: '均匀淋入蛋液，盖盖焖30秒至半熟' },
+      { stepNumber: 6, content: '倒在热米饭上，撒葱花即可' }
+    ])
+  },
+
+  // 泰餐
+  {
+    id: uuidv4(),
+    title: '冬阴功汤',
+    coverImage: 'https://placehold.co/400x300/FF6347/white?text=冬阴功',
+    author: '泰味厨房',
+    cookTime: 25,
+    description: '酸辣鲜香的泰国国汤，椰奶的醇厚与柠檬草的清新完美平衡。',
+    category: 'thai',
+    difficulty: 'medium',
+    servings: 3,
+    ingredients: JSON.stringify([
+      { name: '大虾', amount: 200, unit: 'g' },
+      { name: '椰奶', amount: 200, unit: 'ml' },
+      { name: '冬阴功酱', amount: 2, unit: '勺' },
+      { name: '柠檬草', amount: 2, unit: '根' },
+      { name: '青柠', amount: 2, unit: '个' },
+      { name: '蘑菇', amount: 100, unit: 'g' },
+      { name: '鱼露', amount: 2, unit: '勺' },
+      { name: '辣椒', amount: 2, unit: '个' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '柠檬草拍扁切段，蘑菇切片，虾去虾线' },
+      { stepNumber: 2, content: '锅中加水煮开，放入柠檬草和冬阴功酱' },
+      { stepNumber: 3, content: '煮5分钟出香味后加入椰奶' },
+      { stepNumber: 4, content: '放入蘑菇和虾，煮至虾变红' },
+      { stepNumber: 5, content: '加鱼露和青柠汁调味' },
+      { stepNumber: 6, content: '放辣椒装饰，趁热食用' }
+    ])
+  },
+  {
+    id: uuidv4(),
+    title: '泰式芒果糯米饭',
+    coverImage: 'https://placehold.co/400x300/FFD700/white?text=芒果糯米饭',
+    author: '泰味厨房',
+    cookTime: 40,
+    description: '泰国经典甜品，椰奶浸润的糯米饭搭配新鲜芒果，香甜软糯。',
+    category: 'thai',
+    difficulty: 'easy',
+    servings: 2,
+    ingredients: JSON.stringify([
+      { name: '糯米', amount: 200, unit: 'g' },
+      { name: '芒果', amount: 1, unit: '个' },
+      { name: '椰奶', amount: 150, unit: 'ml' },
+      { name: '糖', amount: 30, unit: 'g' },
+      { name: '盐', amount: 1, unit: '撮' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '糯米提前浸泡4小时，蒸熟' },
+      { stepNumber: 2, content: '椰奶加糖和盐小火加热至糖融化' },
+      { stepNumber: 3, content: '将2/3椰奶倒入糯米饭中拌匀，焖15分钟吸收' },
+      { stepNumber: 4, content: '芒果去皮切片' },
+      { stepNumber: 5, content: '糯米饭盛盘，摆上芒果片' },
+      { stepNumber: 6, content: '淋上剩余椰奶即可' }
+    ])
+  },
+
+  // 韩餐补充
+  {
+    id: uuidv4(),
+    title: '泡菜豆腐汤',
+    coverImage: 'https://placehold.co/400x300/FF4500/white?text=泡菜汤',
+    author: '韩国料理王',
+    cookTime: 20,
+    description: '酸辣开胃的韩式家常汤，泡菜发酵的酸香与嫩豆腐的柔滑完美搭配。',
+    category: 'korean',
+    difficulty: 'easy',
+    servings: 2,
+    ingredients: JSON.stringify([
+      { name: '韩式泡菜', amount: 200, unit: 'g' },
+      { name: '嫩豆腐', amount: 1, unit: '盒' },
+      { name: '猪五花', amount: 100, unit: 'g' },
+      { name: '葱', amount: 2, unit: '根' },
+      { name: '韩式辣酱', amount: 1, unit: '勺' },
+      { name: '蒜末', amount: 1, unit: '勺' },
+      { name: '淘米水', amount: 400, unit: 'ml' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '五花肉切薄片，泡菜切段' },
+      { stepNumber: 2, content: '热锅下五花肉煸出油脂' },
+      { stepNumber: 3, content: '加入泡菜翻炒2分钟' },
+      { stepNumber: 4, content: '倒入淘米水，加辣酱和蒜末煮开' },
+      { stepNumber: 5, content: '豆腐切块轻轻放入，中火煮10分钟' },
+      { stepNumber: 6, content: '撒上葱花，配白米饭食用' }
+    ])
+  },
+
+  // 印度菜
+  {
+    id: uuidv4(),
+    title: '黄油鸡',
+    coverImage: 'https://placehold.co/400x300/FF8C00/white?text=黄油鸡',
+    author: '印度美食家',
+    cookTime: 45,
+    description: '印度最受欢迎的咖喱菜式，浓郁的番茄奶油酱汁包裹嫩滑鸡肉。',
+    category: 'indian',
+    difficulty: 'medium',
+    servings: 4,
+    ingredients: JSON.stringify([
+      { name: '鸡腿肉', amount: 500, unit: 'g' },
+      { name: '番茄', amount: 4, unit: '个' },
+      { name: '洋葱', amount: 1, unit: '个' },
+      { name: '黄油', amount: 40, unit: 'g' },
+      { name: '淡奶油', amount: 100, unit: 'ml' },
+      { name: '蒜', amount: 4, unit: '瓣' },
+      { name: '姜', amount: 20, unit: 'g' },
+      { name: '咖喱粉', amount: 2, unit: '勺' },
+      { name: '孜然粉', amount: 1, unit: '茶匙' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '鸡肉切块，用酸奶、咖喱粉、盐腌制30分钟' },
+      { stepNumber: 2, content: '黄油入锅，炒香洋葱、蒜末、姜末' },
+      { stepNumber: 3, content: '加入番茄碎煮至浓稠，用料理机打成酱' },
+      { stepNumber: 4, content: '倒回锅中，加孜然粉和剩余咖喱粉' },
+      { stepNumber: 5, content: '放入鸡肉煮15分钟至熟透' },
+      { stepNumber: 6, content: '加入淡奶油搅匀，小火煮5分钟' },
+      { stepNumber: 7, content: '搭配印度烤饼或米饭食用' }
+    ])
+  },
+  {
+    id: uuidv4(),
+    title: '印度烤饼',
+    coverImage: 'https://placehold.co/400x300/DEB887/white?text=印度烤饼',
+    author: '印度美食家',
+    cookTime: 20,
+    description: '松软有嚼劲的印度经典面饼，蘸咖喱汁或配黄油鸡都绝佳。',
+    category: 'indian',
+    difficulty: 'medium',
+    servings: 4,
+    ingredients: JSON.stringify([
+      { name: '中筋面粉', amount: 300, unit: 'g' },
+      { name: '酸奶', amount: 100, unit: 'g' },
+      { name: '酵母', amount: 3, unit: 'g' },
+      { name: '糖', amount: 5, unit: 'g' },
+      { name: '盐', amount: 3, unit: 'g' },
+      { name: '黄油', amount: 30, unit: 'g' },
+      { name: '蒜末', amount: 10, unit: 'g' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '面粉、酵母、糖、盐、酸奶混合，揉成光滑面团' },
+      { stepNumber: 2, content: '盖保鲜膜发酵1小时至两倍大' },
+      { stepNumber: 3, content: '分成4份，擀成椭圆形薄饼' },
+      { stepNumber: 4, content: '烤箱预热最高温，烤盘预热' },
+      { stepNumber: 5, content: '面饼放入烤箱烤3-4分钟至鼓泡金黄' },
+      { stepNumber: 6, content: '出炉刷蒜香黄油' }
+    ])
+  },
+
+  // 地中海
+  {
+    id: uuidv4(),
+    title: '希腊沙拉',
+    coverImage: 'https://placehold.co/400x300/006400/white?text=希腊沙拉',
+    author: '地中海厨房',
+    cookTime: 10,
+    description: '清爽的地中海经典，番茄、黄瓜、橄榄和菲达芝士的简单组合。',
+    category: 'mediterranean',
+    difficulty: 'easy',
+    servings: 2,
+    ingredients: JSON.stringify([
+      { name: '番茄', amount: 2, unit: '个' },
+      { name: '黄瓜', amount: 1, unit: '根' },
+      { name: '紫洋葱', amount: 0.5, unit: '个' },
+      { name: '菲达芝士', amount: 100, unit: 'g' },
+      { name: '黑橄榄', amount: 10, unit: '颗' },
+      { name: '橄榄油', amount: 3, unit: '勺' },
+      { name: '牛至', amount: 1, unit: '茶匙' }
+    ]),
+    steps: JSON.stringify([
+      { stepNumber: 1, content: '番茄切块，黄瓜切半月片，洋葱切薄圈' },
+      { stepNumber: 2, content: '所有蔬菜放入沙拉碗' },
+      { stepNumber: 3, content: '放上黑橄榄' },
+      { stepNumber: 4, content: '菲达芝士切厚片或掰块放上' },
+      { stepNumber: 5, content: '淋上特级初榨橄榄油，撒牛至' }
+    ])
   }
 ]
 
