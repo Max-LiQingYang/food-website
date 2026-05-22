@@ -246,8 +246,8 @@ jobs:
             docker compose up -d --force-recreate
 
             echo "=== 健康检查 ==="
-            sleep 15
-            curl -sf http://127.0.0.1:3001/health || { echo "后端健康检查失败"; exit 1; }
+            sleep 20
+            curl -sf http://127.0.0.1:3000/health || { echo "后端健康检查失败"; exit 1; }
             curl -sf http://127.0.0.1:8081/health || { echo "前端健康检查失败"; exit 1; }
 
             echo "=== 清理旧镜像 ==="
