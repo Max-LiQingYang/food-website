@@ -11,25 +11,25 @@ const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 })
 
 // 请求拦截器：自动附加 Token
 apiClient.interceptors.request.use(
-  (config) => {
+  config => {
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 )
 
 // 响应拦截器：统一错误处理
 apiClient.interceptors.response.use(
-  (response) => response.data,
+  response => response.data,
   (error: AxiosError<{ message?: string }>) => {
     let message: string
 
@@ -80,8 +80,8 @@ export interface Recipe {
 }
 
 export interface RecipeDetail extends Recipe {
-  ingredients?: Array<{name: string, amount: number, unit: string}>
-  steps?: Array<{stepNumber: number, content: string, image?: string}>
+  ingredients?: Array<{ name: string; amount: number; unit: string }>
+  steps?: Array<{ stepNumber: number; content: string; image?: string }>
 }
 
 export interface FavoriteListResponse {
@@ -145,7 +145,12 @@ export function getFavoriteStatus(recipeId: string): Promise<FavoriteStatusRespo
  * 用户注册
  * POST /api/auth/register
  */
-export function register(data: {username: string; password: string; email?: string; nickname?: string}) {
+export function register(data: {
+  username: string
+  password: string
+  email?: string
+  nickname?: string
+}) {
   return apiClient.post('/auth/register', data)
 }
 
@@ -153,7 +158,7 @@ export function register(data: {username: string; password: string; email?: stri
  * 用户登录
  * POST /api/auth/login
  */
-export function login(data: {username: string; password: string}) {
+export function login(data: { username: string; password: string }) {
   return apiClient.post('/auth/login', data)
 }
 
@@ -173,7 +178,7 @@ export function getMe() {
  * 获取食谱列表（分页、分类）
  * GET /api/recipes?page=1&pageSize=20&category=中餐
  */
-export function getRecipes(params: {page?: number; pageSize?: number; category?: string}) {
+export function getRecipes(params: { page?: number; pageSize?: number; category?: string }) {
   return apiClient.get('/recipes', { params: { page: 1, pageSize: 20, ...params } })
 }
 
@@ -189,7 +194,7 @@ export function getRecipeById(id: string) {
  * 搜索食谱
  * GET /api/recipes/search?q=关键词&page=1&pageSize=20
  */
-export function searchRecipes(params: {q: string; page?: number; pageSize?: number}) {
+export function searchRecipes(params: { q: string; page?: number; pageSize?: number }) {
   return apiClient.get('/recipes/search', { params: { page: 1, pageSize: 20, ...params } })
 }
 
@@ -216,9 +221,9 @@ export function getUserProfile(id: string): Promise<UserProfile> {
  * 获取用户发布的食谱
  * GET /api/users/:id/recipes?page=1&pageSize=20
  */
-export function getUserRecipes(params: {userId: string; page?: number; pageSize?: number}) {
+export function getUserRecipes(params: { userId: string; page?: number; pageSize?: number }) {
   return apiClient.get(`/users/${params.userId}/recipes`, {
-    params: { page: params.page || 1, pageSize: params.pageSize || 20 }
+    params: { page: params.page || 1, pageSize: params.pageSize || 20 },
   })
 }
 
@@ -230,8 +235,8 @@ export interface CreateRecipeData {
   title: string
   description?: string
   category?: string
-  ingredients?: Array<{name: string; amount: number; unit: string}>
-  steps?: Array<{stepNumber: number; content: string; image?: string}>
+  ingredients?: Array<{ name: string; amount: number; unit: string }>
+  steps?: Array<{ stepNumber: number; content: string; image?: string }>
   coverImage?: string
   servings?: number
   difficulty?: string
@@ -262,6 +267,47 @@ export function deleteRecipe(id: string) {
   return apiClient.delete(`/recipes/${id}`)
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Recommend API
+// ─────────────────────────────────────────────────────────────────
+
+export interface RecommendRecipe {
+  id: string
+  title: string
+  coverImage?: string
+  author?: string
+  cookTime?: number
+  description?: string
+  category?: string
+  difficulty?: string
+  servings?: number
+  matchScore: number
+  matchedIngredients: string[]
+  totalIngredients: number
+}
+
+export interface RecommendResponse {
+  input: string[]
+  list: RecommendRecipe[]
+  aiGenerated: boolean
+  aiRecipes: Array<{
+    title: string
+    description: string
+    ingredients: Array<{ name: string; amount: number; unit: string }>
+    cookTime: number
+    difficulty: string
+    servings: number
+  }>
+}
+
+/**
+ * 食材推荐菜谱
+ * GET /api/recipes/recommend?ingredients=鸡蛋,番茄
+ */
+export function recommendRecipes(ingredients: string): Promise<RecommendResponse> {
+  return apiClient.get('/recipes/recommend', { params: { ingredients } })
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -273,6 +319,7 @@ export default {
   getRecipes,
   getRecipeById,
   searchRecipes,
+  recommendRecipes,
   getUserProfile,
   getUserRecipes,
   createRecipe,

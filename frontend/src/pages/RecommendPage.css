@@ -1,0 +1,384 @@
+/* ─── 食材推荐页面 ─── */
+
+.recommend-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* ─── Hero 区 ─── */
+
+.recommend-hero {
+  text-align: center;
+  padding: 48px 20px 32px;
+}
+
+.recommend-hero__title {
+  font-size: 2rem;
+  color: var(--color-primary, #e8663e);
+  margin: 0 0 8px;
+}
+
+.recommend-hero__subtitle {
+  color: var(--color-text-secondary, #888);
+  margin: 0 0 28px;
+  font-size: 1.05rem;
+}
+
+/* ─── 搜索框 ─── */
+
+.recommend-form {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.recommend-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 2px solid var(--color-border, #e8e0d8);
+  border-radius: 12px;
+  padding: 4px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.recommend-input-wrapper:focus-within {
+  border-color: var(--color-primary, #e8663e);
+  box-shadow:
+    0 0 0 4px rgba(232, 102, 62, 0.1),
+    0 2px 8px rgba(232, 102, 62, 0.06);
+}
+
+.recommend-input-icon {
+  font-size: 1.3rem;
+  padding: 0 4px 0 14px;
+}
+
+.recommend-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 12px 8px;
+  font-size: 1rem;
+  color: #333;
+  background: transparent;
+  min-width: 0;
+}
+
+.recommend-input::placeholder {
+  color: #bbb;
+}
+
+.recommend-submit {
+  flex-shrink: 0;
+  padding: 10px 22px;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  white-space: nowrap;
+}
+
+.recommend-submit:hover:not(:disabled) {
+  background: var(--color-accent, #ff8c42);
+  transform: scale(1.02);
+}
+
+.recommend-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── 快捷标签 ─── */
+
+.recommend-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.recommend-sample-tag {
+  padding: 5px 14px;
+  background: var(--color-bg, #fdf8f4);
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--color-primary, #e8663e);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recommend-sample-tag:hover {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+/* ─── 结果区 ─── */
+
+.recommend-results {
+  margin-top: 16px;
+}
+
+.recommend-section-title {
+  font-size: 1.3rem;
+  margin: 28px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-border, #e8e0d8);
+}
+
+.recommend-section-title--ai {
+  border-bottom-color: var(--color-primary, #e8663e);
+}
+
+.recommend-ai-hint {
+  color: var(--color-text-secondary, #888);
+  font-size: 0.9rem;
+  margin: -8px 0 16px;
+}
+
+/* ─── 卡片网格 ─── */
+
+.recommend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.recommend-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.recommend-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.recommend-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(232, 102, 62, 0.12);
+}
+
+.recommend-card--ai {
+  border: 1px dashed var(--color-primary, #e8663e);
+}
+
+.recommend-card__cover {
+  height: 160px;
+  overflow: hidden;
+  background: var(--color-bg, #fdf8f4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommend-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recommend-card__cover--ai {
+  background: linear-gradient(135deg, #fff3ed, #fdf8f4);
+}
+
+.recommend-card__placeholder {
+  font-size: 2.4rem;
+}
+
+.recommend-card__body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── 匹配度标签 ─── */
+
+.recommend-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  align-self: flex-start;
+}
+
+.recommend-badge--high {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.recommend-badge--mid {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.recommend-badge--low {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.recommend-badge--ai {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+/* ─── 卡片内容 ─── */
+
+.recommend-card__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.recommend-card__desc {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.recommend-card__meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.recommend-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recommend-tag {
+  padding: 2px 8px;
+  background: #f0f7f0;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #4a7c59;
+}
+
+.recommend-tag--ai {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+/* ─── 空状态 ─── */
+
+.recommend-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.recommend-empty__icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.recommend-empty__text {
+  font-size: 1.1rem;
+  margin: 0 0 6px;
+  color: #666;
+}
+
+.recommend-empty__hint {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ─── 骨架屏 ─── */
+
+.skeleton-box {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+.recipe-card--skeleton .recipe-card__cover {
+  height: 160px;
+  background: #f0f0f0;
+}
+
+.recipe-card--skeleton .skeleton-box--title {
+  height: 16px;
+  width: 70%;
+  margin-bottom: 10px;
+}
+
+.recipe-card--skeleton .skeleton-box--meta {
+  height: 12px;
+  width: 50%;
+}
+
+/* ─── 响应式 ─── */
+
+@media (max-width: 768px) {
+  .recommend-hero__title {
+    font-size: 1.5rem;
+  }
+
+  .recommend-input-wrapper {
+    flex-wrap: wrap;
+  }
+
+  .recommend-input {
+    width: 100%;
+  }
+
+  .recommend-submit {
+    width: 100%;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .recommend-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .recommend-hero {
+    padding: 28px 12px 20px;
+  }
+
+  .recommend-hero__title {
+    font-size: 1.3rem;
+  }
+}

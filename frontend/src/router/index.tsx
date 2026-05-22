@@ -9,6 +9,7 @@ const RecipeDetailPage = lazy(() => import('../pages/RecipeDetailPage'))
 const SearchPage = lazy(() => import('../pages/SearchPage'))
 const UserProfilePage = lazy(() => import('../pages/UserProfilePage'))
 const CreateRecipePage = lazy(() => import('../pages/CreateRecipePage'))
+const RecommendPage = lazy(() => import('../pages/RecommendPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -35,11 +36,12 @@ const router = createBrowserRouter([
       { path: '/recipe/new', element: <CreateRecipePage /> },
       { path: '/search', element: <SearchPage /> },
       { path: '/user/:id', element: <UserProfilePage /> },
-    ]
-  }
+      { path: '/recommend', element: <RecommendPage /> },
+    ],
+  },
 ])
 
 export default function Router() {
-// @ts-expect-error TS2786 with TS 5.9 + @types/react 18.3 — harmless render types mismatch
+  // @ts-expect-error TS2786 with TS 5.9 + @types/react 18.3 — harmless render types mismatch
   return <RouterProvider router={router} />
 }

@@ -33,8 +33,18 @@ function resJSON(code, message, data) {
  * 列表查询的公共属性（不含 ingredients/steps，节省带宽）
  */
 const LIST_ATTRIBUTES = [
-  'id', 'title', 'coverImage', 'author', 'cookTime',
-  'description', 'category', 'servings', 'difficulty', 'userId', 'createdAt', 'updatedAt'
+  'id',
+  'title',
+  'coverImage',
+  'author',
+  'cookTime',
+  'description',
+  'category',
+  'servings',
+  'difficulty',
+  'userId',
+  'createdAt',
+  'updatedAt',
 ]
 
 // ─────────────────────────────────────────────────────────────────
@@ -65,7 +75,7 @@ router.get('/', async (req, res) => {
       order: [['createdAt', 'DESC']],
       offset,
       limit: pageSize,
-      attributes: LIST_ATTRIBUTES
+      attributes: LIST_ATTRIBUTES,
     })
 
     return res.status(200).json(
@@ -73,7 +83,7 @@ router.get('/', async (req, res) => {
         list: rows,
         total: count,
         page,
-        pageSize
+        pageSize,
       })
     )
   } catch (err) {
@@ -105,15 +115,12 @@ router.get('/search', async (req, res) => {
 
     const { count, rows } = await Recipe.findAndCountAll({
       where: {
-        [Op.or]: [
-          { title: { [Op.like]: keyword } },
-          { ingredients: { [Op.like]: keyword } }
-        ]
+        [Op.or]: [{ title: { [Op.like]: keyword } }, { ingredients: { [Op.like]: keyword } }],
       },
       order: [['createdAt', 'DESC']],
       offset,
       limit: pageSize,
-      attributes: LIST_ATTRIBUTES
+      attributes: LIST_ATTRIBUTES,
     })
 
     return res.status(200).json(
@@ -121,11 +128,153 @@ router.get('/search', async (req, res) => {
         list: rows,
         total: count,
         page,
-        pageSize
+        pageSize,
       })
     )
   } catch (err) {
     console.error('[GET /recipes/search] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /recommend — 食材推荐菜谱
+// ─────────────────────────────────────────────────────────────────
+router.get('/recommend', async (req, res) => {
+  try {
+    const { ingredients } = req.query
+
+    if (!ingredients || String(ingredients).trim().length === 0) {
+      return res.status(400).json(resJSON(400, '请输入食材关键词', null))
+    }
+
+    // 解析输入食材列表
+    const inputList = String(ingredients)
+      .split(/[,，、\s]+/)
+      .map(s => s.trim())
+      .filter(Boolean)
+
+    if (inputList.length === 0) {
+      return res.status(400).json(resJSON(400, '请输入有效的食材名称', null))
+    }
+
+    // 1. 数据库模糊匹配
+    const dbRecipes = await Recipe.findAll({
+      where: {
+        [Op.and]: inputList.map(name => ({
+          ingredients: { [Op.like]: `%${name}%` },
+        })),
+      },
+      order: [['createdAt', 'DESC']],
+      attributes: LIST_ATTRIBUTES.concat(['ingredients']),
+    })
+
+    // 2. 计算匹配度
+    const results = dbRecipes.map(recipe => {
+      const data = recipe.toJSON()
+      let recipeIngredientNames = []
+      if (data.ingredients) {
+        try {
+          const parsed = JSON.parse(data.ingredients)
+          recipeIngredientNames = (Array.isArray(parsed) ? parsed : []).map(i => i.name)
+        } catch {
+          // 非 JSON 格式则直接用原文
+          recipeIngredientNames = [String(data.ingredients)]
+        }
+      }
+
+      let matchedCount = 0
+      const matchedNames = []
+      for (const input of inputList) {
+        const found = recipeIngredientNames.some(name =>
+          name.toLowerCase().includes(input.toLowerCase())
+        )
+        if (found) {
+          matchedCount++
+          matchedNames.push(input)
+        }
+      }
+
+      const matchScore = Math.round((matchedCount / inputList.length) * 100)
+
+      return {
+        id: data.id,
+        title: data.title,
+        coverImage: data.coverImage,
+        author: data.author,
+        cookTime: data.cookTime,
+        description: data.description,
+        category: data.category,
+        difficulty: data.difficulty,
+        servings: data.servings,
+        userId: data.userId,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        matchScore,
+        matchedIngredients: matchedNames,
+        totalIngredients: recipeIngredientNames.length,
+      }
+    })
+
+    // 按匹配度降序
+    results.sort((a, b) => b.matchScore - a.matchScore)
+
+    // 3. AI 无结果增强（仅当数据库匹配不到时）
+    let aiGenerated = false
+    let aiRecipes = []
+
+    if (results.length === 0 && process.env.AI_API_KEY) {
+      try {
+        const ingredientStr = inputList.join('、')
+        const aiPrompt = `你是一个美食食谱推荐专家。用户提供了以下食材：${ingredientStr}。请推荐 3 道包含这些食材的菜谱，每道菜谱包含：菜名、简介、所需食材列表（从用户食材中选取）、烹饪时长（分钟）、难度（easy/medium/hard）、份数。以 JSON 数组格式返回，每个元素包含 title, description, ingredients(数组[{name, amount, unit}]), cookTime, difficulty, servings 字段。只返回 JSON，不要其他文字。`
+
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 15000)
+
+        const aiRes = await fetch(
+          `${process.env.AI_API_BASE_URL || 'https://ark.cn-beijing.volces.com/api/coding/v3'}/chat/completions`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${process.env.AI_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: process.env.AI_MODEL || 'deepseek-v3.2',
+              messages: [{ role: 'user', content: aiPrompt }],
+              temperature: 0.7,
+            }),
+            signal: controller.signal,
+          }
+        )
+
+        clearTimeout(timeout)
+
+        if (aiRes.ok) {
+          const aiData = await aiRes.json()
+          const content = aiData.choices?.[0]?.message?.content || ''
+          // 提取 JSON 数组
+          const jsonMatch = content.match(/\[\s*\{[\s\S]*?\}\s*\]/)
+          if (jsonMatch) {
+            aiRecipes = JSON.parse(jsonMatch[0])
+            aiGenerated = true
+          }
+        }
+      } catch (aiErr) {
+        console.warn('[RECOMMEND] AI fallback failed:', aiErr.message)
+      }
+    }
+
+    return res.status(200).json(
+      resJSON(0, 'ok', {
+        input: inputList,
+        list: results,
+        aiGenerated,
+        aiRecipes,
+      })
+    )
+  } catch (err) {
+    console.error('[GET /recipes/recommend] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })
@@ -178,7 +327,17 @@ router.get('/:id', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, description, category, ingredients, steps, coverImage, servings, difficulty, cookTime } = req.body
+    const {
+      title,
+      description,
+      category,
+      ingredients,
+      steps,
+      coverImage,
+      servings,
+      difficulty,
+      cookTime,
+    } = req.body
 
     if (!title || title.trim().length === 0) {
       return res.status(400).json(resJSON(400, '食谱标题不能为空', null))
@@ -198,8 +357,8 @@ router.post('/', auth, async (req, res) => {
       servings: servings != null ? parseInt(servings, 10) : null,
       difficulty: difficulty || null,
       cookTime: cookTime != null ? parseInt(cookTime, 10) : null,
-      author: user ? (user.nickname || user.username) : '未知用户',
-      userId: req.userId
+      author: user ? user.nickname || user.username : '未知用户',
+      userId: req.userId,
     })
 
     return res.status(201).json(resJSON(0, 'ok', recipe))
@@ -225,7 +384,17 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(403).json(resJSON(403, '无权编辑此食谱', null))
     }
 
-    const { title, description, category, ingredients, steps, coverImage, servings, difficulty, cookTime } = req.body
+    const {
+      title,
+      description,
+      category,
+      ingredients,
+      steps,
+      coverImage,
+      servings,
+      difficulty,
+      cookTime,
+    } = req.body
 
     const updateData = {}
     if (title !== undefined) updateData.title = title.trim()
@@ -244,10 +413,18 @@ router.put('/:id', auth, async (req, res) => {
     const updated = await Recipe.findByPk(id)
     const data = updated.toJSON()
     if (data.ingredients) {
-      try { data.ingredients = JSON.parse(data.ingredients) } catch { data.ingredients = [] }
+      try {
+        data.ingredients = JSON.parse(data.ingredients)
+      } catch {
+        data.ingredients = []
+      }
     }
     if (data.steps) {
-      try { data.steps = JSON.parse(data.steps) } catch { data.steps = [] }
+      try {
+        data.steps = JSON.parse(data.steps)
+      } catch {
+        data.steps = []
+      }
     }
 
     return res.status(200).json(resJSON(0, 'ok', data))
