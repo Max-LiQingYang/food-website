@@ -9,6 +9,7 @@
  */
 
 const { v4: uuidv4 } = require('uuid')
+const bcrypt = require('bcryptjs')
 const db = require('../models')
 
 const recipes = [
@@ -314,6 +315,20 @@ async function seed () {
     // 清空旧数据
     await db.Favorite.destroy({ where: {} })
     await db.Recipe.destroy({ where: {} })
+    await db.User.destroy({ where: {} })
+
+    // 创建管理员种子账号
+    const hashedPassword = await bcrypt.hash('123456', 10)
+    await db.User.create({
+      id: uuidv4(),
+      username: 'admin',
+      email: 'test@test.com',
+      password: hashedPassword,
+      nickname: '管理员',
+      role: 'admin'
+    })
+
+    console.log('✅ 管理员账号创建成功: test@test.com / 123456')
 
     // 插入新数据
     await db.Recipe.bulkCreate(recipes)

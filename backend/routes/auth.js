@@ -35,7 +35,7 @@ function resJSON(code, message, data) {
 // ─────────────────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
-    const { username, password, email } = req.body
+    const { username, password, email, nickname } = req.body
 
     if (!username || !password) {
       return res.status(400).json(resJSON(400, '用户名和密码不能为空', null))
@@ -62,12 +62,13 @@ router.post('/register', async (req, res) => {
     const user = await User.create({
       username,
       password: hashedPassword,
-      email: email || null
+      email: email || null,
+      nickname: nickname || null
     })
 
     // 生成 JWT
     const token = jwt.sign(
-      { userId: user.id, username: user.username },
+      { userId: user.id, username: user.username, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     )
@@ -79,6 +80,8 @@ router.post('/register', async (req, res) => {
           id: user.id,
           username: user.username,
           email: user.email,
+          nickname: user.nickname,
+          role: user.role,
           createdAt: user.createdAt
         }
       })
@@ -100,8 +103,9 @@ router.post('/login', async (req, res) => {
       return res.status(400).json(resJSON(400, '用户名和密码不能为空', null))
     }
 
-    // 查找用户
-    const user = await User.findOne({ where: { username } })
+    // 查找用户：支持用邮箱或用户名登录
+    const where = username.includes('@') ? { email: username } : { username }
+    const user = await User.findOne({ where })
     if (!user) {
       return res.status(401).json(resJSON(4002, '用户名或密码错误', null))
     }
@@ -114,7 +118,7 @@ router.post('/login', async (req, res) => {
 
     // 生成 JWT
     const token = jwt.sign(
-      { userId: user.id, username: user.username },
+      { userId: user.id, username: user.username, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     )
@@ -126,6 +130,8 @@ router.post('/login', async (req, res) => {
           id: user.id,
           username: user.username,
           email: user.email,
+          nickname: user.nickname,
+          role: user.role,
           createdAt: user.createdAt
         }
       })
@@ -142,7 +148,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findByPk(req.userId, {
-      attributes: ['id', 'username', 'email', 'createdAt']
+      attributes: ['id', 'username', 'email', 'nickname', 'role', 'createdAt']
     })
 
     if (!user) {
@@ -154,6 +160,8 @@ router.get('/me', auth, async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        nickname: user.nickname,
+        role: user.role,
         createdAt: user.createdAt
       })
     )
