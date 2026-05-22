@@ -23,7 +23,7 @@ services:
     networks:
       - food-network
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -63,6 +63,11 @@ services:
 
       # CORS
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+
+      # AI 模型（火山引擎 DeepSeek V3.2）
+      AI_API_BASE_URL: ${AI_API_BASE_URL:-https://ark.cn-beijing.volces.com/api/coding/v3}
+      AI_API_KEY: ${AI_API_KEY:-c5163514-30fb-45b5-8fff-0bf0e76e11c4}
+      AI_MODEL: ${AI_MODEL:-deepseek-v3.2}
     networks:
       - food-network
     healthcheck:

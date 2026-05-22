@@ -1,0 +1,19 @@
+修复 food-website 项目的 CI/CD Docker build 失败问题。项目路径：/Users/max_yang/Projects/food-website/
+
+Run #8 中 Build Frontend Image 和 Build Backend Image 又失败了。
+
+问题原因：
+- deploy.yml 中 build-frontend 和 build-backend job 的 docker/build-push-action 配置了 file: ./Dockerfile
+- 但是 file 参数是相对于仓库根目录的路径，而 Dockerfile 实际在 frontend/Dockerfile 和 backend/Dockerfile
+- 当 context 是 ./frontend 时，默认行为会自动在 context 目录下找 Dockerfile，不需要显式指定 file 参数
+- 之前无效的 dockerfile 参数被忽略了，所以默认行为生效；现在 file 参数生效但路径错误
+
+任务要求：
+1. 修改 .github/workflows/deploy.yml：
+   - build-frontend job 中，删除 docker/build-push-action 的 with 块里的 file: ./Dockerfile 这一行
+   - build-backend job 中，同样删除 file: ./Dockerfile 这一行
+   - 保留 context: ./frontend 和 context: ./backend，这样 action 会自动在各自 context 目录下找到 Dockerfile
+2. 完成后运行本地测试 npm test 确保没有破坏现有功能
+3. 注意：ghcr.io 登录配置、test job 的 cache-dependency-path 和 npm ci 命令、以及 Dockerfile 中的 npm install 修改都已修复，请不要回滚这些修改
+
+完成后汇报修改的文件列表。

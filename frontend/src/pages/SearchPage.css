@@ -3,51 +3,74 @@
   margin: 0 auto;
   padding: 24px 16px 48px;
   min-height: calc(100vh - 56px);
+  animation: fadeIn 0.3s ease;
 }
 
-/* ── 搜索栏 ── */
+/* ── 搜索栏（放大版） ── */
 .search-bar {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.search-bar::before {
+  content: '🔍';
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .search-input {
   flex: 1;
-  padding: 10px 16px;
-  border: 1px solid #d9d9d9;
-  border-radius: 24px;
-  font-size: 15px;
-  color: #333;
+  padding: 13px 16px 13px 46px;
+  border: 2px solid var(--color-border, #E8E0D8);
+  border-radius: 28px;
+  font-size: 16px;
+  color: var(--color-text, #333);
   outline: none;
-  transition: border-color 0.2s;
+  background: var(--color-card, #fff);
+  transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 .search-input:focus {
-  border-color: #ff4d4f;
-  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
+  border-color: var(--color-primary, #E8663E);
+  box-shadow: 0 0 0 4px rgba(232, 102, 62, 0.1), 0 2px 8px rgba(232, 102, 62, 0.06);
+}
+
+.search-input::placeholder {
+  color: var(--color-text-muted, #bbb);
+  font-size: 15px;
 }
 
 .search-btn {
-  padding: 10px 24px;
-  background: #ff4d4f;
+  padding: 13px 28px;
+  background: var(--color-primary, #E8663E);
   color: #fff;
   border: none;
-  border-radius: 24px;
-  font-size: 15px;
-  font-weight: 500;
+  border-radius: 28px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s;
 }
 
 .search-btn:hover {
-  background: #ff7875;
+  background: var(--color-primary-dark, #C94F2A);
+}
+
+.search-btn:active {
+  transform: scale(0.96);
 }
 
 /* ── 结果信息 ── */
 .search-result-info {
   font-size: 14px;
-  color: #999;
+  color: var(--color-text-muted, #999);
   margin: 0 0 20px;
 }
 
@@ -56,6 +79,20 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
+}
+
+/* ── 骨架屏 ── */
+.recipe-card--skeleton {
+  pointer-events: none;
+}
+
+.recipe-card--skeleton .recipe-card__cover {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md, 12px) var(--radius-md, 12px) 0 0;
+}
+
+.recipe-card--skeleton .recipe-card__info {
+  padding: 12px 14px 14px;
 }
 
 /* ── 空状态 ── */
@@ -75,13 +112,13 @@
 .search-empty__text {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text, #333);
   margin: 0;
 }
 
 .search-empty__hint {
   font-size: 14px;
-  color: #999;
+  color: var(--color-text-muted, #999);
   margin: 0;
 }
 
@@ -96,18 +133,18 @@
 
 .pagination-btn {
   padding: 8px 20px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--color-border, #E8E0D8);
   border-radius: 20px;
-  background: #fff;
+  background: var(--color-card, #fff);
   font-size: 14px;
-  color: #333;
+  color: var(--color-text, #333);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  border-color: #ff4d4f;
-  color: #ff4d4f;
+  border-color: var(--color-primary, #E8663E);
+  color: var(--color-primary, #E8663E);
 }
 
 .pagination-btn:disabled {
@@ -117,49 +154,33 @@
 
 .pagination-info {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary, #666);
 }
 
-/* ── 骨架屏 ── */
-.skeleton-box {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 6px;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.recipe-card--skeleton {
-  pointer-events: none;
-}
-
-.recipe-card--skeleton .recipe-card__cover {
-  aspect-ratio: 4 / 3;
-  border-radius: 12px 12px 0 0;
-}
-
-.recipe-card--skeleton .recipe-card__info {
-  padding: 12px 14px 14px;
-}
-
-.skeleton-box--title {
-  height: 18px;
-  width: 70%;
-  margin-bottom: 8px;
-}
-
-.skeleton-box--meta {
-  height: 14px;
-  width: 45%;
+@media (max-width: 768px) {
+  .search-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
 }
 
 @media (max-width: 480px) {
   .search-page {
     padding: 16px 12px 32px;
+  }
+
+  .search-bar::before {
+    left: 14px;
+  }
+
+  .search-input {
+    padding: 11px 14px 11px 40px;
+    font-size: 15px;
+  }
+
+  .search-btn {
+    padding: 11px 18px;
+    font-size: 15px;
   }
 
   .search-grid {

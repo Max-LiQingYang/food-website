@@ -4,6 +4,7 @@ import { getMe } from '../api'
 interface User {
   id: string
   username: string
+  nickname?: string
 }
 
 interface AuthContextValue {
@@ -24,7 +25,7 @@ export function useAuth(): AuthContextValue {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [token] = useState<string | null>(() => localStorage.getItem('token'))
+  const [token, _setToken] = useState<string | null>(() => localStorage.getItem('token'))
   const [initializing, setInitializing] = useState(true)
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     getMe()
       .then((data: any) => {
-        setUser({ id: data.id, username: data.username })
+        setUser({ id: data.id, username: data.username, nickname: data.nickname })
       })
       .catch(() => {
         localStorage.removeItem('token')

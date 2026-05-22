@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: 24px 16px 48px;
   min-height: calc(100vh - 56px);
+  animation: fadeIn 0.3s ease;
 }
 
 /* ── 搜索栏 ── */
@@ -14,34 +15,43 @@
 
 .home-search__input {
   flex: 1;
-  padding: 10px 16px;
-  border: 1px solid #d9d9d9;
+  padding: 10px 18px;
+  border: 1px solid var(--color-border, #E8E0D8);
   border-radius: 24px;
   font-size: 15px;
-  color: #333;
+  color: var(--color-text, #333);
   outline: none;
-  transition: border-color 0.2s;
+  background: var(--color-card, #fff);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .home-search__input:focus {
-  border-color: #ff4d4f;
-  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
+  border-color: var(--color-primary, #E8663E);
+  box-shadow: 0 0 0 3px rgba(232, 102, 62, 0.1);
+}
+
+.home-search__input::placeholder {
+  color: var(--color-text-muted, #bbb);
 }
 
 .home-search__btn {
   padding: 10px 24px;
-  background: #ff4d4f;
+  background: var(--color-primary, #E8663E);
   color: #fff;
   border: none;
   border-radius: 24px;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s;
 }
 
 .home-search__btn:hover {
-  background: #ff7875;
+  background: var(--color-primary-dark, #C94F2A);
+}
+
+.home-search__btn:active {
+  transform: scale(0.96);
 }
 
 /* ── 分类标签 ── */
@@ -54,24 +64,25 @@
 
 .home-category {
   padding: 6px 18px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--color-border, #E8E0D8);
   border-radius: 20px;
-  background: #fff;
+  background: var(--color-card, #fff);
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary, #666);
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .home-category:hover {
-  border-color: #ff4d4f;
-  color: #ff4d4f;
+  border-color: var(--color-primary, #E8663E);
+  color: var(--color-primary, #E8663E);
+  background: var(--color-primary-bg, #FFF3ED);
 }
 
 .home-category.active {
-  background: #ff4d4f;
-  border-color: #ff4d4f;
+  background: var(--color-primary, #E8663E);
+  border-color: var(--color-primary, #E8663E);
   color: #fff;
 }
 
@@ -84,42 +95,14 @@
 
 /* ── 骨架屏 ── */
 .home-card-skeleton {
-  background: #fff;
-  border-radius: 12px;
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
   overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0, 0, 0, 0.06));
 }
 
-.skeleton-box {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 6px;
-}
-
-.skeleton-cover {
-  width: 100%;
-  aspect-ratio: 4 / 3;
+.home-card-skeleton .skeleton-cover {
   border-radius: 0;
-}
-
-.skeleton-body {
-  padding: 12px 14px 14px;
-}
-
-.skeleton-title {
-  height: 18px;
-  width: 70%;
-  margin-bottom: 8px;
-}
-
-.skeleton-meta {
-  height: 14px;
-  width: 45%;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 /* ── 空状态 ── */
@@ -139,13 +122,13 @@
 .home-empty__text {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text, #333);
   margin: 0;
 }
 
 .home-empty__hint {
   font-size: 14px;
-  color: #999;
+  color: var(--color-text-muted, #999);
   margin: 0;
 }
 
@@ -160,18 +143,18 @@
 
 .pagination-btn {
   padding: 8px 20px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--color-border, #E8E0D8);
   border-radius: 20px;
-  background: #fff;
+  background: var(--color-card, #fff);
   font-size: 14px;
-  color: #333;
+  color: var(--color-text, #333);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  border-color: #ff4d4f;
-  color: #ff4d4f;
+  border-color: var(--color-primary, #E8663E);
+  color: var(--color-primary, #E8663E);
 }
 
 .pagination-btn:disabled {
@@ -181,10 +164,17 @@
 
 .pagination-info {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary, #666);
 }
 
 /* ── 移动端 ── */
+@media (max-width: 768px) {
+  .home-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+}
+
 @media (max-width: 480px) {
   .home-page {
     padding: 16px 12px 32px;
@@ -202,6 +192,10 @@
   .home-category {
     padding: 5px 14px;
     font-size: 13px;
+  }
+
+  .home-search__btn {
+    padding: 10px 18px;
   }
 
   .home-empty__icon {

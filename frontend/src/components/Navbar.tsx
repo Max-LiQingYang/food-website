@@ -1,27 +1,43 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useState } from 'react'
 import './Navbar.css'
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const displayName = user?.nickname || user?.username || ''
+
+  const handleNavClick = () => {
+    setMenuOpen(false)
+  }
 
   return (
     <nav className="navbar">
       <div className="navbar__inner">
-        <Link to="/" className="navbar__logo">
+        <Link to="/" className="navbar__logo" onClick={handleNavClick}>
           🍳 美食食谱
         </Link>
 
-        <div className="navbar__links">
-          <Link to="/" className="navbar__link">首页</Link>
-          <Link to="/favorites" className="navbar__link">我的收藏</Link>
+        <button
+          className={`navbar__hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="菜单"
+        >
+          <span /><span /><span />
+        </button>
+
+        <div className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}>
+          <Link to="/" className="navbar__link" onClick={handleNavClick}>首页</Link>
+          <Link to="/favorites" className="navbar__link" onClick={handleNavClick}>我的收藏</Link>
         </div>
 
         <div className="navbar__auth">
           {isAuthenticated ? (
             <div className="navbar__user">
-              <span className="navbar__username">{user?.username}</span>
+              <span className="navbar__username" title={user?.username}>{displayName}</span>
               <button
                 className="navbar__logout-btn"
                 onClick={logout}
@@ -39,6 +55,7 @@ export default function Navbar() {
           )}
         </div>
       </div>
+      {menuOpen && <div className="navbar__overlay" onClick={() => setMenuOpen(false)} />}
     </nav>
   )
 }

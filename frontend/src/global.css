@@ -6,25 +6,39 @@
 }
 
 :root {
-  --color-primary: #ff4d4f;
-  --color-primary-light: #ff7875;
-  --color-primary-bg: #fff1f0;
-  --color-bg: #fafafa;
-  --color-white: #ffffff;
-  --color-text: #1a1a1a;
-  --color-text-secondary: #666;
-  --color-text-muted: #999;
-  --color-border: #d9d9d9;
+  --color-primary: #E8663E;           /* 暖橙 - 主色 */
+  --color-primary-light: #F0946E;     /* 暖橙 - 亮 */
+  --color-primary-dark: #C94F2A;      /* 暖橙 - 暗 */
+  --color-primary-bg: #FFF3ED;        /* 暖橙 - 背景 */
+  --color-accent: #FF8C42;            /* 珊瑚橙 - 强调 */
+  --color-accent-light: #FFB380;      /* 珊瑚橙 - 亮 */
+  --color-bg: #FDF8F4;                /* 米白 - 背景 */
+  --color-card: #FFFFFF;
+  --color-text: #2D2D2D;
+  --color-text-secondary: #666666;
+  --color-text-muted: #999999;
+  --color-border: #E8E0D8;
+  --color-success: #52C41A;
+  --color-warning: #FAAD14;
+  --color-error: #FF4D4F;
   --font-size-title: 24px;
   --font-size-body: 16px;
   --font-size-small: 14px;
-  --spacing-unit: 8px;
+  --font-size-xs: 12px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #1a1a1a;
-  background: #fafafa;
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 #root {
@@ -50,8 +64,140 @@ body {
 /* auth loading */
 .auth-loading {
   min-height: 100vh;
-  background: #fafafa;
+  background: var(--color-bg);
 }
 .qclaw-toast--error   { background: #ff4d4f; }
 .qclaw-toast--warning { background: #faad14; color: #1a1a1a; }
 .qclaw-toast--info    { background: #1890ff; }
+
+/* ── Shimmer 骨架屏动画 ── */
+.skeleton-box {
+  background: linear-gradient(
+    90deg,
+    #F0E8E0 25%,
+    #F8F0EA 37%,
+    #F0E8E0 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.skeleton-cover {
+  width: 100%;
+  aspect-ratio: 16/10;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.skeleton-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-title {
+  height: 18px;
+  width: 70%;
+}
+
+.skeleton-meta {
+  height: 14px;
+  width: 40%;
+}
+
+.skeleton-heading {
+  height: 28px;
+  width: 60%;
+  margin-bottom: 16px;
+}
+
+.skeleton-line {
+  height: 14px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.skeleton-line.short {
+  width: 45%;
+}
+
+/* ── 页面进入过渡 ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.home-page,
+.search-page,
+.detail-page,
+.login-page,
+.favorite-list {
+  animation: fadeIn 0.3s ease;
+}
+
+/* ── 按钮涟漪效果 ── */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.3);
+  transform: scale(0);
+  border-radius: 50%;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.btn-ripple:active::after {
+  transform: scale(2);
+  opacity: 0;
+}
+
+/* ── 通用按钮 ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-light);
+}
+
+/* ── 滚动条美化 ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}

@@ -1,0 +1,22 @@
+修复 food-website 项目的 CI/CD ghcr.io 推送权限问题。项目路径：/Users/max_yang/Projects/food-website/
+
+Run #9 中 Build Frontend Image 和 Build Backend Image 构建成功但推送失败。
+
+问题原因：
+- 镜像构建步骤本身已经成功（Dockerfile 修复生效）
+- 但 push 到 ghcr.io 时报错：denied: installation not allowed to Create organization package
+- 原因是 GITHUB_TOKEN 默认没有 packages: write 权限
+
+任务要求：
+1. 修改 .github/workflows/deploy.yml：
+   - 在 jobs 层级上方（与 on: 同级）添加 permissions 配置：
+     ```yaml
+     permissions:
+       contents: read
+       packages: write
+     ```
+   - 放在 env: 下方即可
+2. 这个权限让 GITHUB_TOKEN 可以写入 GitHub Container Registry
+3. 不要修改其他已经修复的内容（ghcr.io 配置、npm install、file 参数移除等）
+
+完成后汇报修改的文件列表。

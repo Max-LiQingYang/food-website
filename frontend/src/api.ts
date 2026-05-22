@@ -145,7 +145,7 @@ export function getFavoriteStatus(recipeId: string): Promise<FavoriteStatusRespo
  * 用户注册
  * POST /api/auth/register
  */
-export function register(data: {username: string; password: string; email?: string}) {
+export function register(data: {username: string; password: string; email?: string; nickname?: string}) {
   return apiClient.post('/auth/register', data)
 }
 
