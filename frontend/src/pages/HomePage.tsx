@@ -70,7 +70,9 @@ export default function HomePage() {
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
         />
-        <button type="submit" className="home-search__btn">搜索</button>
+        <button type="submit" className="home-search__btn">
+          搜索
+        </button>
       </form>
 
       {/* 分类标签页 */}

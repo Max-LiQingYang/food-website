@@ -35,7 +35,7 @@
 .recommend-input-wrapper {
   display: flex;
   align-items: center;
-  background: #fff;
+  background: var(--color-card, #fff);
   border: 2px solid var(--color-border, #e8e0d8);
   border-radius: 12px;
   padding: 4px;
@@ -62,13 +62,13 @@
   outline: none;
   padding: 12px 8px;
   font-size: 1rem;
-  color: #333;
+  color: var(--color-text, #333);
   background: transparent;
   min-width: 0;
 }
 
 .recommend-input::placeholder {
-  color: #bbb;
+  color: var(--color-text-muted, #bbb);
 }
 
 .recommend-submit {
@@ -119,13 +119,13 @@
 
 .recommend-history__label {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--color-text-muted, #999);
 }
 
 .recommend-history__clear {
   border: none;
   background: none;
-  color: #bbb;
+  color: var(--color-text-muted, #bbb);
   font-size: 0.8rem;
   cursor: pointer;
   padding: 2px 6px;
@@ -145,11 +145,11 @@
 
 .recommend-history__tag {
   padding: 4px 14px;
-  background: #f5f5f5;
+  background: var(--color-bg, #f5f5f5);
   border: 1px solid #eee;
   border-radius: 20px;
   font-size: 0.82rem;
-  color: #666;
+  color: var(--color-text-secondary, #666);
   cursor: pointer;
   transition: all 0.2s;
   line-height: 1.4;
@@ -174,7 +174,7 @@
 
 .recommend-hot__label {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--color-text-muted, #999);
   margin-right: 4px;
 }
 
@@ -238,7 +238,12 @@
   display: inline-block;
   height: 20px;
   width: 200px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #f0f0f0) 25%,
+    var(--color-skeleton-to, #e0e0e0) 37%,
+    var(--color-skeleton-from, #f0f0f0) 63%
+  );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
   border-radius: 6px;
@@ -255,7 +260,7 @@
 .recommend-loading-bar {
   max-width: 320px;
   height: 4px;
-  background: #f0f0f0;
+  background: var(--color-skeleton-from, #f0f0f0);
   border-radius: 4px;
   margin: 20px auto 8px;
   overflow: hidden;
@@ -280,7 +285,7 @@
 
 .recommend-loading-text {
   text-align: center;
-  color: #999;
+  color: var(--color-text-muted, #999);
   font-size: 0.85rem;
   margin: 0 0 20px;
   animation: pulse 1.5s ease-in-out infinite;
@@ -303,7 +308,7 @@
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border-top-color: var(--color-card, #fff);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -329,7 +334,7 @@
 }
 
 .recommend-card {
-  background: #fff;
+  background: var(--color-card, #fff);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -402,7 +407,7 @@
 
 .recommend-card__fav:hover {
   transform: scale(1.15);
-  background: #fff;
+  background: var(--color-card, #fff);
 }
 
 .recommend-card__fav--active {
@@ -469,7 +474,7 @@
   font-size: 1.05rem;
   font-weight: 600;
   margin: 0 0 6px;
-  color: #333;
+  color: var(--color-text, #333);
   line-height: 1.4;
 }
 
@@ -488,7 +493,7 @@
   display: flex;
   gap: 12px;
   font-size: 0.8rem;
-  color: #999;
+  color: var(--color-text-muted, #999);
   margin-bottom: 10px;
 }
 
@@ -541,7 +546,12 @@
 /* ─── 骨架屏 ─── */
 
 .skeleton-box {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #f0f0f0) 25%,
+    var(--color-skeleton-to, #e0e0e0) 37%,
+    var(--color-skeleton-from, #f0f0f0) 63%
+  );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
   border-radius: 6px;
@@ -558,7 +568,7 @@
 
 .recommend-card--skeleton .recommend-card__cover {
   height: 160px;
-  background: #f0f0f0;
+  background: var(--color-skeleton-from, #f0f0f0);
 }
 
 .recommend-card--skeleton .skeleton-box--badge {
@@ -595,7 +605,7 @@
 .recommend-empty {
   text-align: center;
   padding: 40px 20px;
-  color: #999;
+  color: var(--color-text-muted, #999);
 }
 
 .recommend-empty--guide {
@@ -611,7 +621,7 @@
 .recommend-empty__text {
   font-size: 1.1rem;
   margin: 0 0 6px;
-  color: #666;
+  color: var(--color-text-secondary, #666);
 }
 
 .recommend-empty__hint {
@@ -670,7 +680,7 @@
 
 .recommend-empty__cta-hint {
   font-size: 0.85rem;
-  color: #bbb;
+  color: var(--color-text-muted, #bbb);
   margin: 0 0 8px;
 }
 

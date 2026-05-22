@@ -4,7 +4,7 @@ import { vi } from 'vitest'
 // Mock window.scrollTo
 Object.defineProperty(window, 'scrollTo', {
   writable: true,
-  value: vi.fn()
+  value: vi.fn(),
 })
 
 // Mock localStorage
@@ -19,5 +19,5 @@ vi.stubGlobal('localStorage', localStorageMock)
 // Mock window.location
 Object.defineProperty(window, 'location', {
   writable: true,
-  value: { pathname: '/', search: '', hash: '' }
+  value: { pathname: '/', search: '', hash: '' },
 })

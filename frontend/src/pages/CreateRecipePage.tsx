@@ -38,12 +38,12 @@ export default function CreateRecipePage() {
   const [servings, setServings] = useState(2)
   const [difficulty, setDifficulty] = useState('easy')
   const [cookTime, setCookTime] = useState(30)
-  const [ingredients, setIngredients] = useState<Array<{name: string; amount: number; unit: string}>>([
-    { ...EMPTY_INGREDIENT }
-  ])
-  const [steps, setSteps] = useState<Array<{stepNumber: number; content: string; image?: string}>>([
-    { ...EMPTY_STEP }
-  ])
+  const [ingredients, setIngredients] = useState<
+    Array<{ name: string; amount: number; unit: string }>
+  >([{ ...EMPTY_INGREDIENT }])
+  const [steps, setSteps] = useState<
+    Array<{ stepNumber: number; content: string; image?: string }>
+  >([{ ...EMPTY_STEP }])
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(isEdit)
 
@@ -130,11 +130,13 @@ export default function CreateRecipePage() {
         difficulty: difficulty || undefined,
         cookTime: cookTime || undefined,
         ingredients: ingredients.filter(i => i.name.trim()),
-        steps: steps.filter(s => s.content.trim()).map((s, i) => ({
-          ...s,
-          stepNumber: i + 1,
-          content: s.content.trim()
-        })),
+        steps: steps
+          .filter(s => s.content.trim())
+          .map((s, i) => ({
+            ...s,
+            stepNumber: i + 1,
+            content: s.content.trim(),
+          })),
       }
 
       if (isEdit && id) {
@@ -157,7 +159,7 @@ export default function CreateRecipePage() {
     return (
       <div className="create-page">
         <div className="create-skeleton">
-          {[1,2,3,4].map(i => (
+          {[1, 2, 3, 4].map(i => (
             <div key={i} className="skeleton-box skeleton-line" style={{ marginBottom: 16 }} />
           ))}
         </div>
@@ -201,18 +203,30 @@ export default function CreateRecipePage() {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">分类</label>
-              <select className="form-select" value={category} onChange={e => setCategory(e.target.value)}>
+              <select
+                className="form-select"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+              >
                 <option value="">请选择</option>
                 {CATEGORIES.map(c => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="form-group">
               <label className="form-label">难度</label>
-              <select className="form-select" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
+              <select
+                className="form-select"
+                value={difficulty}
+                onChange={e => setDifficulty(e.target.value)}
+              >
                 {DIFFICULTIES.map(d => (
-                  <option key={d.value} value={d.value}>{d.label}</option>
+                  <option key={d.value} value={d.value}>
+                    {d.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -282,8 +296,26 @@ export default function CreateRecipePage() {
                   value={ing.unit}
                   onChange={e => updateIngredient(i, 'unit', e.target.value)}
                 >
-                  {['g','kg','ml','L','个','根','勺','茶匙','汤匙','片','瓣','块','只','条','碗'].map(u => (
-                    <option key={u} value={u}>{u}</option>
+                  {[
+                    'g',
+                    'kg',
+                    'ml',
+                    'L',
+                    '个',
+                    '根',
+                    '勺',
+                    '茶匙',
+                    '汤匙',
+                    '片',
+                    '瓣',
+                    '块',
+                    '只',
+                    '条',
+                    '碗',
+                  ].map(u => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
                   ))}
                 </select>
                 <button
@@ -333,18 +365,10 @@ export default function CreateRecipePage() {
 
           {/* 提交 */}
           <div className="form-actions">
-            <button
-              type="button"
-              className="btn btn--outline"
-              onClick={() => navigate(-1)}
-            >
+            <button type="button" className="btn btn--outline" onClick={() => navigate(-1)}>
               取消
             </button>
-            <button
-              type="submit"
-              className="btn btn--primary"
-              disabled={submitting}
-            >
+            <button type="submit" className="btn btn--primary" disabled={submitting}>
               {submitting ? '提交中…' : isEdit ? '保存修改' : '发布食谱'}
             </button>
           </div>

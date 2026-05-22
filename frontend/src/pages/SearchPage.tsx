@@ -64,7 +64,9 @@ export default function SearchPage() {
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
         />
-        <button type="submit" className="search-btn">搜索</button>
+        <button type="submit" className="search-btn">
+          搜索
+        </button>
       </form>
 
       {q && (
@@ -117,11 +119,7 @@ export default function SearchPage() {
       {/* 分页 */}
       {total > PAGE_SIZE && (
         <div className="search-pagination">
-          <button
-            className="pagination-btn"
-            disabled={page <= 1}
-            onClick={() => goPage(page - 1)}
-          >
+          <button className="pagination-btn" disabled={page <= 1} onClick={() => goPage(page - 1)}>
             ← 上一页
           </button>
           <span className="pagination-info">

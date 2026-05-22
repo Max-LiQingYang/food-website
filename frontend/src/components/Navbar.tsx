@@ -65,26 +65,26 @@ export default function Navbar() {
           </button>
 
           <div className="navbar__auth">
-          {isAuthenticated ? (
-            <div className="navbar__user">
-              <Link
-                to={`/user/${user?.id}`}
-                className="navbar__username"
-                title={user?.username}
-                onClick={handleNavClick}
-              >
-                {displayName}
-              </Link>
-              <button className="navbar__logout-btn" onClick={logout}>
-                退出
+            {isAuthenticated ? (
+              <div className="navbar__user">
+                <Link
+                  to={`/user/${user?.id}`}
+                  className="navbar__username"
+                  title={user?.username}
+                  onClick={handleNavClick}
+                >
+                  {displayName}
+                </Link>
+                <button className="navbar__logout-btn" onClick={logout}>
+                  退出
+                </button>
+              </div>
+            ) : (
+              <button className="navbar__login-btn" onClick={() => navigate('/login')}>
+                登录/注册
               </button>
-            </div>
-          ) : (
-            <button className="navbar__login-btn" onClick={() => navigate('/login')}>
-              登录/注册
-            </button>
-          )}
-        </div>
+            )}
+          </div>
         </div>
       </div>
       {menuOpen && <div className="navbar__overlay" onClick={() => setMenuOpen(false)} />}

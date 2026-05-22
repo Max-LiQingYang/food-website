@@ -28,18 +28,22 @@
 .search-input {
   flex: 1;
   padding: 13px 16px 13px 46px;
-  border: 2px solid var(--color-border, #E8E0D8);
+  border: 2px solid var(--color-border, #e8e0d8);
   border-radius: 28px;
   font-size: 16px;
   color: var(--color-text, #333);
   outline: none;
   background: var(--color-card, #fff);
-  transition: border-color 0.25s, box-shadow 0.25s;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
 }
 
 .search-input:focus {
-  border-color: var(--color-primary, #E8663E);
-  box-shadow: 0 0 0 4px rgba(232, 102, 62, 0.1), 0 2px 8px rgba(232, 102, 62, 0.06);
+  border-color: var(--color-primary, #e8663e);
+  box-shadow:
+    0 0 0 4px rgba(232, 102, 62, 0.1),
+    0 2px 8px rgba(232, 102, 62, 0.06);
 }
 
 .search-input::placeholder {
@@ -49,18 +53,20 @@
 
 .search-btn {
   padding: 13px 28px;
-  background: var(--color-primary, #E8663E);
+  background: var(--color-primary, #e8663e);
   color: #fff;
   border: none;
   border-radius: 28px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition:
+    background 0.2s,
+    transform 0.15s;
 }
 
 .search-btn:hover {
-  background: var(--color-primary-dark, #C94F2A);
+  background: var(--color-primary-dark, #c94f2a);
 }
 
 .search-btn:active {
@@ -133,7 +139,7 @@
 
 .pagination-btn {
   padding: 8px 20px;
-  border: 1px solid var(--color-border, #E8E0D8);
+  border: 1px solid var(--color-border, #e8e0d8);
   border-radius: 20px;
   background: var(--color-card, #fff);
   font-size: 14px;
@@ -143,8 +149,8 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  border-color: var(--color-primary, #E8663E);
-  color: var(--color-primary, #E8663E);
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
 }
 
 .pagination-btn:disabled {

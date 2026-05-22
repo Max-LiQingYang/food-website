@@ -15,9 +15,13 @@ describe('HomePage', () => {
 
   it('空数据时显示空状态', async () => {
     ;(api.getRecipes as any).mockResolvedValue({
-      data: { list: [], total: 0 }
+      data: { list: [], total: 0 },
     })
-    render(<MemoryRouter><HomePage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>
+    )
     await waitFor(() => {
       expect(screen.getByText('暂无食谱')).toBeInTheDocument()
     })
@@ -27,13 +31,31 @@ describe('HomePage', () => {
     ;(api.getRecipes as any).mockResolvedValue({
       data: {
         list: [
-          { id: '1', title: '宫保鸡丁', coverImage: '', author: '大厨', cookTime: 30, category: '中餐' },
-          { id: '2', title: '意大利面', coverImage: '', author: 'Chef', cookTime: 20, category: '西餐' },
+          {
+            id: '1',
+            title: '宫保鸡丁',
+            coverImage: '',
+            author: '大厨',
+            cookTime: 30,
+            category: '中餐',
+          },
+          {
+            id: '2',
+            title: '意大利面',
+            coverImage: '',
+            author: 'Chef',
+            cookTime: 20,
+            category: '西餐',
+          },
         ],
-        total: 2
-      }
+        total: 2,
+      },
     })
-    render(<MemoryRouter><HomePage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>
+    )
     await waitFor(() => {
       expect(screen.getByText('宫保鸡丁')).toBeInTheDocument()
     })
@@ -42,9 +64,13 @@ describe('HomePage', () => {
 
   it('渲染搜索栏和分类标签', async () => {
     ;(api.getRecipes as any).mockResolvedValue({
-      data: { list: [], total: 0 }
+      data: { list: [], total: 0 },
     })
-    render(<MemoryRouter><HomePage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>
+    )
     await waitFor(() => {
       expect(screen.getByPlaceholderText('搜索食谱...')).toBeInTheDocument()
     })
@@ -58,9 +84,13 @@ describe('HomePage', () => {
 
   it('分类切换触发重新请求', async () => {
     const mockFn = (api.getRecipes as any).mockResolvedValue({
-      data: { list: [], total: 0 }
+      data: { list: [], total: 0 },
     })
-    render(<MemoryRouter><HomePage /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>
+    )
     await waitFor(() => {
       expect(mockFn).toHaveBeenCalledTimes(1)
     })

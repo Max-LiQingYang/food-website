@@ -66,7 +66,9 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   position: relative;
 }
 
@@ -90,7 +92,11 @@
   align-items: center;
   justify-content: center;
   background: var(--color-skeleton-from, #f0f0f0);
-  background: linear-gradient(135deg, var(--color-skeleton-from, #f0f0f0), var(--color-skeleton-to, #e8e8e8));
+  background: linear-gradient(
+    135deg,
+    var(--color-skeleton-from, #f0f0f0),
+    var(--color-skeleton-to, #e8e8e8)
+  );
   cursor: default;
 }
 
@@ -174,7 +180,9 @@
   border: none;
   font-size: 16px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -192,7 +200,12 @@
 
 /* ── 骨架屏 ── */
 .skeleton-box {
-  background: linear-gradient(90deg, var(--color-skeleton-from, #f0f0f0) 25%, var(--color-skeleton-to, #e0e0e0) 50%, var(--color-skeleton-from, #f0f0f0) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #f0f0f0) 25%,
+    var(--color-skeleton-to, #e0e0e0) 50%,
+    var(--color-skeleton-from, #f0f0f0) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 6px;
@@ -210,8 +223,12 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ── 分页 ── */
@@ -271,7 +288,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── 通用按钮 ── */

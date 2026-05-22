@@ -35,7 +35,7 @@ function formatDate(isoString?: string): string {
   return new Date(isoString).toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   })
 }
 
@@ -50,7 +50,7 @@ export default function FavoriteList() {
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     pageSize: 12,
-    total: 0
+    total: 0,
   })
 
   const totalPages = Math.ceil(pagination.total / pagination.pageSize)
@@ -59,9 +59,7 @@ export default function FavoriteList() {
     setLoading(true)
     try {
       const res = await getFavoriteList({ page, pageSize: pagination.pageSize })
-      setList(
-        (res.data.list || []).map((item: FavoriteItem) => ({ ...item, removing: false }))
-      )
+      setList((res.data.list || []).map((item: FavoriteItem) => ({ ...item, removing: false })))
       setPagination(prev => ({ ...prev, total: res.data.total || 0, page }))
     } catch {
       // 加载失败静默处理
@@ -72,22 +70,18 @@ export default function FavoriteList() {
 
   useEffect(() => {
     fetchList()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function unfavorite(item: FavoriteItem) {
     if (item.removing || !item.recipe) return
-    setList(prev =>
-      prev.map(i => (i.id === item.id ? { ...i, removing: true } : i))
-    )
+    setList(prev => prev.map(i => (i.id === item.id ? { ...i, removing: true } : i)))
     try {
       await removeFavorite(item.recipe.id)
       setList(prev => prev.filter(i => i.id !== item.id))
       setPagination(prev => ({ ...prev, total: prev.total - 1 }))
     } catch {
-      setList(prev =>
-        prev.map(i => (i.id === item.id ? { ...i, removing: false } : i))
-      )
+      setList(prev => prev.map(i => (i.id === item.id ? { ...i, removing: false } : i)))
     }
   }
 
@@ -161,9 +155,7 @@ export default function FavoriteList() {
                 <span className="recipe-card__deleted-badge">已删除</span>
               </div>
               <div className="recipe-card__info">
-                <h3 className="recipe-card__title recipe-card__title--deleted">
-                  食谱已不存在
-                </h3>
+                <h3 className="recipe-card__title recipe-card__title--deleted">食谱已不存在</h3>
                 <p className="recipe-card__author">该食谱已被作者删除</p>
                 <p className="recipe-card__date">收藏于 {formatDate(item.createdAt)}</p>
               </div>
@@ -180,24 +172,21 @@ export default function FavoriteList() {
                   alt={item.recipe.title}
                   loading="lazy"
                 />
-                <span className="recipe-card__cooktime">
-                  ⏱ {item.recipe.cookTime || '—'} 分钟
-                </span>
+                <span className="recipe-card__cooktime">⏱ {item.recipe.cookTime || '—'} 分钟</span>
               </div>
               <div className="recipe-card__info">
                 <h3 className="recipe-card__title">{item.recipe.title}</h3>
-                <p className="recipe-card__author">
-                  👨🍳 {item.recipe.author || '未知作者'}
-                </p>
-                <p className="recipe-card__date">
-                  收藏于 {formatDate(item.createdAt)}
-                </p>
+                <p className="recipe-card__author">👨🍳 {item.recipe.author || '未知作者'}</p>
+                <p className="recipe-card__date">收藏于 {formatDate(item.createdAt)}</p>
               </div>
               <button
                 className="recipe-card__unfav"
                 disabled={item.removing}
                 aria-label={`取消收藏：${item.recipe.title}`}
-                onClick={e => { e.stopPropagation(); unfavorite(item) }}
+                onClick={e => {
+                  e.stopPropagation()
+                  unfavorite(item)
+                }}
               >
                 {item.removing ? '⋯' : '❤️'}
               </button>

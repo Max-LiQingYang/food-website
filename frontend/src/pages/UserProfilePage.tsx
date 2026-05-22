@@ -17,7 +17,11 @@ export default function UserProfilePage() {
   const pageSize = 12
 
   useEffect(() => {
-    if (!id) { setNotFound(true); setLoading(false); return }
+    if (!id) {
+      setNotFound(true)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     getUserProfile(id)
       .then((data: any) => setProfile(data))
@@ -41,8 +45,14 @@ export default function UserProfilePage() {
     return (
       <div className="profile-page">
         <div className="profile-skeleton">
-          <div className="skeleton-box" style={{ width: 80, height: 80, borderRadius: '50%', margin: '0 auto' }} />
-          <div className="skeleton-box skeleton-heading" style={{ width: '40%', margin: '16px auto' }} />
+          <div
+            className="skeleton-box"
+            style={{ width: 80, height: 80, borderRadius: '50%', margin: '0 auto' }}
+          />
+          <div
+            className="skeleton-box skeleton-heading"
+            style={{ width: '40%', margin: '16px auto' }}
+          />
           <div className="skeleton-box skeleton-line short" style={{ margin: '0 auto' }} />
         </div>
       </div>
@@ -56,7 +66,9 @@ export default function UserProfilePage() {
           <div className="profile-notfound__icon">👤</div>
           <h2>用户不存在</h2>
           <p>该用户可能已注销</p>
-          <Link to="/" className="btn btn--primary">返回首页</Link>
+          <Link to="/" className="btn btn--primary">
+            返回首页
+          </Link>
         </div>
       </div>
     )
@@ -67,12 +79,12 @@ export default function UserProfilePage() {
   return (
     <div className="profile-page">
       <div className="profile-header">
-        <div className="profile-avatar">
-          {displayName.charAt(0).toUpperCase()}
-        </div>
+        <div className="profile-avatar">{displayName.charAt(0).toUpperCase()}</div>
         <h1 className="profile-name">{displayName}</h1>
         {profile.nickname && <p className="profile-username">@{profile.username}</p>}
-        <p className="profile-joined">加入于 {new Date(profile.createdAt).toLocaleDateString('zh-CN')}</p>
+        <p className="profile-joined">
+          加入于 {new Date(profile.createdAt).toLocaleDateString('zh-CN')}
+        </p>
       </div>
 
       <div className="profile-recipes-section">
@@ -82,11 +94,14 @@ export default function UserProfilePage() {
 
         {recipesLoading ? (
           <div className="profile-grid">
-            {[1,2,3,4,5,6].map(i => (
+            {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="profile-card-skeleton">
                 <div className="skeleton-box skeleton-cover" />
                 <div className="skeleton-box skeleton-line" style={{ margin: '12px 14px' }} />
-                <div className="skeleton-box skeleton-line short" style={{ margin: '0 14px 14px' }} />
+                <div
+                  className="skeleton-box skeleton-line short"
+                  style={{ margin: '0 14px 14px' }}
+                />
               </div>
             ))}
           </div>
@@ -111,7 +126,9 @@ export default function UserProfilePage() {
                 >
                   上一页
                 </button>
-                <span className="pagination-info">{page} / {Math.ceil(total / pageSize)}</span>
+                <span className="pagination-info">
+                  {page} / {Math.ceil(total / pageSize)}
+                </span>
                 <button
                   className="pagination-btn"
                   disabled={page >= Math.ceil(total / pageSize)}

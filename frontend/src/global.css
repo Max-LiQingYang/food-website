@@ -6,26 +6,26 @@
 }
 
 :root {
-  --color-primary: #E8663E;           /* 暖橙 - 主色 */
-  --color-primary-light: #F0946E;     /* 暖橙 - 亮 */
-  --color-primary-dark: #C94F2A;      /* 暖橙 - 暗 */
-  --color-primary-bg: #FFF3ED;        /* 暖橙 - 背景 */
-  --color-accent: #FF8C42;            /* 珊瑚橙 - 强调 */
-  --color-accent-light: #FFB380;      /* 珊瑚橙 - 亮 */
-  --color-bg: #FDF8F4;                /* 米白 - 背景 */
-  --color-card: #FFFFFF;
-  --color-text: #2D2D2D;
+  --color-primary: #e8663e; /* 暖橙 - 主色 */
+  --color-primary-light: #f0946e; /* 暖橙 - 亮 */
+  --color-primary-dark: #c94f2a; /* 暖橙 - 暗 */
+  --color-primary-bg: #fff3ed; /* 暖橙 - 背景 */
+  --color-accent: #ff8c42; /* 珊瑚橙 - 强调 */
+  --color-accent-light: #ffb380; /* 珊瑚橙 - 亮 */
+  --color-bg: #fdf8f4; /* 米白 - 背景 */
+  --color-card: #ffffff;
+  --color-text: #2d2d2d;
   --color-text-secondary: #666666;
   --color-text-muted: #999999;
-  --color-border: #E8E0D8;
-  --color-input-bg: #FFFFFF;
-  --color-input-border: #D0C8C0;
-  --color-success: #52C41A;
-  --color-warning: #FAAD14;
-  --color-error: #FF4D4F;
-  --color-skeleton-from: #F0E8E0;
-  --color-skeleton-to: #F8F0EA;
-  --color-scrollbar: #D0C8C0;
+  --color-border: #e8e0d8;
+  --color-input-bg: #ffffff;
+  --color-input-border: #d0c8c0;
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #ff4d4f;
+  --color-skeleton-from: #f0e8e0;
+  --color-skeleton-to: #f8f0ea;
+  --color-scrollbar: #d0c8c0;
   --font-size-title: 24px;
   --font-size-body: 16px;
   --font-size-small: 14px;
@@ -33,38 +33,39 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
 }
 
 /* ── 暗色模式 ── */
 body.dark {
-  --color-bg: #12121E;
-  --color-card: #1E1E32;
-  --color-text: #E0E0EE;
-  --color-text-secondary: #9898B0;
+  --color-bg: #12121e;
+  --color-card: #1e1e32;
+  --color-text: #e0e0ee;
+  --color-text-secondary: #9898b0;
   --color-text-muted: #686880;
-  --color-border: #2E2E48;
+  --color-border: #2e2e48;
   --color-input-bg: #282840;
-  --color-input-border: #3E3E58;
-  --color-primary-bg: #2E1A14;
+  --color-input-border: #3e3e58;
+  --color-primary-bg: #2e1a14;
   --color-skeleton-from: #262640;
   --color-skeleton-to: #303050;
-  --color-scrollbar: #3E3E58;
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  --color-scrollbar: #3e3e58;
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--color-text);
   background: var(--color-bg);
-  transition: background-color var(--transition-normal),
-              color var(--transition-normal);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal);
 }
 
 #root {
@@ -92,9 +93,16 @@ body {
   min-height: 100vh;
   background: var(--color-bg);
 }
-.qclaw-toast--error   { background: #ff4d4f; }
-.qclaw-toast--warning { background: #faad14; color: #1a1a1a; }
-.qclaw-toast--info    { background: #1890ff; }
+.qclaw-toast--error {
+  background: #ff4d4f;
+}
+.qclaw-toast--warning {
+  background: #faad14;
+  color: #1a1a1a;
+}
+.qclaw-toast--info {
+  background: #1890ff;
+}
 
 /* ── Shimmer 骨架屏动画 ── */
 .skeleton-box {
@@ -110,8 +118,12 @@ body {
 }
 
 @keyframes shimmer {
-  0% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .skeleton-cover {
@@ -155,8 +167,14 @@ body {
 
 /* ── 页面进入过渡 ── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .home-page,
@@ -177,10 +195,12 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(0);
   border-radius: 50%;
-  transition: transform 0.5s, opacity 0.5s;
+  transition:
+    transform 0.5s,
+    opacity 0.5s;
 }
 
 .btn-ripple:active::after {

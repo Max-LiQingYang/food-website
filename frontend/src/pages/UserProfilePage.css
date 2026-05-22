@@ -10,7 +10,7 @@
 .profile-header {
   text-align: center;
   padding: 32px 0 24px;
-  border-bottom: 1px solid var(--color-border, #E8E0D8);
+  border-bottom: 1px solid var(--color-border, #e8e0d8);
   margin-bottom: 32px;
 }
 
@@ -18,7 +18,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: var(--color-primary, #E8663E);
+  background: var(--color-primary, #e8663e);
   color: #fff;
   font-size: 32px;
   font-weight: 700;
@@ -143,7 +143,7 @@
 
 .pagination-btn {
   padding: 8px 20px;
-  border: 1px solid var(--color-border, #E8E0D8);
+  border: 1px solid var(--color-border, #e8e0d8);
   border-radius: 20px;
   background: var(--color-card, #fff);
   font-size: 14px;
@@ -153,8 +153,8 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  border-color: var(--color-primary, #E8663E);
-  color: var(--color-primary, #E8663E);
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
 }
 
 .pagination-btn:disabled {

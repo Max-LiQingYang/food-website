@@ -149,11 +149,7 @@ export default function RecipeDetailPage() {
               <Link to={`/recipe/${id}/edit`} className="detail-btn-edit">
                 ✏️ 编辑
               </Link>
-              <button
-                className="detail-btn-delete"
-                onClick={handleDelete}
-                disabled={deleting}
-              >
+              <button className="detail-btn-delete" onClick={handleDelete} disabled={deleting}>
                 🗑️ {deleting ? '删除中…' : '删除'}
               </button>
             </div>
@@ -174,18 +170,19 @@ export default function RecipeDetailPage() {
         <div className="detail-header">
           <h1 className="detail-title">{recipe.title}</h1>
           <p className="detail-author">
-            👨‍🍳 {recipe.userId && isAuthenticated ? (
-              <Link to={`/user/${recipe.userId}`} className="detail-author-link">{recipe.author || '未知作者'}</Link>
-            ) : recipe.author || '未知作者'}
+            👨‍🍳{' '}
+            {recipe.userId && isAuthenticated ? (
+              <Link to={`/user/${recipe.userId}`} className="detail-author-link">
+                {recipe.author || '未知作者'}
+              </Link>
+            ) : (
+              recipe.author || '未知作者'
+            )}
           </p>
 
           <div className="detail-meta">
-            {recipe.category && (
-              <span className="detail-tag">{recipe.category}</span>
-            )}
-            {recipe.difficulty && (
-              <span className="detail-tag">难度：{recipe.difficulty}</span>
-            )}
+            {recipe.category && <span className="detail-tag">{recipe.category}</span>}
+            {recipe.difficulty && <span className="detail-tag">难度：{recipe.difficulty}</span>}
             {recipe.servings != null && (
               <span className="detail-tag">🍽️ {recipe.servings} 人份</span>
             )}
@@ -194,9 +191,7 @@ export default function RecipeDetailPage() {
             )}
           </div>
 
-          {recipe.description && (
-            <p className="detail-desc">{recipe.description}</p>
-          )}
+          {recipe.description && <p className="detail-desc">{recipe.description}</p>}
         </div>
 
         {/* 食材列表 */}

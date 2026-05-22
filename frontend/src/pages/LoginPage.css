@@ -4,7 +4,7 @@
   justify-content: center;
   min-height: calc(100vh - 56px);
   padding: 24px 16px;
-  background: var(--color-bg, #FDF8F4);
+  background: var(--color-bg, #fdf8f4);
 }
 
 .login-card {
@@ -22,7 +22,7 @@
   display: flex;
   gap: 0;
   margin-bottom: 24px;
-  background: var(--color-primary-bg, #FFF3ED);
+  background: var(--color-primary-bg, #fff3ed);
   border-radius: var(--radius-md, 10px);
   padding: 3px;
 }
@@ -42,7 +42,7 @@
 
 .login-tab.active {
   background: var(--color-card, #fff);
-  color: var(--color-primary, #E8663E);
+  color: var(--color-primary, #e8663e);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
@@ -86,11 +86,13 @@
   font-size: 15px;
   color: var(--color-text, #333);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .form-group input:focus {
-  border-color: var(--color-primary, #E8663E);
+  border-color: var(--color-primary, #e8663e);
   box-shadow: 0 0 0 3px rgba(232, 102, 62, 0.12);
 }
 
@@ -102,19 +104,21 @@
   position: relative;
   overflow: hidden;
   padding: 11px 0;
-  background: var(--color-primary, #E8663E);
+  background: var(--color-primary, #e8663e);
   color: #fff;
   border: none;
   border-radius: var(--radius-md, 10px);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition:
+    background 0.2s,
+    transform 0.15s;
   margin-top: 4px;
 }
 
 .login-submit:hover:not(:disabled) {
-  background: var(--color-primary-dark, #C94F2A);
+  background: var(--color-primary-dark, #c94f2a);
   transform: translateY(-1px);
 }
 
@@ -137,7 +141,7 @@
 .login-link-btn {
   background: none;
   border: none;
-  color: var(--color-primary, #E8663E);
+  color: var(--color-primary, #e8663e);
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
@@ -146,7 +150,7 @@
 }
 
 .login-link-btn:hover {
-  color: var(--color-primary-dark, #C94F2A);
+  color: var(--color-primary-dark, #c94f2a);
 }
 
 @media (max-width: 480px) {
