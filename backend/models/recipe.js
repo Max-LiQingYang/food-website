@@ -67,6 +67,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: '难度: easy, medium, hard'
       },
+      categoryTags: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '多维分类标签 JSON: {ingredient, method, cuisine, flavor, price}'
+      },
       userId: {
         type: DataTypes.STRING,
         allowNull: true,
