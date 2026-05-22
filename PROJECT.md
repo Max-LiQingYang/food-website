@@ -36,7 +36,7 @@
 ```
 git push ≠ 部署完成
 ```
-完整闭环：代码提交 → 构建 → 数据库迁移 → 种子脚本 → 重启容器 → 健康检查验证
+完整闭环：代码修改 → 格式化检查 → 代码提交 → 构建 → 数据库迁移 → 种子脚本 → 重启容器 → 健康检查验证
 
 ### 2. 健康检查铁律
 ```
@@ -52,10 +52,11 @@ git push ≠ 部署完成
 
 ### 4. 代码修改后格式化铁律
 ```
-修改代码后必须运行格式化检查：
+修改代码后必须运行格式化检查（替代 PostToolUse Hook）：
 - 前端: cd frontend && npm run lint --fix
 - 后端: cd backend && npm run lint --fix
-避免 CI 因格式问题挂掉
+- 格式化失败必须修复后才能 git commit
+- 避免 CI 因格式问题挂掉
 ```
 
 ## 数据库 Schema
@@ -125,10 +126,11 @@ git push ≠ 部署完成
 
 ## CI/CD 流程
 
-1. push 到 main/develop 分支触发
-2. Lint → Test → Build Docker Image → Push to ghcr.io
-3. SSH 到服务器：`git pull` → `docker pull` → `docker-compose up -d`
-4. 健康检查验证
+1. **代码修改后先格式化**: `npm run lint --fix`（前端和后端都要跑）
+2. push 到 main/develop 分支触发
+3. Lint → Test → Build Docker Image → Push to ghcr.io
+4. SSH 到服务器：`git pull` → `docker pull` → `docker-compose up -d`
+5. 健康检查验证
 
 ## 已知陷阱
 
