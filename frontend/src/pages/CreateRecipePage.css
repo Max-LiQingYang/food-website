@@ -110,7 +110,7 @@
   height: 30px;
   border-radius: 50%;
   border: 1px solid #f0d0d0;
-  background: #fff;
+  background: var(--color-card, #fff);
   color: #c66;
   font-size: 14px;
   cursor: pointer;
@@ -121,7 +121,7 @@
 }
 
 .form-btn-remove:hover:not(:disabled) {
-  background: #fef0f0;
+  background: var(--color-primary-bg, #fef0f0);
   border-color: #e66666;
   color: #e33;
 }

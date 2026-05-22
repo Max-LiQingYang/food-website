@@ -18,9 +18,14 @@
   --color-text-secondary: #666666;
   --color-text-muted: #999999;
   --color-border: #E8E0D8;
+  --color-input-bg: #FFFFFF;
+  --color-input-border: #D0C8C0;
   --color-success: #52C41A;
   --color-warning: #FAAD14;
   --color-error: #FF4D4F;
+  --color-skeleton-from: #F0E8E0;
+  --color-skeleton-to: #F8F0EA;
+  --color-scrollbar: #D0C8C0;
   --font-size-title: 24px;
   --font-size-body: 16px;
   --font-size-small: 14px;
@@ -35,10 +40,31 @@
   --transition-normal: 0.3s ease;
 }
 
+/* ── 暗色模式 ── */
+body.dark {
+  --color-bg: #12121E;
+  --color-card: #1E1E32;
+  --color-text: #E0E0EE;
+  --color-text-secondary: #9898B0;
+  --color-text-muted: #686880;
+  --color-border: #2E2E48;
+  --color-input-bg: #282840;
+  --color-input-border: #3E3E58;
+  --color-primary-bg: #2E1A14;
+  --color-skeleton-from: #262640;
+  --color-skeleton-to: #303050;
+  --color-scrollbar: #3E3E58;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--color-text);
   background: var(--color-bg);
+  transition: background-color var(--transition-normal),
+              color var(--transition-normal);
 }
 
 #root {
@@ -74,9 +100,9 @@ body {
 .skeleton-box {
   background: linear-gradient(
     90deg,
-    #F0E8E0 25%,
-    #F8F0EA 37%,
-    #F0E8E0 63%
+    var(--color-skeleton-from) 25%,
+    var(--color-skeleton-to) 37%,
+    var(--color-skeleton-from) 63%
   );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
@@ -194,7 +220,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: var(--color-scrollbar);
   border-radius: 3px;
 }
 

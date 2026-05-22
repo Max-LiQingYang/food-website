@@ -1,10 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import { useState } from 'react'
 import './Navbar.css'
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth()
+  const { isDark, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -52,7 +54,17 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="navbar__auth">
+        <div className="navbar__actions">
+          <button
+            className="navbar__theme-toggle"
+            onClick={toggleTheme}
+            aria-label={isDark ? '切换到浅色模式' : '切换到深色模式'}
+            title={isDark ? '切换到浅色模式' : '切换到深色模式'}
+          >
+            {isDark ? '☀️' : '🌙'}
+          </button>
+
+          <div className="navbar__auth">
           {isAuthenticated ? (
             <div className="navbar__user">
               <Link
@@ -72,6 +84,7 @@ export default function Navbar() {
               登录/注册
             </button>
           )}
+        </div>
         </div>
       </div>
       {menuOpen && <div className="navbar__overlay" onClick={() => setMenuOpen(false)} />}
