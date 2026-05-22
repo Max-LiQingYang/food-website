@@ -14,7 +14,8 @@ COPY . .
 
 # 构建生产资源
 # VITE_API_BASE_URL 在构建时注入（供 Vite 内联到 bundle）
-ARG VITE_API_BASE_URL=https://api.example.com
+# 默认 /api 利用 Nginx 反向代理（nginx.conf 中已配置 /api → backend:3001）
+ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 RUN npx vite build
