@@ -21,8 +21,8 @@ const LIST_ATTRIBUTES = [
   'id', 'title', 'description', 'category', 'difficulty',
   'servings', 'cookTime', 'coverImage', 'season',
   'favoriteCount', 'commentCount', 'viewCount',
-  'avgRating', 'ratingCount', 'qualityScore', 'qualityLabel',
   'categoryTags', 'nutrition', 'tips'
+  // 注意：avgRating, ratingCount, qualityScore, qualityLabel 不在生产 DB 表结构中
 ]
 
 /** 默认偏好设置 */
@@ -125,11 +125,11 @@ router.get('/recommend-by-preference', auth, async (req, res) => {
     // 排除的食材：后端过滤
     const excluded = (prefs.excludedIngredients || []).filter(Boolean).map(s => s.toLowerCase())
 
-    // 查询
+    // 查询（按收藏数排序作为 qualityScore 的近似替代）
     let recipes = await Recipe.findAll({
       where,
       attributes: LIST_ATTRIBUTES,
-      order: [['qualityScore', 'DESC']],
+      order: [['favoriteCount', 'DESC']],
       limit: 20,
     })
 
@@ -142,9 +142,10 @@ router.get('/recommend-by-preference', auth, async (req, res) => {
       })
     }
 
-    // 设置 qualityLabel
+    // 设置 qualityLabel（使用 favoriteCount 近似替代 qualityScore）
     recipes = recipes.map(r => {
       const d = r.toJSON()
+      d.qualityScore = d.favoriteCount * 2 + d.commentCount * 1.5 + d.viewCount * 0.3
       d.qualityLabel = d.qualityScore >= 20 ? '热门' : d.qualityScore >= 8 ? '高分' : d.qualityScore >= 3 ? '品质' : '普通'
       return d
     })
