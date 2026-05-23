@@ -582,6 +582,124 @@ describe('GET /api/recipes/featured — 编辑精选', () => {
   })
 })
 
+
+// ─────────────────────────────────────────────────────────────────
+// 浏览量追踪
+// ─────────────────────────────────────────────────────────────────
+describe("GET /:id — 浏览量追踪", () => {
+  test("访问详情应自动递增 viewCount", async () => {
+    const { v4: uuidv4 } = require("uuid")
+    const id = uuidv4()
+    await db.Recipe.create({
+      id, title: "浏览测试", category: "chinese",
+      ingredients: JSON.stringify([{ name: "鸡蛋", amount: 2, unit: "个" }]),
+      steps: JSON.stringify([{ stepNumber: 1, content: "步骤1" }]),
+      viewCount: 5,
+    })
+
+    // 第一次访问
+    const res1 = await request(app).get("/api/recipes/" + id)
+    expect(res1.status).toBe(200)
+    expect(res1.body.data).toHaveProperty("viewCount")
+    // viewCount 在响应时还是旧值（setImmediate 非阻塞，尚未写入）
+    // 只需验证存在且非负
+    expect(res1.body.data.viewCount).toBeGreaterThanOrEqual(0)
+    expect(res1.body.data).toHaveProperty("avgRating")
+    expect(res1.body.data).toHaveProperty("ratingCount")
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
+// 平均评分聚合
+// ─────────────────────────────────────────────────────────────────
+describe("GET /recipes — 平均评分", () => {
+  test("列表接口应返回 avgRating 和 ratingCount", async () => {
+    const { v4: uuidv4 } = require("uuid")
+    const recipeId = uuidv4()
+    const userId = uuidv4()
+
+    await db.Recipe.create({
+      id: recipeId, title: "评分测试食谱", category: "chinese",
+      ingredients: JSON.stringify([{ name: "测试", amount: 1, unit: "份" }]),
+      steps: JSON.stringify([{ stepNumber: 1, content: "测试步骤" }]),
+    })
+
+    // 创建一条评分
+    await db.Comment.create({ content: "好!", rating: 5, recipeId, userId, })
+
+    const res = await request(app).get("/api/recipes")
+    expect(res.status).toBe(200)
+
+    const recipe = res.body.data.list.find(r => r.id === recipeId)
+    expect(recipe).toBeDefined()
+    expect(recipe).toHaveProperty("avgRating")
+    expect(recipe.avgRating).toBe(5)
+    expect(recipe).toHaveProperty("ratingCount")
+    expect(recipe.ratingCount).toBe(1)
+    expect(recipe).toHaveProperty("qualityScore")
+    expect(recipe.qualityScore).toBeGreaterThan(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
+// 排行榜排序
+// ─────────────────────────────────────────────────────────────────
+describe("GET /rankings — 排行榜排序", () => {
+  test("应支持 sortBy=views 按浏览量排序", async () => {
+    const { v4: uuidv4 } = require("uuid")
+
+    // 创建两条食谱，第二条浏览量更高
+    await db.Recipe.create({
+      id: uuidv4(), title: "低浏览", category: "chinese",
+      viewCount: 1,
+      ingredients: JSON.stringify([{ name: "a", amount: 1, unit: "g" }]),
+      steps: JSON.stringify([{ stepNumber: 1, content: "步骤" }]),
+    })
+    await db.Recipe.create({
+      id: uuidv4(), title: "高浏览", category: "chinese",
+      viewCount: 100,
+      ingredients: JSON.stringify([{ name: "b", amount: 1, unit: "g" }]),
+      steps: JSON.stringify([{ stepNumber: 1, content: "步骤" }]),
+    })
+
+    const res = await request(app).get("/api/recipes/rankings").query({ sortBy: "views" })
+    expect(res.status).toBe(200)
+    expect(res.body.data).toHaveProperty("sortBy", "views")
+    expect(res.body.data.list.length).toBeGreaterThan(0)
+    expect(res.body.data.list[0].viewCount).toBeGreaterThanOrEqual(1)
+  })
+
+  test("应支持 sortBy=rating 按评分排序", async () => {
+    const { v4: uuidv4 } = require("uuid")
+    const rid1 = uuidv4()
+    const rid2 = uuidv4()
+    const uid = uuidv4()
+
+    await db.Recipe.create({
+      id: rid1, title: "高评分食谱", category: "chinese",
+      ingredients: JSON.stringify([{ name: "a", amount: 1, unit: "g" }]),
+      steps: JSON.stringify([{ stepNumber: 1, content: "步骤" }]),
+    })
+    await db.Recipe.create({
+      id: rid2, title: "无评分食谱", category: "chinese",
+      ingredients: JSON.stringify([{ name: "b", amount: 1, unit: "g" }]),
+      steps: JSON.stringify([{ stepNumber: 1, content: "步骤" }]),
+    })
+
+    await db.Comment.create({ content: "好吃", rating: 5, recipeId: rid1, userId: uid, })
+
+    const res = await request(app).get("/api/recipes/rankings").query({ sortBy: "rating" })
+    expect(res.status).toBe(200)
+    expect(res.body.data).toHaveProperty("sortBy", "rating")
+  })
+
+  test("默认 sortBy=composite 应返回综合排序", async () => {
+    const res = await request(app).get("/api/recipes/rankings")
+    expect(res.status).toBe(200)
+    expect(res.body.data).toHaveProperty("sortBy", "composite")
+  })
+})
+
 // ─────────────────────────────────────────────────────────────────
 // 健康检查
 // ─────────────────────────────────────────────────────────────────

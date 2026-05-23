@@ -105,6 +105,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
         comment: '编辑精选标记'
       },
+      viewCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        comment: '浏览量（每次 GET /:id 自动 +1）'
+      },
       userId: {
         type: DataTypes.STRING,
         allowNull: true,

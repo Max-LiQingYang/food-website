@@ -421,6 +421,22 @@ export default function RecipeDetailPage() {
                 {recipe.qualityLabel}
               </span>
             )}
+            {/* 评分标签 */}
+            {recipe.avgRating != null && recipe.avgRating > 0 && (
+              <span className="detail-tag detail-tag--rating">
+                {"★".repeat(Math.round(recipe.avgRating))}{"☆".repeat(5 - Math.round(recipe.avgRating))}
+                {" "}{recipe.avgRating.toFixed(1)}
+                {recipe.ratingCount != null && recipe.ratingCount > 0 && (
+                  <span> ({recipe.ratingCount}人评分)</span>
+                )}
+              </span>
+            )}
+            {/* 浏览量标签 */}
+            {recipe.viewCount != null && recipe.viewCount > 0 && (
+              <span className="detail-tag detail-tag--views">
+                &#x1F441;&#xFE0F; {recipe.viewCount >= 1000 ? ((recipe.viewCount / 1000).toFixed(1) + "k") : recipe.viewCount} 次浏览
+              </span>
+            )}
             {/* 季节标签 */}
             {recipe.season && SEASON_LABELS[recipe.season] && (
               <span className="detail-tag detail-tag--season">

@@ -77,6 +77,9 @@ export interface Recipe {
   category?: string
   difficulty?: string
   servings?: number
+  viewCount?: number
+  avgRating?: number
+  ratingCount?: number
   season?: string
   qualityScore?: number
   qualityLabel?: string
@@ -734,8 +737,12 @@ export interface RankedRecipe {
   difficulty: string
   cookTime: number
   description: string
+  viewCount: number
+  avgRating: number
+  ratingCount: number
   favoriteCount: number
   commentCount: number
+  qualityScore: number
   compositeScore: number
   rank: number
   qualityLabel: string | null
@@ -743,6 +750,7 @@ export interface RankedRecipe {
 
 export interface RankingResponse {
   period: string
+  sortBy?: string
   list: RankedRecipe[]
 }
 
@@ -750,9 +758,10 @@ export interface RankingResponse {
  * 获取食谱排行榜
  * GET /api/recipes/rankings
  * @param period week | month | all
+ * @param sortBy composite | views | rating
  */
-export function getRankings(period: string = 'all'): Promise<RankingResponse> {
-  return apiClient.get('/recipes/rankings', { params: { period } }).then(r => r.data?.data || r.data)
+export function getRankings(period: string = 'all', sortBy: string = 'composite'): Promise<RankingResponse> {
+  return apiClient.get('/recipes/rankings', { params: { period, sortBy } }).then(r => r.data?.data || r.data)
 }
 
 // ─────────────────────────────────────────────────────────────────

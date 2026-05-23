@@ -150,6 +150,16 @@
   line-height: 1.4;
 }
 
+.recipe-card__rating {
+  color: var(--color-star, #f59e0b) !important;
+}
+
+.recipe-card__rating-count {
+  font-size: 11px;
+  color: var(--color-text-muted, #999);
+  margin-left: 2px;
+}
+
 .recipe-card__category {
   display: inline-block;
   padding: 2px 8px;

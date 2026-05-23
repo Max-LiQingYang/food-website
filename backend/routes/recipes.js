@@ -38,14 +38,67 @@ function resJSON(code, message, data) {
  * @returns {{ qualityScore: number, qualityLabel: string|null }}
  */
 function computeQuality(recipe) {
-  const fav = recipe.favoriteCount || 0
-  const com = recipe.commentCount || 0
-  // 质量分 = 收藏数 * 2 + 评论数 * 3（评论比收藏权重略高，因为评论代表真实互动）
-  const score = fav * 2 + com * 3
+  const views = parseInt(recipe.viewCount || 0, 10)
+  const fav = parseInt(recipe.favoriteCount || 0, 10)
+  const com = parseInt(recipe.commentCount || 0, 10)
+  const rating = parseFloat(recipe.avgRating || 0)
+  // 质量分 = 浏览量*0.3 + 收藏数*2 + 平均评分*5 + 评论数*1.5
+  const score = views * 0.3 + fav * 2 + rating * 5 + com * 1.5
+  const truncated = Math.round(score * 10) / 10
   let label = null
-  if (score >= 10) label = '🔥 热门食谱'
-  else if (score >= 3) label = '📈 高分食谱'
+  if (truncated >= 20) label = '🔥 热门食谱'
+  else if (truncated >= 8) label = '📈 高分食谱'
+  else if (truncated >= 3) label = '📊 品质食谱'
   return { qualityScore: score, qualityLabel: label }
+}
+
+/**
+ * 批量获取食谱的平均评分
+ * @param {string[]} recipeIds
+ * @returns {Promise<Object<string, {avgRating:number, ratingCount:number}>>}
+ */
+async function fetchAvgRatings(recipeIds) {
+  if (!recipeIds || recipeIds.length === 0) return {}
+  const { Comment } = require('../models')
+  const { fn: fn2, col: col2 } = require('sequelize')
+
+  const results = await Comment.findAll({
+    attributes: [
+      'recipeId',
+      [fn2('AVG', col2('rating')), 'avgRating'],
+      [fn2('COUNT', col2('rating')), 'ratingCount'],
+    ],
+    where: {
+      recipeId: { [Op.in]: recipeIds },
+      rating: { [Op.ne]: null },
+    },
+    group: ['recipeId'],
+    raw: true,
+  })
+
+  const map = {}
+  results.forEach(r => {
+    map[r.recipeId] = {
+      avgRating: Math.round(parseFloat(r.avgRating || '0') * 10) / 10,
+      ratingCount: parseInt(r.ratingCount || '0', 10),
+    }
+  })
+  return map
+}
+
+/**
+ * 为食谱列表批量附加 avgRating、ratingCount 并重新计算 qualityScore
+ */
+async function attachRatingInfo(items) {
+  if (!items || items.length === 0) return
+  const ids = items.map(i => i.id)
+  const ratingMap = await fetchAvgRatings(ids)
+  for (const item of items) {
+    const info = ratingMap[item.id] || { avgRating: 0, ratingCount: 0 }
+    item.avgRating = info.avgRating
+    item.ratingCount = info.ratingCount
+    Object.assign(item, computeQuality(item))
+  }
 }
 
 /**
@@ -88,6 +141,7 @@ const LIST_ATTRIBUTES = [
   'favoriteCount',
   'commentCount',
   'isFeatured',
+  'viewCount',
 ]
 
 // ─────────────────────────────────────────────────────────────────
@@ -132,11 +186,8 @@ router.get('/', async (req, res) => {
       attributes: LIST_ATTRIBUTES,
     })
 
-    const list = rows.map(r => {
-      const item = r.toJSON()
-      Object.assign(item, computeQuality(item))
-      return item
-    })
+    const list = rows.map(r => r.toJSON())
+    await attachRatingInfo(list)
 
     return res.status(200).json(
       resJSON(0, 'ok', {
@@ -228,11 +279,8 @@ router.get('/search', async (req, res) => {
       attributes: LIST_ATTRIBUTES,
     })
 
-    const list = rows.map(r => {
-      const item = r.toJSON()
-      Object.assign(item, computeQuality(item))
-      return item
-    })
+    const list = rows.map(r => r.toJSON())
+    await attachRatingInfo(list)
 
     return res.status(200).json(
       resJSON(0, 'ok', {
@@ -399,7 +447,6 @@ router.get('/recommend', async (req, res) => {
               recipes.forEach(r => { recipeMap[r.id] = r })
               recommended = topIds.map(id => recipeMap[id]).filter(Boolean).map(r => {
                 const item = r.toJSON()
-                Object.assign(item, computeQuality(item))
                 item.recommendType = 'collaborative'
                 return item
               })
@@ -421,12 +468,13 @@ router.get('/recommend', async (req, res) => {
           })
           const hotList = hotRecipes.map(r => {
             const item = r.toJSON()
-            Object.assign(item, computeQuality(item))
             item.recommendType = 'popular'
             return item
           })
           recommended = [...recommended, ...hotList]
         }
+
+        await attachRatingInfo(recommended)
 
         return res.status(200).json(resJSON(0, 'ok', { list: recommended, recommendType: 'collaborative' }))
       } catch (authErr) {
@@ -460,11 +508,12 @@ router.get('/recommend', async (req, res) => {
 
       const list = seasonalRecipes.map(r => {
         const item = r.toJSON()
-        Object.assign(item, computeQuality(item))
         item.recommendType = 'seasonal'
         item.seasonContext = `${currentSeason}当季推荐`
         return item
       })
+
+      await attachRatingInfo(list)
 
       return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'seasonal', season: currentSeason }))
     }
@@ -479,10 +528,11 @@ router.get('/recommend', async (req, res) => {
       })
       const list = hotRecipes.map(r => {
         const item = r.toJSON()
-        Object.assign(item, computeQuality(item))
         return item
       })
-      return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'popular' }))
+      await attachRatingInfo(list)
+
+    return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'popular' }))
     }
 
     // 解析输入食材列表
@@ -555,7 +605,9 @@ router.get('/recommend', async (req, res) => {
         userId: data.userId,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
-        ...computeQuality(data),
+        viewCount: data.viewCount || 0,
+        favoriteCount: data.favoriteCount || 0,
+        commentCount: data.commentCount || 0,
         matchScore,
         matchedIngredients: matchedNames,
         totalIngredients: recipeIngredientNames.length,
@@ -565,6 +617,7 @@ router.get('/recommend', async (req, res) => {
 
     // 按匹配度降序
     results.sort((a, b) => b.matchScore - a.matchScore)
+    await attachRatingInfo(results)
 
     // 3. AI 无结果增强（仅当数据库匹配不到时）
     let aiGenerated = false
@@ -641,7 +694,10 @@ router.get('/featured', async (req, res) => {
       order: [['createdAt', 'DESC']],
     })
 
-    return res.json(resJSON(0, 'ok', featured))
+    const list = featured.map(r => r.toJSON())
+    await attachRatingInfo(list)
+
+    return res.json(resJSON(0, 'ok', list))
   } catch (err) {
     logger.error('获取精选食谱失败:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
@@ -650,8 +706,7 @@ router.get('/featured', async (req, res) => {
 
 // ─────────────────────────────────────────────────────────────────
 // GET /rankings — 食谱排行榜（Top 20）
-// 参数: ?period=week|month|all（默认 all）
-// 排序: commentCount * 3 + favoriteCount * 2 + qualityScore
+// 参数: ?period=week|month|all（默认 all）, ?sortBy=composite|views|rating（默认 composite）
 // ─────────────────────────────────────────────────────────────────
 router.get('/rankings', async (req, res) => {
   res.set({
@@ -659,7 +714,7 @@ router.get('/rankings', async (req, res) => {
   })
 
   try {
-    const { period = 'all' } = req.query
+    const { period = 'all', sortBy = 'composite' } = req.query
 
     // 计算时间范围
     let dateWhere = {}
@@ -673,42 +728,46 @@ router.get('/rankings', async (req, res) => {
       dateWhere = { createdAt: { [Op.gte]: monthAgo } }
     }
 
+    // 根据排序方式确定 SQL order
+    let order
+    if (sortBy === 'views') {
+      order = [['viewCount', 'DESC'], ['createdAt', 'DESC']]
+    } else if (sortBy === 'rating') {
+      // 评分需要查 Comment 表，先按 favoriteCount 取候选集，后面用 JS 重排
+      order = [['favoriteCount', 'DESC'], ['commentCount', 'DESC'], ['createdAt', 'DESC']]
+    } else {
+      order = [['favoriteCount', 'DESC'], ['commentCount', 'DESC'], ['createdAt', 'DESC']]
+    }
+
     const recipes = await Recipe.findAll({
       where: dateWhere,
       attributes: LIST_ATTRIBUTES,
-      order: [
-        // 综合排序：favoriteCount * 2 + commentCount * 3
-        ['favoriteCount', 'DESC'],
-        ['commentCount', 'DESC'],
-        ['createdAt', 'DESC'],
-      ],
+      order,
       limit: 50,
     })
 
-    // 计算综合评分并排序
-    let ranked = recipes.map((r, i) => {
-      const data = r.toJSON()
-      const fav = data.favoriteCount || 0
-      const com = data.commentCount || 0
-      const compositeScore = fav * 2 + com * 3
-      return {
-        ...data,
-        compositeScore,
-        rank: 0, // 将在下方赋值
-        qualityLabel: compositeScore >= 10 ? '🔥 热门' : compositeScore >= 3 ? '📈 高分' : null,
-      }
-    })
+    let ranked = recipes.map(r => r.toJSON())
 
-    // 按综合评分降序
-    ranked.sort((a, b) => b.compositeScore - a.compositeScore)
+    // 获取平均评分
+    await attachRatingInfo(ranked)
+
+    if (sortBy === 'rating') {
+      ranked.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0))
+    } else if (sortBy === 'views') {
+      ranked.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
+    } else {
+      // composite: 使用 qualityScore
+      ranked.sort((a, b) => (b.qualityScore || 0) - (a.qualityScore || 0))
+    }
 
     // 取 Top 20 并赋予排名
     ranked = ranked.slice(0, 20).map((item, i) => ({
       ...item,
+      compositeScore: item.qualityScore || 0,
       rank: i + 1,
     }))
 
-    return res.json(resJSON(0, 'ok', { period, list: ranked }))
+    return res.json(resJSON(0, 'ok', { period, sortBy, list: ranked }))
   } catch (err) {
     console.error('[GET /recipes/rankings] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
@@ -955,6 +1014,23 @@ router.get('/:id', async (req, res) => {
 
     // 添加质量评分
     Object.assign(data, computeQuality(data))
+
+    // 批量获取平均评分（单食谱也使用批量 API 保持一致性）
+    const ratingMap = await fetchAvgRatings([id])
+    const ratingInfo = ratingMap[id] || { avgRating: 0, ratingCount: 0 }
+    data.avgRating = ratingInfo.avgRating
+    data.ratingCount = ratingInfo.ratingCount
+    // 重新计算质量分（含评分）
+    Object.assign(data, computeQuality(data))
+
+    // 非阻塞递增浏览量（不等待写入完成）
+    setImmediate(async () => {
+      try {
+        await Recipe.update({ viewCount: data.viewCount + 1 }, { where: { id } })
+      } catch (vErr) {
+        console.warn('[VIEW COUNT] increment failed:', vErr.message)
+      }
+    })
 
     return res.status(200).json(resJSON(0, 'ok', data))
   } catch (err) {

@@ -118,6 +118,17 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
           )}
         </div>
 
+        {/* 评分星星 */}
+        {recipe.avgRating != null && recipe.avgRating > 0 && (
+          <span className="recipe-card__meta-item recipe-card__rating">
+            {"★".repeat(Math.round(recipe.avgRating))}{"☆".repeat(5 - Math.round(recipe.avgRating))} {" "}
+            {recipe.avgRating.toFixed(1)}
+            {recipe.ratingCount != null && recipe.ratingCount > 0 && (
+              <span className="recipe-card__rating-count">({recipe.ratingCount})</span>
+            )}
+          </span>
+        )}
+
         {/* 分类标签 */}
         {recipe.category && (
           <span className="recipe-card__category">{recipe.category}</span>

@@ -54,6 +54,36 @@
   border-color: var(--color-primary, #e8663e);
 }
 
+/* 排序方式切换 */
+.rankings-page__sort {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.rankings-page__sort-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 16px;
+  background: var(--color-card, #fff);
+  color: var(--color-text, #333);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rankings-page__sort-btn:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.rankings-page__sort-btn.active {
+  background: #6366f1;
+  color: #fff;
+  border-color: #6366f1;
+}
+
 /* 加载骨架 */
 .rankings-page__loading {
   display: flex;

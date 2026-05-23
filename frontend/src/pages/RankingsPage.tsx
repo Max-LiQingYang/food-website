@@ -12,19 +12,26 @@ const PERIODS = [
   { key: 'week', label: '本周' },
 ]
 
+const SORT_OPTIONS = [
+  { key: 'composite', label: '综合评分' },
+  { key: 'rating', label: '最高评分' },
+  { key: 'views', label: '最多浏览' },
+]
+
 export default function RankingsPage() {
   const [period, setPeriod] = useState('all')
+  const [sortBy, setSortBy] = useState('composite')
   const [list, setList] = useState<RankedRecipe[]>([])
   const [loading, setLoading] = useState(true)
   const toast = useToast()
 
   useEffect(() => {
     setLoading(true)
-    getRankings(period)
+    getRankings(period, sortBy)
       .then(res => setList(res.list || []))
       .catch(() => toast.error('加载排行榜失败'))
       .finally(() => setLoading(false))
-  }, [period])
+  }, [period, sortBy])
 
   const rankEmoji = (rank: number) => {
     if (rank === 1) return '🥇'
@@ -51,6 +58,19 @@ export default function RankingsPage() {
             onClick={() => setPeriod(p.key)}
           >
             {p.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 排序方式切换 */}
+      <div className="rankings-page__sort">
+        {SORT_OPTIONS.map(s => (
+          <button
+            key={s.key}
+            className={`rankings-page__sort-btn${sortBy === s.key ? ' active' : ''}`}
+            onClick={() => setSortBy(s.key)}
+          >
+            {s.label}
           </button>
         ))}
       </div>
@@ -98,12 +118,18 @@ export default function RankingsPage() {
                 <RecipeCard recipe={item} />
               </div>
 
-              {/* 综合评分 */}
+                            {/* 综合评分 */}
               <div className="rank-card__stats">
                 <div className="rank-card__stat">
                   <span className="rank-card__stat-value">{item.compositeScore}</span>
                   <span className="rank-card__stat-label">综合分</span>
                 </div>
+                {item.avgRating != null && item.avgRating > 0 && (
+                  <div className="rank-card__stat">
+                    <span className="rank-card__stat-value">{item.avgRating.toFixed(1)}</span>
+                    <span className="rank-card__stat-label">评分</span>
+                  </div>
+                )}
                 <div className="rank-card__stat">
                   <span className="rank-card__stat-value">{item.favoriteCount}</span>
                   <span className="rank-card__stat-label">收藏</span>
@@ -112,6 +138,12 @@ export default function RankingsPage() {
                   <span className="rank-card__stat-value">{item.commentCount}</span>
                   <span className="rank-card__stat-label">评论</span>
                 </div>
+                {item.viewCount != null && item.viewCount > 0 && (
+                  <div className="rank-card__stat">
+                    <span className="rank-card__stat-value">{item.viewCount >= 1000 ? (item.viewCount / 1000).toFixed(1) + "k" : item.viewCount}</span>
+                    <span className="rank-card__stat-label">浏览</span>
+                  </div>
+                )}
                 {item.qualityLabel && (
                   <span className="rank-card__quality-tag">{item.qualityLabel}</span>
                 )}

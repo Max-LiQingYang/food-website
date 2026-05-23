@@ -214,6 +214,26 @@
   color: #2e7d32;
 }
 
+.detail-tag--rating {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+[data-theme='dark'] .detail-tag--rating {
+  background: #78350f;
+  color: #fde68a;
+}
+
+.detail-tag--views {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+[data-theme='dark'] .detail-tag--views {
+  background: #0c4a6e;
+  color: #bae6fd;
+}
+
 [data-theme='dark'] .detail-tag--season {
   background: #1b5e20;
   color: #c8e6c9;
