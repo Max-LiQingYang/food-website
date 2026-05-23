@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Recipe } from '../api'
 import { highlightText } from '../utils/highlightText'
+import AddToCollectionDropdown from './AddToCollectionDropdown'
+import AddToShoppingListButton from './AddToShoppingListButton'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -24,9 +26,7 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
     navigate(`/recipe/${recipe.id}`)
   }
 
-  const titleContent = highlightQuery
-    ? highlightText(recipe.title, highlightQuery)
-    : recipe.title
+  const titleContent = highlightQuery ? highlightText(recipe.title, highlightQuery) : recipe.title
 
   return (
     <div
@@ -59,7 +59,12 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
         <p className="recipe-card__author">👨‍🍳 {recipe.author || '未知作者'}</p>
         {recipe.category && <span className="recipe-card__category">{recipe.category}</span>}
       </div>
-      <div className="recipe-card__actions" onClick={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
+      <div
+        className="recipe-card__actions"
+        onClick={e => e.stopPropagation()}
+        onTouchStart={e => e.stopPropagation()}
+        onTouchEnd={e => e.stopPropagation()}
+      >
         <AddToCollectionDropdown recipeId={recipe.id} />
         <AddToShoppingListButton recipeId={recipe.id} />
       </div>
