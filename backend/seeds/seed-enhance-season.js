@@ -152,6 +152,37 @@ async function main() {
     )
     console.log('📊 Season distribution:', JSON.stringify(seasonStats))
 
+    // 5. 确认 favoriteCount/commentCount 列已存在
+    try {
+      await sequelize.query("ALTER TABLE recipes ADD COLUMN favoriteCount INT DEFAULT 0 NOT NULL COMMENT '收藏计数'")
+      console.log('✅ Added favoriteCount column')
+    } catch (e) {
+      if (e.message.includes('Duplicate column')) {
+        console.log('ℹ️  favoriteCount column already exists')
+      } else { throw e }
+    }
+    try {
+      await sequelize.query("ALTER TABLE recipes ADD COLUMN commentCount INT DEFAULT 0 NOT NULL COMMENT '评论计数'")
+      console.log('✅ Added commentCount column')
+    } catch (e) {
+      if (e.message.includes('Duplicate column')) {
+        console.log('ℹ️  commentCount column already exists')
+      } else { throw e }
+    }
+
+    // 6. 回填 favoriteCount / commentCount
+    await sequelize.query(`
+      UPDATE recipes r SET r.favoriteCount = (
+        SELECT COUNT(*) FROM favorites f WHERE f.recipeId = r.id AND f.isDeleted = 0
+      )
+    `)
+    await sequelize.query(`
+      UPDATE recipes r SET r.commentCount = (
+        SELECT COUNT(*) FROM comments c WHERE c.recipeId = r.id
+      )
+    `)
+    console.log('✅ Backfilled favoriteCount and commentCount')
+
     await sequelize.close()
     console.log('\n✅ Season seed complete!')
   } catch (err) {
