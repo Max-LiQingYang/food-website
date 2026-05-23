@@ -18,11 +18,25 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
+const compression = require('compression')
 const rateLimit = require('express-rate-limit')
 
 const errorHandler = require('./middleware/errorHandler')
 
 const app = express()
+
+// ─────────────────────────────────────────────────────────────────
+// 0. Gzip 压缩（减少响应体积，提升传输速度）
+// ─────────────────────────────────────────────────────────────────
+app.use(compression({
+  threshold: 1024,          // 仅压缩 >1KB 的响应
+  level: 6,                 // 压缩级别（1-9，6 为平衡点）
+  filter: (req, res) => {
+    // 不压缩已压缩的资源（如图片）
+    if (req.headers['x-no-compression']) return false
+    return compression.filter(req, res)
+  }
+}))
 
 // ─────────────────────────────────────────────────────────────────
 // 1. 安全中间件

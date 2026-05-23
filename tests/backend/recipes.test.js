@@ -448,6 +448,44 @@ describe('DELETE /api/recipes/:id — 删除食谱', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// GET /api/recipes/categories — 分类统计
+// ─────────────────────────────────────────────────────────────────
+describe('GET /api/recipes/categories — 分类统计', () => {
+  beforeEach(async () => {
+    await db.Recipe.create({ id: uuidv4(), title: '宫保鸡丁', category: 'chinese', author: 'test' })
+    await db.Recipe.create({ id: uuidv4(), title: '麻婆豆腐', category: 'chinese', author: 'test' })
+    await db.Recipe.create({ id: uuidv4(), title: '寿司', category: 'japanese', author: 'test' })
+    await db.Recipe.create({ id: uuidv4(), title: '无分类', category: null, author: 'test' })
+  })
+
+  test('应返回各分类及食谱数量', async () => {
+    const res = await request(app).get('/api/recipes/categories')
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.list).toBeInstanceOf(Array)
+    expect(res.body.data.list.length).toBe(2) // chinese + japanese, null 被排除
+    expect(res.body.data.total).toBe(3)
+  })
+
+  test('应按数量降序排列', async () => {
+    const res = await request(app).get('/api/recipes/categories')
+    const list = res.body.data.list
+    expect(list[0].category).toBe('chinese')
+    expect(list[0].count).toBe(2)
+    expect(list[1].category).toBe('japanese')
+    expect(list[1].count).toBe(1)
+  })
+
+  test('空库应返回空列表', async () => {
+    await db.sequelize.sync({ force: true })
+    const res = await request(app).get('/api/recipes/categories')
+    expect(res.status).toBe(200)
+    expect(res.body.data.list).toEqual([])
+    expect(res.body.data.total).toBe(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
 // 健康检查
 // ─────────────────────────────────────────────────────────────────
 describe('GET /health — 健康检查', () => {

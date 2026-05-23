@@ -14,7 +14,7 @@
 
 const express = require('express')
 const { Recipe } = require('../models')
-const { Op } = require('sequelize')
+const { Op, fn, col } = require('sequelize')
 const auth = require('../middleware/auth')
 
 const router = express.Router()
@@ -40,6 +40,7 @@ const LIST_ATTRIBUTES = [
   'cookTime',
   'description',
   'category',
+  'categoryTags',
   'servings',
   'difficulty',
   'userId',
@@ -51,6 +52,11 @@ const LIST_ATTRIBUTES = [
 // GET / — 食谱列表（分页 + 分类筛选）
 // ─────────────────────────────────────────────────────────────────
 router.get('/', async (req, res) => {
+  // 设置缓存头：公开接口可缓存 60 秒，CDN 可缓存 5 分钟
+  res.set({
+    'Cache-Control': 'public, max-age=60, s-maxage=300',
+    'Vary': 'Accept-Encoding',
+  })
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
@@ -96,6 +102,11 @@ router.get('/', async (req, res) => {
 // GET /search — 搜索食谱（标题 + 食材）
 // ─────────────────────────────────────────────────────────────────
 router.get('/search', async (req, res) => {
+  // 搜索结果短时缓存
+  res.set({
+    'Cache-Control': 'public, max-age=30, s-maxage=120',
+    'Vary': 'Accept-Encoding',
+  })
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
@@ -133,6 +144,43 @@ router.get('/search', async (req, res) => {
     )
   } catch (err) {
     console.error('[GET /recipes/search] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /categories — 分类统计（各分类食谱数量）
+// ─────────────────────────────────────────────────────────────────
+router.get('/categories', async (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=300, s-maxage=600',
+    'Vary': 'Accept-Encoding',
+  })
+  try {
+    const results = await Recipe.findAll({
+      attributes: [
+        'category',
+        [fn('COUNT', col('id')), 'count'],
+      ],
+      where: { category: { [Op.ne]: null } },
+      group: ['category'],
+      order: [[fn('COUNT', col('id')), 'DESC']],
+      raw: true,
+    })
+
+    const total = results.reduce((sum, r) => sum + parseInt(r.count, 10), 0)
+
+    return res.status(200).json(
+      resJSON(0, 'ok', {
+        list: results.map(r => ({
+          category: r.category,
+          count: parseInt(r.count, 10),
+        })),
+        total,
+      })
+    )
+  } catch (err) {
+    console.error('[GET /recipes/categories] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })
@@ -282,6 +330,12 @@ router.get('/recommend', async (req, res) => {
 // GET /:id — 食谱详情（含 ingredients 和 steps 解析为 JSON）
 // ─────────────────────────────────────────────────────────────────
 router.get('/:id', async (req, res) => {
+  // 食谱详情可缓存更久（内容不常变化）
+  res.set({
+    'Cache-Control': 'public, max-age=300, s-maxage=600',
+    'Vary': 'Accept-Encoding',
+  })
+
   try {
     const { id } = req.params
 
@@ -312,6 +366,14 @@ router.get('/:id', async (req, res) => {
       }
     } else {
       data.steps = []
+    }
+
+    if (data.categoryTags) {
+      try {
+        data.categoryTags = JSON.parse(data.categoryTags)
+      } catch {
+        data.categoryTags = null
+      }
     }
 
     return res.status(200).json(resJSON(0, 'ok', data))
