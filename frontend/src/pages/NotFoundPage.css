@@ -1,0 +1,155 @@
+/**
+ * pages/NotFoundPage.css
+ * 自定义 404 页面样式
+ */
+
+.not-found-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1rem 4rem;
+  animation: pageEnter 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
+}
+
+.not-found-content {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.not-found-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.not-found-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.not-found-emoji--flip {
+  transform: scaleX(-1);
+  display: inline-block;
+}
+
+.not-found-code {
+  font-size: 6rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--color-primary, #E8663E), var(--color-primary-dark, #d4552e));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -4px;
+}
+
+.not-found-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-color, #2c3e50);
+  margin: 0 0 0.75rem;
+}
+
+.not-found-desc {
+  font-size: 1rem;
+  color: var(--text-secondary, #7f8c8d);
+  line-height: 1.6;
+  margin: 0 0 2rem;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.not-found-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.not-found-actions .btn--outline {
+  background: transparent;
+  border: 2px solid var(--color-primary, #E8663E);
+  color: var(--color-primary, #E8663E);
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.not-found-actions .btn--outline:hover {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+}
+
+/* ── 推荐热门食谱 ── */
+
+.not-found-recommend {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.not-found-recommend__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-color, #2c3e50);
+  text-align: center;
+  margin: 0 0 1.25rem;
+}
+
+.not-found-recommend__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .not-found-recommend__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .not-found-emoji {
+    font-size: 2.8rem;
+  }
+
+  .not-found-code {
+    font-size: 4rem;
+  }
+
+  .not-found-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .not-found-page {
+    padding: 2rem 0.75rem 3rem;
+  }
+
+  .not-found-recommend__grid {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .not-found-emoji {
+    font-size: 2.2rem;
+  }
+
+  .not-found-code {
+    font-size: 3.2rem;
+  }
+}
+
+/* ── 暗色模式 ── */
+
+[data-theme='dark'] .not-found-title {
+  color: var(--dark-text, #e8e8e8);
+}
+
+[data-theme='dark'] .not-found-desc {
+  color: var(--dark-text-secondary, #999);
+}

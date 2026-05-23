@@ -281,6 +281,13 @@ body {
   animation: pageEnter 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
 }
 
+.collections-page,
+.coll-detail-page,
+.shop-page,
+.profile-page,
+.not-found-page {
+  animation: pageEnter 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
+
 /* ── View Transitions API（渐进增强） ── */
 @supports (view-transition-name: none) {
   .home-page {
@@ -305,6 +312,15 @@ body {
     view-transition-name: page-content;
   }
   .user-profile-page {
+    view-transition-name: page-content;
+  }
+  .collections-page {
+    view-transition-name: page-content;
+  }
+  .shop-page {
+    view-transition-name: page-content;
+  }
+  .coll-detail-page {
     view-transition-name: page-content;
   }
 

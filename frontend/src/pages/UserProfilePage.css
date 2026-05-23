@@ -191,8 +191,27 @@ body.dark .profile-avatar-edit {
 
 /* ── 骨架 ── */
 .profile-skeleton {
-  padding: 48px 16px;
+  padding: 48px 16px 24px;
   text-align: center;
+}
+
+.profile-skeleton__stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 24px 0 20px;
+}
+
+.profile-skeleton__stat-card {
+  text-align: center;
+}
+
+.profile-skeleton__tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 auto;
+  max-width: 300px;
 }
 
 .profile-card-skeleton {

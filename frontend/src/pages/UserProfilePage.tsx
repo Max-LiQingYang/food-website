@@ -173,6 +173,37 @@ export default function UserProfilePage() {
             style={{ width: '40%', margin: '16px auto' }}
           />
           <div className="skeleton-box skeleton-line short" style={{ margin: '0 auto' }} />
+
+          {/* 统计卡片占位 */}
+          <div className="profile-skeleton__stats">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="profile-skeleton__stat-card">
+                <div className="skeleton-box" style={{ width: 28, height: 28, margin: '0 auto', borderRadius: 8 }} />
+                <div className="skeleton-box" style={{ width: 40, height: 14, margin: '8px auto 4px' }} />
+                <div className="skeleton-box" style={{ width: 24, height: 10, margin: '0 auto' }} />
+              </div>
+            ))}
+          </div>
+
+          {/* Tab 占位 */}
+          <div className="profile-skeleton__tabs">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="skeleton-box" style={{ width: 72, height: 32, borderRadius: 8 }} />
+            ))}
+          </div>
+
+          {/* 卡片网格占位 */}
+          <div className="profile-grid" style={{ marginTop: 20 }}>
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="profile-card-skeleton">
+                <div className="skeleton-box skeleton-cover" style={{ height: 140 }} />
+                <div style={{ padding: 12 }}>
+                  <div className="skeleton-box" style={{ height: 16, width: '70%' }} />
+                  <div className="skeleton-box" style={{ height: 12, width: '45%', marginTop: 8 }} />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )
