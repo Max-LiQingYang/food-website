@@ -398,6 +398,90 @@
 
 .detail-step.is-active::before {
   background: var(--color-primary, #e8663e);
+/* ── 复制食材按钮 ── */
+.ingredient-copy-btn {
+  margin-left: auto;
+  padding: 4px 10px;
+  font-size: 12px;
+  background: var(--color-bg, #f5f5f5);
+  border: 1px solid var(--color-border, #e0ddd9);
+  border-radius: 6px;
+  color: var(--color-text-muted, #888);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.ingredient-copy-btn:hover {
+  background: var(--color-primary, #e8663e);
+  color: white;
+  border-color: var(--color-primary, #e8663e);
+}
+
+[data-theme='dark'] .ingredient-copy-btn {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #aaa;
+}
+
+[data-theme='dark'] .ingredient-copy-btn:hover {
+  background: #e8663e;
+  color: white;
+  border-color: #e8663e;
+}
+
+/* ── 步骤勾选框 ── */
+.step-checkbox {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+  cursor: pointer;
+}
+
+.step-checkbox__box {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-border, #d0ccc8);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: white;
+  transition: all 0.25s ease;
+  background: transparent;
+}
+
+.step-checkbox__box.is-checked {
+  background: var(--color-primary, #e8663e);
+  border-color: var(--color-primary, #e8663e);
+}
+
+.detail-step.is-completed {
+  opacity: 0.7;
+}
+
+.detail-step.is-completed .step-content {
+  text-decoration: line-through;
+  text-decoration-color: var(--color-text-muted, #aaa);
+}
+
+.detail-step.is-completed .step-number {
+  background: var(--color-text-muted, #999);
+}
+
+[data-theme='dark'] .step-checkbox__box {
+  border-color: #555;
+}
+
+[data-theme='dark'] .step-checkbox__box.is-checked {
+  background: #e8663e;
+  border-color: #e8663e;
+}
+
+[data-theme='dark'] .detail-step.is-completed {
+  opacity: 0.6;
 }
 
 .step-number {

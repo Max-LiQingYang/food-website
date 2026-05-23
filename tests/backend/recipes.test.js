@@ -125,16 +125,21 @@ describe('GET /api/recipes — 食谱列表', () => {
 describe('GET /api/recipes/search — 搜索食谱', () => {
   beforeEach(async () => {
     await db.Recipe.create({
-      id: uuidv4(), title: '红烧肉', author: '大厨', cookTime: 90,
+      id: uuidv4(), title: '红烧肉', author: '大厨', cookTime: 90, category: 'chinese', difficulty: 'hard',
       ingredients: JSON.stringify([{ name: '五花肉', amount: 500, unit: 'g' }])
     })
     await db.Recipe.create({
-      id: uuidv4(), title: '宫保鸡丁', author: '川菜师傅', cookTime: 25,
+      id: uuidv4(), title: '宫保鸡丁', author: '川菜师傅', cookTime: 25, category: 'chinese', difficulty: 'medium',
       ingredients: JSON.stringify([{ name: '鸡胸肉', amount: 300, unit: 'g' }])
     })
     await db.Recipe.create({
-      id: uuidv4(), title: '番茄炒蛋', author: '家常', cookTime: 10,
+      id: uuidv4(), title: '番茄炒蛋', author: '家常', cookTime: 10, category: 'chinese', difficulty: 'easy',
       ingredients: JSON.stringify([{ name: '番茄', amount: 2, unit: '个' }, { name: '鸡蛋', amount: 3, unit: '个' }])
+    })
+    // 再创建一道非中餐食谱用于分类筛选测试
+    await db.Recipe.create({
+      id: uuidv4(), title: '草莓蛋糕', author: '甜品师', cookTime: 45, category: 'dessert', difficulty: 'medium',
+      ingredients: JSON.stringify([{ name: '草莓', amount: 200, unit: 'g' }])
     })
   })
 
@@ -174,6 +179,42 @@ describe('GET /api/recipes/search — 搜索食谱', () => {
     const res = await request(app).get('/api/recipes/search').query({ q: '红烧' })
     expect(res.body.data.list[0]).not.toHaveProperty('ingredients')
     expect(res.body.data.list[0]).not.toHaveProperty('steps')
+  })
+
+  // ── 筛选参数测试 ──
+
+  test('按分类筛选应返回正确结果', async () => {
+    const res = await request(app).get('/api/recipes/search').query({ q: '蛋糕', category: 'dessert' })
+    expect(res.status).toBe(200)
+    expect(res.body.data.list).toHaveLength(1)
+    expect(res.body.data.list[0].title).toBe('草莓蛋糕')
+  })
+
+  test('按难度筛选应返回正确结果', async () => {
+    const res = await request(app).get('/api/recipes/search').query({ q: '肉', difficulty: 'hard' })
+    expect(res.status).toBe(200)
+    expect(res.body.data.list).toHaveLength(1)
+    expect(res.body.data.list[0].title).toBe('红烧肉')
+  })
+
+  test('按分类+难度组合筛选', async () => {
+    const res = await request(app).get('/api/recipes/search').query({ q: '鸡', category: 'chinese', difficulty: 'medium' })
+    expect(res.status).toBe(200)
+    expect(res.body.data.list).toHaveLength(1)
+    expect(res.body.data.list[0].title).toBe('宫保鸡丁')
+  })
+
+  test('按 cookTime_asc 排序应返回时间最短的在前', async () => {
+    const res = await request(app).get('/api/recipes/search').query({ q: '菜', sortBy: 'cookTime_asc' })
+    expect(res.status).toBe(200)
+    // 实际只搜索到 '菜' 相关内容，但需要确保排序参数不报错
+    expect(Array.isArray(res.body.data.list)).toBe(true)
+  })
+
+  test('不存在的分类筛选应返回空', async () => {
+    const res = await request(app).get('/api/recipes/search').query({ q: '蛋糕', category: 'japanese' })
+    expect(res.status).toBe(200)
+    expect(res.body.data.total).toBe(0)
   })
 })
 

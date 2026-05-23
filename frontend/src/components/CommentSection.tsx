@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getComments, getCommentStats, createComment, deleteComment } from '../api'
+import { getComments, getCommentStats, createComment, deleteComment, likeComment, unlikeComment } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
 import type { Comment, CommentStats } from '../api'
@@ -9,6 +9,8 @@ import './CommentSection.css'
 interface Props {
   recipeId: string
 }
+
+type SortMode = 'latest' | 'hot'
 
 // 星级选择器组件
 function StarRating({
@@ -81,6 +83,7 @@ export default function CommentSection({ recipeId }: Props) {
   const [stats, setStats] = useState<CommentStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [sortMode, setSortMode] = useState<SortMode>('latest')
 
   // 表单状态
   const [content, setContent] = useState('')
@@ -95,7 +98,7 @@ export default function CommentSection({ recipeId }: Props) {
   const fetchData = useCallback(async () => {
     try {
       const [commentRes, statsRes] = await Promise.all([
-        getComments(recipeId, { page, pageSize }),
+        getComments(recipeId, { page, pageSize, sort: sortMode }),
         getCommentStats(recipeId)
       ])
       setComments(commentRes.data.list)
@@ -106,11 +109,19 @@ export default function CommentSection({ recipeId }: Props) {
     } finally {
       setLoading(false)
     }
-  }, [recipeId, page])
+  }, [recipeId, page, sortMode])
 
   useEffect(() => {
+    setLoading(true)
     fetchData()
   }, [fetchData])
+
+  const handleSortChange = (mode: SortMode) => {
+    if (mode !== sortMode) {
+      setSortMode(mode)
+      setPage(1)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,7 +140,6 @@ export default function CommentSection({ recipeId }: Props) {
       setRating(0)
       setShowForm(false)
       toast.success('评论发表成功')
-      // 重新加载数据（跳到第一页）
       setPage(1)
       await fetchData()
     } catch (err: any) {
@@ -147,6 +157,31 @@ export default function CommentSection({ recipeId }: Props) {
       await fetchData()
     } catch (err: any) {
       toast.error(err?.message || '删除失败')
+    }
+  }
+
+  const handleLike = async (commentId: number, isLiked: boolean) => {
+    if (!isAuthenticated) {
+      toast.warning('请先登录')
+      navigate('/login')
+      return
+    }
+    try {
+      if (isLiked) {
+        await unlikeComment(commentId)
+      } else {
+        await likeComment(commentId)
+      }
+      // 乐观更新 UI
+      setComments(prev =>
+        prev.map(c =>
+          c.id === commentId
+            ? { ...c, isLiked: !isLiked, likesCount: (c.likesCount || 0) + (isLiked ? -1 : 1) }
+            : c
+        )
+      )
+    } catch (err: any) {
+      toast.error(err?.message || (isLiked ? '取消点赞失败' : '点赞失败'))
     }
   }
 
@@ -170,6 +205,24 @@ export default function CommentSection({ recipeId }: Props) {
         评论
         {total > 0 && <span className="comment-section__count">{total}</span>}
       </h2>
+
+      {/* 排序切换 */}
+      {total > 0 && (
+        <div className="comment-sort-tabs">
+          <button
+            className={`comment-sort-tab ${sortMode === 'latest' ? 'is-active' : ''}`}
+            onClick={() => handleSortChange('latest')}
+          >
+            📅 最新
+          </button>
+          <button
+            className={`comment-sort-tab ${sortMode === 'hot' ? 'is-active' : ''}`}
+            onClick={() => handleSortChange('hot')}
+          >
+            🔥 最热
+          </button>
+        </div>
+      )}
 
       {/* 评分概览 */}
       {stats && stats.ratedCount > 0 && (
@@ -271,14 +324,23 @@ export default function CommentSection({ recipeId }: Props) {
                 <span className="comment-item__time">{formatTime(comment.createdAt)}</span>
               </div>
               <p className="comment-item__content">{comment.content}</p>
-              {isAuthenticated && user?.id === comment.userId && (
+              <div className="comment-item__actions">
                 <button
-                  className="comment-item__delete"
-                  onClick={() => handleDelete(comment.id)}
+                  className={`comment-like-btn ${comment.isLiked ? 'is-liked' : ''}`}
+                  onClick={() => handleLike(comment.id, !!comment.isLiked)}
                 >
-                  删除
+                  <span className="comment-like-btn__icon">{comment.isLiked ? '❤️' : '🤍'}</span>
+                  <span className="comment-like-btn__count">{comment.likesCount || 0}</span>
                 </button>
-              )}
+                {isAuthenticated && user?.id === comment.userId && (
+                  <button
+                    className="comment-item__delete"
+                    onClick={() => handleDelete(comment.id)}
+                  >
+                    删除
+                  </button>
+                )}
+              </div>
             </div>
           ))}
 

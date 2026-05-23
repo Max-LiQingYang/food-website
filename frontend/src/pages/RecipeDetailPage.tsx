@@ -48,6 +48,50 @@ export default function RecipeDetailPage() {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
   const [showShareModal, setShowShareModal] = useState(false)
 
+  // 已完成步骤（localStorage 持久化）
+  const storageKey = id ? `step_completed_${id}` : ''
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(() => {
+    if (!storageKey) return new Set()
+    try {
+      const saved = localStorage.getItem(storageKey)
+      return saved ? new Set(JSON.parse(saved)) : new Set()
+    } catch {
+      return new Set()
+    }
+  })
+
+  // 保存已完成步骤到 localStorage
+  useEffect(() => {
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify([...completedSteps]))
+    }
+  }, [completedSteps, storageKey])
+
+  const toggleStep = (stepNumber: number) => {
+    setCompletedSteps(prev => {
+      const next = new Set(prev)
+      if (next.has(stepNumber)) {
+        next.delete(stepNumber)
+      } else {
+        next.add(stepNumber)
+      }
+      return next
+    })
+  }
+
+  // 复制食材清单
+  const handleCopyIngredients = () => {
+    if (!recipe?.ingredients?.length) return
+    const text = recipe.ingredients
+      .map(ing => `${ing.name} ${ing.amount}${ing.unit}`)
+      .join('\n')
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success('食材清单已复制')
+    }).catch(() => {
+      toast.error('复制失败')
+    })
+  }
+
   const isAuthor = isAuthenticated && user && recipe && recipe.userId === user.id
 
   useEffect(() => {
@@ -319,6 +363,13 @@ export default function RecipeDetailPage() {
             <h2 className="detail-section__title">
               🥬 食材清单
               <span className="section-count">{recipe.ingredients.length} 种</span>
+              <button
+                className="ingredient-copy-btn"
+                onClick={handleCopyIngredients}
+                title="复制食材清单"
+              >
+                📋 复制
+              </button>
             </h2>
             <AddToShoppingListButton recipeId={id} className="detail-shop-btn" />
             <ul className="detail-ingredients">
@@ -348,9 +399,13 @@ export default function RecipeDetailPage() {
                 return (
                   <li
                     key={step.stepNumber}
-                    className={`detail-step ${isActive ? 'is-active' : ''}`}
-                    onClick={() => handleStepClick(step.stepNumber)}
+                    className={`detail-step ${isActive ? 'is-active' : ''} ${completedSteps.has(step.stepNumber) ? 'is-completed' : ''}`}
                   >
+                    <div className="step-checkbox" onClick={e => { e.stopPropagation(); toggleStep(step.stepNumber); }}>
+                      <div className={`step-checkbox__box ${completedSteps.has(step.stepNumber) ? 'is-checked' : ''}`}>
+                        {completedSteps.has(step.stepNumber) && '✓'}
+                      </div>
+                    </div>
                     <div className="step-number">{step.stepNumber}</div>
                     <div className="step-body">
                       <p className="step-content">{step.content}</p>

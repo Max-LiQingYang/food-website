@@ -135,7 +135,7 @@ router.get('/search', async (req, res) => {
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
-    const { q, exclude } = req.query
+    const { q, exclude, category, difficulty, sortBy } = req.query
 
     if (page < 1) page = 1
     if (pageSize > 100) pageSize = 100
@@ -153,10 +153,42 @@ router.get('/search', async (req, res) => {
       [Op.or]: [{ title: { [Op.like]: keyword } }, { ingredients: { [Op.like]: keyword } }],
     }
 
+    // 分类筛选
+    if (category) {
+      where.category = category
+    }
+
+    // 难度筛选
+    if (difficulty) {
+      where.difficulty = difficulty
+    }
+
     // 食材排除
     const excludeCond = buildExcludeCondition(exclude)
     if (excludeCond) {
-      where[Op.and] = excludeCond
+      // 合并 AND 条件
+      const andConds = [excludeCond]
+      if (category || difficulty) {
+        // where already has direct fields, need to use Op.and
+        const directWhere = {}
+        if (category) directWhere.category = category
+        if (difficulty) directWhere.difficulty = difficulty
+        andConds.push(directWhere)
+        // remove direct fields from where
+        delete where.category
+        delete where.difficulty
+      }
+      where[Op.and] = andConds
+    }
+
+    // 排序方式
+    let order = [['createdAt', 'DESC']]
+    if (sortBy === 'cookTime_asc') {
+      order = [['cookTime', 'ASC'], ['createdAt', 'DESC']]
+    } else if (sortBy === 'cookTime_desc') {
+      order = [['cookTime', 'DESC'], ['createdAt', 'DESC']]
+    } else if (sortBy === 'oldest') {
+      order = [['createdAt', 'ASC']]
     }
 
     const { count, rows } = await Recipe.findAndCountAll({

@@ -276,6 +276,8 @@ export interface Comment {
   userId: string
   recipeId: string
   createdAt: string
+  likesCount?: number
+  isLiked?: boolean
   user?: CommentUser
 }
 
@@ -301,7 +303,7 @@ export interface CommentListResponse {
  */
 export function getComments(
   recipeId: string,
-  params?: { page?: number; pageSize?: number }
+  params?: { page?: number; pageSize?: number; sort?: 'latest' | 'hot' }
 ): Promise<CommentListResponse> {
   return apiClient.get(`/recipes/${recipeId}/comments`, {
     params: { page: 1, pageSize: 20, ...params }
@@ -333,6 +335,39 @@ export function createComment(
  */
 export function deleteComment(id: number): Promise<void> {
   return apiClient.delete(`/comments/${id}`)
+}
+
+/**
+ * 点赞评论
+ * POST /api/comments/:id/like
+ */
+export function likeComment(commentId: number): Promise<void> {
+  return apiClient.post(`/comments/${commentId}/like`)
+}
+
+/**
+ * 取消点赞
+ * DELETE /api/comments/:id/like
+ */
+export function unlikeComment(commentId: number): Promise<void> {
+  return apiClient.delete(`/comments/${commentId}/like`)
+}
+
+/**
+ * 搜索食谱（含筛选参数）
+ * GET /api/recipes/search?q=&category=&difficulty=&sortBy=
+ */
+export interface SearchFilters {
+  q: string
+  page?: number
+  pageSize?: number
+  category?: string
+  difficulty?: string
+  sortBy?: 'newest' | 'oldest' | 'cookTime_asc' | 'cookTime_desc'
+}
+
+export function searchRecipesWithFilters(filters: SearchFilters): Promise<any> {
+  return apiClient.get('/recipes/search', { params: filters })
 }
 
 // ─────────────────────────────────────────────────────────────────

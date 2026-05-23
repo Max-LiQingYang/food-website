@@ -34,6 +34,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         comment: '评分(1-5)，可选'
       },
+      likesCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        comment: '点赞数'
+      },
       userId: {
         type: DataTypes.UUID,
         allowNull: false,

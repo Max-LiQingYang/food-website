@@ -22,6 +22,120 @@
   font-weight: 400;
 }
 
+/* ── 排序切换 ──────────────────────────────────────────────── */
+
+.comment-sort-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color, #e8e0d8);
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.comment-sort-tab {
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  background: var(--bg-primary, #fffdf9);
+  border: none;
+  color: var(--text-secondary, #8b7355);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-sort-tab:first-child {
+  border-right: 1px solid var(--border-color, #e8e0d8);
+}
+
+.comment-sort-tab.is-active {
+  background: var(--accent-warm, #d4532b);
+  color: white;
+  font-weight: 600;
+}
+
+.comment-sort-tab:hover:not(.is-active) {
+  background: var(--bg-secondary, #faf6f1);
+}
+
+[data-theme='dark'] .comment-sort-tabs {
+  border-color: #3a3028;
+}
+
+[data-theme='dark'] .comment-sort-tab {
+  background: #1e1812;
+  color: #a09080;
+}
+
+[data-theme='dark'] .comment-sort-tab:first-child {
+  border-color: #3a3028;
+}
+
+[data-theme='dark'] .comment-sort-tab.is-active {
+  background: #d4532b;
+  color: white;
+}
+
+[data-theme='dark'] .comment-sort-tab:hover:not(.is-active) {
+  background: #2a2118;
+}
+
+/* ── 评论操作栏 ────────────────────────────────────────────── */
+
+.comment-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-left: calc(36px + 0.75rem);
+}
+
+.comment-like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  color: var(--text-secondary, #8b7355);
+}
+
+.comment-like-btn:hover {
+  background: var(--bg-secondary, #faf6f1);
+}
+
+.comment-like-btn.is-liked {
+  color: #e84393;
+}
+
+.comment-like-btn__icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.comment-like-btn__count {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+[data-theme='dark'] .comment-like-btn:hover {
+  background: #2a2118;
+}
+
+/* ── 暗色模式覆盖 ──────────────────────────────────────────── */
+
+[data-theme='dark'] .comment-item__actions .comment-like-btn {
+  color: #a09080;
+}
+
+[data-theme='dark'] .comment-like-btn.is-liked {
+  color: #e84393;
+}
+
 /* ── 评分统计 ──────────────────────────────────────────────── */
 
 .comment-stats {

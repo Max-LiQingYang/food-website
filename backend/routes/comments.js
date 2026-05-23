@@ -4,14 +4,17 @@
  * routes/comments.js
  * 评论相关路由
  *
- * GET  /recipes/:recipeId/comments       — 获取食谱评论列表（公开）
- * POST /recipes/:recipeId/comments       — 发表评论（需认证）
- * GET  /recipes/:recipeId/comments/stats  — 获取评分统计（公开）
- * DEL  /comments/:id                     — 删除自己的评论（需认证）
+ * GET  /recipes/:recipeId/comments          — 获取食谱评论列表（分页，支持 sort=latest|hot）
+ * GET  /recipes/:recipeId/comments/stats     — 获取评分统计
+ * POST /recipes/:recipeId/comments           — 发表评论（需认证）
+ * POST /comments/:id/like                    — 点赞评论（需认证）
+ * DELETE /comments/:id/like                  — 取消点赞（需认证）
+ * DELETE /comments/:id                       — 删除自己的评论（需认证）
  */
 
 const express = require('express')
-const { Comment, User } = require('../models')
+const { Op } = require('sequelize')
+const { Comment, User, CommentLike } = require('../models')
 const auth = require('../middleware/auth')
 
 const router = express.Router()
@@ -22,13 +25,14 @@ function resJSON(code, message, data) {
 
 /**
  * GET /recipes/:recipeId/comments
- * 获取食谱评论列表（分页，按时间倒序）
+ * 获取食谱评论列表（分页，支持排序）
  */
 router.get('/recipes/:recipeId/comments', async (req, res) => {
   try {
     const { recipeId } = req.params
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
+    const sort = req.query.sort || 'latest'
 
     if (page < 1) page = 1
     if (pageSize > 50) pageSize = 50
@@ -36,9 +40,17 @@ router.get('/recipes/:recipeId/comments', async (req, res) => {
 
     const offset = (page - 1) * pageSize
 
+    // 排序方式
+    let order
+    if (sort === 'hot') {
+      order = [['likesCount', 'DESC'], ['createdAt', 'DESC']]
+    } else {
+      order = [['createdAt', 'DESC']]
+    }
+
     const { count, rows } = await Comment.findAndCountAll({
       where: { recipeId },
-      order: [['createdAt', 'DESC']],
+      order,
       offset,
       limit: pageSize,
       include: [
@@ -50,12 +62,39 @@ router.get('/recipes/:recipeId/comments', async (req, res) => {
       ]
     })
 
+    // 如果用户已登录，检查哪些评论已点赞
+    let likedSet = new Set()
+    if (req.headers.authorization) {
+      try {
+        const jwt = require('jsonwebtoken')
+        const token = req.headers.authorization.replace('Bearer ', '')
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'food-jwt-secret-key-2026')
+        const likes = await CommentLike.findAll({
+          where: {
+            commentId: rows.map(r => r.id),
+            userId: decoded.userId
+          },
+          attributes: ['commentId']
+        })
+        likedSet = new Set(likes.map(l => l.commentId))
+      } catch {
+        // 静默失败，不中断评论列表
+      }
+    }
+
+    const list = rows.map(r => {
+      const item = r.toJSON()
+      item.isLiked = likedSet.has(item.id)
+      return item
+    })
+
     return res.status(200).json(
       resJSON(0, 'ok', {
-        list: rows,
+        list,
         total: count,
         page,
-        pageSize
+        pageSize,
+        sort
       })
     )
   } catch (err) {
@@ -142,11 +181,13 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
       content: content.trim(),
       rating: rating || null,
       userId: req.userId,
-      recipeId
+      recipeId,
+      likesCount: 0
     })
 
     // 返回时带上用户信息
     const result = comment.toJSON()
+    result.isLiked = false
     result.user = {
       id: user.id,
       username: user.username,
@@ -156,6 +197,66 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
     return res.status(201).json(resJSON(0, 'ok', result))
   } catch (err) {
     console.error('[POST /recipes/:recipeId/comments] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+/**
+ * POST /comments/:id/like
+ * 点赞评论（需认证）
+ */
+router.post('/comments/:id/like', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    // 检查评论是否存在
+    const comment = await Comment.findByPk(id)
+    if (!comment) {
+      return res.status(404).json(resJSON(404, '评论不存在', null))
+    }
+
+    // 检查是否已点赞
+    const existing = await CommentLike.findOne({
+      where: { commentId: id, userId: req.userId }
+    })
+    if (existing) {
+      return res.status(200).json(resJSON(0, '已点赞', null))
+    }
+
+    await CommentLike.create({ commentId: id, userId: req.userId })
+    await comment.increment('likesCount', { by: 1 })
+
+    return res.status(200).json(resJSON(0, '点赞成功', null))
+  } catch (err) {
+    console.error('[POST /comments/:id/like] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+/**
+ * DELETE /comments/:id/like
+ * 取消点赞（需认证）
+ */
+router.delete('/comments/:id/like', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const existing = await CommentLike.findOne({
+      where: { commentId: id, userId: req.userId }
+    })
+    if (!existing) {
+      return res.status(404).json(resJSON(404, '未点赞', null))
+    }
+
+    await existing.destroy()
+    const comment = await Comment.findByPk(id)
+    if (comment && comment.likesCount > 0) {
+      await comment.decrement('likesCount', { by: 1 })
+    }
+
+    return res.status(200).json(resJSON(0, '取消点赞成功', null))
+  } catch (err) {
+    console.error('[DELETE /comments/:id/like] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })
@@ -178,6 +279,8 @@ router.delete('/comments/:id', auth, async (req, res) => {
     }
 
     await Comment.destroy({ where: { id } })
+    // 同时删除所有对应的点赞
+    await CommentLike.destroy({ where: { commentId: id } })
 
     return res.status(200).json(resJSON(0, 'ok', null))
   } catch (err) {

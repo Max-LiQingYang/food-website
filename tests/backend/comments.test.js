@@ -19,6 +19,7 @@ const request = require('supertest')
 const jwt = require('jsonwebtoken')
 const { v4: uuidv4 } = require('uuid')
 const db = require('../../backend/models')
+const { CommentLike } = db
 
 function makeToken(userId, extra = {}) {
   return jwt.sign({ userId, ...extra }, process.env.JWT_SECRET, { expiresIn: '1h' })
@@ -146,7 +147,52 @@ describe('GET /api/recipes/:recipeId/comments — 获取评论列表', () => {
     expect(res.body.data.total).toBe(5)
   })
 
-  test('应按时间倒序排列', async () => {
+  test('应支持最新/最热排序切换', async () => {
+    // 先清理 beforeEach 创建的5条评论，重建测试数据
+    await db.Comment.destroy({ where: { recipeId: RECIPE_ID } })
+
+    const c1 = await db.Comment.create({
+      content: '最新评论', rating: 4, userId: USER_B_ID, recipeId: RECIPE_ID, likesCount: 10, createdAt: new Date('2026-01-03')
+    })
+    await db.Comment.create({
+      content: '最热评论', rating: 5, userId: USER_B_ID, recipeId: RECIPE_ID, likesCount: 99, createdAt: new Date('2026-01-01')
+    })
+    await db.Comment.create({
+      content: '中间评论', rating: 3, userId: USER_A_ID, recipeId: RECIPE_ID, likesCount: 5, createdAt: new Date('2026-01-02')
+    })
+
+    // 最新排序
+    const resLatest = await request(app)
+      .get(`/api/recipes/${RECIPE_ID}/comments`)
+      .query({ sort: 'latest' })
+    expect(resLatest.body.data.list[0].content).toBe('最新评论')
+    expect(resLatest.body.data.list[2].content).toBe('最热评论')
+
+    // 最热排序
+    const resHot = await request(app)
+      .get(`/api/recipes/${RECIPE_ID}/comments`)
+      .query({ sort: 'hot' })
+    expect(resHot.body.data.list[0].content).toBe('最热评论')
+  })
+
+  test('应包含点赞信息和用户已点赞状态', async () => {
+    const token = makeToken(USER_A_ID)
+    const comment = await db.Comment.create({
+      content: '带点赞的评论', rating: 4, userId: USER_B_ID, recipeId: RECIPE_ID, likesCount: 3
+    })
+    await CommentLike.create({ commentId: comment.id, userId: USER_A_ID })
+
+    const res = await request(app)
+      .get(`/api/recipes/${RECIPE_ID}/comments`)
+      .set('Authorization', `Bearer ${token}`)
+
+    const found = res.body.data.list.find(c => c.id === comment.id)
+    expect(found).toBeDefined()
+    expect(found.likesCount).toBe(3)
+    expect(found.isLiked).toBe(true)
+  })
+
+  test('按时间倒序排列', async () => {
     const res = await request(app).get(`/api/recipes/${RECIPE_ID}/comments`)
 
     const times = res.body.data.list.map(c => new Date(c.createdAt).getTime())
@@ -220,6 +266,121 @@ describe('GET /api/recipes/:recipeId/comments/stats — 评分统计', () => {
     expect(res.body.data.total).toBe(0)
     expect(res.body.data.ratedCount).toBe(0)
     expect(res.body.data.averageRating).toBe(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
+// POST /api/comments/:id/like — 点赞评论
+// ─────────────────────────────────────────────────────────────────
+describe('POST /api/comments/:id/like — 点赞评论', () => {
+  let commentId
+
+  beforeEach(async () => {
+    const comment = await db.Comment.create({
+      content: '待点赞评论',
+      rating: 4,
+      userId: USER_B_ID,
+      recipeId: RECIPE_ID,
+      likesCount: 0
+    })
+    commentId = comment.id
+  })
+
+  test('应成功点赞', async () => {
+    const token = makeToken(USER_A_ID)
+    const res = await request(app)
+      .post(`/api/comments/${commentId}/like`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+
+    const comment = await db.Comment.findByPk(commentId)
+    expect(comment.likesCount).toBe(1)
+
+    const like = await CommentLike.findOne({ where: { commentId, userId: USER_A_ID } })
+    expect(like).not.toBeNull()
+  })
+
+  test('重复点赞应返回成功但不重复计数', async () => {
+    await CommentLike.create({ commentId, userId: USER_A_ID })
+    await db.Comment.update({ likesCount: 1 }, { where: { id: commentId } })
+
+    const token = makeToken(USER_A_ID)
+    const res = await request(app)
+      .post(`/api/comments/${commentId}/like`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    // 点赞数不变
+    const comment = await db.Comment.findByPk(commentId)
+    expect(comment.likesCount).toBe(1)
+  })
+
+  test('未登录应返回 401', async () => {
+    const res = await request(app).post(`/api/comments/${commentId}/like`)
+    expect(res.status).toBe(401)
+  })
+
+  test('点赞不存在的评论应返回 404', async () => {
+    const token = makeToken(USER_A_ID)
+    const res = await request(app)
+      .post('/api/comments/99999/like')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(404)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
+// DELETE /api/comments/:id/like — 取消点赞
+// ─────────────────────────────────────────────────────────────────
+describe('DELETE /api/comments/:id/like — 取消点赞', () => {
+  let commentId
+
+  beforeEach(async () => {
+    const comment = await db.Comment.create({
+      content: '待取消点赞评论',
+      rating: 4,
+      userId: USER_B_ID,
+      recipeId: RECIPE_ID,
+      likesCount: 1
+    })
+    commentId = comment.id
+    await CommentLike.create({ commentId, userId: USER_A_ID })
+  })
+
+  test('应成功取消点赞', async () => {
+    const token = makeToken(USER_A_ID)
+    const res = await request(app)
+      .delete(`/api/comments/${commentId}/like`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+
+    const comment = await db.Comment.findByPk(commentId)
+    expect(comment.likesCount).toBe(0)
+
+    const like = await CommentLike.findOne({ where: { commentId, userId: USER_A_ID } })
+    expect(like).toBeNull()
+  })
+
+  test('未点赞时取消应返回 404', async () => {
+    // 先删除已有点赞
+    await CommentLike.destroy({ where: { commentId, userId: USER_A_ID } })
+
+    const token = makeToken(USER_A_ID)
+    const res = await request(app)
+      .delete(`/api/comments/${commentId}/like`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(404)
+  })
+
+  test('未登录应返回 401', async () => {
+    const res = await request(app).delete(`/api/comments/${commentId}/like`)
+    expect(res.status).toBe(401)
   })
 })
 
