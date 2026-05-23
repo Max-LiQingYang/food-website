@@ -39,6 +39,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: '昵称'
       },
+      avatar: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: '头像URL'
+      },
       role: {
         type: DataTypes.STRING,
         defaultValue: 'user',

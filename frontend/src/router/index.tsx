@@ -1,7 +1,8 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import Navbar from '../components/Navbar'
 import MobileBottomNav from '../components/MobileBottomNav'
+import BackToTop from '../components/BackToTop'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))
@@ -25,6 +26,7 @@ function Layout() {
         <Outlet />
       </Suspense>
       <MobileBottomNav />
+      <BackToTop />
     </>
   )
 }
@@ -39,6 +41,7 @@ const router = createBrowserRouter([
       { path: '/recipe/:id', element: <RecipeDetailPage /> },
       { path: '/recipe/:id/edit', element: <CreateRecipePage /> },
       { path: '/recipe/new', element: <CreateRecipePage /> },
+      { path: '/create', element: <Navigate to="/recipe/new" replace /> },
       { path: '/search', element: <SearchPage /> },
       { path: '/user/:id', element: <UserProfilePage /> },
       { path: '/recommend', element: <RecommendPage /> },

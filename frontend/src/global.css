@@ -379,6 +379,78 @@ body {
   background: var(--color-primary-light);
 }
 
+/* ── 移动端交互优化 ── */
+a, button, select, input[type="submit"], input[type="button"], textarea, .clickable {
+  touch-action: manipulation;
+  /* 最小触控目标 44px (Apple HIG) */
+  min-height: 44px;
+}
+
+/* 小按钮/图标按钮不强行撑大 */
+a.btn--small, .btn--small, .profile-avatar-edit, .form-btn-remove {
+  min-height: auto;
+}
+
+/* 防止 iOS 双击缩放 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 移动端安全区域 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 移动端禁止长按选择（除文本外） */
+img, button, a {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+textarea, input[type="text"], input[type="email"], input[type="password"] {
+  -webkit-user-select: text;
+  user-select: text;
+  font-size: 16px !important; /* 防止 iOS 自动缩放 */
+}
+
+/* 返回顶部按钮 */
+.back-to-top {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 90;
+  box-shadow: var(--shadow-md, 0 2px 8px rgba(0,0,0,0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  touch-action: manipulation;
+}
+
+.back-to-top:hover {
+  transform: scale(1.1);
+}
+
+.back-to-top--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+body.dark .back-to-top {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
 /* ── 滚动条美化 ── */
 ::-webkit-scrollbar {
   width: 6px;

@@ -218,6 +218,7 @@ export interface UserProfile {
   id: string
   username: string
   nickname?: string
+  avatar?: string
   createdAt: string
 }
 
@@ -613,6 +614,18 @@ export function getShareInfo(id: string): Promise<ShareInfo> {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Profile Update API
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * 更新个人资料
+ * PUT /api/auth/me
+ */
+export function updateProfile(data: { nickname?: string; avatar?: string }): Promise<UserProfile> {
+  return apiClient.put(`/auth/me`, data).then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
 // Follow API
 // ─────────────────────────────────────────────────────────────────
 
@@ -709,6 +722,7 @@ export default {
   updateShoppingList,
   deleteShoppingList,
   getShareInfo,
+  updateProfile,
   followUser,
   unfollowUser,
   getFollowers,

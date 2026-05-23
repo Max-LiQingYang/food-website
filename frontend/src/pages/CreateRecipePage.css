@@ -1,16 +1,9 @@
 .create-page {
-  max-width: 720px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 24px 16px 48px;
   min-height: calc(100vh - 56px);
   animation: fadeIn 0.3s ease;
-}
-
-.create-container {
-  background: var(--color-card, #fff);
-  border-radius: var(--radius-lg, 16px);
-  box-shadow: var(--shadow-md, 0 2px 12px rgba(0, 0, 0, 0.06));
-  padding: 28px 24px;
 }
 
 .create-title {
@@ -18,6 +11,21 @@
   font-weight: 700;
   color: var(--color-text, #333);
   margin: 0 0 24px;
+}
+
+/* ── 双栏布局 ── */
+.create-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 28px;
+  align-items: start;
+}
+
+.create-form-wrap {
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-md, 0 2px 12px rgba(0, 0, 0, 0.06));
+  padding: 28px 24px;
 }
 
 /* ── 表单通用 ── */
@@ -48,9 +56,8 @@
   color: var(--color-text, #333);
   outline: none;
   background: var(--color-bg, #fdf8f4);
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
 .form-input:focus,
@@ -67,9 +74,7 @@
   color: var(--color-text, #333);
   outline: none;
   background: var(--color-bg, #fdf8f4);
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   resize: vertical;
   font-family: inherit;
   line-height: 1.6;
@@ -80,11 +85,50 @@
   box-shadow: 0 0 0 3px rgba(232, 102, 62, 0.1);
 }
 
+.form-hint {
+  font-size: 12px;
+  color: var(--color-text-muted, #999);
+}
+
 /* ── 双栏 ── */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+}
+
+/* ── 拖拽手柄 ── */
+.form-drag-handle {
+  cursor: grab;
+  color: var(--color-text-muted, #bbb);
+  font-size: 18px;
+  padding: 0 4px;
+  user-select: none;
+  flex-shrink: 0;
+  line-height: 40px;
+}
+
+.form-drag-handle:active {
+  cursor: grabbing;
+}
+
+.form-ingredient-row.dragging,
+.form-step-row.dragging {
+  opacity: 0.4;
+}
+
+.form-ingredient-row.drag-over,
+.form-step-row.drag-over {
+  border-top: 2px solid var(--color-primary, #e8663e);
+  padding-top: 4px;
+}
+
+.form-ingredient-row.drag-over:first-child,
+.form-step-row.drag-over:first-child {
+  border-top: none;
+  border-bottom: 2px solid var(--color-primary, #e8663e);
+  padding-bottom: 4px;
+  padding-top: 0;
 }
 
 /* ── 食材行 ── */
@@ -93,6 +137,9 @@
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
+  padding: 4px 0;
+  border-radius: 8px;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
 }
 
 .form-ingredient-name {
@@ -141,6 +188,9 @@
   gap: 8px;
   align-items: flex-start;
   margin-bottom: 10px;
+  padding: 4px 0;
+  border-radius: 8px;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
 }
 
 .form-step-number {
@@ -156,6 +206,37 @@
   align-items: center;
   justify-content: center;
   margin-top: 2px;
+}
+
+.form-step-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-step-toolbar {
+  display: flex;
+  gap: 4px;
+}
+
+.toolbar-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 6px;
+  background: var(--color-bg, #fdf8f4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+  background: var(--color-primary-bg, #fff3ed);
+  border-color: var(--color-primary, #e8663e);
 }
 
 .form-step-input {
@@ -218,6 +299,7 @@
   background: transparent;
   border: 1px solid var(--color-border, #e8e0d8);
   color: var(--color-text-secondary, #666);
+  text-decoration: none;
 }
 
 .btn--outline:hover {
@@ -225,13 +307,247 @@
   color: var(--color-primary, #e8663e);
 }
 
+/* ── 预览区 ── */
+.create-preview {
+  position: sticky;
+  top: 80px;
+}
+
+.preview-sticky {
+  position: sticky;
+  top: 80px;
+}
+
+.preview-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted, #999);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.preview-card {
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--shadow-md, 0 2px 12px rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--color-border, #e8e0d8);
+}
+
+.preview-cover {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.preview-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-cover--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5a885, #e8663e);
+  font-size: 48px;
+}
+
+.preview-body {
+  padding: 20px;
+}
+
+.preview-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0 0 10px;
+  word-break: break-word;
+}
+
+.preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.preview-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--color-primary-bg, #fff3ed);
+  color: var(--color-primary, #e8663e);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.preview-desc {
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.preview-section {
+  margin-bottom: 16px;
+}
+
+.preview-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--color-border, #e8e0d8);
+}
+
+.preview-ingredients {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.preview-ingredients li {
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--color-text, #333);
+  border-bottom: 1px dashed var(--color-border-light, #f0ebe5);
+}
+
+.preview-ingredients li:last-child {
+  border-bottom: none;
+}
+
+.preview-steps {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.preview-steps li {
+  padding: 6px 0;
+  font-size: 14px;
+  color: var(--color-text, #333);
+  line-height: 1.6;
+}
+
+.preview-steps li strong {
+  color: var(--color-text, #333);
+  font-weight: 700;
+}
+
+.preview-steps li em {
+  color: var(--color-text-secondary, #666);
+}
+
+.preview-tips {
+  background: #fefce8;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.preview-tips h4 {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 6px;
+}
+
+.preview-tips p {
+  font-size: 13px;
+  color: #856404;
+  line-height: 1.6;
+  margin: 0;
+}
+
+body.dark .preview-tips {
+  background: #2a2a0e;
+}
+
+body.dark .preview-tips p {
+  color: #d4a72c;
+}
+
 /* ── 骨架屏 ── */
 .create-skeleton {
   padding: 24px 16px;
 }
 
+/* ── 暗色模式 ── */
+body.dark .create-form-wrap {
+  background: var(--color-card-dark, #2a2a2a);
+}
+
+body.dark .form-label {
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .form-input,
+body.dark .form-select,
+body.dark .form-textarea {
+  background: var(--color-bg-dark, #1a1a1a);
+  border-color: var(--color-border-dark, #333);
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .preview-card {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #333);
+}
+
+body.dark .preview-name {
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .preview-desc {
+  color: var(--color-text-secondary-dark, #aaa);
+}
+
+body.dark .preview-section h4 {
+  color: var(--color-text-dark, #eee);
+  border-bottom-color: var(--color-border-dark, #333);
+}
+
+body.dark .preview-ingredients li {
+  color: var(--color-text-dark, #eee);
+  border-bottom-color: var(--color-border-dark, #333);
+}
+
+body.dark .preview-steps li {
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .preview-section strong {
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .form-btn-remove {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: #442a2a;
+}
+
+body.dark .toolbar-btn {
+  background: var(--color-bg-dark, #1a1a1a);
+  border-color: var(--color-border-dark, #333);
+  color: var(--color-text-dark, #eee);
+}
+
+/* ── 响应式 ── */
+@media (max-width: 900px) {
+  .create-layout {
+    grid-template-columns: 1fr;
+  }
+  .create-preview {
+    position: static;
+  }
+  .preview-sticky {
+    position: static;
+  }
+}
+
 @media (max-width: 480px) {
-  .create-container {
+  .create-form-wrap {
     padding: 20px 16px;
   }
   .form-row {

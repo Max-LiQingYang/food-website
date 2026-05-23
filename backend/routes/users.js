@@ -29,7 +29,7 @@ const LIST_ATTRIBUTES = [
 router.get('/:id/profile', async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id, {
-      attributes: ['id', 'username', 'nickname', 'createdAt']
+      attributes: ['id', 'username', 'nickname', 'avatar', 'createdAt']
     })
 
     if (!user) {

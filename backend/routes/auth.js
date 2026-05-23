@@ -151,7 +151,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findByPk(req.userId, {
-      attributes: ['id', 'username', 'email', 'nickname', 'role', 'createdAt'],
+      attributes: ['id', 'username', 'email', 'nickname', 'avatar', 'role', 'createdAt'],
     })
 
     if (!user) {
@@ -164,6 +164,7 @@ router.get('/me', auth, async (req, res) => {
         username: user.username,
         email: user.email,
         nickname: user.nickname,
+        avatar: user.avatar,
         role: user.role,
         createdAt: user.createdAt,
       })
@@ -179,6 +180,45 @@ module.exports = router
 // ─────────────────────────────────────────────────────────────────
 // PUT /change-password — 修改密码（需认证）
 // ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// PUT /me — 更新个人资料（需认证）
+// ─────────────────────────────────────────────────────────────────
+router.put('/me', auth, async (req, res) => {
+  try {
+    const { nickname, avatar } = req.body
+
+    const updateData = {}
+    if (nickname !== undefined) updateData.nickname = nickname
+    if (avatar !== undefined) updateData.avatar = avatar
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json(resJSON(400, '没有需要更新的字段', null))
+    }
+
+    const user = await User.findByPk(req.userId)
+    if (!user) {
+      return res.status(404).json(resJSON(404, '用户不存在', null))
+    }
+
+    await user.update(updateData)
+
+    return res.status(200).json(
+      resJSON(0, 'ok', {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        nickname: user.nickname,
+        avatar: user.avatar,
+        role: user.role,
+        createdAt: user.createdAt,
+      })
+    )
+  } catch (err) {
+    console.error('[PUT /me] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 router.put('/change-password', auth, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body
