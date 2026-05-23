@@ -16,8 +16,8 @@ const COMPARE_ATTRIBUTES = [
   'id', 'title', 'description', 'category', 'difficulty',
   'servings', 'cookTime', 'coverImage',
   'nutrition', 'ingredients', 'steps',
-  'season', 'favoriteCount', 'commentCount', 'viewCount',
-  'avgRating', 'ratingCount', 'qualityScore', 'qualityLabel'
+  'season', 'favoriteCount', 'commentCount', 'viewCount'
+  // 注意：avgRating, ratingCount, qualityScore, qualityLabel 未在 MariaDB 表结构中存在
 ]
 
 function parseJSONField(val, fallback = null) {
