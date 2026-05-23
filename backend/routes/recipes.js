@@ -72,7 +72,7 @@ router.get('/', async (req, res) => {
   // 设置缓存头：公开接口可缓存 60 秒，CDN 可缓存 5 分钟
   res.set({
     'Cache-Control': 'public, max-age=60, s-maxage=300',
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
   })
   try {
     let page = parseInt(req.query.page, 10) || 1
@@ -128,7 +128,7 @@ router.get('/search', async (req, res) => {
   // 搜索结果短时缓存
   res.set({
     'Cache-Control': 'public, max-age=30, s-maxage=120',
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
   })
   try {
     let page = parseInt(req.query.page, 10) || 1
@@ -185,17 +185,14 @@ router.get('/search', async (req, res) => {
 router.get('/categories', async (req, res) => {
   res.set({
     'Cache-Control': 'public, max-age=300, s-maxage=600',
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
   })
   try {
     const whereCategory = { category: { [Op.ne]: null } }
 
     // 1. 各分类数量
     const results = await Recipe.findAll({
-      attributes: [
-        'category',
-        [fn('COUNT', col('id')), 'count'],
-      ],
+      attributes: ['category', [fn('COUNT', col('id')), 'count']],
       where: whereCategory,
       group: ['category'],
       order: [[fn('COUNT', col('id')), 'DESC']],
@@ -204,11 +201,7 @@ router.get('/categories', async (req, res) => {
 
     // 2. 难度分布（按 category + difficulty 聚合）
     const difficultyStats = await Recipe.findAll({
-      attributes: [
-        'category',
-        'difficulty',
-        [fn('COUNT', col('id')), 'count'],
-      ],
+      attributes: ['category', 'difficulty', [fn('COUNT', col('id')), 'count']],
       where: {
         category: { [Op.ne]: null },
         difficulty: { [Op.ne]: null },
@@ -360,7 +353,7 @@ router.get('/recommend', async (req, res) => {
     let aiGenerated = false
     let aiRecipes = []
 
-    if (results.length === 0 && process.env.AI_API_KEY) {
+    if (results.length === 0 && process.env.AI_API_KEY && process.env.NODE_ENV !== 'test') {
       try {
         const ingredientStr = inputList.join('、')
         const aiPrompt = `你是一个美食食谱推荐专家。用户提供了以下食材：${ingredientStr}。请推荐 3 道包含这些食材的菜谱，每道菜谱包含：菜名、简介、所需食材列表（从用户食材中选取）、烹饪时长（分钟）、难度（easy/medium/hard）、份数。以 JSON 数组格式返回，每个元素包含 title, description, ingredients(数组[{name, amount, unit}]), cookTime, difficulty, servings 字段。只返回 JSON，不要其他文字。`
@@ -422,7 +415,7 @@ router.get('/recommend', async (req, res) => {
 router.get('/:id/similar', async (req, res) => {
   res.set({
     'Cache-Control': 'public, max-age=300, s-maxage=600',
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
   })
   try {
     const { id } = req.params
@@ -434,7 +427,11 @@ router.get('/:id/similar', async (req, res) => {
     const data = recipe.toJSON()
     let categoryTagsParsed = null
     if (data.categoryTags) {
-      try { categoryTagsParsed = JSON.parse(data.categoryTags) } catch { categoryTagsParsed = null }
+      try {
+        categoryTagsParsed = JSON.parse(data.categoryTags)
+      } catch {
+        categoryTagsParsed = null
+      }
     }
 
     let similarRecipes
@@ -524,13 +521,13 @@ router.get('/:id/similar', async (req, res) => {
 router.get('/:id/share', async (req, res) => {
   res.set({
     'Cache-Control': 'public, max-age=600, s-maxage=3600',
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
   })
 
   try {
     const { id } = req.params
     const recipe = await Recipe.findByPk(id, {
-      attributes: ['id', 'title', 'description', 'coverImage', 'category']
+      attributes: ['id', 'title', 'description', 'coverImage', 'category'],
     })
 
     if (!recipe) {
@@ -546,7 +543,7 @@ router.get('/:id/share', async (req, res) => {
         description: data.description || '',
         coverImage: data.coverImage || '',
         shareUrl,
-        shareText: `来看看这道【${data.title}】吧！${shareUrl}`
+        shareText: `来看看这道【${data.title}】吧！${shareUrl}`,
       })
     )
   } catch (err) {
@@ -562,7 +559,7 @@ router.get('/:id', async (req, res) => {
   // 食谱详情可缓存更久（内容不常变化）
   res.set({
     'Cache-Control': 'public, max-age=300, s-maxage=600',
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
   })
 
   try {
@@ -657,8 +654,16 @@ router.post('/', auth, async (req, res) => {
       servings: servings != null ? parseInt(servings, 10) : null,
       difficulty: difficulty || null,
       cookTime: cookTime != null ? parseInt(cookTime, 10) : null,
-      categoryTags: categoryTags ? (typeof categoryTags === 'string' ? categoryTags : JSON.stringify(categoryTags)) : null,
-      nutrition: nutrition ? (typeof nutrition === 'string' ? nutrition : JSON.stringify(nutrition)) : null,
+      categoryTags: categoryTags
+        ? typeof categoryTags === 'string'
+          ? categoryTags
+          : JSON.stringify(categoryTags)
+        : null,
+      nutrition: nutrition
+        ? typeof nutrition === 'string'
+          ? nutrition
+          : JSON.stringify(nutrition)
+        : null,
       author: user ? user.nickname || user.username : '未知用户',
       userId: req.userId,
     })
@@ -710,8 +715,11 @@ router.put('/:id', auth, async (req, res) => {
     if (servings !== undefined) updateData.servings = parseInt(servings, 10)
     if (difficulty !== undefined) updateData.difficulty = difficulty
     if (cookTime !== undefined) updateData.cookTime = parseInt(cookTime, 10)
-    if (categoryTags !== undefined) updateData.categoryTags = typeof categoryTags === 'string' ? categoryTags : JSON.stringify(categoryTags)
-    if (nutrition !== undefined) updateData.nutrition = typeof nutrition === 'string' ? nutrition : JSON.stringify(nutrition)
+    if (categoryTags !== undefined)
+      updateData.categoryTags =
+        typeof categoryTags === 'string' ? categoryTags : JSON.stringify(categoryTags)
+    if (nutrition !== undefined)
+      updateData.nutrition = typeof nutrition === 'string' ? nutrition : JSON.stringify(nutrition)
     updateData.updatedAt = new Date()
 
     await Recipe.update(updateData, { where: { id } })
