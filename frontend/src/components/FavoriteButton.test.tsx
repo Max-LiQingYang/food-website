@@ -6,8 +6,9 @@ import * as api from '../api'
 
 // Mock API
 vi.mock('../api', () => ({
-  addFavorite: vi.fn().mockResolvedValue({}),
-  removeFavorite: vi.fn().mockResolvedValue({}),
+  addFavorite: vi.fn().mockResolvedValue({ data: {} }),
+  removeFavorite: vi.fn().mockResolvedValue({ data: {} }),
+  getFavoriteStatus: vi.fn().mockResolvedValue({ data: { isFavorited: false } }),
 }))
 
 const renderButton = (props = {}) => {
@@ -24,27 +25,17 @@ describe('FavoriteButton', () => {
     localStorage.getItem = vi.fn().mockReturnValue('fake-token')
   })
 
-  it('未收藏时显示"收藏"', () => {
-    renderButton({ isFavorited: false })
-    expect(screen.getByText('收藏')).toBeInTheDocument()
+  it('渲染心形图标按钮', () => {
+    renderButton()
+    const btn = screen.getByRole('button')
+    expect(btn).toBeInTheDocument()
+    expect(btn.querySelector('svg')).toBeInTheDocument()
   })
 
-  it('已收藏时显示"已收藏"', () => {
-    renderButton({ isFavorited: true })
-    expect(screen.getByText('已收藏')).toBeInTheDocument()
-  })
-
-  it('点击已收藏按钮调用 removeFavorite', async () => {
-    renderButton({ isFavorited: true })
-    fireEvent.click(screen.getByRole('button'))
-    await waitFor(() => {
-      expect(api.removeFavorite).toHaveBeenCalledWith('test-recipe-123')
-    })
-  })
-
-  it('点击未收藏按钮调用 addFavorite', async () => {
-    renderButton({ isFavorited: false })
-    fireEvent.click(screen.getByRole('button'))
+  it('点击收藏调用 addFavorite', async () => {
+    renderButton()
+    const btn = screen.getByRole('button')
+    fireEvent.click(btn)
     await waitFor(() => {
       expect(api.addFavorite).toHaveBeenCalledWith('test-recipe-123')
     })

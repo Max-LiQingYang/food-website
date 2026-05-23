@@ -1,9 +1,7 @@
-import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Recipe } from '../api'
 import { highlightText } from '../utils/highlightText'
-import AddToCollectionDropdown from './AddToCollectionDropdown'
-import AddToShoppingListButton from './AddToShoppingListButton'
+import FavoriteButton from './FavoriteButton'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -12,29 +10,41 @@ interface RecipeCardProps {
   highlightQuery?: string
 }
 
+const DIFFICULTY_LABELS: Record<string, string> = {
+  easy: '简单',
+  medium: '中等',
+  hard: '困难',
+}
+
+const DIFFICULTY_ICONS: Record<string, string> = {
+  easy: '🟢',
+  medium: '🟡',
+  hard: '🔴',
+}
+
+function getCalories(recipe: Recipe): number | null {
+  if (!recipe.nutrition) return null
+  if (typeof recipe.nutrition === 'object') {
+    return (recipe.nutrition as any).calories || null
+  }
+  return null
+}
+
 export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) {
   const navigate = useNavigate()
-  const [pressed, setPressed] = useState(false)
-
-  const handleTouchStart = useCallback(() => setPressed(true), [])
-  const handleTouchEnd = useCallback(() => {
-    setPressed(false)
-    navigate(`/recipe/${recipe.id}`)
-  }, [navigate, recipe.id])
 
   const handleClick = () => {
     navigate(`/recipe/${recipe.id}`)
   }
 
   const titleContent = highlightQuery ? highlightText(recipe.title, highlightQuery) : recipe.title
+  const difficulty = recipe.difficulty?.toLowerCase() || ''
+  const calories = getCalories(recipe)
 
   return (
     <div
-      className={`recipe-card ${pressed ? 'recipe-card--pressed' : ''}`}
+      className="recipe-card"
       onClick={handleClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={() => setPressed(false)}
       role="button"
       tabIndex={0}
       onKeyDown={e => {
@@ -44,29 +54,58 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
         }
       }}
     >
+      {/* 封面图 */}
       <div className="recipe-card__cover">
         {recipe.coverImage ? (
           <img src={recipe.coverImage} alt={recipe.title} loading="lazy" />
         ) : (
           <div className="recipe-card__cover-placeholder">🍽️</div>
         )}
+
+        {/* 收藏按钮 - 浮在图片右上角 */}
+        <div className="recipe-card__fav" onClick={e => e.stopPropagation()}>
+          <FavoriteButton recipeId={recipe.id} inline />
+        </div>
+
+        {/* 烹饪时间标签 */}
         {recipe.cookTime != null && (
-          <span className="recipe-card__cooktime">⏱ {recipe.cookTime} 分钟</span>
+          <span className="recipe-card__badge recipe-card__badge--time">
+            ⏱ {recipe.cookTime}分钟
+          </span>
         )}
       </div>
+
+      {/* 信息区 */}
       <div className="recipe-card__info">
         <h3 className="recipe-card__title">{titleContent}</h3>
-        <p className="recipe-card__author">👨‍🍳 {recipe.author || '未知作者'}</p>
-        {recipe.category && <span className="recipe-card__category">{recipe.category}</span>}
-      </div>
-      <div
-        className="recipe-card__actions"
-        onClick={e => e.stopPropagation()}
-        onTouchStart={e => e.stopPropagation()}
-        onTouchEnd={e => e.stopPropagation()}
-      >
-        <AddToCollectionDropdown recipeId={recipe.id} />
-        <AddToShoppingListButton recipeId={recipe.id} />
+
+        <div className="recipe-card__meta">
+          {/* 作者 */}
+          {recipe.author && (
+            <span className="recipe-card__meta-item recipe-card__author">
+              👨‍🍳 {recipe.author}
+            </span>
+          )}
+
+          {/* 难度 */}
+          {difficulty && DIFFICULTY_LABELS[difficulty] && (
+            <span className="recipe-card__meta-item recipe-card__difficulty">
+              {DIFFICULTY_ICONS[difficulty]} {DIFFICULTY_LABELS[difficulty]}
+            </span>
+          )}
+
+          {/* 卡路里 */}
+          {calories != null && (
+            <span className="recipe-card__meta-item recipe-card__calories">
+              🔥 {calories} kcal
+            </span>
+          )}
+        </div>
+
+        {/* 分类标签 */}
+        {recipe.category && (
+          <span className="recipe-card__category">{recipe.category}</span>
+        )}
       </div>
     </div>
   )

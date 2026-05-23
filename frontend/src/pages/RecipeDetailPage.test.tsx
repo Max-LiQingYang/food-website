@@ -8,9 +8,10 @@ import React from 'react'
 // ── Mock API ──────────────────────────────────────────────────────────────────
 vi.mock('../api', () => ({
   getRecipeById: vi.fn(),
-  getFavoriteStatus: vi.fn().mockResolvedValue({ isFavorited: false, favoriteId: '' }),
-  addFavorite: vi.fn().mockResolvedValue({}),
-  removeFavorite: vi.fn().mockResolvedValue({}),
+  getRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
+  getFavoriteStatus: vi.fn().mockResolvedValue({ data: { isFavorited: false } }),
+  addFavorite: vi.fn().mockResolvedValue({ data: {} }),
+  removeFavorite: vi.fn().mockResolvedValue({ data: {} }),
   deleteRecipe: vi.fn().mockResolvedValue({}),
 }))
 

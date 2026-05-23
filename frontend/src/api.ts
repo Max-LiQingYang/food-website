@@ -77,6 +77,13 @@ export interface Recipe {
   category?: string
   difficulty?: string
   servings?: number
+  nutrition?: {
+    calories?: number
+    protein?: number
+    fat?: number
+    carbs?: number
+  }
+  tips?: string
 }
 
 export interface RecipeDetail extends Recipe {

@@ -6,7 +6,12 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* ── 拉动刷新指示器 ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 拉动刷新 ── */
 .pull-indicator {
   display: flex;
   align-items: center;
@@ -28,9 +33,7 @@
 }
 
 @keyframes pullSpin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 /* ── 搜索栏 ── */
@@ -48,10 +51,8 @@
   font-size: 15px;
   color: var(--color-text, #333);
   outline: none;
-  background: var(--color-card, #fff);
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  background: var(--color-input-bg, #fff);
+  transition: border-color var(--transition-normal, 0.3s ease), box-shadow var(--transition-normal, 0.3s ease);
 }
 
 .home-search__input:focus {
@@ -59,112 +60,130 @@
   box-shadow: 0 0 0 3px rgba(232, 102, 62, 0.1);
 }
 
-.home-search__input::placeholder {
-  color: var(--color-text-muted, #bbb);
-}
-
 .home-search__btn {
-  padding: 10px 24px;
-  background: var(--color-primary, #e8663e);
-  color: #fff;
+  padding: 10px 20px;
   border: none;
   border-radius: 24px;
-  font-size: 15px;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.15s;
+  transition: background var(--transition-fast, 0.2s ease), transform var(--transition-fast, 0.2s ease);
   white-space: nowrap;
 }
 
 .home-search__btn:hover {
-  background: var(--color-primary-dark, #c94f2a);
+  background: var(--color-primary-hover, #d45a30);
 }
 
 .home-search__btn:active {
   transform: scale(0.96);
 }
 
-/* ── 分类标签（横向滚动 + scroll-snap） ── */
+/* ── 分类标签 ── */
 .home-categories {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 16px;
-  flex-wrap: nowrap;
   overflow-x: auto;
+  scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
   padding-bottom: 4px;
 }
 
 .home-categories::-webkit-scrollbar {
-  height: 3px;
-}
-
-.home-categories::-webkit-scrollbar-thumb {
-  background: var(--color-scrollbar, #d0c8c0);
-  border-radius: 2px;
+  display: none;
 }
 
 .home-category {
-  padding: 6px 18px;
+  flex-shrink: 0;
+  padding: 8px 18px;
   border: 1px solid var(--color-border, #e8e0d8);
   border-radius: 20px;
   background: var(--color-card, #fff);
+  color: var(--color-text, #333);
   font-size: 14px;
-  color: var(--color-text-secondary, #666);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast, 0.2s ease);
   white-space: nowrap;
-  scroll-snap-align: start;
-  flex-shrink: 0;
+  font-family: inherit;
 }
 
 .home-category:hover {
-  border-color: var(--color-primary, #e8663e);
+  border-color: var(--color-primary-light, #f0a080);
   color: var(--color-primary, #e8663e);
-  background: var(--color-primary-bg, #fff3ed);
 }
 
 .home-category.active {
   background: var(--color-primary, #e8663e);
-  border-color: var(--color-primary, #e8663e);
   color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+/* ── 内容区块 ── */
+.home-section {
+  margin-bottom: 36px;
+}
+
+.home-section__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-border, #e8e0d8);
+}
+
+.home-section__icon {
+  font-size: 22px;
 }
 
 /* ── 食谱网格 ── */
 .home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
+}
+
+@media (max-width: 560px) {
+  .home-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
 }
 
 /* ── 空状态 ── */
 .home-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 60px 0;
-  gap: 12px;
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-muted, #999);
 }
 
 .home-empty__icon {
-  font-size: 64px;
-  margin-bottom: 8px;
+  font-size: 48px;
+  margin-bottom: 12px;
 }
 
 .home-empty__text {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text, #333);
-  margin: 0;
+  font-size: 16px;
+  margin: 0 0 4px;
 }
 
 .home-empty__hint {
   font-size: 14px;
-  color: var(--color-text-muted, #999);
   margin: 0;
+  color: var(--color-text-muted, #bbb);
 }
 
 /* ── 分页 ── */
@@ -174,17 +193,20 @@
   justify-content: center;
   gap: 16px;
   margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border, #e8e0d8);
 }
 
 .pagination-btn {
-  padding: 8px 20px;
+  padding: 8px 18px;
   border: 1px solid var(--color-border, #e8e0d8);
-  border-radius: 20px;
+  border-radius: 8px;
   background: var(--color-card, #fff);
-  font-size: 14px;
   color: var(--color-text, #333);
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast, 0.2s ease);
+  font-family: inherit;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -199,45 +221,32 @@
 
 .pagination-info {
   font-size: 14px;
-  color: var(--color-text-secondary, #666);
+  color: var(--color-text-muted, #888);
 }
 
-/* ── 移动端 ── */
-@media (max-width: 768px) {
-  .home-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-  }
+/* ── 暗色模式 ── */
+.dark .home-page {
+  color: var(--color-text, #e0d8d0);
 }
 
-@media (max-width: 480px) {
-  .home-page {
-    padding: 16px 12px 32px;
-  }
+.dark .home-search__input {
+  background: var(--color-input-bg, #2a2520);
+  color: var(--color-text, #e0d8d0);
+  border-color: var(--color-border, #3a3530);
+}
 
-  .home-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
+.dark .home-category {
+  background: var(--color-card, #2a2520);
+  border-color: var(--color-border, #3a3530);
+  color: var(--color-text, #e0d8d0);
+}
 
-  .home-categories {
-    gap: 6px;
-  }
+.dark .pagination-btn {
+  background: var(--color-card, #2a2520);
+  border-color: var(--color-border, #3a3530);
+  color: var(--color-text, #e0d8d0);
+}
 
-  .home-category {
-    padding: 5px 14px;
-    font-size: 13px;
-  }
-
-  .home-search__btn {
-    padding: 10px 18px;
-  }
-
-  .home-empty__icon {
-    font-size: 48px;
-  }
-
-  .home-empty__text {
-    font-size: 16px;
-  }
+.dark .home-section__title {
+  border-bottom-color: var(--color-border, #3a3530);
 }

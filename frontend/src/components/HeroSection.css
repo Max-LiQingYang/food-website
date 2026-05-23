@@ -1,0 +1,160 @@
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    height: 200px;
+    border-radius: var(--radius-md, 12px);
+  }
+}
+
+.hero-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: transform;
+}
+
+.hero-slide {
+  min-width: 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+}
+
+.hero-slide__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-slide__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.65) 0%,
+    rgba(0, 0, 0, 0.2) 40%,
+    transparent 60%
+  );
+}
+
+.hero-slide__content {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .hero-slide__content {
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+  }
+}
+
+.hero-slide__title {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  line-height: 1.3;
+}
+
+@media (max-width: 480px) {
+  .hero-slide__title {
+    font-size: 20px;
+  }
+}
+
+.hero-slide__tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+/* ── 导航点 ── */
+.hero-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.hero-dot--active {
+  background: #fff;
+  transform: scale(1.3);
+}
+
+/* ── 箭头 ── */
+.hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease, background 0.3s ease;
+  line-height: 1;
+}
+
+.hero-section:hover .hero-arrow {
+  opacity: 1;
+}
+
+.hero-arrow:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.hero-arrow--prev {
+  left: 10px;
+}
+
+.hero-arrow--next {
+  right: 10px;
+}
+
+@media (max-width: 480px) {
+  .hero-arrow {
+    display: none;
+  }
+}

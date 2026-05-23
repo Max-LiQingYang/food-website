@@ -5,6 +5,8 @@ import RecipeCard from '../components/RecipeCard'
 import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import SearchAutocomplete from '../components/SearchAutocomplete'
 import FilterPanel from '../components/FilterPanel'
+import HeroSection from '../components/HeroSection'
+import CategoryCards from '../components/CategoryCards'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import type { Recipe } from '../api'
@@ -12,27 +14,24 @@ import './HomePage.css'
 
 const CATEGORIES = ['全部', '中餐', '西餐', '甜点', '日韩', '其他'] as const
 const PAGE_SIZE = 12
+const FEATURED_TITLES = ['宫保鸡丁', '红烧肉', '提拉米苏', '清蒸鲈鱼', '凯撒沙拉']
 
 export default function HomePage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Read filters from URL params
   const initialCategory = searchParams.get('category') || '全部'
   const initialDifficulty = searchParams.get('difficulty') || ''
-  const initialMaxCookTime = searchParams.get('maxCookTime')
-    ? Number(searchParams.get('maxCookTime'))
-    : null
+  const initialMaxCookTime = searchParams.get('maxCookTime') ? Number(searchParams.get('maxCookTime')) : null
   const initialSortBy = searchParams.get('sortBy') || ''
 
   const [category, setCategory] = useState(initialCategory)
   const [page, setPage] = useState(1)
   const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [allRecipes, setAllRecipes] = useState<Recipe[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [searchInput, setSearchInput] = useState('')
-
-  // Filter state
   const [filters, setFilters] = useState<FilterState>({
     difficulty: initialDifficulty,
     maxCookTime: initialMaxCookTime,
@@ -41,7 +40,6 @@ export default function HomePage() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
-  // Sync filters to URL
   useEffect(() => {
     const params = new URLSearchParams()
     if (category !== '全部') params.set('category', category)
@@ -51,19 +49,10 @@ export default function HomePage() {
     setSearchParams(params, { replace: true })
   }, [category, filters, setSearchParams])
 
-  // Fetch recipes
   const fetchRecipes = useCallback(async () => {
     setLoading(true)
-    const params: Record<string, any> = {
-      page,
-      pageSize: PAGE_SIZE,
-    }
+    const params: Record<string, any> = { page, pageSize: PAGE_SIZE }
     if (category !== '全部') params.category = category
-
-    // TODO: Backend needs to support these filter params
-    // if (filters.difficulty) params.difficulty = filters.difficulty
-    // if (filters.maxCookTime !== null) params.maxCookTime = filters.maxCookTime
-    // if (filters.sortBy) params.sortBy = filters.sortBy
 
     try {
       const res: any = await getRecipes(params)
@@ -71,18 +60,15 @@ export default function HomePage() {
       const rawList = data.list || []
       setTotal(data.total || 0)
 
-      // Client-side filtering (temporary until backend supports these params)
       let filteredList = rawList
-      // TODO: Remove client-side filtering when backend filter params are supported
       if (filters.difficulty) {
         filteredList = filteredList.filter((r: Recipe) => r.difficulty === filters.difficulty)
       }
       if (filters.maxCookTime !== null) {
-        const maxTime = filters.maxCookTime
-        if (maxTime === 61) {
+        if (filters.maxCookTime === 61) {
           filteredList = filteredList.filter((r: Recipe) => (r.cookTime || 0) > 60)
         } else {
-          filteredList = filteredList.filter((r: Recipe) => (r.cookTime || 0) <= maxTime)
+          filteredList = filteredList.filter((r: Recipe) => (r.cookTime || 0) <= filters.maxCookTime)
         }
       }
       if (filters.sortBy === 'rating') {
@@ -99,14 +85,19 @@ export default function HomePage() {
     }
   }, [category, page, filters])
 
+  // Load full recipe list for hero + featured sections (only once)
+  useEffect(() => {
+    getRecipes({ page: 1, pageSize: 55 }).then((res: any) => {
+      const data = res.data || res
+      setAllRecipes(data.list || [])
+    }).catch(() => {})
+  }, [])
+
   useEffect(() => {
     fetchRecipes()
   }, [fetchRecipes])
 
-  // Pull-to-refresh
-  const { refreshing, pullDistance } = usePullToRefresh({
-    onRefresh: fetchRecipes,
-  })
+  const { refreshing, pullDistance } = usePullToRefresh({ onRefresh: fetchRecipes })
 
   const handleCategoryChange = (cat: string) => {
     if (cat === category) return
@@ -123,32 +114,38 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  // Build featured recipes for hero from fetched data
+  const heroRecipes = allRecipes.length > 0
+    ? FEATURED_TITLES.map(title => allRecipes.find(r => r.title === title)).filter(Boolean).map(r => ({
+        id: r!.id,
+        title: r!.title,
+        image: r!.coverImage || '',
+        category: r!.category,
+      }))
+    : undefined
+
+  // Featured section: show the same 5 featured recipes
+  const featuredRecipes = allRecipes.filter(r => FEATURED_TITLES.includes(r.title))
+
+  // Show category is 全部 and no filters
+  const showFullLayout = category === '全部' && !filters.difficulty && filters.maxCookTime === null && !filters.sortBy
+
   return (
     <div className="home-page">
-      {/* Pull-to-refresh indicator */}
       {pullDistance > 0 && (
-        <div
-          className="pull-indicator"
-          style={{ height: `${pullDistance}px`, opacity: pullDistance / 60 }}
-        >
-          {refreshing ? (
-            <span className="pull-indicator__spinner" />
-          ) : pullDistance >= 60 ? (
-            '释放刷新'
-          ) : (
-            '下拉刷新'
-          )}
+        <div className="pull-indicator" style={{ height: `${pullDistance}px`, opacity: pullDistance / 60 }}>
+          {refreshing ? <span className="pull-indicator__spinner" /> : pullDistance >= 60 ? '释放刷新' : '下拉刷新'}
         </div>
       )}
 
-      {/* 搜索栏 */}
-      <form
-        className="home-search"
-        onSubmit={e => {
-          e.preventDefault()
-          handleSearchSubmit(searchInput)
-        }}
-      >
+      {/* ── 精选轮播 ── */}
+      {showFullLayout && <HeroSection recipes={heroRecipes} />}
+
+      {/* ── 分类快速入口 ── */}
+      {showFullLayout && <CategoryCards />}
+
+      {/* ── 搜索栏 ── */}
+      <form className="home-search" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>
         <SearchAutocomplete
           value={searchInput}
           onChange={setSearchInput}
@@ -156,12 +153,10 @@ export default function HomePage() {
           placeholder="搜索食谱..."
           inputClassName="home-search__input"
         />
-        <button type="submit" className="home-search__btn">
-          搜索
-        </button>
+        <button type="submit" className="home-search__btn">搜索</button>
       </form>
 
-      {/* 分类标签页 - 横向滚动 */}
+      {/* ── 分类标签 ── */}
       <div className="home-categories">
         {CATEGORIES.map(cat => (
           <button
@@ -174,54 +169,59 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* 筛选面板 */}
+      {/* ── 筛选面板 ── */}
       <FilterPanel filters={filters} onChange={setFilters} />
 
-      {/* 加载态 - 骨架屏 */}
-      {loading && (
-        <div className="home-grid">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <RecipeCardSkeleton key={i} />
-          ))}
-        </div>
+      {/* ── 精选推荐区（仅首页） ── */}
+      {showFullLayout && featuredRecipes.length > 0 && (
+        <section className="home-section">
+          <h2 className="home-section__title">
+            <span className="home-section__icon">⭐</span> 精选推荐
+          </h2>
+          <div className="home-grid">
+            {featuredRecipes.map(recipe => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            ))}
+          </div>
+        </section>
       )}
 
-      {/* 食谱卡片网格 */}
-      {!loading && recipes.length > 0 && (
-        <div className="home-grid">
-          {recipes.map(recipe => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
-      )}
+      {/* ── 全部食谱（或搜索结果） ── */}
+      <section className="home-section">
+        <h2 className="home-section__title">
+          <span className="home-section__icon">{showFullLayout ? '📋' : '🔍'}</span>
+          {showFullLayout ? '全部食谱' : '搜索结果'}
+        </h2>
 
-      {/* 空状态 */}
-      {!loading && recipes.length === 0 && (
-        <div className="home-empty">
-          <div className="home-empty__icon">🍳</div>
-          <p className="home-empty__text">暂无食谱</p>
-          <p className="home-empty__hint">试试其它筛选条件~</p>
-        </div>
-      )}
+        {loading && (
+          <div className="home-grid">
+            {Array.from({ length: 6 }).map((_, i) => <RecipeCardSkeleton key={i} />)}
+          </div>
+        )}
 
-      {/* 分页 */}
+        {!loading && recipes.length > 0 && (
+          <div className="home-grid">
+            {recipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
+          </div>
+        )}
+
+        {!loading && recipes.length === 0 && (
+          <div className="home-empty">
+            <div className="home-empty__icon">🍳</div>
+            <p className="home-empty__text">暂无食谱</p>
+            <p className="home-empty__hint">试试其它筛选条件~</p>
+          </div>
+        )}
+      </section>
+
+      {/* ── 分页 ── */}
       {total > PAGE_SIZE && (
         <div className="home-pagination">
-          <button
-            className="pagination-btn"
-            disabled={page <= 1 || loading}
-            onClick={() => goPage(page - 1)}
-          >
+          <button className="pagination-btn" disabled={page <= 1 || loading} onClick={() => goPage(page - 1)}>
             ← 上一页
           </button>
-          <span className="pagination-info">
-            第 {page} / {totalPages} 页
-          </span>
-          <button
-            className="pagination-btn"
-            disabled={page >= totalPages || loading}
-            onClick={() => goPage(page + 1)}
-          >
+          <span className="pagination-info">第 {page} / {totalPages} 页</span>
+          <button className="pagination-btn" disabled={page >= totalPages || loading} onClick={() => goPage(page + 1)}>
             下一页 →
           </button>
         </div>
