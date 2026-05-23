@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   RecipeVersion.associate = function (models) {
-    RecipeVersion.belongsTo(models.Recipe, { foreignKey: 'recipeId', as: 'recipe' })
+    RecipeVersion.belongsTo(models.Recipe, { foreignKey: 'recipeId', constraints: false, as: 'recipe' })
   }
 
   return RecipeVersion
