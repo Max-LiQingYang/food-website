@@ -95,7 +95,7 @@ async function enhanceRecipes() {
     let notFound = []
 
     for (const recipe of ENHANCED_RECIPES) {
-      const [affectedRows] = await sequelize.query(
+      const result = await sequelize.query(
         `UPDATE recipes SET nutrition = :nutrition, tips = :tips WHERE title = :title`,
         {
           replacements: {
@@ -106,6 +106,8 @@ async function enhanceRecipes() {
           type: Sequelize.QueryTypes.UPDATE,
         }
       )
+      // Sequelize v6 + MySQL2 returns [null, affectedRows] for UPDATE
+      const affectedRows = result[1]
 
       if (affectedRows > 0) {
         console.log(`  ✅ 已更新: ${recipe.title}`)
