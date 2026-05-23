@@ -70,6 +70,23 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = function (models) {
     User.hasMany(models.Recipe, { foreignKey: 'userId', as: 'recipes' })
+    User.hasMany(models.Follow, { foreignKey: 'followerId', as: 'followingRelations', constraints: false })
+    User.hasMany(models.Follow, { foreignKey: 'followingId', as: 'followerRelations', constraints: false })
+    // 通过关联查询关注/粉丝列表（belongsToMany）
+    User.belongsToMany(models.User, {
+      through: models.Follow,
+      as: 'followers',
+      foreignKey: 'followingId',
+      otherKey: 'followerId',
+      constraints: false
+    })
+    User.belongsToMany(models.User, {
+      through: models.Follow,
+      as: 'following',
+      foreignKey: 'followerId',
+      otherKey: 'followingId',
+      constraints: false
+    })
   }
 
   return User

@@ -9,7 +9,7 @@
  */
 
 const express = require('express')
-const { User, Recipe, Comment, Favorite, Collection, ShoppingList } = require('../models')
+const { User, Recipe, Comment, Favorite, Collection, ShoppingList, Activity, Follow } = require('../models')
 const { Op } = require('sequelize')
 
 const router = express.Router()
@@ -99,10 +99,12 @@ router.get('/:id/stats', async (req, res) => {
       return res.status(404).json(resJSON(404, '用户不存在', null))
     }
 
-    const [recipeCount, favoriteCount, commentCount] = await Promise.all([
+    const [recipeCount, favoriteCount, commentCount, followersCount, followingCount] = await Promise.all([
       Recipe.count({ where: { userId: id } }),
       Favorite.count({ where: { userId: id, isDeleted: false } }),
-      Comment.count({ where: { userId: id } })
+      Comment.count({ where: { userId: id } }),
+      Follow.count({ where: { followingId: id } }),
+      Follow.count({ where: { followerId: id } })
     ])
 
     return res.status(200).json(
@@ -110,7 +112,9 @@ router.get('/:id/stats', async (req, res) => {
         userId: id,
         recipeCount,
         favoriteCount,
-        commentCount
+        commentCount,
+        followersCount,
+        followingCount
       })
     )
   } catch (err) {
@@ -167,6 +171,47 @@ router.get('/:id/favorites', async (req, res) => {
     )
   } catch (err) {
     console.error('[GET /users/:id/favorites] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/activities — 指定用户的活动记录
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/activities', async (req, res) => {
+  try {
+    const { id } = req.params
+    let page = Math.max(1, parseInt(req.query.page, 10) || 1)
+    let pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize, 10) || 20))
+    const offset = (page - 1) * pageSize
+
+    const user = await User.findByPk(id, { attributes: ['id'] })
+    if (!user) {
+      return res.status(404).json(resJSON(404, '用户不存在', null))
+    }
+
+    const { count, rows } = await Activity.findAndCountAll({
+      where: { userId: id },
+      order: [['createdAt', 'DESC']],
+      offset,
+      limit: pageSize
+    })
+
+    const list = rows.map(r => {
+      const item = r.toJSON()
+      try {
+        item.extra = typeof r.extra === 'string' ? JSON.parse(r.extra) : r.extra
+      } catch {
+        item.extra = null
+      }
+      return item
+    })
+
+    return res.status(200).json(
+      resJSON(0, 'ok', { list, total: count, page, pageSize })
+    )
+  } catch (err) {
+    console.error('[GET /users/:id/activities] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })

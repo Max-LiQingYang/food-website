@@ -17,6 +17,8 @@ const { Recipe } = require('../models')
 const { Op, fn, col } = require('sequelize')
 const auth = require('../middleware/auth')
 
+const { createActivity } = require('../utils/activity')
+
 const router = express.Router()
 
 /**
@@ -702,6 +704,13 @@ router.post('/', auth, async (req, res) => {
       tips: tips || null,
       author: user ? user.nickname || user.username : '未知用户',
       userId: req.userId,
+    })
+
+    // 记录活动（不阻塞响应）
+    setImmediate(() => {
+      createActivity(req.userId, 'create_recipe', recipe.id, 'recipe', {
+        title: recipe.title
+      })
     })
 
     return res.status(201).json(resJSON(0, 'ok', recipe))

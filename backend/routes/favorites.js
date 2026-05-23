@@ -1,5 +1,6 @@
 'use strict'
 
+const { createActivity } = require('../utils/activity')
 const favoriteService = require('../services/favoriteService')
 
 /**
@@ -52,6 +53,10 @@ async function addFavorite(req, res) {
 
     if (result.isNew) {
       // 新增，返回 201
+      // 记录活动（不阻塞响应）
+      setImmediate(() => {
+        createActivity(userId, 'favorite', recipeId, 'recipe', null)
+      })
       return res.status(201).json(resJSON(0, '收藏成功', result.data))
     } else {
       // 已存在，幂等返回 200

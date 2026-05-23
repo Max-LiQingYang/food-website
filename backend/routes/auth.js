@@ -175,3 +175,44 @@ router.get('/me', auth, async (req, res) => {
 })
 
 module.exports = router
+
+// ─────────────────────────────────────────────────────────────────
+// PUT /change-password — 修改密码（需认证）
+// ─────────────────────────────────────────────────────────────────
+router.put('/change-password', auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json(resJSON(400, '当前密码和新密码不能为空', null))
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json(resJSON(400, '新密码长度不能少于6位', null))
+    }
+
+    const user = await User.findByPk(req.userId)
+    if (!user) {
+      return res.status(404).json(resJSON(404, '用户不存在', null))
+    }
+
+    if (!user.password) {
+      return res.status(400).json(resJSON(400, '该账号未设置密码，无法修改', null))
+    }
+
+    // 验证旧密码
+    const isMatch = await bcrypt.compare(currentPassword, user.password)
+    if (!isMatch) {
+      return res.status(401).json(resJSON(401, '当前密码错误', null))
+    }
+
+    // 更新密码
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    await user.update({ password: hashedPassword })
+
+    return res.status(200).json(resJSON(0, 'ok', { message: '密码修改成功' }))
+  } catch (err) {
+    console.error('[PUT /change-password] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})

@@ -247,3 +247,83 @@ describe('GET /api/auth/me — 获取当前用户', () => {
     expect(res.body.code).toBe(404)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────
+// 修改密码
+// ─────────────────────────────────────────────────────────────────
+describe('PUT /api/auth/change-password — 修改密码', () => {
+  let token
+  const testUsername = 'change_pw_test'
+
+  beforeEach(async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ username: testUsername, password: 'old123456' })
+    token = res.body.data.token
+  })
+
+  test('正确修改密码 → 200', async () => {
+    const res = await request(app)
+      .put('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'old123456', newPassword: 'new654321' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+  })
+
+  test('修改密码后旧密码不可用 + 新密码可用', async () => {
+    // 修改密码
+    await request(app)
+      .put('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'old123456', newPassword: 'new654321' })
+
+    // 新密码应可用
+    const newPwRes = await request(app)
+      .post('/api/auth/login')
+      .send({ username: testUsername, password: 'new654321' })
+    expect(newPwRes.status).toBe(200)
+
+    // 旧密码应不可用
+    const oldPwRes = await request(app)
+      .post('/api/auth/login')
+      .send({ username: testUsername, password: 'old123456' })
+    expect(oldPwRes.status).toBe(401)
+  })
+
+  test('旧密码错误 → 401', async () => {
+    const res = await request(app)
+      .put('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'wrong', newPassword: 'new123' })
+
+    expect(res.status).toBe(401)
+  })
+
+  test('新密码太短 → 400', async () => {
+    const res = await request(app)
+      .put('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'new654321', newPassword: '123' })
+
+    expect(res.status).toBe(400)
+  })
+
+  test('缺少参数 → 400', async () => {
+    const res = await request(app)
+      .put('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({})
+
+    expect(res.status).toBe(400)
+  })
+
+  test('未登录 → 401', async () => {
+    const res = await request(app)
+      .put('/api/auth/change-password')
+      .send({ currentPassword: 'test', newPassword: 'test123456' })
+
+    expect(res.status).toBe(401)
+  })
+})

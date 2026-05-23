@@ -18,6 +18,8 @@ const auth = require('../middleware/auth')
 const authRoutes = require('./auth')
 const recipeRoutes = require('./recipes')
 const userRoutes = require('./users')
+const followRoutes = require('./follows')
+const feedRoutes = require('./feed')
 const favoriteRoutes = require('./favorites')
 const commentRoutes = require('./comments')
 const collectionRoutes = require('./collections')
@@ -30,6 +32,12 @@ router.use('/auth', authRoutes)
 router.use('/', commentRoutes)
 router.use('/recipes', recipeRoutes)
 router.use('/users', userRoutes)
+
+// 用户关注路由（部分需认证，在 routes/follows.js 中按需使用 auth 中间件）
+router.use('/users', followRoutes)
+
+// 动态流
+router.use('/feed', auth, feedRoutes)
 
 // 需要 auth 的路由（collections, shopping-list）
 router.use('/collections', auth, collectionRoutes)
