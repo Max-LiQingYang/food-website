@@ -27,7 +27,7 @@ const existingRecipes = [
     ingredients: [ { name: '鸡胸肉', amount: 300, unit: 'g' }, { name: '花生米', amount: 50, unit: 'g' }, { name: '干辣椒', amount: 10, unit: '个' }, { name: '花椒', amount: 1, unit: '勺' }, { name: '葱姜蒜', amount: 15, unit: 'g' }, { name: '生抽', amount: 2, unit: '勺' }, { name: '醋', amount: 1, unit: '勺' }, { name: '糖', amount: 1, unit: '勺' } ],
     steps: [ { stepNumber: 1, content: '鸡胸肉切丁，用料酒、生抽、淀粉腌制15分钟' }, { stepNumber: 2, content: '花生米小火炒至金黄盛出备用' }, { stepNumber: 3, content: '调汁：生抽2勺、醋1勺、糖1勺、淀粉适量加少许水搅匀' }, { stepNumber: 4, content: '热锅冷油，下鸡丁滑炒至变色盛出' }, { stepNumber: 5, content: '锅中留底油，爆香干辣椒、花椒、葱姜蒜' }, { stepNumber: 6, content: '倒入鸡丁和花生米翻炒，淋入调好的酱汁' }, { stepNumber: 7, content: '大火收汁，撒上葱花出锅' } ],
     categoryTags: { ingredient: '肉类', method: '炒', cuisine: '川菜', flavor: '麻辣', price: '普通家常' }
-  },
+,\n    nutrition: {"calories":385,"protein":28,"fat":22,"carbs":16,"fiber":2,"sodium":820},\n    tips: '炒花生米时一定要小火慢炒，否则容易外焦里生。腌制鸡丁时加少许蛋清能让肉质更嫩滑。鱼香汁提前调好，下锅后大火快炒才够锅气。'  },
   {
     title: '红烧肉', category: 'chinese', difficulty: 'medium', servings: 4, cookTime: 90,
     author: '家常美食',
@@ -36,7 +36,7 @@ const existingRecipes = [
     ingredients: [ { name: '五花肉', amount: 500, unit: 'g' }, { name: '冰糖', amount: 30, unit: 'g' }, { name: '八角', amount: 2, unit: '个' }, { name: '桂皮', amount: 1, unit: '块' }, { name: '生抽', amount: 3, unit: '勺' }, { name: '老抽', amount: 1, unit: '勺' }, { name: '料酒', amount: 2, unit: '勺' }, { name: '姜', amount: 3, unit: '片' } ],
     steps: [ { stepNumber: 1, content: '五花肉切3厘米方块，冷水下锅焯水去血沫' }, { stepNumber: 2, content: '捞出洗净，沥干水分' }, { stepNumber: 3, content: '锅中放少许油，下冰糖小火炒至焦糖色' }, { stepNumber: 4, content: '放入五花肉翻炒上色' }, { stepNumber: 5, content: '加入八角、桂皮、姜片、料酒、生抽、老抽' }, { stepNumber: 6, content: '加热水没过肉块，大火烧开转小火炖60分钟' }, { stepNumber: 7, content: '大火收汁，待汤汁浓稠即可出锅' } ],
     categoryTags: { ingredient: '肉类', method: '炖', cuisine: '家常菜', flavor: '咸鲜', price: '普通家常' }
-  },
+,\n    nutrition: {"calories":520,"protein":18,"fat":42,"carbs":12,"fiber":0,"sodium":650},\n    tips: '五花肉选肥瘦相间的三层肉最合适。炒糖色时用小火，冰糖融化成琥珀色即可下肉，过火会发苦。炖煮时加一勺黄酒能去腥增香。收汁时不要离开锅，很容易糊。'  },
   {
     title: '鱼香肉丝', category: 'chinese', difficulty: 'medium', servings: 3, cookTime: 20,
     author: '家常美食',
@@ -45,7 +45,7 @@ const existingRecipes = [
     ingredients: [ { name: '猪里脊肉', amount: 250, unit: 'g' }, { name: '木耳', amount: 50, unit: 'g' }, { name: '胡萝卜', amount: 1, unit: '根' }, { name: '青椒', amount: 1, unit: '个' }, { name: '泡椒', amount: 3, unit: '个' }, { name: '葱姜蒜', amount: 15, unit: 'g' }, { name: '醋', amount: 2, unit: '勺' }, { name: '糖', amount: 2, unit: '勺' }, { name: '生抽', amount: 2, unit: '勺' } ],
     steps: [ { stepNumber: 1, content: '猪里脊切丝，用料酒、生抽、淀粉腌制10分钟' }, { stepNumber: 2, content: '木耳泡发切丝，胡萝卜、青椒切丝' }, { stepNumber: 3, content: '调鱼香汁：醋2勺、糖2勺、生抽2勺、淀粉1勺、水适量搅匀' }, { stepNumber: 4, content: '热锅冷油，下肉丝滑炒至变色盛出' }, { stepNumber: 5, content: '锅中留底油，爆香泡椒、葱姜蒜' }, { stepNumber: 6, content: '下配菜翻炒至断生' }, { stepNumber: 7, content: '倒入肉丝和鱼香汁，大火翻炒均匀即可' } ],
     categoryTags: { ingredient: '肉类', method: '炒', cuisine: '川菜', flavor: '酸甜', price: '普通家常' }
-  },
+,\n    nutrition: {"calories":310,"protein":20,"fat":18,"carbs":18,"fiber":3,"sodium":860},\n    tips: '肉丝逆着纹路切，炒出来不柴。泡椒是鱼香味的关键，没有泡椒可以用剁椒加少许醋代替。鱼香汁要提前调好，下锅后全程大火快炒。'  },
   {
     title: '麻婆豆腐', category: 'chinese', difficulty: 'easy', servings: 2, cookTime: 15,
     author: '家常美食',
@@ -54,7 +54,7 @@ const existingRecipes = [
     ingredients: [ { name: '嫩豆腐', amount: 1, unit: '盒' }, { name: '猪肉末', amount: 50, unit: 'g' }, { name: '豆瓣酱', amount: 1, unit: '勺' }, { name: '花椒粉', amount: 1, unit: '茶匙' }, { name: '蒜末', amount: 1, unit: '勺' }, { name: '葱花', amount: 10, unit: 'g' }, { name: '水淀粉', amount: 2, unit: '勺' } ],
     steps: [ { stepNumber: 1, content: '豆腐切2厘米方块，开水加盐焯2分钟' }, { stepNumber: 2, content: '热锅冷油，下肉末炒至变色' }, { stepNumber: 3, content: '加入豆瓣酱炒出红油' }, { stepNumber: 4, content: '加适量水烧开，轻轻放入豆腐块' }, { stepNumber: 5, content: '中火煮3分钟入味' }, { stepNumber: 6, content: '淋入水淀粉勾芡，撒花椒粉和葱花' } ],
     categoryTags: { ingredient: '豆制品', method: '煮', cuisine: '川菜', flavor: '麻辣', price: '经济实惠' }
-  },
+,\n    nutrition: {"calories":220,"protein":14,"fat":15,"carbs":10,"fiber":3,"sodium":980},\n    tips: '豆腐先用盐水焯一下，既去豆腥又不易碎。豆瓣酱一定要炒出红油才够香。勾芡分两次，第一次薄芡让汤汁变稠，第二次厚芡挂在豆腐上。'  },
   {
     title: '糖醋排骨', category: 'chinese', difficulty: 'medium', servings: 3, cookTime: 40,
     author: '家常美食',
@@ -63,7 +63,7 @@ const existingRecipes = [
     ingredients: [ { name: '小排', amount: 500, unit: 'g' }, { name: '醋', amount: 3, unit: '勺' }, { name: '糖', amount: 3, unit: '勺' }, { name: '生抽', amount: 2, unit: '勺' }, { name: '料酒', amount: 2, unit: '勺' }, { name: '姜', amount: 3, unit: '片' }, { name: '白芝麻', amount: 5, unit: 'g' } ],
     steps: [ { stepNumber: 1, content: '小排冷水下锅焯水，捞出洗净' }, { stepNumber: 2, content: '锅中放油，下排骨煎至两面金黄' }, { stepNumber: 3, content: '加入姜片、料酒、生抽翻炒上色' }, { stepNumber: 4, content: '加热水没过排骨，大火烧开转小火炖25分钟' }, { stepNumber: 5, content: '加入醋和糖，大火收汁至浓稠' }, { stepNumber: 6, content: '撒上白芝麻出锅' } ],
     categoryTags: { ingredient: '肉类', method: '炖', cuisine: '家常菜', flavor: '酸甜', price: '普通家常' }
-  },
+,\n    nutrition: {"calories":450,"protein":22,"fat":28,"carbs":30,"fiber":1,"sodium":720},\n    tips: '排骨焯水后用厨房纸吸干水分，下锅炸时不易溅油。糖醋汁的比例是 3 份糖、2 份醋、1 份生抽，这是黄金比例。炸排骨复炸一次外皮更酥脆。'  },
   {
     title: '水煮牛肉', category: 'chinese', difficulty: 'hard', servings: 3, cookTime: 30,
     author: '家常美食',
@@ -72,7 +72,7 @@ const existingRecipes = [
     ingredients: [ { name: '牛里脊', amount: 300, unit: 'g' }, { name: '豆芽', amount: 200, unit: 'g' }, { name: '郫县豆瓣酱', amount: 2, unit: '勺' }, { name: '干辣椒', amount: 15, unit: '个' }, { name: '花椒', amount: 2, unit: '勺' }, { name: '蒜末', amount: 2, unit: '勺' }, { name: '生抽', amount: 2, unit: '勺' }, { name: '淀粉', amount: 1, unit: '勺' } ],
     steps: [ { stepNumber: 1, content: '牛里脊逆纹切薄片，用蛋清、淀粉、料酒腌制15分钟' }, { stepNumber: 2, content: '豆芽焯水铺在碗底' }, { stepNumber: 3, content: '热锅冷油，下豆瓣酱炒出红油，加蒜末爆香' }, { stepNumber: 4, content: '加水烧开，下牛肉片滑散煮至变色' }, { stepNumber: 5, content: '将牛肉和汤汁倒在豆芽上' }, { stepNumber: 6, content: '另起锅烧热油，下干辣椒和花椒炸香' }, { stepNumber: 7, content: '将热油浇在牛肉上，滋啦一声即成' } ],
     categoryTags: { ingredient: '肉类', method: '煮', cuisine: '川菜', flavor: '麻辣', price: '中档' }
-  },
+,\n    nutrition: {"calories":380,"protein":32,"fat":24,"carbs":8,"fiber":2,"sodium":1100},\n    tips: '牛肉逆纹切薄片，用蛋清和淀粉上浆，煮出来才嫩。最后淋热油那一步不能省，油要烧到冒烟才能激发出辣椒和花椒的香味。垫底的蔬菜可以用豆芽、莴笋或白菜。'  },
   {
     title: '清蒸鲈鱼', category: 'chinese', difficulty: 'easy', servings: 2, cookTime: 20,
     author: '家常美食',
@@ -81,7 +81,7 @@ const existingRecipes = [
     ingredients: [ { name: '鲈鱼', amount: 1, unit: '条' }, { name: '葱', amount: 3, unit: '根' }, { name: '姜', amount: 5, unit: '片' }, { name: '蒸鱼豉油', amount: 3, unit: '勺' }, { name: '料酒', amount: 1, unit: '勺' }, { name: '红椒丝', amount: 10, unit: 'g' } ],
     steps: [ { stepNumber: 1, content: '鲈鱼处理干净，两面各划三刀' }, { stepNumber: 2, content: '鱼身抹料酒，塞入姜片，腌制10分钟' }, { stepNumber: 3, content: '盘底铺葱段和姜片，放上鱼' }, { stepNumber: 4, content: '水开后上锅大火蒸8分钟，关火焖2分钟' }, { stepNumber: 5, content: '倒掉盘中蒸汁，铺上葱丝和红椒丝' }, { stepNumber: 6, content: '淋上蒸鱼豉油，浇上一勺热油激香' } ],
     categoryTags: { ingredient: '海鲜类', method: '蒸', cuisine: '粤菜', flavor: '清淡', price: '中档' }
-  },
+,\n    nutrition: {"calories":180,"protein":26,"fat":7,"carbs":2,"fiber":0,"sodium":380},\n    tips: '鱼腹内的黑膜一定要刮干净，否则会苦。蒸鱼水开后计时，一斤左右的鱼蒸 8-10 分钟刚好。蒸出来的汤汁很腥，一定要倒掉再淋蒸鱼豉油。最后浇一勺滚烫的花生油，鱼肉瞬间锁住鲜味。'  },
   {
     title: '番茄意面', category: 'western', difficulty: 'easy', servings: 2, cookTime: 20,
     author: '家常美食',
@@ -90,7 +90,7 @@ const existingRecipes = [
     ingredients: [ { name: '意大利面', amount: 200, unit: 'g' }, { name: '番茄', amount: 3, unit: '个' }, { name: '蒜', amount: 3, unit: '瓣' }, { name: '洋葱', amount: 1, unit: '个' }, { name: '橄榄油', amount: 2, unit: '勺' }, { name: '番茄酱', amount: 3, unit: '勺' }, { name: '盐', amount: 1, unit: '茶匙' }, { name: '黑胡椒', amount: 1, unit: '茶匙' }, { name: '帕玛森芝士', amount: 20, unit: 'g' } ],
     steps: [ { stepNumber: 1, content: '大锅烧水，加盐，下意面煮8-10分钟至弹牙' }, { stepNumber: 2, content: '番茄划十字，开水烫后去皮切碎' }, { stepNumber: 3, content: '平底锅倒橄榄油，爆香蒜末和洋葱丁' }, { stepNumber: 4, content: '倒入番茄碎和番茄酱，小火熬煮10分钟' }, { stepNumber: 5, content: '加盐和黑胡椒调味' }, { stepNumber: 6, content: '将煮好的意面拌入酱汁，撒上芝士碎即可' } ],
     categoryTags: { ingredient: '主食类', method: '煮', cuisine: '西餐', flavor: '酸甜', price: '普通家常' }
-  },
+,\n    nutrition: {"calories":340,"protein":10,"fat":12,"carbs":48,"fiber":4,"sodium":520},\n    tips: '煮意面的水要像海水一样咸（1000ml 水加 10g 盐），这样面条才有底味。意面煮到比包装说明少 1 分钟，在酱汁里继续煮到弹牙。番茄炒出汁后加少许糖中和酸味，风味更柔和。'  },
   {
     title: '提拉米苏', category: 'dessert', difficulty: 'medium', servings: 6, cookTime: 30,
     author: '家常美食',
@@ -99,7 +99,7 @@ const existingRecipes = [
     ingredients: [ { name: '马斯卡彭芝士', amount: 250, unit: 'g' }, { name: '手指饼干', amount: 200, unit: 'g' }, { name: '浓缩咖啡', amount: 200, unit: 'ml' }, { name: '鸡蛋', amount: 3, unit: '个' }, { name: '糖', amount: 80, unit: 'g' }, { name: '可可粉', amount: 20, unit: 'g' }, { name: '朗姆酒', amount: 2, unit: '勺' } ],
     steps: [ { stepNumber: 1, content: '蛋黄加糖打至浓稠发白' }, { stepNumber: 2, content: '加入马斯卡彭芝士搅拌均匀' }, { stepNumber: 3, content: '蛋白打发至硬性发泡，轻轻拌入芝士糊' }, { stepNumber: 4, content: '浓缩咖啡冷却，加入朗姆酒' }, { stepNumber: 5, content: '手指饼干快速蘸咖啡液，铺满容器底部' }, { stepNumber: 6, content: '铺一层芝士糊，再铺一层蘸咖啡的饼干' }, { stepNumber: 7, content: '重复层叠，最后盖上芝士糊' }, { stepNumber: 8, content: '冷藏4小时以上，食用前筛上可可粉' } ],
     categoryTags: { ingredient: '蛋奶类', method: '烤', cuisine: '西餐', flavor: '甜', price: '中档' }
-  },
+,\n    nutrition: {"calories":420,"protein":8,"fat":28,"carbs":38,"fiber":1,"sodium":180},\n    tips: '马斯卡彭奶酪和蛋黄的混合要轻柔翻拌，不要过度搅拌以免出水。手指饼干在咖啡液中浸泡约 2 秒即可，太久会软烂塌陷。做好的提拉米苏冷藏至少 4 小时，隔夜风味更融合。'  },
   {
     title: '抹茶千层蛋糕', category: 'japanese', difficulty: 'hard', servings: 8, cookTime: 60,
     author: '家常美食',
@@ -223,6 +223,8 @@ async function seed() {
         ingredients: JSON.stringify(r.ingredients),
         steps: JSON.stringify(r.steps),
         categoryTags: JSON.stringify(r.categoryTags),
+        nutrition: r.nutrition ? JSON.stringify(r.nutrition) : null,
+        tips: r.tips || null,
         createdAt: new Date()
       }
     })

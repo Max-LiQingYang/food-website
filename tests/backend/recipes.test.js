@@ -251,16 +251,20 @@ describe('GET /api/recipes/:id — 食谱详情', () => {
       difficulty: 'medium',
       ingredients: JSON.stringify([{ name: '食材A', amount: 100, unit: 'g' }]),
       steps: JSON.stringify([{ stepNumber: 1, content: '步骤一' }]),
+      nutrition: JSON.stringify({ calories: 300, protein: 20, fat: 10, carbs: 30, fiber: 2, sodium: 500 }),
+      tips: '测试小贴士内容',
       userId: USER_A_ID
     })
   })
 
-  test('应返回完整详情，含 ingredients 和 steps', async () => {
+  test('应返回完整详情，含 ingredients、steps、nutrition 和 tips', async () => {
     const res = await request(app).get(`/api/recipes/${recipeId}`)
     expect(res.status).toBe(200)
     expect(res.body.data.title).toBe('详细食谱')
     expect(res.body.data.ingredients).toEqual([{ name: '食材A', amount: 100, unit: 'g' }])
     expect(res.body.data.steps).toEqual([{ stepNumber: 1, content: '步骤一' }])
+    expect(res.body.data.nutrition).toEqual({ calories: 300, protein: 20, fat: 10, carbs: 30, fiber: 2, sodium: 500 })
+    expect(res.body.data.tips).toBe('测试小贴士内容')
   })
 
   test('不存在的 id 应返回 404', async () => {

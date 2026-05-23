@@ -63,6 +63,8 @@ const LIST_ATTRIBUTES = [
   'userId',
   'createdAt',
   'updatedAt',
+  'nutrition',
+  'tips',
 ]
 
 // ─────────────────────────────────────────────────────────────────
@@ -634,6 +636,7 @@ router.post('/', auth, async (req, res) => {
       cookTime,
       categoryTags,
       nutrition,
+      tips,
     } = req.body
 
     if (!title || title.trim().length === 0) {
@@ -664,6 +667,7 @@ router.post('/', auth, async (req, res) => {
           ? nutrition
           : JSON.stringify(nutrition)
         : null,
+      tips: tips || null,
       author: user ? user.nickname || user.username : '未知用户',
       userId: req.userId,
     })
@@ -703,6 +707,7 @@ router.put('/:id', auth, async (req, res) => {
       cookTime,
       categoryTags,
       nutrition,
+      tips,
     } = req.body
 
     const updateData = {}
@@ -720,6 +725,7 @@ router.put('/:id', auth, async (req, res) => {
         typeof categoryTags === 'string' ? categoryTags : JSON.stringify(categoryTags)
     if (nutrition !== undefined)
       updateData.nutrition = typeof nutrition === 'string' ? nutrition : JSON.stringify(nutrition)
+    if (tips !== undefined) updateData.tips = tips
     updateData.updatedAt = new Date()
 
     await Recipe.update(updateData, { where: { id } })

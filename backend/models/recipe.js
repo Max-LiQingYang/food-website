@@ -77,6 +77,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: '营养信息 JSON: {calories, protein, fat, carbs, fiber, sodium}'
       },
+      tips: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '烹饪小贴士（纯文本）'
+      },
       userId: {
         type: DataTypes.STRING,
         allowNull: true,

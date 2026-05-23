@@ -9,23 +9,75 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/F5DEB3/white?text=酸辣土豆丝",
     "ingredients": [
-      { "name": "土豆", "amount": 2, "unit": "个" },
-      { "name": "干辣椒", "amount": 5, "unit": "个" },
-      { "name": "花椒", "amount": 1, "unit": "茶匙" },
-      { "name": "醋", "amount": 2, "unit": "勺" },
-      { "name": "盐", "amount": 1, "unit": "茶匙" },
-      { "name": "青椒", "amount": 1, "unit": "个" },
-      { "name": "蒜", "amount": 3, "unit": "瓣" }
+      {
+        "name": "土豆",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "干辣椒",
+        "amount": 5,
+        "unit": "个"
+      },
+      {
+        "name": "花椒",
+        "amount": 1,
+        "unit": "茶匙"
+      },
+      {
+        "name": "醋",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "盐",
+        "amount": 1,
+        "unit": "茶匙"
+      },
+      {
+        "name": "青椒",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "蒜",
+        "amount": 3,
+        "unit": "瓣"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "土豆去皮切细丝，放入冷水中浸泡去淀粉" },
-      { "stepNumber": 2, "content": "青椒切丝，蒜切片，干辣椒剪段" },
-      { "stepNumber": 3, "content": "锅中烧水，土豆丝焯水10秒捞出过凉" },
-      { "stepNumber": 4, "content": "热锅冷油，下花椒、干辣椒、蒜片爆香" },
-      { "stepNumber": 5, "content": "放入土豆丝大火翻炒，加盐和醋" },
-      { "stepNumber": 6, "content": "加入青椒丝翻炒均匀即可出锅" }
+      {
+        "stepNumber": 1,
+        "content": "土豆去皮切细丝，放入冷水中浸泡去淀粉"
+      },
+      {
+        "stepNumber": 2,
+        "content": "青椒切丝，蒜切片，干辣椒剪段"
+      },
+      {
+        "stepNumber": 3,
+        "content": "锅中烧水，土豆丝焯水10秒捞出过凉"
+      },
+      {
+        "stepNumber": 4,
+        "content": "热锅冷油，下花椒、干辣椒、蒜片爆香"
+      },
+      {
+        "stepNumber": 5,
+        "content": "放入土豆丝大火翻炒，加盐和醋"
+      },
+      {
+        "stepNumber": 6,
+        "content": "加入青椒丝翻炒均匀即可出锅"
+      }
     ],
-    "categoryTags": { "ingredient": "蔬菜类", "method": "炒", "cuisine": "家常菜", "flavor": "酸辣", "price": "经济实惠" }
+    "categoryTags": {
+      "ingredient": "蔬菜类",
+      "method": "炒",
+      "cuisine": "家常菜",
+      "flavor": "酸辣",
+      "price": "经济实惠"
+    }
   },
   {
     "title": "西红柿炒鸡蛋",
@@ -37,22 +89,79 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/FF6347/white?text=西红柿炒鸡蛋",
     "ingredients": [
-      { "name": "鸡蛋", "amount": 3, "unit": "个" },
-      { "name": "西红柿", "amount": 2, "unit": "个" },
-      { "name": "葱", "amount": 1, "unit": "根" },
-      { "name": "糖", "amount": 1, "unit": "勺" },
-      { "name": "盐", "amount": 1, "unit": "茶匙" },
-      { "name": "食用油", "amount": 2, "unit": "勺" }
+      {
+        "name": "鸡蛋",
+        "amount": 3,
+        "unit": "个"
+      },
+      {
+        "name": "西红柿",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "葱",
+        "amount": 1,
+        "unit": "根"
+      },
+      {
+        "name": "糖",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "盐",
+        "amount": 1,
+        "unit": "茶匙"
+      },
+      {
+        "name": "食用油",
+        "amount": 2,
+        "unit": "勺"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "鸡蛋打散加少许盐搅匀" },
-      { "stepNumber": 2, "content": "西红柿切块，葱切段" },
-      { "stepNumber": 3, "content": "热锅多油，倒入蛋液炒至凝固盛出" },
-      { "stepNumber": 4, "content": "锅中留底油，下西红柿炒出汁" },
-      { "stepNumber": 5, "content": "加糖和盐调味，倒入鸡蛋翻炒均匀" },
-      { "stepNumber": 6, "content": "撒葱花出锅" }
+      {
+        "stepNumber": 1,
+        "content": "鸡蛋打散加少许盐搅匀"
+      },
+      {
+        "stepNumber": 2,
+        "content": "西红柿切块，葱切段"
+      },
+      {
+        "stepNumber": 3,
+        "content": "热锅多油，倒入蛋液炒至凝固盛出"
+      },
+      {
+        "stepNumber": 4,
+        "content": "锅中留底油，下西红柿炒出汁"
+      },
+      {
+        "stepNumber": 5,
+        "content": "加糖和盐调味，倒入鸡蛋翻炒均匀"
+      },
+      {
+        "stepNumber": 6,
+        "content": "撒葱花出锅"
+      }
     ],
-    "categoryTags": { "ingredient": "蛋奶类", "method": "炒", "cuisine": "家常菜", "flavor": "酸甜", "price": "经济实惠" }
+    "categoryTags": {
+      "ingredient": "蛋奶类",
+      "method": "炒",
+      "cuisine": "家常菜",
+      "flavor": "酸甜",
+      "price": "经济实惠"
+    },
+    "nutrition": {
+      "calories": 180,
+      "protein": 12,
+      "fat": 12,
+      "carbs": 8,
+      "fiber": 2,
+      "sodium": 480
+    },
+    "tips": "鸡蛋打散后加少许水或牛奶，炒出来更嫩。番茄先切小块炒出红油再下蛋，味道更浓郁。最后撒一点葱花和白糖提鲜，酸甜平衡更好吃。"
   },
   {
     "title": "回锅肉",
@@ -64,24 +173,79 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/8B0000/white?text=回锅肉",
     "ingredients": [
-      { "name": "五花肉", "amount": 300, "unit": "g" },
-      { "name": "蒜苗", "amount": 3, "unit": "根" },
-      { "name": "郫县豆瓣酱", "amount": 2, "unit": "勺" },
-      { "name": "豆豉", "amount": 1, "unit": "勺" },
-      { "name": "姜", "amount": 3, "unit": "片" },
-      { "name": "料酒", "amount": 1, "unit": "勺" },
-      { "name": "糖", "amount": 1, "unit": "茶匙" }
+      {
+        "name": "五花肉",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "蒜苗",
+        "amount": 3,
+        "unit": "根"
+      },
+      {
+        "name": "郫县豆瓣酱",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "豆豉",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "姜",
+        "amount": 3,
+        "unit": "片"
+      },
+      {
+        "name": "料酒",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "糖",
+        "amount": 1,
+        "unit": "茶匙"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "五花肉整块冷水下锅，加姜片、料酒煮20分钟至八成熟" },
-      { "stepNumber": 2, "content": "捞出放凉，切薄片" },
-      { "stepNumber": 3, "content": "蒜苗斜切段" },
-      { "stepNumber": 4, "content": "锅不放油，下肉片中火煸至出油卷曲" },
-      { "stepNumber": 5, "content": "将肉推到一边，下豆瓣酱和豆豉炒出红油" },
-      { "stepNumber": 6, "content": "混合翻炒，加糖调味" },
-      { "stepNumber": 7, "content": "下蒜苗段大火翻炒至断生即可" }
+      {
+        "stepNumber": 1,
+        "content": "五花肉整块冷水下锅，加姜片、料酒煮20分钟至八成熟"
+      },
+      {
+        "stepNumber": 2,
+        "content": "捞出放凉，切薄片"
+      },
+      {
+        "stepNumber": 3,
+        "content": "蒜苗斜切段"
+      },
+      {
+        "stepNumber": 4,
+        "content": "锅不放油，下肉片中火煸至出油卷曲"
+      },
+      {
+        "stepNumber": 5,
+        "content": "将肉推到一边，下豆瓣酱和豆豉炒出红油"
+      },
+      {
+        "stepNumber": 6,
+        "content": "混合翻炒，加糖调味"
+      },
+      {
+        "stepNumber": 7,
+        "content": "下蒜苗段大火翻炒至断生即可"
+      }
     ],
-    "categoryTags": { "ingredient": "肉类", "method": "炒", "cuisine": "川菜", "flavor": "香辣", "price": "普通家常" }
+    "categoryTags": {
+      "ingredient": "肉类",
+      "method": "炒",
+      "cuisine": "川菜",
+      "flavor": "香辣",
+      "price": "普通家常"
+    }
   },
   {
     "title": "醋溜白菜",
@@ -93,23 +257,75 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/98FB98/white?text=醋溜白菜",
     "ingredients": [
-      { "name": "大白菜", "amount": 300, "unit": "g" },
-      { "name": "干辣椒", "amount": 3, "unit": "个" },
-      { "name": "醋", "amount": 2, "unit": "勺" },
-      { "name": "生抽", "amount": 1, "unit": "勺" },
-      { "name": "糖", "amount": 1, "unit": "茶匙" },
-      { "name": "蒜", "amount": 3, "unit": "瓣" },
-      { "name": "水淀粉", "amount": 1, "unit": "勺" }
+      {
+        "name": "大白菜",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "干辣椒",
+        "amount": 3,
+        "unit": "个"
+      },
+      {
+        "name": "醋",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "生抽",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "糖",
+        "amount": 1,
+        "unit": "茶匙"
+      },
+      {
+        "name": "蒜",
+        "amount": 3,
+        "unit": "瓣"
+      },
+      {
+        "name": "水淀粉",
+        "amount": 1,
+        "unit": "勺"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "白菜切块，菜帮和菜叶分开" },
-      { "stepNumber": 2, "content": "蒜切片，干辣椒切段" },
-      { "stepNumber": 3, "content": "调汁：醋、生抽、糖、水淀粉搅匀" },
-      { "stepNumber": 4, "content": "热锅冷油，下辣椒和蒜片爆香" },
-      { "stepNumber": 5, "content": "先下白菜帮炒软，再下菜叶翻炒" },
-      { "stepNumber": 6, "content": "倒入调好的汁，大火翻炒均匀即可" }
+      {
+        "stepNumber": 1,
+        "content": "白菜切块，菜帮和菜叶分开"
+      },
+      {
+        "stepNumber": 2,
+        "content": "蒜切片，干辣椒切段"
+      },
+      {
+        "stepNumber": 3,
+        "content": "调汁：醋、生抽、糖、水淀粉搅匀"
+      },
+      {
+        "stepNumber": 4,
+        "content": "热锅冷油，下辣椒和蒜片爆香"
+      },
+      {
+        "stepNumber": 5,
+        "content": "先下白菜帮炒软，再下菜叶翻炒"
+      },
+      {
+        "stepNumber": 6,
+        "content": "倒入调好的汁，大火翻炒均匀即可"
+      }
     ],
-    "categoryTags": { "ingredient": "蔬菜类", "method": "炒", "cuisine": "家常菜", "flavor": "酸辣", "price": "经济实惠" }
+    "categoryTags": {
+      "ingredient": "蔬菜类",
+      "method": "炒",
+      "cuisine": "家常菜",
+      "flavor": "酸辣",
+      "price": "经济实惠"
+    }
   },
   {
     "title": "地三鲜",
@@ -121,24 +337,80 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/556B2F/white?text=地三鲜",
     "ingredients": [
-      { "name": "土豆", "amount": 2, "unit": "个" },
-      { "name": "茄子", "amount": 1, "unit": "根" },
-      { "name": "青椒", "amount": 2, "unit": "个" },
-      { "name": "蒜", "amount": 4, "unit": "瓣" },
-      { "name": "生抽", "amount": 2, "unit": "勺" },
-      { "name": "老抽", "amount": 0.5, "unit": "勺" },
-      { "name": "糖", "amount": 1, "unit": "茶匙" },
-      { "name": "淀粉", "amount": 1, "unit": "勺" }
+      {
+        "name": "土豆",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "茄子",
+        "amount": 1,
+        "unit": "根"
+      },
+      {
+        "name": "青椒",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "蒜",
+        "amount": 4,
+        "unit": "瓣"
+      },
+      {
+        "name": "生抽",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "老抽",
+        "amount": 0.5,
+        "unit": "勺"
+      },
+      {
+        "name": "糖",
+        "amount": 1,
+        "unit": "茶匙"
+      },
+      {
+        "name": "淀粉",
+        "amount": 1,
+        "unit": "勺"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "土豆去皮切滚刀块，茄子切块，青椒掰块" },
-      { "stepNumber": 2, "content": "多油烧至七成热，分别炸土豆和茄子至金黄" },
-      { "stepNumber": 3, "content": "调汁：生抽、老抽、糖、淀粉、水搅匀" },
-      { "stepNumber": 4, "content": "锅中留底油，爆香蒜末" },
-      { "stepNumber": 5, "content": "倒入青椒翻炒几下" },
-      { "stepNumber": 6, "content": "加入土豆和茄子，倒入酱汁大火翻炒均匀" }
+      {
+        "stepNumber": 1,
+        "content": "土豆去皮切滚刀块，茄子切块，青椒掰块"
+      },
+      {
+        "stepNumber": 2,
+        "content": "多油烧至七成热，分别炸土豆和茄子至金黄"
+      },
+      {
+        "stepNumber": 3,
+        "content": "调汁：生抽、老抽、糖、淀粉、水搅匀"
+      },
+      {
+        "stepNumber": 4,
+        "content": "锅中留底油，爆香蒜末"
+      },
+      {
+        "stepNumber": 5,
+        "content": "倒入青椒翻炒几下"
+      },
+      {
+        "stepNumber": 6,
+        "content": "加入土豆和茄子，倒入酱汁大火翻炒均匀"
+      }
     ],
-    "categoryTags": { "ingredient": "蔬菜类", "method": "炒", "cuisine": "东北菜", "flavor": "咸鲜", "price": "经济实惠" }
+    "categoryTags": {
+      "ingredient": "蔬菜类",
+      "method": "炒",
+      "cuisine": "东北菜",
+      "flavor": "咸鲜",
+      "price": "经济实惠"
+    }
   },
   {
     "title": "可乐鸡翅",
@@ -150,23 +422,75 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/8B4513/white?text=可乐鸡翅",
     "ingredients": [
-      { "name": "鸡中翅", "amount": 10, "unit": "个" },
-      { "name": "可乐", "amount": 1, "unit": "罐" },
-      { "name": "姜", "amount": 3, "unit": "片" },
-      { "name": "生抽", "amount": 2, "unit": "勺" },
-      { "name": "老抽", "amount": 0.5, "unit": "勺" },
-      { "name": "料酒", "amount": 1, "unit": "勺" },
-      { "name": "白芝麻", "amount": 5, "unit": "g" }
+      {
+        "name": "鸡中翅",
+        "amount": 10,
+        "unit": "个"
+      },
+      {
+        "name": "可乐",
+        "amount": 1,
+        "unit": "罐"
+      },
+      {
+        "name": "姜",
+        "amount": 3,
+        "unit": "片"
+      },
+      {
+        "name": "生抽",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "老抽",
+        "amount": 0.5,
+        "unit": "勺"
+      },
+      {
+        "name": "料酒",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "白芝麻",
+        "amount": 5,
+        "unit": "g"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "鸡翅洗净，两面各划两刀" },
-      { "stepNumber": 2, "content": "冷水下锅焯水，捞出沥干" },
-      { "stepNumber": 3, "content": "锅中放少许油，下鸡翅煎至两面金黄" },
-      { "stepNumber": 4, "content": "加入姜片、料酒、生抽、老抽翻炒上色" },
-      { "stepNumber": 5, "content": "倒入可乐没过鸡翅，大火烧开转小火炖15分钟" },
-      { "stepNumber": 6, "content": "大火收汁至浓稠，撒白芝麻" }
+      {
+        "stepNumber": 1,
+        "content": "鸡翅洗净，两面各划两刀"
+      },
+      {
+        "stepNumber": 2,
+        "content": "冷水下锅焯水，捞出沥干"
+      },
+      {
+        "stepNumber": 3,
+        "content": "锅中放少许油，下鸡翅煎至两面金黄"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加入姜片、料酒、生抽、老抽翻炒上色"
+      },
+      {
+        "stepNumber": 5,
+        "content": "倒入可乐没过鸡翅，大火烧开转小火炖15分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "大火收汁至浓稠，撒白芝麻"
+      }
     ],
-    "categoryTags": { "ingredient": "肉类", "method": "炖", "cuisine": "家常菜", "flavor": "咸鲜", "price": "普通家常" }
+    "categoryTags": {
+      "ingredient": "肉类",
+      "method": "炖",
+      "cuisine": "家常菜",
+      "flavor": "咸鲜",
+      "price": "普通家常"
+    }
   },
   {
     "title": "干锅花菜",
@@ -178,24 +502,79 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/228B22/white?text=干锅花菜",
     "ingredients": [
-      { "name": "花菜", "amount": 1, "unit": "颗" },
-      { "name": "五花肉", "amount": 100, "unit": "g" },
-      { "name": "干辣椒", "amount": 5, "unit": "个" },
-      { "name": "蒜", "amount": 4, "unit": "瓣" },
-      { "name": "豆瓣酱", "amount": 1, "unit": "勺" },
-      { "name": "生抽", "amount": 1, "unit": "勺" },
-      { "name": "青蒜", "amount": 2, "unit": "根" }
+      {
+        "name": "花菜",
+        "amount": 1,
+        "unit": "颗"
+      },
+      {
+        "name": "五花肉",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "干辣椒",
+        "amount": 5,
+        "unit": "个"
+      },
+      {
+        "name": "蒜",
+        "amount": 4,
+        "unit": "瓣"
+      },
+      {
+        "name": "豆瓣酱",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "生抽",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "青蒜",
+        "amount": 2,
+        "unit": "根"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "花菜掰小朵，淡盐水浸泡10分钟沥干" },
-      { "stepNumber": 2, "content": "五花肉切薄片，蒜切片，青蒜切段" },
-      { "stepNumber": 3, "content": "锅中不放油，下花菜干煸至焦黄盛出" },
-      { "stepNumber": 4, "content": "锅中放少许油，下五花肉煸至出油卷曲" },
-      { "stepNumber": 5, "content": "加入蒜片、干辣椒、豆瓣酱炒香" },
-      { "stepNumber": 6, "content": "倒入花菜大火翻炒，加生抽调味" },
-      { "stepNumber": 7, "content": "放入青蒜段翻炒均匀出锅" }
+      {
+        "stepNumber": 1,
+        "content": "花菜掰小朵，淡盐水浸泡10分钟沥干"
+      },
+      {
+        "stepNumber": 2,
+        "content": "五花肉切薄片，蒜切片，青蒜切段"
+      },
+      {
+        "stepNumber": 3,
+        "content": "锅中不放油，下花菜干煸至焦黄盛出"
+      },
+      {
+        "stepNumber": 4,
+        "content": "锅中放少许油，下五花肉煸至出油卷曲"
+      },
+      {
+        "stepNumber": 5,
+        "content": "加入蒜片、干辣椒、豆瓣酱炒香"
+      },
+      {
+        "stepNumber": 6,
+        "content": "倒入花菜大火翻炒，加生抽调味"
+      },
+      {
+        "stepNumber": 7,
+        "content": "放入青蒜段翻炒均匀出锅"
+      }
     ],
-    "categoryTags": { "ingredient": "蔬菜类", "method": "炒", "cuisine": "湘菜", "flavor": "香辣", "price": "经济实惠" }
+    "categoryTags": {
+      "ingredient": "蔬菜类",
+      "method": "炒",
+      "cuisine": "湘菜",
+      "flavor": "香辣",
+      "price": "经济实惠"
+    }
   },
   {
     "title": "白灼基围虾",
@@ -207,21 +586,66 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/FF7F50/white?text=白灼基围虾",
     "ingredients": [
-      { "name": "基围虾", "amount": 300, "unit": "g" },
-      { "name": "姜", "amount": 4, "unit": "片" },
-      { "name": "葱", "amount": 2, "unit": "根" },
-      { "name": "料酒", "amount": 1, "unit": "勺" },
-      { "name": "生抽", "amount": 2, "unit": "勺" },
-      { "name": "芥末", "amount": 1, "unit": "茶匙" }
+      {
+        "name": "基围虾",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "姜",
+        "amount": 4,
+        "unit": "片"
+      },
+      {
+        "name": "葱",
+        "amount": 2,
+        "unit": "根"
+      },
+      {
+        "name": "料酒",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "生抽",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "芥末",
+        "amount": 1,
+        "unit": "茶匙"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "虾剪去虾须虾枪，挑去虾线洗净" },
-      { "stepNumber": 2, "content": "锅中烧水，加姜片、葱段和料酒" },
-      { "stepNumber": 3, "content": "水大开后下虾，煮至虾身变红弯曲即捞出" },
-      { "stepNumber": 4, "content": "放入冰水中浸泡片刻使虾肉紧实弹牙" },
-      { "stepNumber": 5, "content": "摆盘，生抽加芥末调成蘸汁" }
+      {
+        "stepNumber": 1,
+        "content": "虾剪去虾须虾枪，挑去虾线洗净"
+      },
+      {
+        "stepNumber": 2,
+        "content": "锅中烧水，加姜片、葱段和料酒"
+      },
+      {
+        "stepNumber": 3,
+        "content": "水大开后下虾，煮至虾身变红弯曲即捞出"
+      },
+      {
+        "stepNumber": 4,
+        "content": "放入冰水中浸泡片刻使虾肉紧实弹牙"
+      },
+      {
+        "stepNumber": 5,
+        "content": "摆盘，生抽加芥末调成蘸汁"
+      }
     ],
-    "categoryTags": { "ingredient": "海鲜类", "method": "煮", "cuisine": "粤菜", "flavor": "清淡", "price": "中档" }
+    "categoryTags": {
+      "ingredient": "海鲜类",
+      "method": "煮",
+      "cuisine": "粤菜",
+      "flavor": "清淡",
+      "price": "中档"
+    }
   },
   {
     "title": "蒜蓉粉丝蒸扇贝",
@@ -233,23 +657,75 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/D2B48C/white?text=蒜蓉粉丝蒸扇贝",
     "ingredients": [
-      { "name": "扇贝", "amount": 8, "unit": "只" },
-      { "name": "粉丝", "amount": 1, "unit": "把" },
-      { "name": "蒜", "amount": 6, "unit": "瓣" },
-      { "name": "葱花", "amount": 10, "unit": "g" },
-      { "name": "蒸鱼豉油", "amount": 2, "unit": "勺" },
-      { "name": "食用油", "amount": 2, "unit": "勺" },
-      { "name": "红椒粒", "amount": 5, "unit": "g" }
+      {
+        "name": "扇贝",
+        "amount": 8,
+        "unit": "只"
+      },
+      {
+        "name": "粉丝",
+        "amount": 1,
+        "unit": "把"
+      },
+      {
+        "name": "蒜",
+        "amount": 6,
+        "unit": "瓣"
+      },
+      {
+        "name": "葱花",
+        "amount": 10,
+        "unit": "g"
+      },
+      {
+        "name": "蒸鱼豉油",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "食用油",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "红椒粒",
+        "amount": 5,
+        "unit": "g"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "扇贝刷洗干净，粉丝提前泡软" },
-      { "stepNumber": 2, "content": "蒜剁成蒜蓉，用油炒至金黄色" },
-      { "stepNumber": 3, "content": "粉丝剪段，铺在扇贝上" },
-      { "stepNumber": 4, "content": "放上炒好的蒜蓉" },
-      { "stepNumber": 5, "content": "水开后上锅大火蒸5分钟" },
-      { "stepNumber": 6, "content": "淋蒸鱼豉油，撒葱花红椒粒，浇热油" }
+      {
+        "stepNumber": 1,
+        "content": "扇贝刷洗干净，粉丝提前泡软"
+      },
+      {
+        "stepNumber": 2,
+        "content": "蒜剁成蒜蓉，用油炒至金黄色"
+      },
+      {
+        "stepNumber": 3,
+        "content": "粉丝剪段，铺在扇贝上"
+      },
+      {
+        "stepNumber": 4,
+        "content": "放上炒好的蒜蓉"
+      },
+      {
+        "stepNumber": 5,
+        "content": "水开后上锅大火蒸5分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "淋蒸鱼豉油，撒葱花红椒粒，浇热油"
+      }
     ],
-    "categoryTags": { "ingredient": "海鲜类", "method": "蒸", "cuisine": "粤菜", "flavor": "咸鲜", "price": "中档" }
+    "categoryTags": {
+      "ingredient": "海鲜类",
+      "method": "蒸",
+      "cuisine": "粤菜",
+      "flavor": "咸鲜",
+      "price": "中档"
+    }
   },
   {
     "title": "兰州牛肉面",
@@ -261,25 +737,84 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/D2691E/white?text=兰州牛肉面",
     "ingredients": [
-      { "name": "高筋面粉", "amount": 300, "unit": "g" },
-      { "name": "牛腱子", "amount": 300, "unit": "g" },
-      { "name": "牛肉汤", "amount": 1000, "unit": "ml" },
-      { "name": "白萝卜", "amount": 1, "unit": "根" },
-      { "name": "蒜苗", "amount": 2, "unit": "根" },
-      { "name": "香菜", "amount": 10, "unit": "g" },
-      { "name": "辣椒油", "amount": 2, "unit": "勺" },
-      { "name": "八角", "amount": 3, "unit": "个" }
+      {
+        "name": "高筋面粉",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "牛腱子",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "牛肉汤",
+        "amount": 1000,
+        "unit": "ml"
+      },
+      {
+        "name": "白萝卜",
+        "amount": 1,
+        "unit": "根"
+      },
+      {
+        "name": "蒜苗",
+        "amount": 2,
+        "unit": "根"
+      },
+      {
+        "name": "香菜",
+        "amount": 10,
+        "unit": "g"
+      },
+      {
+        "name": "辣椒油",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "八角",
+        "amount": 3,
+        "unit": "个"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "牛腱焯水后加八角等香料炖煮2小时，冷却切片" },
-      { "stepNumber": 2, "content": "面粉加盐和碱水揉成光滑面团，饧面30分钟" },
-      { "stepNumber": 3, "content": "反复揉拉成面条" },
-      { "stepNumber": 4, "content": "白萝卜切薄片焯水，蒜苗香菜切碎" },
-      { "stepNumber": 5, "content": "面条煮熟捞入碗中" },
-      { "stepNumber": 6, "content": "浇上滚烫的牛肉汤，铺牛肉片和白萝卜" },
-      { "stepNumber": 7, "content": "撒蒜苗香菜，加辣椒油即可" }
+      {
+        "stepNumber": 1,
+        "content": "牛腱焯水后加八角等香料炖煮2小时，冷却切片"
+      },
+      {
+        "stepNumber": 2,
+        "content": "面粉加盐和碱水揉成光滑面团，饧面30分钟"
+      },
+      {
+        "stepNumber": 3,
+        "content": "反复揉拉成面条"
+      },
+      {
+        "stepNumber": 4,
+        "content": "白萝卜切薄片焯水，蒜苗香菜切碎"
+      },
+      {
+        "stepNumber": 5,
+        "content": "面条煮熟捞入碗中"
+      },
+      {
+        "stepNumber": 6,
+        "content": "浇上滚烫的牛肉汤，铺牛肉片和白萝卜"
+      },
+      {
+        "stepNumber": 7,
+        "content": "撒蒜苗香菜，加辣椒油即可"
+      }
     ],
-    "categoryTags": { "ingredient": "主食类", "method": "煮", "cuisine": "西北菜", "flavor": "咸鲜", "price": "普通家常" }
+    "categoryTags": {
+      "ingredient": "主食类",
+      "method": "煮",
+      "cuisine": "西北菜",
+      "flavor": "咸鲜",
+      "price": "普通家常"
+    }
   },
   {
     "title": "小炒肉",
@@ -291,23 +826,75 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/DC143C/white?text=小炒肉",
     "ingredients": [
-      { "name": "五花肉", "amount": 250, "unit": "g" },
-      { "name": "杭椒", "amount": 150, "unit": "g" },
-      { "name": "红尖椒", "amount": 3, "unit": "个" },
-      { "name": "豆豉", "amount": 1, "unit": "勺" },
-      { "name": "蒜", "amount": 3, "unit": "瓣" },
-      { "name": "生抽", "amount": 2, "unit": "勺" },
-      { "name": "料酒", "amount": 1, "unit": "勺" }
+      {
+        "name": "五花肉",
+        "amount": 250,
+        "unit": "g"
+      },
+      {
+        "name": "杭椒",
+        "amount": 150,
+        "unit": "g"
+      },
+      {
+        "name": "红尖椒",
+        "amount": 3,
+        "unit": "个"
+      },
+      {
+        "name": "豆豉",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "蒜",
+        "amount": 3,
+        "unit": "瓣"
+      },
+      {
+        "name": "生抽",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "料酒",
+        "amount": 1,
+        "unit": "勺"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "五花肉切薄片，杭椒和红椒斜切片" },
-      { "stepNumber": 2, "content": "锅中不放油，下辣椒干煸至起虎皮盛出" },
-      { "stepNumber": 3, "content": "锅中放少许油，下五花肉煸至出油卷曲" },
-      { "stepNumber": 4, "content": "加入豆豉和蒜片爆香" },
-      { "stepNumber": 5, "content": "倒入辣椒，加生抽和料酒大火翻炒" },
-      { "stepNumber": 6, "content": "炒至辣椒断生即可出锅" }
+      {
+        "stepNumber": 1,
+        "content": "五花肉切薄片，杭椒和红椒斜切片"
+      },
+      {
+        "stepNumber": 2,
+        "content": "锅中不放油，下辣椒干煸至起虎皮盛出"
+      },
+      {
+        "stepNumber": 3,
+        "content": "锅中放少许油，下五花肉煸至出油卷曲"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加入豆豉和蒜片爆香"
+      },
+      {
+        "stepNumber": 5,
+        "content": "倒入辣椒，加生抽和料酒大火翻炒"
+      },
+      {
+        "stepNumber": 6,
+        "content": "炒至辣椒断生即可出锅"
+      }
     ],
-    "categoryTags": { "ingredient": "肉类", "method": "炒", "cuisine": "湘菜", "flavor": "香辣", "price": "普通家常" }
+    "categoryTags": {
+      "ingredient": "肉类",
+      "method": "炒",
+      "cuisine": "湘菜",
+      "flavor": "香辣",
+      "price": "普通家常"
+    }
   },
   {
     "title": "葱油拌面",
@@ -319,21 +906,69 @@
     "author": "家常美食",
     "coverImage": "https://placehold.co/400x300/DEB887/white?text=葱油拌面",
     "ingredients": [
-      { "name": "挂面", "amount": 200, "unit": "g" },
-      { "name": "葱", "amount": 4, "unit": "根" },
-      { "name": "生抽", "amount": 3, "unit": "勺" },
-      { "name": "老抽", "amount": 1, "unit": "勺" },
-      { "name": "糖", "amount": 1, "unit": "茶匙" },
-      { "name": "食用油", "amount": 3, "unit": "勺" }
+      {
+        "name": "挂面",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "葱",
+        "amount": 4,
+        "unit": "根"
+      },
+      {
+        "name": "生抽",
+        "amount": 3,
+        "unit": "勺"
+      },
+      {
+        "name": "老抽",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "糖",
+        "amount": 1,
+        "unit": "茶匙"
+      },
+      {
+        "name": "食用油",
+        "amount": 3,
+        "unit": "勺"
+      }
     ],
     "steps": [
-      { "stepNumber": 1, "content": "葱切长段，用厨房纸吸干水分" },
-      { "stepNumber": 2, "content": "锅中倒油，小火炸葱段至焦黄酥脆" },
-      { "stepNumber": 3, "content": "捞出葱段，锅中留葱油" },
-      { "stepNumber": 4, "content": "加入生抽、老抽、糖煮至冒泡关火" },
-      { "stepNumber": 5, "content": "面煮熟捞出，浇上葱油酱汁" },
-      { "stepNumber": 6, "content": "放上炸好的葱段拌匀食用" }
+      {
+        "stepNumber": 1,
+        "content": "葱切长段，用厨房纸吸干水分"
+      },
+      {
+        "stepNumber": 2,
+        "content": "锅中倒油，小火炸葱段至焦黄酥脆"
+      },
+      {
+        "stepNumber": 3,
+        "content": "捞出葱段，锅中留葱油"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加入生抽、老抽、糖煮至冒泡关火"
+      },
+      {
+        "stepNumber": 5,
+        "content": "面煮熟捞出，浇上葱油酱汁"
+      },
+      {
+        "stepNumber": 6,
+        "content": "放上炸好的葱段拌匀食用"
+      }
     ],
-    "categoryTags": { "ingredient": "主食类", "method": "煮", "cuisine": "家常菜", "flavor": "咸鲜", "price": "经济实惠" }
+    "categoryTags": {
+      "ingredient": "主食类",
+      "method": "煮",
+      "cuisine": "家常菜",
+      "flavor": "咸鲜",
+      "price": "经济实惠"
+    }
   }
 ]
