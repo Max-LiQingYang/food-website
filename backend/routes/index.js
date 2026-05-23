@@ -25,6 +25,8 @@ const commentRoutes = require('./comments')
 const collectionRoutes = require('./collections')
 const shoppingListRoutes = require('./shoppingList')
 const importRoutes = require('./import')
+const compareRoutes = require('./compare')
+const preferencesRoutes = require('./preferences')
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
@@ -44,6 +46,12 @@ router.use('/feed', auth, feedRoutes)
 router.use('/collections', auth, collectionRoutes)
 router.use('/shopping-list', auth, shoppingListRoutes)
 router.use('/recipes/import', importRoutes)
+
+// 食谱对比（无需认证）
+router.use('/recipes', compareRoutes)
+
+// 用户偏好（需认证）
+router.use('/preferences', preferencesRoutes)
 
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)

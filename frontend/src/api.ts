@@ -633,6 +633,90 @@ export function deleteShoppingList(id: string): Promise<void> {
 }
 
 // ─────────────────────────────────────────────────────────────────
+
+// ── Compare Types ──
+export interface CompareRecipe {
+  id: string
+  title: string
+  description: string
+  category: string
+  difficulty: string
+  servings: number
+  cookTime: string
+  coverImage: string | null
+  nutrition: Record<string, any> | null
+  ingredients: { name: string; amount: number; unit: string }[]
+  steps: { stepNumber: number; content: string }[]
+  season: string
+  qualityScore: number
+  qualityLabel: string
+  avgRating: number
+  favoriteCount: number
+  commentCount: number
+  viewCount: number
+}
+
+export interface CompareSummary {
+  totalCompared: number
+  difficulties: string[]
+  categories: string[]
+  allDifferentDifficulty: boolean
+  hasCommonDifficulty: boolean
+  commonIngredientCount: number
+  commonIngredients: string[]
+  recipeIngredients: { recipeId: string; uniqueCount: number; uniqueIngredients: string[] }[]
+}
+
+export interface CompareResult {
+  recipes: CompareRecipe[]
+  summary: CompareSummary
+}
+
+// ── Preferences Types ──
+export interface UserPreferences {
+  diet: string
+  cuisine: string
+  difficulty: string
+  maxCookTime: string
+  allergies: string[]
+  excludedIngredients: string[]
+}
+
+// ── Shopping List Item for add ──
+export interface AddShoppingItem {
+  name: string
+  amount: number
+  unit: string
+}
+
+
+// ── Compare Recipes ──
+export function compareRecipes(recipeIds: string[]): Promise<CompareResult> {
+  return apiClient.post('/recipes/compare', { recipeIds }).then((res: any) => res.data.data || res.data)
+}
+
+// ── Preferences ──
+export function getPreferences(): Promise<UserPreferences> {
+  return apiClient.get('/preferences/').then((res: any) => res.data.data || {})
+}
+
+export function updatePreferences(prefs: Partial<UserPreferences>): Promise<UserPreferences> {
+  return apiClient.put('/preferences/', prefs).then((res: any) => res.data.data)
+}
+
+export function getRecommendByPreference(): Promise<{ list: any[]; preferences: UserPreferences }> {
+  return apiClient.get('/preferences/recommend-by-preference').then((res: any) => res.data.data || { list: [], preferences: {} })
+}
+
+// ── Shopping List Item Operations ──
+export function addShoppingListItems(listId: string, items: AddShoppingItem[]): Promise<ShoppingList> {
+  return apiClient.post(`/shopping-list/${listId}/items`, { items }).then((res: any) => res.data.data)
+}
+
+export function deleteShoppingListItem(listId: string, itemName: string): Promise<ShoppingList> {
+  return apiClient.delete(`/shopping-list/${listId}/items/${encodeURIComponent(itemName)}`).then((res: any) => res.data.data)
+}
+
 // Share API
 // ─────────────────────────────────────────────────────────────────
 
@@ -831,4 +915,10 @@ export default {
   getFollowStatus,
   getRankings,
   getRecipeVersions,
+  compareRecipes,
+  getPreferences,
+  updatePreferences,
+  getRecommendByPreference,
+  addShoppingListItems,
+  deleteShoppingListItem,
 }

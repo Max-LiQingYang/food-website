@@ -25,6 +25,8 @@ const ROUTE_LABELS: Record<string, string> = {
   'collections': '收藏夹',
   'shopping-list': '购物清单',
   'rankings': '排行榜',
+  'compare': '食谱对比',
+  'preferences': '偏好设置',
   'recipe': '食谱',
   'create': '创建食谱',
   'new': '新建',

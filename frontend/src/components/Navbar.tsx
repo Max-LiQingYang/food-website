@@ -43,6 +43,12 @@ export default function Navbar() {
           <Link to="/favorites" className="navbar__link" onClick={handleNavClick}>
             我的收藏
           </Link>
+          <Link to="/compare" className="navbar__link" onClick={handleNavClick}>
+            📊 对比
+          </Link>
+          <Link to="/preferences" className="navbar__link" onClick={handleNavClick}>
+            ⚙️ 偏好
+          </Link>
           {isAuthenticated && (
             <Link
               to="/recipe/new"

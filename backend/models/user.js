@@ -49,6 +49,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 'user',
         comment: '角色, user/admin'
       },
+      preferences: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: '{}',
+        comment: '用户偏好设置（JSON: {diet,cuisine,allergies,...}）'
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

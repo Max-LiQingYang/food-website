@@ -1,0 +1,292 @@
+.cmp-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.cmp-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text, #1a1a1a);
+  margin: 0 0 20px;
+}
+
+.cmp-input-section {
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  padding: 20px;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,.06));
+  margin-bottom: 24px;
+}
+
+.cmp-input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #666);
+  margin-bottom: 8px;
+}
+
+.cmp-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  background: var(--color-input-bg, #fafafa);
+  color: var(--color-text, #333);
+  margin-bottom: 12px;
+  transition: border-color .2s;
+}
+
+.cmp-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary, #e8663e);
+}
+
+.cmp-error {
+  color: #dc3545;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* Result */
+.cmp-result {
+  animation: fadeIn .3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cmp-summary {
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,.06));
+}
+
+.cmp-summary h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--color-text, #1a1a1a);
+}
+
+.cmp-summary p {
+  font-size: 13px;
+  color: var(--color-text-secondary, #666);
+  margin: 0 0 10px;
+}
+
+.cmp-summary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cmp-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--color-primary-bg, #fff3ed);
+  color: var(--color-primary-dark, #d45a32);
+  font-size: 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.cmp-tag--info {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.cmp-tag--warn {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.cmp-tag--common {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Table */
+.cmp-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,.06));
+  min-width: 600px;
+}
+
+.cmp-table th,
+.cmp-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border, #eee);
+  vertical-align: top;
+}
+
+.cmp-th-label {
+  background: var(--color-bg, #faf6f1);
+  color: var(--color-text-secondary, #666);
+  font-weight: 600;
+  font-size: 13px;
+  width: 100px;
+  min-width: 80px;
+}
+
+.cmp-th-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  min-width: 180px;
+}
+
+.cmp-th--0 { background: #fff3ed; }
+.cmp-th--1 { background: #e8f5e9; }
+.cmp-th--2 { background: #e3f2fd; }
+
+.cmp-link {
+  color: var(--color-primary, #e8663e);
+  text-decoration: none;
+}
+
+.cmp-link:hover {
+  text-decoration: underline;
+}
+
+.cmp-td-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #666);
+  white-space: nowrap;
+  position: sticky;
+  left: 0;
+  background: var(--color-card, #fff);
+}
+
+.cmp-td-value {
+  font-size: 14px;
+  color: var(--color-text, #333);
+}
+
+.cmp-row-even td {
+  background: var(--color-bg, #fafaf8);
+}
+
+.cmp-meta {
+  font-size: 11px;
+  color: var(--color-text-muted, #999);
+}
+
+.cmp-null {
+  font-size: 12px;
+  color: var(--color-text-muted, #aaa);
+  font-style: italic;
+}
+
+.cmp-unique-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 11px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.cmp-ingredient-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cmp-ingredient-item {
+  font-size: 12px;
+  padding: 2px 8px;
+  background: var(--color-bg, #f5f5f5);
+  border-radius: 4px;
+  color: var(--color-text-secondary, #555);
+}
+
+/* Nutrition grid */
+.cmp-nutrition-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.cmp-nutrition-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cmp-nutrition-label {
+  font-size: 11px;
+  color: var(--color-text-muted, #888);
+}
+
+.cmp-nutrition-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+}
+
+/* Common ingredients */
+.cmp-common {
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,.06));
+}
+
+.cmp-common h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: var(--color-text, #1a1a1a);
+}
+
+.cmp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .cmp-page { padding: 16px 12px 32px; }
+  .cmp-title { font-size: 20px; }
+  .cmp-input-section { padding: 14px; }
+  .cmp-table th, .cmp-table td { padding: 8px 10px; font-size: 13px; }
+  .cmp-th-value { min-width: 130px; }
+  .cmp-nutrition-grid { grid-template-columns: 1fr; }
+}
+
+/* Dark mode */
+[data-theme=dark] .cmp-th-label {
+  background: #2a2118;
+}
+[data-theme=dark] .cmp-th--0 { background: #3a1e14; }
+[data-theme=dark] .cmp-th--1 { background: #1a2e1a; }
+[data-theme=dark] .cmp-th--2 { background: #14263a; }
+[data-theme=dark] .cmp-row-even td { background: #1a1815; }
+[data-theme=dark] .cmp-td-label { background: #1e1812; }
+[data-theme=dark] .cmp-ingredient-item { background: #2a2a2a; color: #aaa; }

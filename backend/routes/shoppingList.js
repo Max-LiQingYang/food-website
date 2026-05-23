@@ -257,4 +257,112 @@ router.delete('/:id', auth, async (req, res) => {
   }
 })
 
+// ─────────────────────────────────────────────────────────────────
+// POST /:id/items — 向清单添加多个项目
+// ─────────────────────────────────────────────────────────────────
+router.post('/:id/items', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { items } = req.body
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json(resJSON(400, '请提供要添加的项目', null))
+    }
+
+    const list = await ShoppingList.findOne({
+      where: { id, userId: req.userId }
+    })
+
+    if (!list) {
+      return res.status(404).json(resJSON(404, '购物清单不存在', null))
+    }
+
+    let existingItems = []
+    try {
+      existingItems = JSON.parse(list.items || '[]')
+    } catch {
+      existingItems = []
+    }
+
+    const existingMap = {}
+    for (const item of existingItems) {
+      existingMap[item.name] = item
+    }
+
+    for (const newItem of items) {
+      const name = (newItem.name || '').trim()
+      if (!name) continue
+      if (existingMap[name]) {
+        existingMap[name].amount += parseFloat(newItem.amount) || 0
+        if (!existingMap[name].unit && newItem.unit) {
+          existingMap[name].unit = newItem.unit
+        }
+      } else {
+        existingMap[name] = {
+          name,
+          amount: parseFloat(newItem.amount) || 0,
+          unit: newItem.unit || '',
+          checked: false
+        }
+      }
+    }
+
+    const finalItems = Object.values(existingMap)
+    await list.update({ items: JSON.stringify(finalItems) })
+
+    const data = list.toJSON()
+    try {
+      data.items = typeof data.items === 'string' ? JSON.parse(data.items) : data.items
+    } catch {
+      data.items = []
+    }
+
+    return res.status(200).json(resJSON(0, '已添加', data))
+  } catch (err) {
+    console.error('[POST /shopping-list/:id/items] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// DELETE /:id/items/:itemName — 从清单删除一个项目
+// ─────────────────────────────────────────────────────────────────
+router.delete('/:id/items/:itemName', auth, async (req, res) => {
+  try {
+    const { id, itemName } = req.params
+
+    const list = await ShoppingList.findOne({
+      where: { id, userId: req.userId }
+    })
+
+    if (!list) {
+      return res.status(404).json(resJSON(404, '购物清单不存在', null))
+    }
+
+    let items = []
+    try {
+      items = JSON.parse(list.items || '[]')
+    } catch {
+      items = []
+    }
+
+    const decodedName = decodeURIComponent(itemName)
+    const filtered = items.filter((i) => i.name !== decodedName)
+
+    if (filtered.length === items.length) {
+      return res.status(404).json(resJSON(404, '未找到该项目', null))
+    }
+
+    await list.update({ items: JSON.stringify(filtered) })
+
+    const data = list.toJSON()
+    data.items = filtered
+
+    return res.status(200).json(resJSON(0, '已删除项目', data))
+  } catch (err) {
+    console.error('[DELETE /shopping-list/:id/items/:itemName] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router

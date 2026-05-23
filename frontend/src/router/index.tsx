@@ -19,6 +19,9 @@ const CollectionsDetailPage = lazy(() => import('../pages/CollectionsDetailPage'
 const ShoppingListPage = lazy(() => import('../pages/ShoppingListPage'))
 const RankingsPage = lazy(() => import('../pages/RankingsPage'))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
+const ComparePage = lazy(() => import('../pages/ComparePage'))
+const PreferencesPage = lazy(() => import('../pages/PreferencesPage'))
+const PreferenceRecommendations = lazy(() => import('../pages/PreferenceRecommendations'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -56,6 +59,9 @@ const router = createBrowserRouter([
       { path: '/collections/:id', element: <CollectionsDetailPage /> },
       { path: '/shopping-list', element: <ShoppingListPage /> },
       { path: '/rankings', element: <RankingsPage /> },
+      { path: '/compare', element: <ComparePage /> },
+      { path: '/preferences', element: <PreferencesPage /> },
+      { path: '/preferences/recommendations', element: <PreferenceRecommendations /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
