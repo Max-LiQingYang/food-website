@@ -108,3 +108,11 @@
     font-size: 12px;
   }
 }
+
+/* ── Actions bar (add to collection / shopping list) ── */
+.recipe-card__actions {
+  display: flex;
+  gap: 6px;
+  padding: 0 14px 12px;
+  flex-wrap: wrap;
+}

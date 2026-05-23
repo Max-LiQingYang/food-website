@@ -8,6 +8,9 @@ import CommentSection from '../components/CommentSection'
 import NutritionCard from '../components/NutritionCard'
 import SimilarRecipes from '../components/SimilarRecipes'
 import ImageLightbox from '../components/ImageLightbox'
+import ShareModal from '../components/ShareModal'
+import AddToCollectionDropdown from '../components/AddToCollectionDropdown'
+import AddToShoppingListButton from '../components/AddToShoppingListButton'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
 import './RecipeDetailPage.css'
@@ -43,6 +46,7 @@ export default function RecipeDetailPage() {
   const [deleting, setDeleting] = useState(false)
   const [activeStep, setActiveStep] = useState<number | null>(null)
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   const isAuthor = isAuthenticated && user && recipe && recipe.userId === user.id
 
@@ -100,32 +104,7 @@ export default function RecipeDetailPage() {
 
   const handleShare = async () => {
     if (!recipe) return
-    const shareData = {
-      title: recipe.title,
-      text: `来看看这道美食：${recipe.title}`,
-      url: window.location.href,
-    }
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData)
-        toast.success('分享成功')
-      } catch (err: any) {
-        // User cancelled or share failed
-        if (err?.name !== 'AbortError') {
-          fallbackCopyLink()
-        }
-      }
-    } else {
-      fallbackCopyLink()
-    }
-  }
-
-  const fallbackCopyLink = () => {
-    navigator.clipboard
-      .writeText(window.location.href)
-      .then(() => toast.success('链接已复制到剪贴板'))
-      .catch(() => toast.error('复制失败，请手动复制链接'))
+    setShowShareModal(true)
   }
 
   const handleDelete = async () => {
@@ -246,15 +225,18 @@ export default function RecipeDetailPage() {
           </div>
 
           {/* 收藏按钮 */}
-          <button
-            className={`detail-fav-btn ${isFavorited ? 'is-favorited' : ''}`}
-            onClick={handleFavoriteToggle}
-            disabled={favLoading}
-            title={isFavorited ? '取消收藏' : '收藏'}
-          >
-            <span className="fav-icon">{favLoading ? '⋯' : isFavorited ? '❤️' : '🤍'}</span>
-            <span className="fav-text">{isFavorited ? '已收藏' : '收藏'}</span>
-          </button>
+          <div className="detail-cover-actions">
+            <button
+              className={`detail-fav-btn ${isFavorited ? 'is-favorited' : ''}`}
+              onClick={handleFavoriteToggle}
+              disabled={favLoading}
+              title={isFavorited ? '取消收藏' : '收藏'}
+            >
+              <span className="fav-icon">{favLoading ? '⋯' : isFavorited ? '❤️' : '🤍'}</span>
+              <span className="fav-text">{isFavorited ? '已收藏' : '收藏'}</span>
+            </button>
+            <AddToCollectionDropdown recipeId={id} label="📁 收藏到" />
+          </div>
 
           {/* 作者操作栏 */}
           {isAuthor && (
@@ -338,6 +320,7 @@ export default function RecipeDetailPage() {
               🥬 食材清单
               <span className="section-count">{recipe.ingredients.length} 种</span>
             </h2>
+            <AddToShoppingListButton recipeId={id} className="detail-shop-btn" />
             <ul className="detail-ingredients">
               {recipe.ingredients.map((ing, i) => (
                 <li key={i} className="detail-ingredient">
@@ -413,6 +396,15 @@ export default function RecipeDetailPage() {
           src={lightboxSrc}
           alt="步骤图片"
           onClose={() => setLightboxSrc(null)}
+        />
+      )}
+
+      {/* 分享弹窗 */}
+      {showShareModal && id && (
+        <ShareModal
+          recipeId={id}
+          recipeTitle={recipe.title}
+          onClose={() => setShowShareModal(false)}
         />
       )}
     </div>

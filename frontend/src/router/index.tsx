@@ -11,6 +11,9 @@ const SearchPage = lazy(() => import('../pages/SearchPage'))
 const UserProfilePage = lazy(() => import('../pages/UserProfilePage'))
 const CreateRecipePage = lazy(() => import('../pages/CreateRecipePage'))
 const RecommendPage = lazy(() => import('../pages/RecommendPage'))
+const CollectionsPage = lazy(() => import('../pages/CollectionsPage'))
+const CollectionsDetailPage = lazy(() => import('../pages/CollectionsDetailPage'))
+const ShoppingListPage = lazy(() => import('../pages/ShoppingListPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -39,6 +42,9 @@ const router = createBrowserRouter([
       { path: '/search', element: <SearchPage /> },
       { path: '/user/:id', element: <UserProfilePage /> },
       { path: '/recommend', element: <RecommendPage /> },
+      { path: '/collections', element: <CollectionsPage /> },
+      { path: '/collections/:id', element: <CollectionsDetailPage /> },
+      { path: '/shopping-list', element: <ShoppingListPage /> },
     ],
   },
 ])

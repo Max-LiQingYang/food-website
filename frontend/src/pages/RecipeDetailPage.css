@@ -69,10 +69,16 @@
 }
 
 /* ── 收藏按钮 ── */
-.detail-fav-btn {
+.detail-cover-actions {
   position: absolute;
   top: 14px;
   right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-fav-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -269,6 +275,10 @@
 }
 
 /* ── 食材列表 ── */
+.detail-shop-btn {
+  margin-bottom: 14px;
+}
+
 .detail-ingredients {
   list-style: none;
   padding: 0;

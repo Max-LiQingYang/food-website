@@ -20,6 +20,8 @@ const recipeRoutes = require('./recipes')
 const userRoutes = require('./users')
 const favoriteRoutes = require('./favorites')
 const commentRoutes = require('./comments')
+const collectionRoutes = require('./collections')
+const shoppingListRoutes = require('./shoppingList')
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
@@ -28,6 +30,10 @@ router.use('/auth', authRoutes)
 router.use('/', commentRoutes)
 router.use('/recipes', recipeRoutes)
 router.use('/users', userRoutes)
+
+// 需要 auth 的路由（collections, shopping-list）
+router.use('/collections', auth, collectionRoutes)
+router.use('/shopping-list', auth, shoppingListRoutes)
 
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)

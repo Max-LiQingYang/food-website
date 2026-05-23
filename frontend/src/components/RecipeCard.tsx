@@ -59,6 +59,10 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
         <p className="recipe-card__author">👨‍🍳 {recipe.author || '未知作者'}</p>
         {recipe.category && <span className="recipe-card__category">{recipe.category}</span>}
       </div>
+      <div className="recipe-card__actions" onClick={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()} onTouchEnd={e => e.stopPropagation()}>
+        <AddToCollectionDropdown recipeId={recipe.id} />
+        <AddToShoppingListButton recipeId={recipe.id} />
+      </div>
     </div>
   )
 }

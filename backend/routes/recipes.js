@@ -519,6 +519,43 @@ router.get('/:id/similar', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// GET /:id/share — 食谱分享摘要
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/share', async (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=600, s-maxage=3600',
+    'Vary': 'Accept-Encoding',
+  })
+
+  try {
+    const { id } = req.params
+    const recipe = await Recipe.findByPk(id, {
+      attributes: ['id', 'title', 'description', 'coverImage', 'category']
+    })
+
+    if (!recipe) {
+      return res.status(404).json(resJSON(404, '食谱不存在', null))
+    }
+
+    const data = recipe.toJSON()
+    const shareUrl = `${process.env.FRONTEND_URL || 'http://39.103.68.205'}/recipe/${id}`
+
+    return res.status(200).json(
+      resJSON(0, 'ok', {
+        title: data.title,
+        description: data.description || '',
+        coverImage: data.coverImage || '',
+        shareUrl,
+        shareText: `来看看这道【${data.title}】吧！${shareUrl}`
+      })
+    )
+  } catch (err) {
+    console.error('[GET /recipes/:id/share] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
 // GET /:id — 食谱详情（含 ingredients 和 steps 解析为 JSON）
 // ─────────────────────────────────────────────────────────────────
 router.get('/:id', async (req, res) => {

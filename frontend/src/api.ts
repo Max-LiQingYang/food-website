@@ -384,6 +384,152 @@ export function recommendRecipes(ingredients: string): Promise<RecommendResponse
   return apiClient.get('/recipes/recommend', { params: { ingredients } })
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Collections API
+// ─────────────────────────────────────────────────────────────────
+
+export interface Collection {
+  id: string
+  name: string
+  description?: string
+  recipeCount: number
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface CollectionDetail {
+  id: string
+  name: string
+  description?: string
+  recipeCount: number
+  createdAt: string
+  updatedAt?: string
+  recipes: Recipe[]
+}
+
+/**
+ * 获取收藏夹列表
+ * GET /api/collections
+ */
+export function getCollections(): Promise<{ list: Collection[] }> {
+  return apiClient.get('/collections').then((res: any) => ({
+    list: res.data || []
+  }))
+}
+
+/**
+ * 创建收藏夹
+ * POST /api/collections
+ */
+export function createCollection(data: { name: string; description?: string }): Promise<Collection> {
+  return apiClient.post('/collections', data).then((res: any) => res.data)
+}
+
+/**
+ * 获取收藏夹详情（含食谱列表）
+ * GET /api/collections/:id
+ */
+export function getCollection(id: string): Promise<CollectionDetail> {
+  return apiClient.get(`/collections/${id}`).then((res: any) => res.data)
+}
+
+/**
+ * 更新收藏夹
+ * PUT /api/collections/:id
+ */
+export function updateCollection(id: string, data: { name?: string; description?: string }): Promise<Collection> {
+  return apiClient.put(`/collections/${id}`, data).then((res: any) => res.data)
+}
+
+/**
+ * 删除收藏夹
+ * DELETE /api/collections/:id
+ */
+export function deleteCollection(id: string): Promise<void> {
+  return apiClient.delete(`/collections/${id}`).then((res: any) => res.data)
+}
+
+/**
+ * 将食谱添加到收藏夹
+ * POST /api/collections/:id/recipes
+ */
+export function addRecipeToCollection(collectionId: string, recipeId: string): Promise<unknown> {
+  return apiClient.post(`/collections/${collectionId}/recipes`, { recipeId }).then((res: any) => res.data)
+}
+
+/**
+ * 从收藏夹移除食谱
+ * DELETE /api/collections/:id/recipes/:recipeId
+ */
+export function removeRecipeFromCollection(collectionId: string, recipeId: string): Promise<void> {
+  return apiClient.delete(`/collections/${collectionId}/recipes/${recipeId}`).then((res: any) => res.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Shopping List API
+// ─────────────────────────────────────────────────────────────────
+
+export interface ShoppingListItem {
+  name: string
+  amount?: number
+  unit?: string
+  checked: boolean
+}
+
+export interface ShoppingList {
+  id: string
+  name: string
+  items: ShoppingListItem[]
+  recipeId?: string
+  createdAt: string
+  updatedAt?: string
+}
+
+/**
+ * 从食谱生成购物清单
+ * POST /api/shopping-list/generate
+ */
+export function generateShoppingList(recipeIds: string[]): Promise<ShoppingList> {
+  return apiClient.post('/shopping-list/generate', { recipeIds }).then((res: any) => res.data)
+}
+
+/**
+ * 获取购物清单列表
+ * GET /api/shopping-list
+ */
+export function getShoppingLists(): Promise<{ list: ShoppingList[] }> {
+  return apiClient.get('/shopping-list').then((res: any) => ({
+    list: res.data || []
+  }))
+}
+
+/**
+ * 更新购物清单
+ * PUT /api/shopping-list/:id
+ */
+export function updateShoppingList(id: string, data: { name?: string; items?: ShoppingListItem[] }): Promise<ShoppingList> {
+  return apiClient.put(`/shopping-list/${id}`, data).then((res: any) => res.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Share API
+// ─────────────────────────────────────────────────────────────────
+
+export interface ShareInfo {
+  title: string
+  description: string
+  shareUrl: string
+  shareText: string
+}
+
+/**
+ * 获取食谱分享信息
+ * GET /api/recipes/:id/share
+ */
+export function getShareInfo(id: string): Promise<ShareInfo> {
+  return apiClient.get(`/recipes/${id}/share`).then((res: any) => res.data)
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -405,4 +551,15 @@ export default {
   getCommentStats,
   createComment,
   deleteComment,
+  getCollections,
+  createCollection,
+  getCollection,
+  updateCollection,
+  deleteCollection,
+  addRecipeToCollection,
+  removeRecipeFromCollection,
+  generateShoppingList,
+  getShoppingLists,
+  updateShoppingList,
+  getShareInfo,
 }
