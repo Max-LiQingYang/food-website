@@ -35,7 +35,7 @@ router.use('/auth', authRoutes)
 router.use('/', commentRoutes)
 
 // 食谱对比（无需认证，必须在 recipeRoutes 之前避免 /:id 拦截 /compare）
-router.use('/recipes', compareRoutes)
+router.use('/recipes/compare', compareRoutes)
 
 router.use('/recipes', recipeRoutes)
 router.use('/users', userRoutes)
