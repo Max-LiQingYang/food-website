@@ -16,7 +16,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '宫保鸡丁',
-    coverImage: 'https://placehold.co/400x300/E74C3C/white?text=宫保鸡丁',
+    coverImage: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&h=300&fit=crop',
     author: '美食达人',
     cookTime: 25,
     description: '经典川菜，鸡肉嫩滑，花生酥脆，麻辣鲜香，是一道老少皆宜的家常菜。',
@@ -46,7 +46,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '红烧肉',
-    coverImage: 'https://placehold.co/400x300/8B4513/white?text=红烧肉',
+    coverImage: 'https://images.unsplash.com/photo-1623689046286-01cd25b32d79?w=400&h=300&fit=crop',
     author: '家常菜师傅',
     cookTime: 90,
     description: '肥而不腻、入口即化的经典红烧肉，浓油赤酱，是下饭的绝佳选择。',
@@ -76,7 +76,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '番茄意面',
-    coverImage: 'https://placehold.co/400x300/FF6347/white?text=番茄意面',
+    coverImage: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop',
     author: '西餐爱好者',
     cookTime: 20,
     description: '经典的意大利面做法，酸甜可口的番茄酱汁搭配弹牙的意面，简单又美味。',
@@ -106,7 +106,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '法式焗蜗牛',
-    coverImage: 'https://placehold.co/400x300/DC143C/white?text=法式焗蜗牛',
+    coverImage: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
     author: '法餐大厨',
     cookTime: 45,
     description: '经典法式前菜，蜗牛搭配蒜香黄油和欧芹，口感独特，风味浓郁。',
@@ -133,7 +133,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '提拉米苏',
-    coverImage: 'https://placehold.co/400x300/8B4513/white?text=提拉米苏',
+    coverImage: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=300&fit=crop',
     author: '甜点大师',
     cookTime: 30,
     description: '来自意大利的经典甜点，马斯卡彭芝士与浓缩咖啡的完美结合，入口即化。',
@@ -163,7 +163,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '抹茶千层蛋糕',
-    coverImage: 'https://placehold.co/400x300/2E8B57/white?text=抹茶千层',
+    coverImage: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400&h=300&fit=crop',
     author: '日式甜点屋',
     cookTime: 60,
     description: '细腻的抹茶可丽饼层层叠加，搭配丝滑奶油，日式甜点的经典之作。',
@@ -194,7 +194,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '韩式拌饭',
-    coverImage: 'https://placehold.co/400x300/FF4500/white?text=韩式拌饭',
+    coverImage: 'https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=400&h=300&fit=crop',
     author: '韩国料理王',
     cookTime: 35,
     description: '色彩缤纷的韩式经典料理，多种蔬菜搭配米饭和辣酱，营养均衡又美味。',
@@ -224,7 +224,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '麻婆豆腐',
-    coverImage: 'https://placehold.co/400x300/CC0000/white?text=麻婆豆腐',
+    coverImage: 'https://images.unsplash.com/photo-1582452919408-aca4cd4cff2e?w=400&h=300&fit=crop',
     author: '川菜小馆',
     cookTime: 15,
     description: '麻辣鲜香的经典川菜，嫩豆腐搭配肉末和花椒，简单快手却味道十足。',
@@ -252,7 +252,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '味噌拉面',
-    coverImage: 'https://placehold.co/400x300/8B4513/white?text=味噌拉面',
+    coverImage: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=300&fit=crop',
     author: '日式拉面馆',
     cookTime: 40,
     description: '浓郁味噌汤底搭配弹牙拉面，配上溏心蛋和叉烧，冬日暖身首选。',
@@ -281,7 +281,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '法式焦糖布丁',
-    coverImage: 'https://placehold.co/400x300/DAA520/white?text=焦糖布丁',
+    coverImage: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop',
     author: '甜点师小天',
     cookTime: 60,
     description: '经典法式甜点，焦糖的微苦与蛋奶的香甜交织，口感丝滑细腻。',
@@ -313,7 +313,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '鱼香肉丝',
-    coverImage: 'https://placehold.co/400x300/E74C3C/white?text=鱼香肉丝',
+    coverImage: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop',
     author: '川味厨房',
     cookTime: 20,
     description: '酸甜微辣的经典川菜，肉丝嫩滑，配菜爽脆，鱼香汁浓郁下饭。',
@@ -344,7 +344,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '糖醋排骨',
-    coverImage: 'https://placehold.co/400x300/CD5C5C/white?text=糖醋排骨',
+    coverImage: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop',
     author: '家常菜师傅',
     cookTime: 40,
     description: '色泽红亮、酸甜适口的经典家常菜，外酥里嫩，大人小孩都爱吃。',
@@ -372,7 +372,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '水煮牛肉',
-    coverImage: 'https://placehold.co/400x300/B22222/white?text=水煮牛肉',
+    coverImage: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
     author: '川菜小馆',
     cookTime: 30,
     description: '麻辣鲜香的川菜经典，牛肉嫩滑入味，汤底红亮，辣而不燥。',
@@ -402,7 +402,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '清蒸鲈鱼',
-    coverImage: 'https://placehold.co/400x300/4682B4/white?text=清蒸鲈鱼',
+    coverImage: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=400&h=300&fit=crop',
     author: '粤菜大厨',
     cookTime: 20,
     description: '原汁原味的粤式经典，鱼肉鲜嫩，豉油提味，清淡而不寡淡。',
@@ -431,7 +431,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '凯撒沙拉',
-    coverImage: 'https://placehold.co/400x300/228B22/white?text=凯撒沙拉',
+    coverImage: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop',
     author: '西餐爱好者',
     cookTime: 15,
     description: '经典西式沙拉，生菜爽脆，面包丁酥香，凯撒酱浓郁丝滑。',
@@ -459,7 +459,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '奶油蘑菇汤',
-    coverImage: 'https://placehold.co/400x300/D2B48C/white?text=蘑菇汤',
+    coverImage: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop',
     author: '法餐大厨',
     cookTime: 30,
     description: '法式经典浓汤，蘑菇鲜香与奶油丝滑完美融合，温暖治愈。',
@@ -491,7 +491,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '日式炸猪排',
-    coverImage: 'https://placehold.co/400x300/DAA520/white?text=炸猪排',
+    coverImage: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop',
     author: '日式料理屋',
     cookTime: 25,
     description: '外酥里嫩的日式经典，面包糠裹出金黄脆壳，搭配猪排酱和卷心菜丝。',
@@ -519,7 +519,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '亲子丼',
-    coverImage: 'https://placehold.co/400x300/FFD700/white?text=亲子丼',
+    coverImage: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=400&h=300&fit=crop',
     author: '日式料理屋',
     cookTime: 15,
     description: '鸡肉和鸡蛋的经典搭配，滑嫩的蛋液包裹鸡肉，浇在热米饭上。',
@@ -550,7 +550,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '冬阴功汤',
-    coverImage: 'https://placehold.co/400x300/FF6347/white?text=冬阴功',
+    coverImage: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop',
     author: '泰味厨房',
     cookTime: 25,
     description: '酸辣鲜香的泰国国汤，椰奶的醇厚与柠檬草的清新完美平衡。',
@@ -579,7 +579,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '泰式芒果糯米饭',
-    coverImage: 'https://placehold.co/400x300/FFD700/white?text=芒果糯米饭',
+    coverImage: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=300&fit=crop',
     author: '泰味厨房',
     cookTime: 40,
     description: '泰国经典甜品，椰奶浸润的糯米饭搭配新鲜芒果，香甜软糯。',
@@ -607,7 +607,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '泡菜豆腐汤',
-    coverImage: 'https://placehold.co/400x300/FF4500/white?text=泡菜汤',
+    coverImage: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop',
     author: '韩国料理王',
     cookTime: 20,
     description: '酸辣开胃的韩式家常汤，泡菜发酵的酸香与嫩豆腐的柔滑完美搭配。',
@@ -637,7 +637,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '黄油鸡',
-    coverImage: 'https://placehold.co/400x300/FF8C00/white?text=黄油鸡',
+    coverImage: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop',
     author: '印度美食家',
     cookTime: 45,
     description: '印度最受欢迎的咖喱菜式，浓郁的番茄奶油酱汁包裹嫩滑鸡肉。',
@@ -668,7 +668,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '印度烤饼',
-    coverImage: 'https://placehold.co/400x300/DEB887/white?text=印度烤饼',
+    coverImage: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop',
     author: '印度美食家',
     cookTime: 20,
     description: '松软有嚼劲的印度经典面饼，蘸咖喱汁或配黄油鸡都绝佳。',
@@ -698,7 +698,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '希腊沙拉',
-    coverImage: 'https://placehold.co/400x300/006400/white?text=希腊沙拉',
+    coverImage: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop',
     author: '地中海厨房',
     cookTime: 10,
     description: '清爽的地中海经典，番茄、黄瓜、橄榄和菲达芝士的简单组合。',
