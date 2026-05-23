@@ -20,7 +20,7 @@ const DB_CONFIG = {
   host: process.env.DB_HOST || '127.0.0.1',
   port: parseInt(process.env.DB_PORT || '3307', 10),
   username: process.env.DB_USER || 'food',
-  password: process.env.DB_PASSWORD || 'food',
+  password: process.env.DB_PASSWORD || process.env.DB_PASS || 'food',
   database: process.env.DB_NAME || 'food',
   logging: false,
 }
