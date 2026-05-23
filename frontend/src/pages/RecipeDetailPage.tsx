@@ -374,6 +374,16 @@ export default function RecipeDetailPage() {
           </section>
         )}
 
+        {/* 烹饪小贴士 */}
+        {recipe.tips && (
+          <section className="detail-section detail-section--tips">
+            <h2 className="detail-section__title">💡 烹饪小贴士</h2>
+            <div className="tips-content">
+              <p>{recipe.tips}</p>
+            </div>
+          </section>
+        )}
+
         {/* 相似食谱推荐 */}
         {id && (
           <div className="detail-container__section">

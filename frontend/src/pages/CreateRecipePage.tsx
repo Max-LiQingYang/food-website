@@ -38,6 +38,7 @@ export default function CreateRecipePage() {
   const [servings, setServings] = useState(2)
   const [difficulty, setDifficulty] = useState('easy')
   const [cookTime, setCookTime] = useState(30)
+  const [tips, setTips] = useState('')
   const [ingredients, setIngredients] = useState<
     Array<{ name: string; amount: number; unit: string }>
   >([{ ...EMPTY_INGREDIENT }])
@@ -59,6 +60,7 @@ export default function CreateRecipePage() {
         setServings(data.servings || 2)
         setDifficulty(data.difficulty || 'easy')
         setCookTime(data.cookTime || 30)
+        setTips(data.tips || '')
         setIngredients(data.ingredients?.length ? data.ingredients : [{ ...EMPTY_INGREDIENT }])
         setSteps(data.steps?.length ? data.steps : [{ ...EMPTY_STEP }])
       })
@@ -129,6 +131,7 @@ export default function CreateRecipePage() {
         servings: servings || undefined,
         difficulty: difficulty || undefined,
         cookTime: cookTime || undefined,
+        tips: tips.trim() || undefined,
         ingredients: ingredients.filter(i => i.name.trim()),
         steps: steps
           .filter(s => s.content.trim())
@@ -268,6 +271,20 @@ export default function CreateRecipePage() {
               onChange={e => setCoverImage(e.target.value)}
               placeholder="https://example.com/image.jpg（可选）"
             />
+          </div>
+
+          {/* 烹饪小贴士 */}
+          <div className="form-group">
+            <label className="form-label">烹饪小贴士</label>
+            <textarea
+              className="form-textarea"
+              value={tips}
+              onChange={e => setTips(e.target.value)}
+              placeholder="分享一些烹饪技巧和注意事项..."
+              rows={3}
+              maxLength={500}
+            />
+            <span className="form-hint">可选，填写烹饪技巧、注意事项等</span>
           </div>
 
           {/* 食材 */}

@@ -253,6 +253,27 @@
   margin-top: 4px;
 }
 
+.detail-section--tips {
+  margin-top: 4px;
+}
+
+.tips-content {
+  background: #fef8e8;
+  border-left: 4px solid #f59e0b;
+  border-radius: 0 10px 10px 0;
+  padding: 16px 20px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #6b5a2e;
+  margin: 0 28px;
+}
+
+[data-theme='dark'] .tips-content {
+  background: #2a2418;
+  color: #c8b88a;
+  border-left-color: #b8860b;
+}
+
 .detail-section__title {
   font-size: 20px;
   font-weight: 600;
