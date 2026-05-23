@@ -85,6 +85,8 @@ export interface Recipe {
   qualityLabel?: string
   favoriteCount?: number
   commentCount?: number
+  nutriScore?: string
+  smartDifficulty?: string
   nutrition?: {
     calories?: number
     protein?: number
@@ -99,6 +101,18 @@ export interface Recipe {
 export interface RecipeDetail extends Recipe {
   ingredients?: Array<{ name: string; amount: number; unit: string }>
   steps?: Array<{ stepNumber: number; content: string; image?: string }>
+}
+
+export interface SimilarRecipe {
+  recipe: Recipe
+  similarity: number
+}
+
+export interface SeasonalRecipes {
+  list: Recipe[]
+  season: string
+  seasonLabel?: string
+  total: number
 }
 
 export interface FavoriteListResponse {
@@ -221,6 +235,24 @@ export function getFeaturedRecipes() {
  */
 export function searchRecipes(params: { q: string; page?: number; pageSize?: number }) {
   return apiClient.get('/recipes/search', { params: { page: 1, pageSize: 20, ...params } })
+}
+
+/**
+ * 获取季节性推荐食谱
+ * GET /api/recipes/seasonal?season=spring
+ */
+export function getSeasonalRecipes(season?: string) {
+  const params: any = {}
+  if (season) params.season = season
+  return apiClient.get('/recipes/seasonal', { params })
+}
+
+/**
+ * 获取相似食谱推荐（含 Jaccard 相似度）
+ * GET /api/recipes/:id/similar
+ */
+export function getSimilarRecipes(recipeId: string): Promise<{ data: { list: Array<{ recipe: Recipe; similarity: number }>; recipeId: string } }> {
+  return apiClient.get(`/recipes/${recipeId}/similar`)
 }
 
 // ─────────────────────────────────────────────────────────────────

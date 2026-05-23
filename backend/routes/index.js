@@ -27,6 +27,7 @@ const shoppingListRoutes = require('./shoppingList')
 const importRoutes = require('./import')
 const compareRoutes = require('./compare')
 const preferencesRoutes = require('./preferences')
+const seasonalRoutes = require('./seasonal')
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
@@ -36,6 +37,9 @@ router.use('/', commentRoutes)
 
 // 食谱对比（无需认证，必须在 recipeRoutes 之前避免 /:id 拦截 /compare）
 router.use('/recipes/compare', compareRoutes)
+
+// 季节性推荐（无需认证，必须在 recipeRoutes 之前避免 /:id 拦截 /seasonal）
+router.use('/recipes/seasonal', seasonalRoutes)
 
 router.use('/recipes', recipeRoutes)
 router.use('/users', userRoutes)

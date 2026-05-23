@@ -32,11 +32,93 @@ function resJSON(code, message, data) {
 }
 
 /**
- * 计算食谱质量评分
- * qualityScore = f(commentCount, favoriteCount, totalScorePotential)
- * @param {Object} recipe - 食谱对象
- * @returns {{ qualityScore: number, qualityLabel: string|null }}
+ * NutriScore 计算（基于营养数据的综合评分）
+ * A ≥ 4, B ≥ 2.5, C ≥ 1, D ≥ 0, E < 0
  */
+function computeNutriScore(nutrition) {
+  if (!nutrition) return null
+  let score = 0
+  // 蛋白质评分（每 10g +1 分）
+  if (nutrition.protein) score += nutrition.protein / 10
+  // 膳食纤维评分（每 5g +1 分）
+  if (nutrition.fiber) score += nutrition.fiber / 5
+  // 钠超标扣分（每超过 600mg -1 分）
+  if (nutrition.sodium && nutrition.sodium > 600) score -= (nutrition.sodium - 600) / 600
+  // 脂肪超标扣分（每超过 20g -0.5 分）
+  if (nutrition.fat && nutrition.fat > 20) score -= (nutrition.fat - 20) / 40
+  // 热量超标扣分（每超过 500kcal -0.5 分）
+  if (nutrition.calories && nutrition.calories > 500) score -= (nutrition.calories - 500) / 500
+
+  if (score >= 4) return 'A'
+  if (score >= 2.5) return 'B'
+  if (score >= 1) return 'C'
+  if (score >= 0) return 'D'
+  return 'E'
+}
+
+/**
+ * Smart Difficulty 计算
+ */
+function computeSmartDifficulty(recipe) {
+  if (!recipe) return 'beginner'
+  const cookTime = parseInt(recipe.cookTime || 0, 10)
+  const stepsCount = Array.isArray(recipe.steps) ? recipe.steps.length : 0
+  const ingredientsCount = Array.isArray(recipe.ingredients) ? recipe.ingredients.length : 0
+
+  // 也考虑 categoryTags 中的技法（method）维度
+  let methodCount = 0
+  if (recipe.categoryTags) {
+    if (typeof recipe.categoryTags === 'string') {
+      try {
+        const tags = JSON.parse(recipe.categoryTags)
+        methodCount = tags.method ? tags.method.length : 0
+      } catch {}
+    } else if (typeof recipe.categoryTags === 'object') {
+      methodCount = recipe.categoryTags.method ? recipe.categoryTags.method.length : 0
+    }
+  }
+
+  let complexity = 0
+  if (cookTime >= 90) complexity += 3
+  else if (cookTime >= 45) complexity += 2
+  else if (cookTime >= 20) complexity += 1
+
+  if (stepsCount >= 8) complexity += 3
+  else if (stepsCount >= 5) complexity += 2
+  else if (stepsCount >= 3) complexity += 1
+
+  if (ingredientsCount >= 12) complexity += 3
+  else if (ingredientsCount >= 8) complexity += 2
+  else if (ingredientsCount >= 5) complexity += 1
+
+  if (methodCount >= 3) complexity += 1
+
+  if (complexity >= 7) return 'advanced'
+  if (complexity >= 4) return 'intermediate'
+  return 'beginner'
+}
+
+/**
+ * 批量附加 nutriScore 和 smartDifficulty
+ */
+function attachContentScore(items) {
+  if (!items || items.length === 0) return
+  for (const item of items) {
+    // 如果 DB 已有则使用，否则计算
+    if (item.nutriScore == null && item.nutrition) {
+      let nutrition
+      if (typeof item.nutrition === 'string') {
+        try { nutrition = JSON.parse(item.nutrition) } catch { nutrition = null }
+      } else {
+        nutrition = item.nutrition
+      }
+      item.nutriScore = computeNutriScore(nutrition)
+    }
+    if (item.smartDifficulty == null) {
+      item.smartDifficulty = computeSmartDifficulty(item)
+    }
+  }
+}
 function computeQuality(recipe) {
   const views = parseInt(recipe.viewCount || 0, 10)
   const fav = parseInt(recipe.favoriteCount || 0, 10)
@@ -142,6 +224,8 @@ const LIST_ATTRIBUTES = [
   'commentCount',
   'isFeatured',
   'viewCount',
+  'nutriScore',
+  'smartDifficulty',
 ]
 
 // ─────────────────────────────────────────────────────────────────
@@ -188,6 +272,7 @@ router.get('/', async (req, res) => {
 
     const list = rows.map(r => r.toJSON())
     await attachRatingInfo(list)
+    attachContentScore(list)
 
     return res.status(200).json(
       resJSON(0, 'ok', {
@@ -281,6 +366,7 @@ router.get('/search', async (req, res) => {
 
     const list = rows.map(r => r.toJSON())
     await attachRatingInfo(list)
+    attachContentScore(list)
 
     return res.status(200).json(
       resJSON(0, 'ok', {
@@ -812,7 +898,7 @@ router.get('/:id/versions', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
-// GET /:id/similar — 相似食谱推荐（基于 categoryTags 或 category）
+// GET /:id/similar — 相似食谱推荐（基于 categoryTags Jaccard 相似度）
 // ─────────────────────────────────────────────────────────────────
 router.get('/:id/similar', async (req, res) => {
   res.set({
@@ -821,94 +907,123 @@ router.get('/:id/similar', async (req, res) => {
   })
   try {
     const { id } = req.params
-    const recipe = await Recipe.findByPk(id, { attributes: ['id', 'category', 'categoryTags'] })
+    const recipe = await Recipe.findByPk(id, {
+      attributes: ['id', 'category', 'categoryTags', 'nutrition']
+    })
     if (!recipe) {
       return res.status(404).json(resJSON(404, '食谱不存在', null))
     }
 
     const data = recipe.toJSON()
-    let categoryTagsParsed = null
+    let sourceTags = null
     if (data.categoryTags) {
-      try {
-        categoryTagsParsed = JSON.parse(data.categoryTags)
-      } catch {
-        categoryTagsParsed = null
-      }
+      try { sourceTags = JSON.parse(data.categoryTags) } catch { sourceTags = null }
     }
 
-    let similarRecipes
+    // 获取候选食谱
+    const candidates = await Recipe.findAll({
+      where: { id: { [Op.ne]: id } },
+      attributes: LIST_ATTRIBUTES.concat(['ingredients']),
+      limit: 50,
+    })
 
-    if (categoryTagsParsed && typeof categoryTagsParsed === 'object') {
-      // 基于 categoryTags 做精确匹配
-      const cuisine = categoryTagsParsed.cuisine
-      const method = categoryTagsParsed.method
-      const ingredient = categoryTagsParsed.ingredient
+    // 计算 Jaccard 相似度
+    let scored = candidates.map(candidate => {
+      const c = candidate.toJSON()
+      let candidateTags = null
+      if (c.categoryTags) {
+        try { candidateTags = JSON.parse(c.categoryTags) } catch { candidateTags = null }
+      }
 
-      const where = { id: { [Op.ne]: id } }
-      const orConditions = []
+      let similarity = 0
 
-      if (cuisine) orConditions.push({ categoryTags: { [Op.like]: `%${cuisine}%` } })
-      if (method) orConditions.push({ categoryTags: { [Op.like]: `%${method}%` } })
-      if (ingredient) orConditions.push({ categoryTags: { [Op.like]: `%${ingredient}%` } })
+      if (sourceTags && candidateTags && typeof sourceTags === 'object' && typeof candidateTags === 'object') {
+        // 计算五维 Jaccard 相似度
+        const dimensions = ['ingredient', 'method', 'cuisine', 'flavor', 'price']
+        let totalScore = 0
+        let validDims = 0
 
-      if (orConditions.length > 0) {
-        where[Op.or] = orConditions
-        similarRecipes = await Recipe.findAll({
-          where,
-          order: [['createdAt', 'DESC']],
-          limit: 6,
-          attributes: LIST_ATTRIBUTES,
-        })
-
-        // 若匹配不足 6 条，按同 category 补充
-        if (similarRecipes.length < 6 && data.category) {
-          const existingIds = similarRecipes.map(r => r.id).concat([id])
-          const fillRecipes = await Recipe.findAll({
-            where: {
-              id: { [Op.notIn]: existingIds },
-              category: data.category,
-            },
-            order: [['createdAt', 'DESC']],
-            limit: 6 - similarRecipes.length,
-            attributes: LIST_ATTRIBUTES,
-          })
-          similarRecipes = similarRecipes.concat(fillRecipes)
+        for (const dim of dimensions) {
+          const src = sourceTags[dim]
+          const tgt = candidateTags[dim]
+          if (Array.isArray(src) && Array.isArray(tgt) && src.length > 0 && tgt.length > 0) {
+            const setA = new Set(src)
+            const setB = new Set(tgt)
+            let intersection = 0
+            for (const item of setA) {
+              if (setB.has(item)) intersection++
+            }
+            const union = new Set([...setA, ...setB]).size
+            if (union > 0) {
+              totalScore += intersection / union
+              validDims++
+            }
+          }
         }
-      } else if (data.category) {
-        similarRecipes = await Recipe.findAll({
-          where: { id: { [Op.ne]: id }, category: data.category },
-          order: [['createdAt', 'DESC']],
-          limit: 6,
-          attributes: LIST_ATTRIBUTES,
-        })
-      } else {
-        similarRecipes = await Recipe.findAll({
-          where: { id: { [Op.ne]: id } },
-          order: [['createdAt', 'DESC']],
-          limit: 6,
-          attributes: LIST_ATTRIBUTES,
-        })
+
+        if (validDims > 0) {
+          similarity = totalScore / validDims
+        }
+
+        // category 匹配加分
+        if (sourceTags.cuisine && candidateTags.cuisine) {
+          const cuisineMatch = sourceTags.cuisine.some(c =>
+            Array.isArray(candidateTags.cuisine) && candidateTags.cuisine.includes(c)
+          )
+          if (cuisineMatch) similarity = Math.min(1, similarity + 0.15)
+        }
+      } else if (data.category && c.category === data.category) {
+        // 无 categoryTags 时按同 category 算基础分
+        similarity = 0.3
       }
-    } else if (data.category) {
-      similarRecipes = await Recipe.findAll({
-        where: { id: { [Op.ne]: id }, category: data.category },
-        order: [['createdAt', 'DESC']],
-        limit: 6,
+
+      return { recipe: c, similarity: Math.round(similarity * 100) / 100 }
+    })
+
+    // 按相似度降序，排除自身，取前 5
+    scored = scored
+      .filter(s => s.similarity > 0)
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 5)
+
+    // 如果不足 5 条，按 category 补充
+    if (scored.length < 5 && data.category) {
+      const existingIds = scored.map(s => s.recipe.id).concat(id)
+      const fillRecipes = await Recipe.findAll({
+        where: { id: { [Op.notIn]: existingIds }, category: data.category },
         attributes: LIST_ATTRIBUTES,
+        order: [['favoriteCount', 'DESC']],
+        limit: 5 - scored.length,
       })
-    } else {
-      similarRecipes = await Recipe.findAll({
-        where: { id: { [Op.ne]: id } },
-        order: [['createdAt', 'DESC']],
-        limit: 6,
-        attributes: LIST_ATTRIBUTES,
-      })
+      for (const fr of fillRecipes) {
+        scored.push({ recipe: fr.toJSON(), similarity: 0 })
+      }
     }
+
+    // 如果仍不足 5 条，随机补充热门食谱
+    if (scored.length < 5) {
+      const existingIds = scored.map(s => s.recipe.id).concat(id)
+      const hotRecipes = await Recipe.findAll({
+        where: { id: { [Op.notIn]: existingIds } },
+        attributes: LIST_ATTRIBUTES,
+        order: [['favoriteCount', 'DESC']],
+        limit: 5 - scored.length,
+      })
+      for (const hr of hotRecipes) {
+        scored.push({ recipe: hr.toJSON(), similarity: 0 })
+      }
+    }
+
+    // 附加 nutriScore/smartDifficulty
+    const list = scored.map(s => {
+      attachContentScore([s.recipe])
+      return s
+    })
 
     return res.status(200).json(
       resJSON(0, 'ok', {
         recipeId: id,
-        list: similarRecipes,
+        list,
       })
     )
   } catch (err) {
@@ -1014,6 +1129,9 @@ router.get('/:id', async (req, res) => {
 
     // 添加质量评分
     Object.assign(data, computeQuality(data))
+
+    // 添加 nutriScore 和 smartDifficulty
+    attachContentScore([data])
 
     // 批量获取平均评分（单食谱也使用批量 API 保持一致性）
     const ratingMap = await fetchAvgRatings([id])
@@ -1259,3 +1377,5 @@ router.delete('/:id', auth, async (req, res) => {
 
 module.exports = router
 module.exports.auth = auth
+module.exports.attachRatingInfo = attachRatingInfo
+module.exports.attachContentScore = attachContentScore

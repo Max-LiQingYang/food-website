@@ -36,6 +36,20 @@ const DIFFICULTY_NAMES: Record<string, string> = {
   hard: '困难',
 }
 
+const SMART_DIFFICULTY_LABELS: Record<string, string> = {
+  beginner: '🟢 入门',
+  intermediate: '🟡 进阶',
+  advanced: '🔴 高手',
+}
+
+const NUTRI_SCORE_COLORS: Record<string, string> = {
+  A: '#22c55e',
+  B: '#86efac',
+  C: '#eab308',
+  D: '#f97316',
+  E: '#ef4444',
+}
+
 const SEASON_LABELS: Record<string, string> = {
   spring: '🌸 春季',
   summer: '☀️ 夏季',
@@ -468,6 +482,17 @@ export default function RecipeDetailPage() {
         {/* 营养信息卡片 */}
         {nutrition && (
           <div className="detail-container__section">
+            <div className="nutri-score-header">
+              <h2 className="nutrition-card__title">📊 营养信息</h2>
+              {recipe.nutriScore && (
+                <span
+                  className="nutri-score-badge"
+                  style={{ backgroundColor: NUTRI_SCORE_COLORS[recipe.nutriScore] || '#aaa' }}
+                >
+                  NutriScore {recipe.nutriScore}
+                </span>
+              )}
+            </div>
             <NutritionCard nutrition={nutrition} />
           </div>
         )}

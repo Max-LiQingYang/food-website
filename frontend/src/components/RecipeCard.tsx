@@ -23,6 +23,26 @@ const DIFFICULTY_ICONS: Record<string, string> = {
   hard: '🔴',
 }
 
+const SMART_DIFFICULTY_LABELS: Record<string, string> = {
+  beginner: '入门',
+  intermediate: '进阶',
+  advanced: '高手',
+}
+
+const SMART_DIFFICULTY_ICONS: Record<string, string> = {
+  beginner: '🟢',
+  intermediate: '🟡',
+  advanced: '🔴',
+}
+
+const NUTRI_SCORE_COLORS: Record<string, string> = {
+  A: '#22c55e',
+  B: '#86efac',
+  C: '#eab308',
+  D: '#f97316',
+  E: '#ef4444',
+}
+
 const SEASON_LABELS: Record<string, string> = {
   spring: '🌸 春季',
   summer: '☀️ 夏季',
@@ -76,6 +96,16 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
           <FavoriteButton recipeId={recipe.id} inline />
         </div>
 
+        {/* NutriScore 评级徽章 - 浮在图片左上角 */}
+        {recipe.nutriScore && (
+          <span
+            className="recipe-card__badge recipe-card__nutri-badge"
+            style={{ backgroundColor: NUTRI_SCORE_COLORS[recipe.nutriScore] || '#aaa' }}
+          >
+            NutriScore {recipe.nutriScore}
+          </span>
+        )}
+
         {/* 质量标签 */}
         {recipe.qualityLabel && (
           <span className="recipe-card__badge recipe-card__badge--quality">
@@ -107,6 +137,13 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
           {difficulty && DIFFICULTY_LABELS[difficulty] && (
             <span className="recipe-card__meta-item recipe-card__difficulty">
               {DIFFICULTY_ICONS[difficulty]} {DIFFICULTY_LABELS[difficulty]}
+            </span>
+          )}
+
+          {/* 智能难度 */}
+          {recipe.smartDifficulty && (
+            <span className="recipe-card__meta-item recipe-card__smart-difficulty">
+              {SMART_DIFFICULTY_ICONS[recipe.smartDifficulty] || '⚡'} {SMART_DIFFICULTY_LABELS[recipe.smartDifficulty] || recipe.smartDifficulty}
             </span>
           )}
 

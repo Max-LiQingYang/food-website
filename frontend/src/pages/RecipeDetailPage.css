@@ -476,6 +476,34 @@
   cursor: pointer;
 }
 
+/* NutriScore 标题行与徽章 */
+.nutri-score-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.nutri-score-header .nutrition-card__title {
+  margin: 0;
+}
+
+.nutri-score-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  letter-spacing: 0.5px;
+}
+
+/* 智能难度标签 */
+.detail-tag--smart-difficulty {
+  background: var(--color-primary-bg, #fff3ed) !important;
+}
+
 .step-checkbox__box {
   width: 24px;
   height: 24px;

@@ -105,6 +105,60 @@
   border-radius: 8px;
 }
 
+/* 相似度进度条 */
+.similar-recipes__card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.similar-recipes__sim-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 14px;
+  background: var(--color-border, #eee);
+  border-radius: 7px;
+  overflow: hidden;
+  position: relative;
+  min-width: 60px;
+  padding: 0 4px;
+}
+
+.similar-recipes__sim-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #e8663e, #f0876a);
+  border-radius: 7px;
+  transition: width 0.5s ease;
+}
+
+.similar-recipes__sim-label {
+  position: relative;
+  font-size: 9px;
+  color: var(--color-text, #333);
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.nutri-badge-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
 @media (max-width: 768px) {
   .similar-recipes {
     margin: 0 18px;

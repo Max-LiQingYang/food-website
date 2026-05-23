@@ -8,6 +8,7 @@ import FilterPanel from '../components/FilterPanel'
 import HeroSection from '../components/HeroSection'
 import CategoryCards from '../components/CategoryCards'
 import FeaturedSection from '../components/FeaturedSection'
+import SeasonalRecommendations from '../components/SeasonalRecommendations'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -191,6 +192,9 @@ export default function HomePage() {
 
       {/* ── 编辑精选区 ── */}
       {showFullLayout && showFeatured && <FeaturedSection />}
+
+      {/* 季节性推荐 */}
+      {showFullLayout && <SeasonalRecommendations />}
 
       {/* ── 全部食谱（或搜索结果） ── */}
       <section className="home-section">

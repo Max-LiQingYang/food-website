@@ -169,3 +169,22 @@
   background: var(--color-tag-bg, #f0ebe6);
   color: var(--color-tag-text, #666);
 }
+
+/* NutriScore 评级徽章 */
+.recipe-card__nutri-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* 智能难度 */
+.recipe-card__smart-difficulty {
+  font-size: 12px;
+}

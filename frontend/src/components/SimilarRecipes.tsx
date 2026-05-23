@@ -1,29 +1,63 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getRecipes } from '../api'
-import type { Recipe } from '../api'
+import { getSimilarRecipes, getRecipes } from '../api'
+import type { Recipe, SimilarRecipe } from '../api'
 import './SimilarRecipes.css'
 
 interface SimilarRecipesProps {
   recipeId: string
 }
 
+const NUTRI_SCORE_COLORS: Record<string, string> = {
+  A: '#22c55e',
+  B: '#86efac',
+  C: '#eab308',
+  D: '#f97316',
+  E: '#ef4444',
+}
+
 export default function SimilarRecipes({ recipeId }: SimilarRecipesProps) {
-  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [recipes, setRecipes] = useState<SimilarRecipe[]>([])
   const [loading, setLoading] = useState(true)
+  const [useNewAPI, setUseNewAPI] = useState(true)
 
   useEffect(() => {
-    // TODO: Replace with GET /api/recipes/:id/similar when backend supports it
-    // For now, use getRecipes with same category as fallback
+    let cancelled = false
     setLoading(true)
-    getRecipes({ page: 1, pageSize: 5 })
-      .then((res: any) => {
+
+    async function fetchSimilar() {
+      if (!recipeId) return
+      try {
+        const res: any = await getSimilarRecipes(recipeId)
         const data = res.data || res
-        const list = (data.list || []).filter((r: Recipe) => r.id !== recipeId).slice(0, 4)
-        setRecipes(list)
-      })
-      .catch(() => setRecipes([]))
-      .finally(() => setLoading(false))
+        const list = (data.list || []).slice(0, 5)
+        if (!cancelled) {
+          setRecipes(list)
+          setUseNewAPI(true)
+        }
+      } catch {
+        // Fallback: 老 API 随机推荐
+        if (!cancelled) {
+          setUseNewAPI(false)
+          try {
+            const fallback: any = await getRecipes({ page: 1, pageSize: 5 })
+            const fd = fallback.data || fallback
+            const fallbackList = (fd.list || [])
+              .filter((r: Recipe) => r.id !== recipeId)
+              .slice(0, 4)
+              .map((r: Recipe) => ({ recipe: r, similarity: 0 }))
+            setRecipes(fallbackList)
+          } catch {
+            setRecipes([])
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    fetchSimilar()
+    return () => { cancelled = true }
   }, [recipeId])
 
   if (!loading && recipes.length === 0) return null
@@ -46,27 +80,55 @@ export default function SimilarRecipes({ recipeId }: SimilarRecipesProps) {
         </div>
       ) : (
         <div className="similar-recipes__scroll">
-          {recipes.map(recipe => (
-            <Link
-              key={recipe.id}
-              to={`/recipe/${recipe.id}`}
-              className="similar-recipes__card"
-            >
-              <div className="similar-recipes__card-img">
-                {recipe.coverImage ? (
-                  <img src={recipe.coverImage} alt={recipe.title} loading="lazy" />
-                ) : (
-                  <div className="similar-recipes__card-placeholder">🍽️</div>
-                )}
-              </div>
-              <div className="similar-recipes__card-info">
-                <h4 className="similar-recipes__card-title">{recipe.title}</h4>
-                {recipe.category && (
-                  <span className="similar-recipes__card-tag">{recipe.category}</span>
-                )}
-              </div>
-            </Link>
-          ))}
+          {recipes.map((item, idx) => {
+            const recipe = item.recipe
+            const sim = item.similarity
+
+            return (
+              <Link
+                key={recipe.id || idx}
+                to={`/recipe/${recipe.id}`}
+                className="similar-recipes__card"
+              >
+                <div className="similar-recipes__card-img">
+                  {recipe.coverImage ? (
+                    <img src={recipe.coverImage} alt={recipe.title} loading="lazy" />
+                  ) : (
+                    <div className="similar-recipes__card-placeholder">🍽️</div>
+                  )}
+                </div>
+                <div className="similar-recipes__card-info">
+                  <h4 className="similar-recipes__card-title">
+                    {recipe.title}
+                    {recipe.nutriScore && (
+                      <span
+                        className="nutri-badge-mini"
+                        style={{ backgroundColor: NUTRI_SCORE_COLORS[recipe.nutriScore] || '#aaa' }}
+                      >
+                        {recipe.nutriScore}
+                      </span>
+                    )}
+                  </h4>
+                  <div className="similar-recipes__card-meta">
+                    {sim > 0 && useNewAPI && (
+                      <span className="similar-recipes__sim-bar">
+                        <span
+                          className="similar-recipes__sim-fill"
+                          style={{ width: `${Math.min(sim * 100, 100)}%` }}
+                        />
+                        <span className="similar-recipes__sim-label">
+                          {Math.round(sim * 100)}% 相似
+                        </span>
+                      </span>
+                    )}
+                    {recipe.category && (
+                      <span className="similar-recipes__card-tag">{recipe.category}</span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       )}
     </section>
