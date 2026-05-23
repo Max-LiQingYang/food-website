@@ -248,6 +248,8 @@ export interface UserStats {
   recipeCount: number
   favoriteCount: number
   commentCount: number
+  followersCount: number
+  followingCount: number
 }
 
 export function getUserStats(id: string): Promise<UserStats> {
@@ -610,6 +612,68 @@ export function getShareInfo(id: string): Promise<ShareInfo> {
   return apiClient.get(`/recipes/${id}/share`).then((res: any) => res.data)
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Follow API
+// ─────────────────────────────────────────────────────────────────
+
+export interface FollowStatus {
+  isFollowing: boolean
+}
+
+export interface FollowUser {
+  id: string
+  username: string
+  nickname?: string
+  followedAt: string
+}
+
+export interface FollowListResponse {
+  list: FollowUser[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+/**
+ * 关注用户
+ * POST /api/users/:id/follow
+ */
+export function followUser(id: string): Promise<{ followed: boolean }> {
+  return apiClient.post(`/users/${id}/follow`).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 取消关注
+ * DELETE /api/users/:id/follow
+ */
+export function unfollowUser(id: string): Promise<{ followed: boolean }> {
+  return apiClient.delete(`/users/${id}/follow`).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 粉丝列表
+ * GET /api/users/:id/followers
+ */
+export function getFollowers(id: string, params?: { page?: number; pageSize?: number }): Promise<FollowListResponse> {
+  return apiClient.get(`/users/${id}/followers`, { params }).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 关注列表
+ * GET /api/users/:id/following
+ */
+export function getFollowing(id: string, params?: { page?: number; pageSize?: number }): Promise<FollowListResponse> {
+  return apiClient.get(`/users/${id}/following`, { params }).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 获取关注状态
+ * GET /api/users/:id/follow-status
+ */
+export function getFollowStatus(id: string): Promise<FollowStatus> {
+  return apiClient.get(`/users/${id}/follow-status`).then(r => r.data?.data || r.data)
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -645,4 +709,9 @@ export default {
   updateShoppingList,
   deleteShoppingList,
   getShareInfo,
+  followUser,
+  unfollowUser,
+  getFollowers,
+  getFollowing,
+  getFollowStatus,
 }

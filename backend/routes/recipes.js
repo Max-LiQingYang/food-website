@@ -43,8 +43,8 @@ function computeQuality(recipe) {
   // 质量分 = 收藏数 * 2 + 评论数 * 3（评论比收藏权重略高，因为评论代表真实互动）
   const score = fav * 2 + com * 3
   let label = null
-  if (score >= 30) label = '🔥 热门食谱'
-  else if (score >= 10) label = '📈 高分食谱'
+  if (score >= 10) label = '🔥 热门食谱'
+  else if (score >= 3) label = '📈 高分食谱'
   return { qualityScore: score, qualityLabel: label }
 }
 
