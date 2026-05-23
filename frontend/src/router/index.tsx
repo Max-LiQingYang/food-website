@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import Navbar from '../components/Navbar'
+import MobileBottomNav from '../components/MobileBottomNav'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))
@@ -20,6 +21,7 @@ function Layout() {
       <Suspense fallback={<Fallback />}>
         <Outlet />
       </Suspense>
+      <MobileBottomNav />
     </>
   )
 }
