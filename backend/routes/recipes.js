@@ -87,6 +87,7 @@ const LIST_ATTRIBUTES = [
   'season',
   'favoriteCount',
   'commentCount',
+  'isFeatured',
 ]
 
 // ─────────────────────────────────────────────────────────────────
@@ -621,6 +622,28 @@ router.get('/recommend', async (req, res) => {
     )
   } catch (err) {
     console.error('[GET /recipes/recommend] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /featured — 编辑精选食谱列表
+// ─────────────────────────────────────────────────────────────────
+router.get('/featured', async (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=300, s-maxage=600',
+  })
+
+  try {
+    const featured = await Recipe.findAll({
+      where: { isFeatured: true },
+      attributes: LIST_ATTRIBUTES,
+      order: [['createdAt', 'DESC']],
+    })
+
+    return res.json(resJSON(0, 'ok', featured))
+  } catch (err) {
+    logger.error('获取精选食谱失败:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })

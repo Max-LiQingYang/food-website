@@ -99,6 +99,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
         comment: '评论数（物化字段，自动同步）'
       },
+      isFeatured: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        comment: '编辑精选标记'
+      },
       userId: {
         type: DataTypes.STRING,
         allowNull: true,

@@ -8,11 +8,13 @@ import CommentSection from '../components/CommentSection'
 import NutritionCard from '../components/NutritionCard'
 import SimilarRecipes from '../components/SimilarRecipes'
 import ImageLightbox from '../components/ImageLightbox'
+import ImagePlaceholder from '../components/ImagePlaceholder'
 import ShareModal from '../components/ShareModal'
 import AddToCollectionDropdown from '../components/AddToCollectionDropdown'
 import AddToShoppingListButton from '../components/AddToShoppingListButton'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
+import { useRecipeStructuredData, useMetaTags, usePageTitle } from '../hooks/useSEO'
 import './RecipeDetailPage.css'
 
 /** 分类中文映射 */
@@ -111,6 +113,36 @@ export default function RecipeDetailPage() {
       return next
     })
   }
+
+  // ── SEO: 食谱结构化数据 + OG meta ──
+  const seoRecipe = recipe
+    ? {
+        name: recipe.title,
+        description: recipe.description,
+        image: recipe.coverImage,
+        recipeIngredient: (recipe.ingredients || []).map((i) => `${i.name} ${i.amount || ''}${i.unit || ''}`.trim()),
+        recipeInstructions: (recipe.steps || []).map((s) => ({
+          text: typeof s === 'string' ? s : s.content || '',
+          name: typeof s !== 'string' ? s.name : undefined,
+        })),
+        cookTime: recipe.cookTime ? `${recipe.cookTime}` : undefined,
+        recipeYield: recipe.servings ? `${recipe.servings}人份` : undefined,
+        author: recipe.author || undefined,
+        keywords: recipe.categoryTags ? [recipe.category, ...Object.values(recipe.categoryTags)] : [recipe.category].filter(Boolean),
+        nutrition: recipe.nutrition
+          ? (typeof recipe.nutrition === 'string' ? JSON.parse(recipe.nutrition) : recipe.nutrition)
+          : undefined,
+      }
+    : null
+
+  usePageTitle(recipe ? `${recipe.title} - 美食食谱` : '加载中... - 美食食谱')
+  useRecipeStructuredData(seoRecipe)
+  useMetaTags({
+    'og:title': recipe?.title || '美食食谱',
+    'og:description': recipe?.description?.slice(0, 200) || '三餐四季，与美食相伴——每一个菜谱都值得分享',
+    'og:image': recipe?.coverImage || '',
+    'og:type': 'article',
+  })
 
   // 复制食材清单
   const handleCopyIngredients = () => {
@@ -281,25 +313,14 @@ export default function RecipeDetailPage() {
         {/* 封面图 */}
         <div className="detail-cover">
           {recipe.coverImage ? (
-            <img
+            <ImagePlaceholder
               src={recipe.coverImage}
               alt={recipe.title}
-              loading="lazy"
-              onError={e => {
-                ;(e.target as HTMLImageElement).style.display = 'none'
-                const placeholder = (e.target as HTMLImageElement).nextElementSibling
-                if (placeholder) {
-                  ;(placeholder as HTMLElement).style.display = 'flex'
-                }
-              }}
+              className="detail-cover__img"
             />
-          ) : null}
-          <div
-            className="detail-cover__placeholder"
-            style={{ display: recipe.coverImage ? 'none' : 'flex' }}
-          >
-            🍽️
-          </div>
+          ) : (
+            <div className="detail-cover__placeholder">🍽️</div>
+          )}
 
           {/* 收藏按钮 */}
           <div className="detail-cover-actions">

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Recipe } from '../api'
 import { highlightText } from '../utils/highlightText'
 import FavoriteButton from './FavoriteButton'
+import ImagePlaceholder from './ImagePlaceholder'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -65,7 +66,7 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
       {/* 封面图 */}
       <div className="recipe-card__cover">
         {recipe.coverImage ? (
-          <img src={recipe.coverImage} alt={recipe.title} loading="lazy" />
+          <ImagePlaceholder src={recipe.coverImage} alt={recipe.title} className="recipe-card__cover-img" />
         ) : (
           <div className="recipe-card__cover-placeholder">🍽️</div>
         )}

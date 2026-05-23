@@ -7,6 +7,8 @@ import SearchAutocomplete from '../components/SearchAutocomplete'
 import FilterPanel from '../components/FilterPanel'
 import HeroSection from '../components/HeroSection'
 import CategoryCards from '../components/CategoryCards'
+import FeaturedSection from '../components/FeaturedSection'
+import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import type { Recipe } from '../api'
@@ -14,7 +16,7 @@ import './HomePage.css'
 
 const CATEGORIES = ['全部', '中餐', '西餐', '甜点', '日韩', '其他'] as const
 const PAGE_SIZE = 12
-const FEATURED_TITLES = ['宫保鸡丁', '红烧肉', '提拉米苏', '清蒸鲈鱼', '凯撒沙拉']
+const FEATURED_TITLES = ['宫保鸡丁', '提拉米苏', '西红柿炒鸡蛋']
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -124,8 +126,14 @@ export default function HomePage() {
       }))
     : undefined
 
-  // Featured section: show the same 5 featured recipes
-  const featuredRecipes = allRecipes.filter(r => FEATURED_TITLES.includes(r.title))
+  // Featured section: use API endpoint
+  const [showFeatured, setShowFeatured] = useState(true)
+
+  // SEO meta
+  usePageTitle("美食食谱 - 三餐四季，与美食相伴")
+  useMetaTags({
+    description: "美食食谱分享平台 —— 发现中餐、西餐、甜点、日韩等多国美食菜谱。家常菜、私房菜、烘焙甜品，简单易学，让烹饪成为享受。",
+  })
 
   // Show category is 全部 and no filters
   const showFullLayout = category === '全部' && !filters.difficulty && filters.maxCookTime === null && !filters.sortBy
@@ -172,19 +180,8 @@ export default function HomePage() {
       {/* ── 筛选面板 ── */}
       <FilterPanel filters={filters} onChange={setFilters} />
 
-      {/* ── 精选推荐区（仅首页） ── */}
-      {showFullLayout && featuredRecipes.length > 0 && (
-        <section className="home-section">
-          <h2 className="home-section__title">
-            <span className="home-section__icon">⭐</span> 精选推荐
-          </h2>
-          <div className="home-grid">
-            {featuredRecipes.map(recipe => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
-            ))}
-          </div>
-        </section>
-      )}
+      {/* ── 编辑精选区 ── */}
+      {showFullLayout && showFeatured && <FeaturedSection />}
 
       {/* ── 全部食谱（或搜索结果） ── */}
       <section className="home-section">

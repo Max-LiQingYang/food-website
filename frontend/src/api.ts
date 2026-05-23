@@ -205,6 +205,14 @@ export function getRecipeById(id: string) {
 }
 
 /**
+ * 获取编辑精选食谱
+ * GET /api/recipes/featured
+ */
+export function getFeaturedRecipes() {
+  return apiClient.get('/recipes/featured')
+}
+
+/**
  * 搜索食谱
  * GET /api/recipes/search?q=关键词&page=1&pageSize=20
  */

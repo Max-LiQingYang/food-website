@@ -533,6 +533,56 @@ describe('GET /api/recipes/categories — 分类统计', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// GET /api/recipes/featured — 编辑精选
+// ─────────────────────────────────────────────────────────────────
+describe('GET /api/recipes/featured — 编辑精选', () => {
+  beforeEach(async () => {
+    await db.sequelize.sync({ force: true })
+    await db.User.create({ id: USER_A_ID, username: 'userA', email: 'a@test.com' })
+  })
+
+  test('无精选食谱应返回空列表', async () => {
+    await db.Recipe.create({
+      id: uuidv4(), title: '普通食谱', category: 'chinese',
+      isFeatured: false,
+    })
+    const res = await request(app).get('/api/recipes/featured')
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+    expect(res.body.data).toEqual([])
+  })
+
+  test('应只返回 isFeatured=true 的食谱', async () => {
+    await db.Recipe.create({
+      id: uuidv4(), title: '精选A', category: 'chinese',
+      isFeatured: true,
+    })
+    await db.Recipe.create({
+      id: uuidv4(), title: '精选B', category: 'dessert',
+      isFeatured: true,
+    })
+    await db.Recipe.create({
+      id: uuidv4(), title: '普通', category: 'western',
+      isFeatured: false,
+    })
+    const res = await request(app).get('/api/recipes/featured')
+    expect(res.status).toBe(200)
+    expect(res.body.data).toHaveLength(2)
+    const titles = res.body.data.map(r => r.title).sort()
+    expect(titles).toEqual(['精选A', '精选B'])
+  })
+
+  test('返回值应包含 isFeatured 字段', async () => {
+    await db.Recipe.create({
+      id: uuidv4(), title: '精选食谱', category: 'chinese',
+      isFeatured: true,
+    })
+    const res = await request(app).get('/api/recipes/featured')
+    expect(res.body.data[0]).toHaveProperty('isFeatured', true)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
 // 健康检查
 // ─────────────────────────────────────────────────────────────────
 describe('GET /health — 健康检查', () => {
