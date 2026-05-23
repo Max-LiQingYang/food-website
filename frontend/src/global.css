@@ -72,36 +72,129 @@ body {
   min-height: 100vh;
 }
 
-/* ── Toast 全局样式 ── */
-.qclaw-toast {
+/* ── Toast 全局样式（增强版：堆叠 + 动画 + 可关闭） ── */
+.qclaw-toast-container {
   position: fixed;
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.qclaw-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 20px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   font-size: 14px;
   color: #fff;
-  pointer-events: none;
+  cursor: pointer;
   white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qclaw-toast--entering {
+  animation: toastSlideIn 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+.qclaw-toast--exiting {
+  animation: toastSlideOut 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+}
+
+.qclaw-toast__icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.qclaw-toast__message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qclaw-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.qclaw-toast__close:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Type-specific toast backgrounds */
+.qclaw-toast--success {
+  background: #52c41a;
+}
+
+.qclaw-toast--error {
+  background: #ff4d4f;
+}
+
+.qclaw-toast--warning {
+  background: #faad14;
+  color: #1a1a1a;
+}
+
+.qclaw-toast--warning .qclaw-toast__close {
+  color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.qclaw-toast--info {
+  background: #1890ff;
 }
 
 /* auth loading */
 .auth-loading {
   min-height: 100vh;
   background: var(--color-bg);
-}
-.qclaw-toast--error {
-  background: #ff4d4f;
-}
-.qclaw-toast--warning {
-  background: #faad14;
-  color: #1a1a1a;
-}
-.qclaw-toast--info {
-  background: #1890ff;
 }
 
 /* ── Shimmer 骨架屏动画 ── */
@@ -165,11 +258,11 @@ body {
   width: 45%;
 }
 
-/* ── 页面进入过渡 ── */
-@keyframes fadeIn {
+/* ── 页面进入过渡（增强：slide-up + fadeIn） ── */
+@keyframes pageEnter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -181,8 +274,64 @@ body {
 .search-page,
 .detail-page,
 .login-page,
-.favorite-list {
-  animation: fadeIn 0.3s ease;
+.favorite-list,
+.create-page,
+.recommend-page,
+.user-profile-page {
+  animation: pageEnter 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
+}
+
+/* ── View Transitions API（渐进增强） ── */
+@supports (view-transition-name: none) {
+  .home-page {
+    view-transition-name: page-content;
+  }
+  .search-page {
+    view-transition-name: page-content;
+  }
+  .detail-page {
+    view-transition-name: page-content;
+  }
+  .login-page {
+    view-transition-name: page-content;
+  }
+  .favorite-list {
+    view-transition-name: page-content;
+  }
+  .create-page {
+    view-transition-name: page-content;
+  }
+  .recommend-page {
+    view-transition-name: page-content;
+  }
+  .user-profile-page {
+    view-transition-name: page-content;
+  }
+
+  ::view-transition-old(page-content) {
+    animation: 0.15s cubic-bezier(0.4, 0, 1, 1) both vt-fade-out,
+      0.15s cubic-bezier(0.4, 0, 1, 1) both vt-slide-up-out;
+  }
+
+  ::view-transition-new(page-content) {
+    animation: 0.25s cubic-bezier(0, 0, 0.2, 1) both vt-fade-in,
+      0.25s cubic-bezier(0, 0, 0.2, 1) both vt-slide-down-in;
+  }
+
+  @keyframes vt-fade-out {
+    to { opacity: 0; }
+  }
+  @keyframes vt-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes vt-slide-up-out {
+    to { transform: translateY(-8px); }
+  }
+  @keyframes vt-slide-down-in {
+    from { transform: translateY(8px); }
+    to { transform: translateY(0); }
+  }
 }
 
 /* ── 按钮涟漪效果 ── */

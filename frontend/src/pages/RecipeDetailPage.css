@@ -164,6 +164,28 @@
   margin-bottom: 14px;
 }
 
+/* ── 分享按钮 ── */
+.detail-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 14px;
+  margin-bottom: 8px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 16px;
+  background: var(--color-card, #fff);
+  font-size: 13px;
+  color: var(--color-text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.detail-share-btn:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+  background: var(--color-primary-bg, #fff3ed);
+}
+
 .detail-tag {
   padding: 4px 14px;
   background: var(--color-primary-bg, #fff3ed);
@@ -388,6 +410,12 @@
   border-radius: 10px;
   margin-top: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: zoom-in;
+  transition: opacity 0.2s ease;
+}
+
+.step-image:hover {
+  opacity: 0.85;
 }
 
 /* ── 空状态 / 404 ── */

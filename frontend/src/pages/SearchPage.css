@@ -11,17 +11,20 @@
   display: flex;
   gap: 12px;
   margin-bottom: 28px;
+}
+
+.search-bar__input-wrap {
+  flex: 1;
   position: relative;
 }
 
-.search-bar::before {
-  content: '🔍';
+.search-bar__icon {
   position: absolute;
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
 }
 
@@ -49,6 +52,11 @@
 .search-input::placeholder {
   color: var(--color-text-muted, #bbb);
   font-size: 15px;
+}
+
+/* Autocomplete variant: handle padding inside SearchAutocomplete */
+.search-input--autocomplete {
+  padding: 13px 16px 13px 46px;
 }
 
 .search-btn {

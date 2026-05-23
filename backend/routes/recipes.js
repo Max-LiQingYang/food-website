@@ -30,6 +30,23 @@ function resJSON(code, message, data) {
 }
 
 /**
+ * 构建食材排除条件
+ * @param {string} excludeStr - 逗号分隔的食材名称
+ * @returns {Array|null} Sequelize where 条件数组，无排除时返回 null
+ */
+function buildExcludeCondition(excludeStr) {
+  if (!excludeStr || String(excludeStr).trim().length === 0) return null
+  const excludeList = String(excludeStr)
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+  if (excludeList.length === 0) return null
+  return excludeList.map(name => ({
+    ingredients: { [Op.notLike]: `%${name}%` },
+  }))
+}
+
+/**
  * 列表查询的公共属性（不含 ingredients/steps，节省带宽）
  */
 const LIST_ATTRIBUTES = [
@@ -60,7 +77,7 @@ router.get('/', async (req, res) => {
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
-    const { category, userId } = req.query
+    const { category, userId, exclude } = req.query
 
     if (page < 1) page = 1
     if (pageSize > 100) pageSize = 100
@@ -74,6 +91,12 @@ router.get('/', async (req, res) => {
     }
     if (userId) {
       where.userId = userId
+    }
+
+    // 食材排除
+    const excludeCond = buildExcludeCondition(exclude)
+    if (excludeCond) {
+      where[Op.and] = excludeCond
     }
 
     const { count, rows } = await Recipe.findAndCountAll({
@@ -110,7 +133,7 @@ router.get('/search', async (req, res) => {
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
-    const { q } = req.query
+    const { q, exclude } = req.query
 
     if (page < 1) page = 1
     if (pageSize > 100) pageSize = 100
@@ -124,10 +147,18 @@ router.get('/search', async (req, res) => {
 
     const keyword = `%${q.trim()}%`
 
+    const where = {
+      [Op.or]: [{ title: { [Op.like]: keyword } }, { ingredients: { [Op.like]: keyword } }],
+    }
+
+    // 食材排除
+    const excludeCond = buildExcludeCondition(exclude)
+    if (excludeCond) {
+      where[Op.and] = excludeCond
+    }
+
     const { count, rows } = await Recipe.findAndCountAll({
-      where: {
-        [Op.or]: [{ title: { [Op.like]: keyword } }, { ingredients: { [Op.like]: keyword } }],
-      },
+      where,
       order: [['createdAt', 'DESC']],
       offset,
       limit: pageSize,
@@ -149,7 +180,7 @@ router.get('/search', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
-// GET /categories — 分类统计（各分类食谱数量）
+// GET /categories — 分类统计（数量 + 难度分布 + 烹饪时间范围）
 // ─────────────────────────────────────────────────────────────────
 router.get('/categories', async (req, res) => {
   res.set({
@@ -157,16 +188,64 @@ router.get('/categories', async (req, res) => {
     'Vary': 'Accept-Encoding',
   })
   try {
+    const whereCategory = { category: { [Op.ne]: null } }
+
+    // 1. 各分类数量
     const results = await Recipe.findAll({
       attributes: [
         'category',
         [fn('COUNT', col('id')), 'count'],
       ],
-      where: { category: { [Op.ne]: null } },
+      where: whereCategory,
       group: ['category'],
       order: [[fn('COUNT', col('id')), 'DESC']],
       raw: true,
     })
+
+    // 2. 难度分布（按 category + difficulty 聚合）
+    const difficultyStats = await Recipe.findAll({
+      attributes: [
+        'category',
+        'difficulty',
+        [fn('COUNT', col('id')), 'count'],
+      ],
+      where: {
+        category: { [Op.ne]: null },
+        difficulty: { [Op.ne]: null },
+      },
+      group: ['category', 'difficulty'],
+      raw: true,
+    })
+
+    // 3. 烹饪时间范围（按 category 聚合 min/max cookTime）
+    const cookTimeStats = await Recipe.findAll({
+      attributes: [
+        'category',
+        [fn('MIN', col('cookTime')), 'minCookTime'],
+        [fn('MAX', col('cookTime')), 'maxCookTime'],
+      ],
+      where: {
+        category: { [Op.ne]: null },
+        cookTime: { [Op.ne]: null },
+      },
+      group: ['category'],
+      raw: true,
+    })
+
+    // 聚合为 Map
+    const difficultyMap = {}
+    for (const row of difficultyStats) {
+      if (!difficultyMap[row.category]) difficultyMap[row.category] = {}
+      difficultyMap[row.category][row.difficulty] = parseInt(row.count, 10)
+    }
+
+    const cookTimeMap = {}
+    for (const row of cookTimeStats) {
+      cookTimeMap[row.category] = {
+        minCookTime: parseInt(row.minCookTime, 10),
+        maxCookTime: parseInt(row.maxCookTime, 10),
+      }
+    }
 
     const total = results.reduce((sum, r) => sum + parseInt(r.count, 10), 0)
 
@@ -175,6 +254,8 @@ router.get('/categories', async (req, res) => {
         list: results.map(r => ({
           category: r.category,
           count: parseInt(r.count, 10),
+          difficulty: difficultyMap[r.category] || {},
+          cookTimeRange: cookTimeMap[r.category] || null,
         })),
         total,
       })
@@ -190,7 +271,7 @@ router.get('/categories', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 router.get('/recommend', async (req, res) => {
   try {
-    const { ingredients } = req.query
+    const { ingredients, exclude } = req.query
 
     if (!ingredients || String(ingredients).trim().length === 0) {
       return res.status(400).json(resJSON(400, '请输入食材关键词', null))
@@ -206,13 +287,22 @@ router.get('/recommend', async (req, res) => {
       return res.status(400).json(resJSON(400, '请输入有效的食材名称', null))
     }
 
+    // 构建 where 条件
+    const where = {
+      [Op.or]: inputList.map(name => ({
+        ingredients: { [Op.like]: `%${name}%` },
+      })),
+    }
+
+    // 食材排除
+    const excludeCond = buildExcludeCondition(exclude)
+    if (excludeCond) {
+      where[Op.and] = excludeCond
+    }
+
     // 1. 数据库模糊匹配（OR 逻辑：匹配任意一种食材即可，按匹配数量排序）
     const dbRecipes = await Recipe.findAll({
-      where: {
-        [Op.or]: inputList.map(name => ({
-          ingredients: { [Op.like]: `%${name}%` },
-        })),
-      },
+      where,
       attributes: LIST_ATTRIBUTES.concat(['ingredients']),
     })
 
@@ -327,6 +417,108 @@ router.get('/recommend', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// GET /:id/similar — 相似食谱推荐（基于 categoryTags 或 category）
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/similar', async (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=300, s-maxage=600',
+    'Vary': 'Accept-Encoding',
+  })
+  try {
+    const { id } = req.params
+    const recipe = await Recipe.findByPk(id, { attributes: ['id', 'category', 'categoryTags'] })
+    if (!recipe) {
+      return res.status(404).json(resJSON(404, '食谱不存在', null))
+    }
+
+    const data = recipe.toJSON()
+    let categoryTagsParsed = null
+    if (data.categoryTags) {
+      try { categoryTagsParsed = JSON.parse(data.categoryTags) } catch { categoryTagsParsed = null }
+    }
+
+    let similarRecipes
+
+    if (categoryTagsParsed && typeof categoryTagsParsed === 'object') {
+      // 基于 categoryTags 做精确匹配
+      const cuisine = categoryTagsParsed.cuisine
+      const method = categoryTagsParsed.method
+      const ingredient = categoryTagsParsed.ingredient
+
+      const where = { id: { [Op.ne]: id } }
+      const orConditions = []
+
+      if (cuisine) orConditions.push({ categoryTags: { [Op.like]: `%${cuisine}%` } })
+      if (method) orConditions.push({ categoryTags: { [Op.like]: `%${method}%` } })
+      if (ingredient) orConditions.push({ categoryTags: { [Op.like]: `%${ingredient}%` } })
+
+      if (orConditions.length > 0) {
+        where[Op.or] = orConditions
+        similarRecipes = await Recipe.findAll({
+          where,
+          order: [['createdAt', 'DESC']],
+          limit: 6,
+          attributes: LIST_ATTRIBUTES,
+        })
+
+        // 若匹配不足 6 条，按同 category 补充
+        if (similarRecipes.length < 6 && data.category) {
+          const existingIds = similarRecipes.map(r => r.id).concat([id])
+          const fillRecipes = await Recipe.findAll({
+            where: {
+              id: { [Op.notIn]: existingIds },
+              category: data.category,
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 6 - similarRecipes.length,
+            attributes: LIST_ATTRIBUTES,
+          })
+          similarRecipes = similarRecipes.concat(fillRecipes)
+        }
+      } else if (data.category) {
+        similarRecipes = await Recipe.findAll({
+          where: { id: { [Op.ne]: id }, category: data.category },
+          order: [['createdAt', 'DESC']],
+          limit: 6,
+          attributes: LIST_ATTRIBUTES,
+        })
+      } else {
+        similarRecipes = await Recipe.findAll({
+          where: { id: { [Op.ne]: id } },
+          order: [['createdAt', 'DESC']],
+          limit: 6,
+          attributes: LIST_ATTRIBUTES,
+        })
+      }
+    } else if (data.category) {
+      similarRecipes = await Recipe.findAll({
+        where: { id: { [Op.ne]: id }, category: data.category },
+        order: [['createdAt', 'DESC']],
+        limit: 6,
+        attributes: LIST_ATTRIBUTES,
+      })
+    } else {
+      similarRecipes = await Recipe.findAll({
+        where: { id: { [Op.ne]: id } },
+        order: [['createdAt', 'DESC']],
+        limit: 6,
+        attributes: LIST_ATTRIBUTES,
+      })
+    }
+
+    return res.status(200).json(
+      resJSON(0, 'ok', {
+        recipeId: id,
+        list: similarRecipes,
+      })
+    )
+  } catch (err) {
+    console.error('[GET /recipes/:id/similar] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
 // GET /:id — 食谱详情（含 ingredients 和 steps 解析为 JSON）
 // ─────────────────────────────────────────────────────────────────
 router.get('/:id', async (req, res) => {
@@ -376,6 +568,14 @@ router.get('/:id', async (req, res) => {
       }
     }
 
+    if (data.nutrition) {
+      try {
+        data.nutrition = JSON.parse(data.nutrition)
+      } catch {
+        data.nutrition = null
+      }
+    }
+
     return res.status(200).json(resJSON(0, 'ok', data))
   } catch (err) {
     console.error('[GET /recipes/:id] Error:', err)
@@ -398,6 +598,8 @@ router.post('/', auth, async (req, res) => {
       servings,
       difficulty,
       cookTime,
+      categoryTags,
+      nutrition,
     } = req.body
 
     if (!title || title.trim().length === 0) {
@@ -418,6 +620,8 @@ router.post('/', auth, async (req, res) => {
       servings: servings != null ? parseInt(servings, 10) : null,
       difficulty: difficulty || null,
       cookTime: cookTime != null ? parseInt(cookTime, 10) : null,
+      categoryTags: categoryTags ? (typeof categoryTags === 'string' ? categoryTags : JSON.stringify(categoryTags)) : null,
+      nutrition: nutrition ? (typeof nutrition === 'string' ? nutrition : JSON.stringify(nutrition)) : null,
       author: user ? user.nickname || user.username : '未知用户',
       userId: req.userId,
     })
@@ -455,6 +659,8 @@ router.put('/:id', auth, async (req, res) => {
       servings,
       difficulty,
       cookTime,
+      categoryTags,
+      nutrition,
     } = req.body
 
     const updateData = {}
@@ -467,6 +673,8 @@ router.put('/:id', auth, async (req, res) => {
     if (servings !== undefined) updateData.servings = parseInt(servings, 10)
     if (difficulty !== undefined) updateData.difficulty = difficulty
     if (cookTime !== undefined) updateData.cookTime = parseInt(cookTime, 10)
+    if (categoryTags !== undefined) updateData.categoryTags = typeof categoryTags === 'string' ? categoryTags : JSON.stringify(categoryTags)
+    if (nutrition !== undefined) updateData.nutrition = typeof nutrition === 'string' ? nutrition : JSON.stringify(nutrition)
     updateData.updatedAt = new Date()
 
     await Recipe.update(updateData, { where: { id } })
@@ -485,6 +693,13 @@ router.put('/:id', auth, async (req, res) => {
         data.steps = JSON.parse(data.steps)
       } catch {
         data.steps = []
+      }
+    }
+    if (data.nutrition) {
+      try {
+        data.nutrition = JSON.parse(data.nutrition)
+      } catch {
+        data.nutrition = null
       }
     }
 

@@ -1,7 +1,12 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
+import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
+import SearchAutocomplete from '../components/SearchAutocomplete'
+import FilterPanel from '../components/FilterPanel'
+import type { FilterState } from '../components/FilterPanel'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import type { Recipe } from '../api'
 import './HomePage.css'
 
@@ -10,37 +15,98 @@ const PAGE_SIZE = 12
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const [category, setCategory] = useState('全部')
+  // Read filters from URL params
+  const initialCategory = searchParams.get('category') || '全部'
+  const initialDifficulty = searchParams.get('difficulty') || ''
+  const initialMaxCookTime = searchParams.get('maxCookTime')
+    ? Number(searchParams.get('maxCookTime'))
+    : null
+  const initialSortBy = searchParams.get('sortBy') || ''
+
+  const [category, setCategory] = useState(initialCategory)
   const [page, setPage] = useState(1)
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [searchInput, setSearchInput] = useState('')
 
+  // Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    difficulty: initialDifficulty,
+    maxCookTime: initialMaxCookTime,
+    sortBy: initialSortBy,
+  })
+
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
+  // Sync filters to URL
   useEffect(() => {
+    const params = new URLSearchParams()
+    if (category !== '全部') params.set('category', category)
+    if (filters.difficulty) params.set('difficulty', filters.difficulty)
+    if (filters.maxCookTime !== null) params.set('maxCookTime', String(filters.maxCookTime))
+    if (filters.sortBy) params.set('sortBy', filters.sortBy)
+    setSearchParams(params, { replace: true })
+  }, [category, filters, setSearchParams])
+
+  // Fetch recipes
+  const fetchRecipes = useCallback(async () => {
     setLoading(true)
-    const params: { page: number; pageSize: number; category?: string } = {
+    const params: Record<string, any> = {
       page,
       pageSize: PAGE_SIZE,
     }
-    if (category !== '全部') {
-      params.category = category
+    if (category !== '全部') params.category = category
+
+    // TODO: Backend needs to support these filter params
+    // if (filters.difficulty) params.difficulty = filters.difficulty
+    // if (filters.maxCookTime !== null) params.maxCookTime = filters.maxCookTime
+    // if (filters.sortBy) params.sortBy = filters.sortBy
+
+    try {
+      const res: any = await getRecipes(params)
+      const data = res.data || res
+      const rawList = data.list || []
+      setTotal(data.total || 0)
+
+      // Client-side filtering (temporary until backend supports these params)
+      let filteredList = rawList
+      // TODO: Remove client-side filtering when backend filter params are supported
+      if (filters.difficulty) {
+        filteredList = filteredList.filter((r: Recipe) => r.difficulty === filters.difficulty)
+      }
+      if (filters.maxCookTime !== null) {
+        const maxTime = filters.maxCookTime
+        if (maxTime === 61) {
+          filteredList = filteredList.filter((r: Recipe) => (r.cookTime || 0) > 60)
+        } else {
+          filteredList = filteredList.filter((r: Recipe) => (r.cookTime || 0) <= maxTime)
+        }
+      }
+      if (filters.sortBy === 'rating') {
+        filteredList = [...filteredList].sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))
+      } else if (filters.sortBy === 'time') {
+        filteredList = [...filteredList].sort((a: any, b: any) => (a.cookTime || 999) - (b.cookTime || 999))
+      }
+      setRecipes(filteredList)
+    } catch {
+      setRecipes([])
+      setTotal(0)
+    } finally {
+      setLoading(false)
     }
-    getRecipes(params)
-      .then((res: any) => {
-        const data = res.data || res
-        setRecipes(data.list || [])
-        setTotal(data.total || 0)
-      })
-      .catch(() => {
-        setRecipes([])
-        setTotal(0)
-      })
-      .finally(() => setLoading(false))
-  }, [category, page])
+  }, [category, page, filters])
+
+  useEffect(() => {
+    fetchRecipes()
+  }, [fetchRecipes])
+
+  // Pull-to-refresh
+  const { refreshing, pullDistance } = usePullToRefresh({
+    onRefresh: fetchRecipes,
+  })
 
   const handleCategoryChange = (cat: string) => {
     if (cat === category) return
@@ -48,10 +114,8 @@ export default function HomePage() {
     setPage(1)
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!searchInput.trim()) return
-    navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`)
+  const handleSearchSubmit = (query: string) => {
+    navigate(`/search?q=${encodeURIComponent(query)}`)
   }
 
   const goPage = (newPage: number) => {
@@ -61,21 +125,43 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
+      {/* Pull-to-refresh indicator */}
+      {pullDistance > 0 && (
+        <div
+          className="pull-indicator"
+          style={{ height: `${pullDistance}px`, opacity: pullDistance / 60 }}
+        >
+          {refreshing ? (
+            <span className="pull-indicator__spinner" />
+          ) : pullDistance >= 60 ? (
+            '释放刷新'
+          ) : (
+            '下拉刷新'
+          )}
+        </div>
+      )}
+
       {/* 搜索栏 */}
-      <form className="home-search" onSubmit={handleSearch}>
-        <input
-          type="text"
-          className="home-search__input"
-          placeholder="搜索食谱..."
+      <form
+        className="home-search"
+        onSubmit={e => {
+          e.preventDefault()
+          handleSearchSubmit(searchInput)
+        }}
+      >
+        <SearchAutocomplete
           value={searchInput}
-          onChange={e => setSearchInput(e.target.value)}
+          onChange={setSearchInput}
+          onSubmit={handleSearchSubmit}
+          placeholder="搜索食谱..."
+          inputClassName="home-search__input"
         />
         <button type="submit" className="home-search__btn">
           搜索
         </button>
       </form>
 
-      {/* 分类标签页 */}
+      {/* 分类标签页 - 横向滚动 */}
       <div className="home-categories">
         {CATEGORIES.map(cat => (
           <button
@@ -88,17 +174,14 @@ export default function HomePage() {
         ))}
       </div>
 
+      {/* 筛选面板 */}
+      <FilterPanel filters={filters} onChange={setFilters} />
+
       {/* 加载态 - 骨架屏 */}
       {loading && (
         <div className="home-grid">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="home-card-skeleton">
-              <div className="skeleton-box skeleton-cover" />
-              <div className="skeleton-body">
-                <div className="skeleton-box skeleton-title" />
-                <div className="skeleton-box skeleton-meta" />
-              </div>
-            </div>
+            <RecipeCardSkeleton key={i} />
           ))}
         </div>
       )}
@@ -117,7 +200,7 @@ export default function HomePage() {
         <div className="home-empty">
           <div className="home-empty__icon">🍳</div>
           <p className="home-empty__text">暂无食谱</p>
-          <p className="home-empty__hint">稍后再来看看吧~</p>
+          <p className="home-empty__hint">试试其它筛选条件~</p>
         </div>
       )}
 

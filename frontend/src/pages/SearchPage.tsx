@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { searchRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
+import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
+import SearchAutocomplete from '../components/SearchAutocomplete'
+import { highlightText } from '../utils/highlightText'
+import { useToast } from '../context/ToastContext'
 import type { Recipe } from '../api'
 import './SearchPage.css'
 
@@ -16,6 +20,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<Recipe[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
+  const toast = useToast()
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -33,8 +38,15 @@ export default function SearchPage() {
     setLoading(true)
     searchRecipes({ q: q.trim(), page, pageSize: PAGE_SIZE })
       .then((res: any) => {
-        setResults(res.data?.list || res.list || [])
-        setTotal(res.data?.total || res.total || 0)
+        const list = res.data?.list || res.list || []
+        setResults(list)
+        const foundTotal = res.data?.total || res.total || 0
+        setTotal(foundTotal)
+
+        // No results toast
+        if (foundTotal === 0 && page === 1) {
+          toast.info('没有找到相关食谱，试试其他关键词')
+        }
       })
       .catch(() => {
         setResults([])
@@ -43,10 +55,9 @@ export default function SearchPage() {
       .finally(() => setLoading(false))
   }, [q, page])
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!inputValue.trim()) return
-    setSearchParams({ q: inputValue.trim(), page: '1' })
+  const handleSearchSubmit = (query: string) => {
+    if (!query.trim()) return
+    setSearchParams({ q: query.trim(), page: '1' })
   }
 
   const goPage = (newPage: number) => {
@@ -55,15 +66,25 @@ export default function SearchPage() {
 
   return (
     <div className="search-page">
-      {/* 搜索栏 */}
-      <form className="search-bar" onSubmit={handleSearch}>
-        <input
-          type="text"
-          className="search-input"
-          placeholder="搜索食谱..."
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-        />
+      {/* 搜索栏 - 使用自动补全组件 */}
+      <form
+        className="search-bar"
+        onSubmit={e => {
+          e.preventDefault()
+          handleSearchSubmit(inputValue)
+        }}
+      >
+        <div className="search-bar__input-wrap">
+          <span className="search-bar__icon">🔍</span>
+          <SearchAutocomplete
+            value={inputValue}
+            onChange={setInputValue}
+            onSubmit={handleSearchSubmit}
+            placeholder="搜索食谱..."
+            inputClassName="search-input search-input--autocomplete"
+            showHotSearches={false}
+          />
+        </div>
         <button type="submit" className="search-btn">
           搜索
         </button>
@@ -75,26 +96,24 @@ export default function SearchPage() {
         </p>
       )}
 
-      {/* 加载态 */}
+      {/* 加载态 - 骨架屏 */}
       {loading && (
         <div className="search-grid">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="recipe-card recipe-card--skeleton">
-              <div className="recipe-card__cover skeleton-box" />
-              <div className="recipe-card__info">
-                <div className="skeleton-box skeleton-box--title" />
-                <div className="skeleton-box skeleton-box--meta" />
-              </div>
-            </div>
+            <RecipeCardSkeleton key={i} />
           ))}
         </div>
       )}
 
-      {/* 结果列表 */}
+      {/* 结果列表 - 带关键词高亮 */}
       {!loading && results.length > 0 && (
         <div className="search-grid">
           {results.map(recipe => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard
+              key={recipe.id}
+              recipe={recipe}
+              highlightQuery={q}
+            />
           ))}
         </div>
       )}

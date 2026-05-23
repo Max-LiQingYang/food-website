@@ -5,7 +5,11 @@ import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
 import CommentSection from '../components/CommentSection'
+import NutritionCard from '../components/NutritionCard'
+import SimilarRecipes from '../components/SimilarRecipes'
+import ImageLightbox from '../components/ImageLightbox'
 import type { RecipeDetail } from '../api'
+import type { NutritionData } from '../components/NutritionCard'
 import './RecipeDetailPage.css'
 
 /** 分类中文映射 */
@@ -38,6 +42,7 @@ export default function RecipeDetailPage() {
   const [favLoading, setFavLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [activeStep, setActiveStep] = useState<number | null>(null)
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
 
   const isAuthor = isAuthenticated && user && recipe && recipe.userId === user.id
 
@@ -56,7 +61,6 @@ export default function RecipeDetailPage() {
       getFavoriteStatus(id).catch(() => ({ isFavorited: false, favoriteId: '' })),
     ] as const)
       .then(([res, favStatus]) => {
-        // API returns { code: 0, message: 'ok', data: recipeObject }
         const recipeData = (res as any).data ?? res
         setRecipe(recipeData as RecipeDetail)
         setIsFavorited(favStatus.isFavorited)
@@ -92,6 +96,36 @@ export default function RecipeDetailPage() {
     } finally {
       setFavLoading(false)
     }
+  }
+
+  const handleShare = async () => {
+    if (!recipe) return
+    const shareData = {
+      title: recipe.title,
+      text: `来看看这道美食：${recipe.title}`,
+      url: window.location.href,
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+        toast.success('分享成功')
+      } catch (err: any) {
+        // User cancelled or share failed
+        if (err?.name !== 'AbortError') {
+          fallbackCopyLink()
+        }
+      }
+    } else {
+      fallbackCopyLink()
+    }
+  }
+
+  const fallbackCopyLink = () => {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => toast.success('链接已复制到剪贴板'))
+      .catch(() => toast.error('复制失败，请手动复制链接'))
   }
 
   const handleDelete = async () => {
@@ -150,7 +184,7 @@ export default function RecipeDetailPage() {
     )
   }
 
-  // ── 处理 categoryTags（可能是 null 或 JSON 字符串） ──────
+  // ── 处理 categoryTags ────────────────────────────────────
   let categoryTags: Record<string, string> | null = null
   if (recipe.categoryTags) {
     if (typeof recipe.categoryTags === 'string') {
@@ -173,6 +207,10 @@ export default function RecipeDetailPage() {
         { label: '价格', value: categoryTags.price },
       ].filter(t => t.value)
     : []
+
+  // ── 提取营养信息 ─────────────────────────────────────────
+  const nutrition: NutritionData | null =
+    (recipe as any).nutrition ? (recipe as any).nutrition : null
 
   // ── 详情 ──────────────────────────────────────────────────
 
@@ -235,6 +273,11 @@ export default function RecipeDetailPage() {
         <div className="detail-header">
           <h1 className="detail-title">{recipe.title}</h1>
 
+          {/* 分享按钮 */}
+          <button className="detail-share-btn" onClick={handleShare} title="分享食谱">
+            📤 分享
+          </button>
+
           <p className="detail-author">
             👨🍳{' '}
             {recipe.userId && isAuthenticated ? (
@@ -280,6 +323,13 @@ export default function RecipeDetailPage() {
 
           {recipe.description && <p className="detail-desc">{recipe.description}</p>}
         </div>
+
+        {/* 营养信息卡片 */}
+        {nutrition && (
+          <div className="detail-container__section">
+            <NutritionCard nutrition={nutrition} />
+          </div>
+        )}
 
         {/* 食材清单 */}
         {recipe.ingredients && recipe.ingredients.length > 0 && (
@@ -327,6 +377,10 @@ export default function RecipeDetailPage() {
                           alt={`步骤 ${step.stepNumber}`}
                           className="step-image"
                           loading="lazy"
+                          onClick={e => {
+                            e.stopPropagation()
+                            setLightboxSrc(step.image!)
+                          }}
                         />
                       )}
                     </div>
@@ -337,6 +391,13 @@ export default function RecipeDetailPage() {
           </section>
         )}
 
+        {/* 相似食谱推荐 */}
+        {id && (
+          <div className="detail-container__section">
+            <SimilarRecipes recipeId={id} />
+          </div>
+        )}
+
         {/* 评论区 */}
         {id && (
           <section className="detail-section detail-section--comments">
@@ -345,6 +406,15 @@ export default function RecipeDetailPage() {
           </section>
         )}
       </div>
+
+      {/* 步骤图片灯箱 */}
+      {lightboxSrc && (
+        <ImageLightbox
+          src={lightboxSrc}
+          alt="步骤图片"
+          onClose={() => setLightboxSrc(null)}
+        />
+      )}
     </div>
   )
 }

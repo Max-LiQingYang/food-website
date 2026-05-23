@@ -8,11 +8,19 @@
     transform var(--transition-normal, 0.3s ease),
     box-shadow var(--transition-normal, 0.3s ease);
   position: relative;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .recipe-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.12));
+}
+
+/* Long-press / touch feedback */
+.recipe-card--pressed {
+  transform: scale(0.97) !important;
+  transition: transform 0.1s ease;
 }
 
 .recipe-card__cover {
