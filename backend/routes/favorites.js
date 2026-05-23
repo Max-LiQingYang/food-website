@@ -2,6 +2,7 @@
 
 const { createActivity } = require('../utils/activity')
 const favoriteService = require('../services/favoriteService')
+const { Recipe } = require('../models')
 
 /**
  * 通用响应封装
@@ -53,9 +54,12 @@ async function addFavorite(req, res) {
 
     if (result.isNew) {
       // 新增，返回 201
-      // 记录活动（不阻塞响应）
+      // 记录活动 + 更新食谱收藏计数（不阻塞响应）
       setImmediate(() => {
         createActivity(userId, 'favorite', recipeId, 'recipe', null)
+        Recipe.increment('favoriteCount', { by: 1, where: { id: recipeId } }).catch(err => {
+          console.error('[favoriteCount increment error]', err)
+        })
       })
       return res.status(201).json(resJSON(0, '收藏成功', result.data))
     } else {
@@ -83,6 +87,12 @@ async function removeFavorite(req, res) {
     const result = await favoriteService.removeFavorite(userId, recipeId)
 
     if (result.deleted) {
+      // 更新食谱收藏计数（不阻塞响应）
+      setImmediate(() => {
+        Recipe.decrement('favoriteCount', { by: 1, where: { id: recipeId } }).catch(err => {
+          console.error('[favoriteCount decrement error]', err)
+        })
+      })
       return res.status(200).json(resJSON(0, '取消收藏成功', null))
     } else {
       // 未收藏，幂等返回 200

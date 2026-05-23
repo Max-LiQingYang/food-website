@@ -261,9 +261,11 @@ describe('GET /api/recipes/recommend — 食材推荐', () => {
     expect(res.body.data.aiGenerated).toBe(false)
   })
 
-  test('空食材应返回 400', async () => {
+  test('空食材应返回热门推荐', async () => {
     const res = await request(app).get('/api/recipes/recommend').query({ ingredients: '' })
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(200)
+    expect(res.body.data.recommendType).toBe('popular')
+    expect(Array.isArray(res.body.data.list)).toBe(true)
   })
 
   test('中文顿号分隔应正常解析', async () => {

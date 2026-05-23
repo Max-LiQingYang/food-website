@@ -82,6 +82,23 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: '烹饪小贴士（纯文本）'
       },
+      season: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: '季节标签: spring, summer, autumn, winter, all（四季皆宜）'
+      },
+      favoriteCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        comment: '收藏数（物化字段，自动同步）'
+      },
+      commentCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        comment: '评论数（物化字段，自动同步）'
+      },
       userId: {
         type: DataTypes.STRING,
         allowNull: true,

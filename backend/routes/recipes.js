@@ -32,6 +32,23 @@ function resJSON(code, message, data) {
 }
 
 /**
+ * 计算食谱质量评分
+ * qualityScore = f(commentCount, favoriteCount, totalScorePotential)
+ * @param {Object} recipe - 食谱对象
+ * @returns {{ qualityScore: number, qualityLabel: string|null }}
+ */
+function computeQuality(recipe) {
+  const fav = recipe.favoriteCount || 0
+  const com = recipe.commentCount || 0
+  // 质量分 = 收藏数 * 2 + 评论数 * 3（评论比收藏权重略高，因为评论代表真实互动）
+  const score = fav * 2 + com * 3
+  let label = null
+  if (score >= 30) label = '🔥 热门食谱'
+  else if (score >= 10) label = '📈 高分食谱'
+  return { qualityScore: score, qualityLabel: label }
+}
+
+/**
  * 构建食材排除条件
  * @param {string} excludeStr - 逗号分隔的食材名称
  * @returns {Array|null} Sequelize where 条件数组，无排除时返回 null
@@ -67,6 +84,9 @@ const LIST_ATTRIBUTES = [
   'updatedAt',
   'nutrition',
   'tips',
+  'season',
+  'favoriteCount',
+  'commentCount',
 ]
 
 // ─────────────────────────────────────────────────────────────────
@@ -111,9 +131,15 @@ router.get('/', async (req, res) => {
       attributes: LIST_ATTRIBUTES,
     })
 
+    const list = rows.map(r => {
+      const item = r.toJSON()
+      Object.assign(item, computeQuality(item))
+      return item
+    })
+
     return res.status(200).json(
       resJSON(0, 'ok', {
-        list: rows,
+        list,
         total: count,
         page,
         pageSize,
@@ -201,9 +227,15 @@ router.get('/search', async (req, res) => {
       attributes: LIST_ATTRIBUTES,
     })
 
+    const list = rows.map(r => {
+      const item = r.toJSON()
+      Object.assign(item, computeQuality(item))
+      return item
+    })
+
     return res.status(200).json(
       resJSON(0, 'ok', {
-        list: rows,
+        list,
         total: count,
         page,
         pageSize,
@@ -296,14 +328,160 @@ router.get('/categories', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
-// GET /recommend — 食材推荐菜谱
+// GET /recommend — 食材推荐菜谱 + 协同过滤 + 季节性推荐
 // ─────────────────────────────────────────────────────────────────
 router.get('/recommend', async (req, res) => {
   try {
-    const { ingredients, exclude } = req.query
+    const { ingredients, exclude, type } = req.query
 
+    // ─── 模式1: 协同过滤推荐（无需食材参数） ───
+    if (type === 'collaborative' || (!ingredients && req.headers.authorization)) {
+      try {
+        const jwt = require('jsonwebtoken')
+        const token = req.headers.authorization.replace('Bearer ', '')
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'food-jwt-secret-key-2026')
+        const userId = decoded.userId
+        const { Favorite, Recipe } = require('../models')
+        const { Op: Op2 } = require('sequelize')
+
+        // 获取当前用户收藏的食谱ID
+        const myFavorites = await Favorite.findAll({
+          where: { userId, isDeleted: false },
+          attributes: ['recipeId']
+        })
+        const myRecipeIds = myFavorites.map(f => f.recipeId)
+
+        let recommended = []
+
+        if (myRecipeIds.length > 0) {
+          // 查找收藏了同样食谱的其他用户
+          const similarUsers = await Favorite.findAll({
+            where: {
+              recipeId: { [Op2.in]: myRecipeIds },
+              userId: { [Op2.ne]: userId },
+              isDeleted: false
+            },
+            attributes: ['userId']
+          })
+          const similarUserIds = [...new Set(similarUsers.map(f => f.userId))]
+
+          if (similarUserIds.length > 0) {
+            // 查找这些用户收藏的其他食谱
+            const collabFavs = await Favorite.findAll({
+              where: {
+                userId: { [Op2.in]: similarUserIds },
+                recipeId: { [Op2.notIn]: myRecipeIds },
+                isDeleted: false
+              },
+              attributes: ['recipeId'],
+              order: [['createdAt', 'DESC']]
+            })
+
+            // 按出现次数聚合
+            const recipeCount = {}
+            collabFavs.forEach(f => {
+              recipeCount[f.recipeId] = (recipeCount[f.recipeId] || 0) + 1
+            })
+
+            const topIds = Object.entries(recipeCount)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 12)
+              .map(([id]) => id)
+
+            if (topIds.length > 0) {
+              const recipes = await Recipe.findAll({
+                where: { id: { [Op2.in]: topIds } },
+                attributes: LIST_ATTRIBUTES
+              })
+              // 保持 topIds 顺序
+              const recipeMap = {}
+              recipes.forEach(r => { recipeMap[r.id] = r })
+              recommended = topIds.map(id => recipeMap[id]).filter(Boolean).map(r => {
+                const item = r.toJSON()
+                Object.assign(item, computeQuality(item))
+                item.recommendType = 'collaborative'
+                return item
+              })
+            }
+          }
+        }
+
+        // 如果没有足够的协同推荐，按收藏数补充热门食谱
+        if (recommended.length < 6) {
+          const existingIds = recommended.map(r => r.id)
+          const hotRecipes = await Recipe.findAll({
+            where: {
+              id: { [Op2.notIn]: existingIds },
+              ...(myRecipeIds.length > 0 ? { id: { [Op2.notIn]: [Op2.in, myRecipeIds] } } : {})
+            },
+            order: [['favoriteCount', 'DESC']],
+            limit: 12 - recommended.length,
+            attributes: LIST_ATTRIBUTES
+          })
+          const hotList = hotRecipes.map(r => {
+            const item = r.toJSON()
+            Object.assign(item, computeQuality(item))
+            item.recommendType = 'popular'
+            return item
+          })
+          recommended = [...recommended, ...hotList]
+        }
+
+        return res.status(200).json(resJSON(0, 'ok', { list: recommended, recommendType: 'collaborative' }))
+      } catch (authErr) {
+        // token 验证失败，回退到默认推荐
+        console.warn('[COLLAB RECOMMEND] Auth failed:', authErr.message)
+      }
+    }
+
+    // ─── 模式2: 季节性推荐（无需食材参数） ───
+    if (type === 'seasonal') {
+      const now = new Date()
+      const month = now.getMonth() + 1
+      let currentSeason
+      if (month >= 3 && month <= 5) currentSeason = 'spring'
+      else if (month >= 6 && month <= 8) currentSeason = 'summer'
+      else if (month >= 9 && month <= 11) currentSeason = 'autumn'
+      else currentSeason = 'winter'
+
+      const { Op: Op3 } = require('sequelize')
+      const seasonalRecipes = await Recipe.findAll({
+        where: {
+          [Op3.or]: [
+            { season: currentSeason },
+            { season: 'all' }
+          ]
+        },
+        order: [['favoriteCount', 'DESC']],
+        limit: 12,
+        attributes: LIST_ATTRIBUTES
+      })
+
+      const list = seasonalRecipes.map(r => {
+        const item = r.toJSON()
+        Object.assign(item, computeQuality(item))
+        item.recommendType = 'seasonal'
+        item.seasonContext = `${currentSeason}当季推荐`
+        return item
+      })
+
+      return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'seasonal', season: currentSeason }))
+    }
+
+    // ─── 模式3: 食材推荐（原逻辑增强 + 质量分） ───
     if (!ingredients || String(ingredients).trim().length === 0) {
-      return res.status(400).json(resJSON(400, '请输入食材关键词', null))
+      // 无参数时返回热门推荐
+      const hotRecipes = await Recipe.findAll({
+        order: [['favoriteCount', 'DESC']],
+        limit: 12,
+        attributes: LIST_ATTRIBUTES
+      })
+      const list = hotRecipes.map(r => {
+        const item = r.toJSON()
+        Object.assign(item, computeQuality(item))
+        return item
+      })
+      return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'popular' }))
     }
 
     // 解析输入食材列表
@@ -376,9 +554,11 @@ router.get('/recommend', async (req, res) => {
         userId: data.userId,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        ...computeQuality(data),
         matchScore,
         matchedIngredients: matchedNames,
         totalIngredients: recipeIngredientNames.length,
+        recommendType: 'ingredient',
       }
     })
 
@@ -645,6 +825,9 @@ router.get('/:id', async (req, res) => {
         data.nutrition = null
       }
     }
+
+    // 添加质量评分
+    Object.assign(data, computeQuality(data))
 
     return res.status(200).json(resJSON(0, 'ok', data))
   } catch (err) {

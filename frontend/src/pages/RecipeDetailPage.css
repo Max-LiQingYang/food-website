@@ -202,6 +202,21 @@
   white-space: nowrap;
 }
 
+.detail-tag--quality {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+}
+
+.detail-tag--season {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+[data-theme='dark'] .detail-tag--season {
+  background: #1b5e20;
+  color: #c8e6c9;
+}
+
 /* ── 多维分类标签（categoryTags） ── */
 .detail-tags-row {
   display: flex;

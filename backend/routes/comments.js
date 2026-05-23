@@ -186,6 +186,13 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
       likesCount: 0
     })
 
+    // 更新食谱评论计数（不阻塞响应）
+    setImmediate(() => {
+      recipe.increment('commentCount', { by: 1 }).catch(err => {
+        console.error('[commentCount increment error]', err)
+      })
+    })
+
     // 返回时带上用户信息
     const result = comment.toJSON()
     result.isLiked = false
@@ -289,6 +296,13 @@ router.delete('/comments/:id', auth, async (req, res) => {
     await Comment.destroy({ where: { id } })
     // 同时删除所有对应的点赞
     await CommentLike.destroy({ where: { commentId: id } })
+
+    // 更新食谱评论计数
+    const { Recipe } = require('../models')
+    const recipe = await Recipe.findByPk(comment.recipeId)
+    if (recipe && recipe.commentCount > 0) {
+      await recipe.decrement('commentCount', { by: 1 })
+    }
 
     return res.status(200).json(resJSON(0, 'ok', null))
   } catch (err) {

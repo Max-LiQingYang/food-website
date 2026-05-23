@@ -32,6 +32,14 @@ const DIFFICULTY_NAMES: Record<string, string> = {
   hard: '困难',
 }
 
+const SEASON_LABELS: Record<string, string> = {
+  spring: '🌸 春季',
+  summer: '☀️ 夏季',
+  autumn: '🍂 秋季',
+  winter: '❄️ 冬季',
+  all: '🔄 四季皆宜',
+}
+
 export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -332,6 +340,18 @@ export default function RecipeDetailPage() {
             )}
             {recipe.cookTime != null && (
               <span className="detail-tag">⏱ {recipe.cookTime} 分钟</span>
+            )}
+            {/* 质量标签 */}
+            {recipe.qualityLabel && (
+              <span className="detail-tag detail-tag--quality">
+                {recipe.qualityLabel}
+              </span>
+            )}
+            {/* 季节标签 */}
+            {recipe.season && SEASON_LABELS[recipe.season] && (
+              <span className="detail-tag detail-tag--season">
+                {SEASON_LABELS[recipe.season]}
+              </span>
             )}
           </div>
 

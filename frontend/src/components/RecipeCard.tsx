@@ -22,6 +22,14 @@ const DIFFICULTY_ICONS: Record<string, string> = {
   hard: '🔴',
 }
 
+const SEASON_LABELS: Record<string, string> = {
+  spring: '🌸 春季',
+  summer: '☀️ 夏季',
+  autumn: '🍂 秋季',
+  winter: '❄️ 冬季',
+  all: '四季皆宜',
+}
+
 function getCalories(recipe: Recipe): number | null {
   if (!recipe.nutrition) return null
   if (typeof recipe.nutrition === 'object') {
@@ -67,6 +75,13 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
           <FavoriteButton recipeId={recipe.id} inline />
         </div>
 
+        {/* 质量标签 */}
+        {recipe.qualityLabel && (
+          <span className="recipe-card__badge recipe-card__badge--quality">
+            {recipe.qualityLabel}
+          </span>
+        )}
+
         {/* 烹饪时间标签 */}
         {recipe.cookTime != null && (
           <span className="recipe-card__badge recipe-card__badge--time">
@@ -105,6 +120,11 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
         {/* 分类标签 */}
         {recipe.category && (
           <span className="recipe-card__category">{recipe.category}</span>
+        )}
+
+        {/* 季节标签 */}
+        {recipe.season && recipe.season !== 'all' && SEASON_LABELS[recipe.season] && (
+          <span className="recipe-card__season">{SEASON_LABELS[recipe.season]}</span>
         )}
       </div>
     </div>

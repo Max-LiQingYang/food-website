@@ -77,6 +77,11 @@ export interface Recipe {
   category?: string
   difficulty?: string
   servings?: number
+  season?: string
+  qualityScore?: number
+  qualityLabel?: string
+  favoriteCount?: number
+  commentCount?: number
   nutrition?: {
     calories?: number
     protein?: number
