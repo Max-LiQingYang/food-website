@@ -1,0 +1,97 @@
+/* Breadcrumb.css — 面包屑导航 */
+
+.breadcrumb {
+  padding: 12px 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.breadcrumb__list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb__item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.breadcrumb__item + .breadcrumb__item::before {
+  content: '›';
+  color: var(--color-text-muted, #b0a8a0);
+  margin-right: 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.breadcrumb__link {
+  color: var(--color-text-muted, #888);
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.breadcrumb__link:hover {
+  color: var(--color-primary, #e8663e);
+}
+
+.breadcrumb__current {
+  color: var(--color-text, #333);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* 暗色模式 */
+[data-theme='dark'] .breadcrumb__link {
+  color: #999;
+}
+
+[data-theme='dark'] .breadcrumb__link:hover {
+  color: var(--color-primary, #e8663e);
+}
+
+[data-theme='dark'] .breadcrumb__current {
+  color: #e0e0e0;
+}
+
+[data-theme='dark'] .breadcrumb__item + .breadcrumb__item::before {
+  color: #666;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding: 10px 12px 0;
+  }
+
+  .breadcrumb__item {
+    font-size: 12px;
+  }
+
+  .breadcrumb__current {
+    max-width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 移动端收缩：超过 4 个面包屑时隐藏中间项 */
+  .breadcrumb__item:nth-child(n+3):nth-last-child(n+3) {
+    display: none;
+  }
+
+  .breadcrumb__current {
+    max-width: 100px;
+  }
+}

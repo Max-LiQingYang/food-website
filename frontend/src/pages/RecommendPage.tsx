@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { recommendRecipes, addFavorite, removeFavorite, getFavoriteStatus } from '../api'
 import type { RecommendRecipe } from '../api'
+import { useToast } from '../context/ToastContext'
 import './RecommendPage.css'
 
 /* ─── 常量 ─── */
@@ -50,6 +51,7 @@ export default function RecommendPage() {
   const [history, setHistory] = useState<string[]>(loadHistory)
   const [favorites, setFavorites] = useState<Record<string, boolean>>({})
   const navigate = useNavigate()
+  const toast = useToast()
   const resultRef = useRef<HTMLDivElement>(null)
 
   /* 载入每张卡片收藏状态 */
@@ -114,7 +116,7 @@ export default function RecommendPage() {
 
     const token = localStorage.getItem('token')
     if (!token) {
-      alert('请先登录后再收藏')
+      toast.warning('请先登录后再收藏')
       navigate('/login')
       return
     }

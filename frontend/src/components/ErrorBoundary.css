@@ -1,0 +1,169 @@
+/* ErrorBoundary.css – 错误边界降级 UI */
+
+.error-boundary {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--color-bg, #faf6f0);
+}
+
+.error-boundary__card {
+  max-width: 480px;
+  width: 100%;
+  background: var(--color-card, #fff);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.error-boundary__icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.error-boundary__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0 0 12px;
+}
+
+.error-boundary__desc {
+  font-size: 14px;
+  color: var(--color-text-muted, #888);
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+.error-boundary__details {
+  text-align: left;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: var(--color-skeleton-from, #f5f0eb);
+}
+
+.error-boundary__details summary {
+  cursor: pointer;
+  color: var(--color-text-muted, #888);
+  font-weight: 500;
+}
+
+.error-boundary__details pre {
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 11px;
+  color: #e74c3c;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.error-boundary__stack {
+  color: var(--color-text-muted, #888) !important;
+  font-size: 10px !important;
+}
+
+.error-boundary__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-boundary__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.error-boundary__btn--retry {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+}
+
+.error-boundary__btn--retry:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.error-boundary__btn--home {
+  background: var(--color-border, #e8e0d8);
+  color: var(--color-text, #333);
+}
+
+.error-boundary__btn--home:hover {
+  background: var(--color-text-muted, #bbb);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* 暗色模式 */
+[data-theme='dark'] .error-boundary {
+  background: #1a1a2e;
+}
+
+[data-theme='dark'] .error-boundary__card {
+  background: #16213e;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .error-boundary__title {
+  color: #e0e0e0;
+}
+
+[data-theme='dark'] .error-boundary__desc {
+  color: #999;
+}
+
+[data-theme='dark'] .error-boundary__details {
+  border-color: #333;
+  background: #1a1a2e;
+}
+
+[data-theme='dark'] .error-boundary__details pre {
+  color: #ff6b6b;
+}
+
+[data-theme='dark'] .error-boundary__btn--home {
+  background: #333;
+  color: #ccc;
+}
+
+[data-theme='dark'] .error-boundary__btn--home:hover {
+  background: #555;
+  color: #fff;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .error-boundary__card {
+    padding: 28px 20px;
+  }
+  .error-boundary__icon {
+    font-size: 44px;
+  }
+  .error-boundary__title {
+    font-size: 18px;
+  }
+  .error-boundary__actions {
+    flex-direction: column;
+  }
+  .error-boundary__btn {
+    justify-content: center;
+  }
+}

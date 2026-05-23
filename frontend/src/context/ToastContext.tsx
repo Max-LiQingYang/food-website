@@ -31,7 +31,12 @@ const TOAST_ICONS: Record<ToastType, string> = {
   info: 'ℹ️',
 }
 
-const TOAST_DURATION = 3000
+const TOAST_DURATION: Record<ToastType, number> = {
+  success: 3000,
+  error: 5000,
+  warning: 3000,
+  info: 3000,
+}
 const ANIMATION_DURATION = 300
 
 // ── ToastProvider ──────────────────────────────────────────────────────────────
@@ -53,8 +58,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       const id = Date.now() + Math.random()
       setToasts(prev => [...prev, { id, message, type }])
 
-      // Auto dismiss
-      setTimeout(() => dismissToast(id), TOAST_DURATION)
+      // Auto dismiss (error type lasts longer)
+      setTimeout(() => dismissToast(id), TOAST_DURATION[type])
     },
     [dismissToast]
   )

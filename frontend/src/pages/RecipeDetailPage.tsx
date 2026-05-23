@@ -17,6 +17,7 @@ import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
 import { useRecipeStructuredData, useMetaTags, usePageTitle } from '../hooks/useSEO'
 import './RecipeDetailPage.css'
+import '../components/PrintView.css'
 
 /** 分类中文映射 */
 const CATEGORY_NAMES: Record<string, string> = {
@@ -357,6 +358,10 @@ export default function RecipeDetailPage() {
           {/* 分享按钮 */}
           <button className="detail-share-btn" onClick={handleShare} title="分享食谱">
             📤 分享
+          </button>
+          {/* 打印按钮 */}
+          <button className="detail__print-btn" onClick={() => window.print()} title="打印食谱">
+            🖨️ 打印
           </button>
 
           <p className="detail-author">

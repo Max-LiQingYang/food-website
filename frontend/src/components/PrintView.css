@@ -1,0 +1,302 @@
+/* print.css — 食谱打印视图专用样式 */
+
+@media print {
+  /* 隐藏非核心元素 */
+  .navbar,
+  .breadcrumb,
+  .mobile-bottom-nav,
+  .back-to-top,
+  .comment-section,
+  .similar-recipes,
+  .recipe-version-panel,
+  .favorite-button,
+  .shopping-list-btn,
+  .detail__actions,
+  .detail__print-btn,
+  .detail__share-btn,
+  .detail__edit-btn,
+  .detail__delete-btn,
+  .toast-container,
+  .qclaw-toast-container,
+  .error-boundary,
+  .recipe-card__favorite,
+  .recipe-card__add-cart,
+  footer,
+  .recommend-recipes,
+  .rankings-page,
+  .search-page,
+  .collections-page,
+  .shopping-list-page,
+  .recommend-page,
+  .user-profile-page,
+  .create-recipe-page {
+    display: none !important;
+  }
+
+  /* 页面基础设置 */
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  @page {
+    margin: 1.5cm 1cm;
+    size: A4;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000 !important;
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', serif;
+  }
+
+  /* 食谱详情容器 */
+  .recipe-detail,
+  .detail__content,
+  .detail__main {
+    display: block !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* 标题 */
+  h1, h2, h3 {
+    page-break-after: avoid;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+  }
+
+  .detail__title {
+    font-size: 24pt;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .detail__meta {
+    text-align: center;
+    font-size: 10pt;
+    color: #555 !important;
+    margin-bottom: 20px;
+  }
+
+  /* 封面图 */
+  .detail__cover img {
+    max-width: 60% !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto 16px;
+    page-break-inside: avoid;
+  }
+
+  /* 描述 */
+  .detail__description {
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #333 !important;
+    margin-bottom: 16px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* 标签行 */
+  .detail__tags {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .detail-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 9pt;
+    margin: 2px 4px;
+    color: #333 !important;
+  }
+
+  /* 食材列表 */
+  .ingredients-section {
+    page-break-inside: avoid;
+    margin-bottom: 20px;
+  }
+
+  .ingredients-section h2 {
+    font-size: 14pt;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4px;
+  }
+
+  .ingredients-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ingredients-table th,
+  .ingredients-table td {
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid #ddd;
+    font-size: 11pt;
+  }
+
+  .ingredients-table th {
+    font-weight: 600;
+    width: 60%;
+  }
+
+  .ingredients-table td {
+    text-align: right;
+    width: 40%;
+  }
+
+  /* 步骤列表 */
+  .steps-section h2 {
+    font-size: 14pt;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4px;
+  }
+
+  .step-item {
+    page-break-inside: avoid;
+    margin-bottom: 12px;
+    padding-left: 0;
+  }
+
+  .step-item__number {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 11pt;
+    margin-right: 8px;
+  }
+
+  .step-item__content {
+    display: inline;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #333 !important;
+  }
+
+  .step-checkbox {
+    display: none !important;
+  }
+
+  /* 营养信息 */
+  .nutrition-section {
+    page-break-inside: avoid;
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 12px;
+  }
+
+  .nutrition-section h2 {
+    font-size: 14pt;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4px;
+  }
+
+  .nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .nutrition-item {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    font-size: 10pt;
+  }
+
+  .nutrition-item__label {
+    font-weight: 600;
+  }
+
+  .nutrition-item__value {
+    float: right;
+  }
+
+  /* 提示（tips） */
+  .tips-section {
+    page-break-inside: avoid;
+    margin-top: 16px;
+    border: 1px dashed #999;
+    padding: 8px 12px;
+    font-size: 10pt;
+    font-style: italic;
+    color: #555 !important;
+  }
+
+  .tips-section h2 {
+    font-size: 12pt;
+    border: none;
+    margin: 0 0 4px;
+  }
+
+  /* 版权信息 */
+  .detail__footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+    font-size: 8pt;
+    color: #999 !important;
+  }
+
+  /* 打印 URL */
+  .detail__url {
+    text-align: center;
+    font-size: 8pt;
+    color: #999 !important;
+    margin-bottom: 0;
+  }
+
+  /* 分页控制 */
+  .ingredients-section,
+  .steps-section {
+    page-break-inside: avoid;
+  }
+
+  img {
+    page-break-inside: avoid;
+    max-width: 100% !important;
+  }
+
+  a {
+    text-decoration: underline;
+    color: #000 !important;
+  }
+}
+
+/* 打印按钮样式（屏幕可见） */
+.detail__print-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--color-border, #e8e0d8);
+  color: var(--color-text, #333);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail__print-btn:hover {
+  background: var(--color-text-muted, #bbb);
+  color: #fff;
+}
+
+[data-theme='dark'] .detail__print-btn {
+  background: #333;
+  color: #ccc;
+}
+
+[data-theme='dark'] .detail__print-btn:hover {
+  background: #555;
+  color: #fff;
+}

@@ -3,6 +3,8 @@ import { lazy, Suspense } from 'react'
 import Navbar from '../components/Navbar'
 import MobileBottomNav from '../components/MobileBottomNav'
 import BackToTop from '../components/BackToTop'
+import Breadcrumb from '../components/Breadcrumb'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))
@@ -22,14 +24,17 @@ const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载�
 
 function Layout() {
   return (
-    <>
+    <ErrorBoundary>
       <Navbar />
+      <Breadcrumb />
       <Suspense fallback={<Fallback />}>
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </Suspense>
       <MobileBottomNav />
       <BackToTop />
-    </>
+    </ErrorBoundary>
   )
 }
 

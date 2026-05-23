@@ -191,6 +191,32 @@ body {
   background: #1890ff;
 }
 
+/* 暗色模式 Toast */
+[data-theme='dark'] .qclaw-toast--success {
+  background: #2e7d32;
+}
+
+[data-theme='dark'] .qclaw-toast--error {
+  background: #c62828;
+}
+
+[data-theme='dark'] .qclaw-toast--warning {
+  background: #f9a825;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .qclaw-toast--info {
+  background: #1565c0;
+}
+
+[data-theme='dark'] .qclaw-toast__close {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='dark'] .qclaw-toast__close:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
 /* auth loading */
 .auth-loading {
   min-height: 100vh;
