@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { createRecipe, updateRecipe, getRecipeById } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
-import type { CreateRecipeData } from '../api'
+import ImportFromUrl from '../components/ImportFromUrl'
+import type { CreateRecipeData, ImportedRecipe } from '../api'
 import './CreateRecipePage.css'
 
 const CATEGORIES = [
@@ -179,6 +180,28 @@ export default function CreateRecipePage() {
     })
   }, [steps])
 
+  // ── 导入数据 ──
+  const handleImportData = (imported: ImportedRecipe) => {
+    setTitle(imported.title || '')
+    setDescription(imported.description || '')
+    setCoverImage(imported.coverImage || '')
+    setServings(imported.servings || 2)
+    setDifficulty(['easy', 'medium', 'hard'].includes(imported.difficulty) ? imported.difficulty : 'medium')
+    setCookTime(imported.cookTime || 30)
+    if (imported.ingredients?.length) {
+      setIngredients(imported.ingredients)
+    }
+    if (imported.steps?.length) {
+      setSteps(imported.steps)
+    }
+    // 如果有营养数据，encode 到 tips 或 description 中方便用户参考
+    // （实际创建时 nutrition 由后端种子脚本填充）
+    if (imported.description && !description) {
+      setDescription(imported.description)
+    }
+    toast.success('已导入食谱数据，请确认后发布')
+  }
+
   // ── 提交 ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -257,6 +280,10 @@ export default function CreateRecipePage() {
       <div className="create-layout">
         {/* Left: Form */}
         <div className="create-form-wrap">
+          {/* URL 导入（仅创建模式，非编辑模式） */}
+          {!isEdit && (
+            <ImportFromUrl onImport={handleImportData} />
+          )}
           <form className="create-form" onSubmit={handleSubmit}>
             {/* 标题 */}
             <div className="form-group">

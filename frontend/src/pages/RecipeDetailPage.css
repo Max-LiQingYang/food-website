@@ -788,3 +788,104 @@
     aspect-ratio: 4 / 3;
   }
 }
+
+/* ── 份量缩放 ── */
+.serving-scaler {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--color-bg, #fdf8f4);
+  border-radius: 20px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  margin-left: 4px;
+}
+
+.serving-scaler__btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border, #e8e0d8);
+  background: var(--color-card, #fff);
+  color: var(--color-primary, #e8663e);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  touch-action: manipulation;
+  line-height: 1;
+}
+
+.serving-scaler__btn:hover:not(:disabled) {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+.serving-scaler__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.serving-scaler__value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: center;
+}
+
+.serving-scaler__reset {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted, #999);
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.serving-scaler__reset:hover {
+  color: var(--color-primary, #e8663e);
+}
+
+.ingredient-scaled-hint {
+  font-size: 12px;
+  color: var(--color-text-muted, #999);
+  margin: 4px 0 8px;
+}
+
+.ingredient-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+body.dark .serving-scaler {
+  background: var(--color-bg-dark, #1a1a1a);
+  border-color: var(--color-border-dark, #333);
+}
+
+body.dark .serving-scaler__btn {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #333);
+  color: var(--color-primary-light, #f0946e);
+}
+
+body.dark .serving-scaler__value {
+  color: var(--color-text-dark, #eee);
+}
+
+@media (max-width: 768px) {
+  .serving-scaler {
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}

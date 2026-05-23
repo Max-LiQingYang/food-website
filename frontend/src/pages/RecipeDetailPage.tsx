@@ -56,7 +56,32 @@ export default function RecipeDetailPage() {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
   const [showShareModal, setShowShareModal] = useState(false)
 
-  // 已完成步骤（localStorage 持久化）
+  // ── 份量缩放 ──
+  const scaleKey = id ? `serving_scale_${id}` : ''
+  const [servingScale, setServingScale] = useState<number>(() => {
+    if (!scaleKey) return 1
+    try {
+      const saved = localStorage.getItem(scaleKey)
+      return saved ? JSON.parse(saved) : 1
+    } catch {
+      return 1
+    }
+  })
+
+  // 持久化份量缩放
+  useEffect(() => {
+    if (scaleKey) {
+      localStorage.setItem(scaleKey, JSON.stringify(servingScale))
+    }
+  }, [servingScale, scaleKey])
+
+  // 缩放后的食材
+  const scaledIngredients = recipe?.ingredients?.map(ing => ({
+    ...ing,
+    displayAmount: ing.amount * servingScale,
+  })) ?? []
+
+  // ── 已完成步骤（localStorage 持久化）
   const storageKey = id ? `step_completed_${id}` : ''
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(() => {
     if (!storageKey) return new Set()
@@ -90,8 +115,8 @@ export default function RecipeDetailPage() {
   // 复制食材清单
   const handleCopyIngredients = () => {
     if (!recipe?.ingredients?.length) return
-    const text = recipe.ingredients
-      .map(ing => `${ing.name} ${ing.amount}${ing.unit}`)
+    const text = scaledIngredients
+      .map(ing => `${ing.name} ${ing.displayAmount}${ing.unit}`)
       .join('\n')
     navigator.clipboard.writeText(text).then(() => {
       toast.success('食材清单已复制')
@@ -338,6 +363,33 @@ export default function RecipeDetailPage() {
             {recipe.servings != null && (
               <span className="detail-tag">🍽️ {recipe.servings} 人份</span>
             )}
+            {/* 份量缩放 */}
+            {recipe.servings != null && (
+              <div className="serving-scaler">
+                <button
+                  className="serving-scaler__btn"
+                  onClick={() => setServingScale(s => Math.max(0.25, s - 0.25))}
+                  disabled={servingScale <= 0.25}
+                  title="减少份量"
+                >−</button>
+                <span className="serving-scaler__value">
+                  {Math.round(recipe.servings * servingScale)} 人份
+                </span>
+                <button
+                  className="serving-scaler__btn"
+                  onClick={() => setServingScale(s => Math.min(10, s + 0.25))}
+                  disabled={servingScale >= 10}
+                  title="增加份量"
+                >+</button>
+                {servingScale !== 1 && (
+                  <button
+                    className="serving-scaler__reset"
+                    onClick={() => setServingScale(1)}
+                    title="重置"
+                  >↺</button>
+                )}
+              </div>
+            )}
             {recipe.cookTime != null && (
               <span className="detail-tag">⏱ {recipe.cookTime} 分钟</span>
             )}
@@ -392,13 +444,21 @@ export default function RecipeDetailPage() {
               </button>
             </h2>
             <AddToShoppingListButton recipeId={id} className="detail-shop-btn" />
+            {servingScale !== 1 && (
+              <p className="ingredient-scaled-hint">
+                原 {recipe.servings} 人份 → 当前 {Math.round(recipe.servings * servingScale)} 人份（{servingScale === 1 ? '×1' : `×${servingScale}`}）
+              </p>
+            )}
             <ul className="detail-ingredients">
-              {recipe.ingredients.map((ing, i) => (
+              {scaledIngredients.map((ing, i) => (
                 <li key={i} className="detail-ingredient">
                   <span className="ingredient-name">{ing.name}</span>
                   <span className="ingredient-divider" />
                   <span className="ingredient-amount">
-                    {ing.amount} {ing.unit}
+                    {ing.displayAmount % 1 === 0
+                      ? ing.displayAmount
+                      : ing.displayAmount.toFixed(1)}
+                    {' '}{ing.unit}
                   </span>
                 </li>
               ))}

@@ -87,6 +87,8 @@ export interface Recipe {
     protein?: number
     fat?: number
     carbs?: number
+    fiber?: number
+    sodium?: number
   }
   tips?: string
 }
@@ -382,6 +384,30 @@ export function searchRecipesWithFilters(filters: SearchFilters): Promise<any> {
 // Recipe CRUD API
 // ─────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────
+// Import Recipe API
+// ─────────────────────────────────────────────────────────────────
+
+export interface ImportedRecipe {
+  title: string
+  description: string
+  coverImage: string
+  cookTime: number
+  servings: number
+  difficulty: string
+  ingredients: Array<{ name: string; amount: number; unit: string }>
+  steps: Array<{ stepNumber: number; content: string }>
+  nutrition: Record<string, number> | null
+}
+
+/**
+ * 从 URL 导入食谱
+ * POST /api/recipes/import
+ */
+export function importRecipeFromUrl(url: string): Promise<ImportedRecipe> {
+  return apiClient.post('/recipes/import', { url }).then(res => res.data)
+}
+
 export interface CreateRecipeData {
   title: string
   description?: string
@@ -392,6 +418,7 @@ export interface CreateRecipeData {
   servings?: number
   difficulty?: string
   cookTime?: number
+  tips?: string
 }
 
 /**

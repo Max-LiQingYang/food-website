@@ -24,6 +24,7 @@ const favoriteRoutes = require('./favorites')
 const commentRoutes = require('./comments')
 const collectionRoutes = require('./collections')
 const shoppingListRoutes = require('./shoppingList')
+const importRoutes = require('./import')
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
@@ -39,9 +40,10 @@ router.use('/users', followRoutes)
 // 动态流
 router.use('/feed', auth, feedRoutes)
 
-// 需要 auth 的路由（collections, shopping-list）
+// 需要 auth 的路由（collections, shopping-list, import）
 router.use('/collections', auth, collectionRoutes)
 router.use('/shopping-list', auth, shoppingListRoutes)
+router.use('/recipes/import', importRoutes)
 
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)

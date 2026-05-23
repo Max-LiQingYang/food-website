@@ -1,0 +1,88 @@
+/* ImportFromUrl — URL 导入按钮组件 */
+
+.import-url {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--color-primary-bg, #fff3ed);
+  border: 1px dashed var(--color-primary, #e8663e);
+  border-radius: var(--radius-lg, 16px);
+}
+
+.import-url__row {
+  display: flex;
+  gap: 8px;
+}
+
+.import-url__input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--color-text, #333);
+  outline: none;
+  background: var(--color-card, #fff);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.import-url__input:focus {
+  border-color: var(--color-primary, #e8663e);
+  box-shadow: 0 0 0 3px rgba(232, 102, 62, 0.1);
+}
+
+.import-url__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.import-url__btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  touch-action: manipulation;
+}
+
+.import-url__btn:hover:not(:disabled) {
+  background: var(--color-primary-dark, #c94f2a);
+}
+
+.import-url__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.import-url__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted, #999);
+  line-height: 1.5;
+}
+
+/* ── 暗色模式 ── */
+body.dark .import-url {
+  background: rgba(232, 102, 62, 0.08);
+}
+
+body.dark .import-url__input {
+  background: var(--color-bg-dark, #1a1a1a);
+  border-color: var(--color-border-dark, #333);
+  color: var(--color-text-dark, #eee);
+}
+
+/* ── 移动端 ── */
+@media (max-width: 480px) {
+  .import-url__row {
+    flex-direction: column;
+  }
+
+  .import-url__btn {
+    width: 100%;
+  }
+}
