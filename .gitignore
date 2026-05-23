@@ -16,6 +16,8 @@ node_modules/
 dist/
 dist-ssr/
 *.local
+frontend/dist.tar.gz
+*.tar.gz
 
 # 测试覆盖率
 coverage/
