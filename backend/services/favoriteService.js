@@ -98,6 +98,7 @@ async function addFavorite(userId, recipeId) {
   if (!created) {
     // 已有软删除记录，设为未删除（恢复收藏）
     await record.update({ isDeleted: false, createdAt: new Date() })
+    clearCache()
     return {
       isNew: true,
       data: {
@@ -109,6 +110,7 @@ async function addFavorite(userId, recipeId) {
     }
   }
 
+  clearCache()
   return {
     isNew: true,
     data: {
@@ -138,6 +140,7 @@ async function removeFavorite(userId, recipeId) {
 
   // 软删除
   await record.update({ isDeleted: true })
+  clearCache()
   return { deleted: true }
 }
 

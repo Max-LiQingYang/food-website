@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     getMe()
       .then((data: any) => {
-        setUser({ id: data.id, username: data.username, nickname: data.nickname })
+        setUser({ id: data.data.id, username: data.data.username, nickname: data.data.nickname })
       })
       .catch(() => {
         localStorage.removeItem('token')
@@ -46,11 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback((newToken: string, newUser: User) => {
     localStorage.setItem('token', newToken)
+    _setToken(newToken)
     setUser(newUser)
   }, [])
 
   const logout = useCallback(() => {
     localStorage.removeItem('token')
+    _setToken(null)
     setUser(null)
   }, [])
 

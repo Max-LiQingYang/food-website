@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
+import { useAuth } from '../context/AuthContext'
 import './FavoriteButton.css'
 
 interface FavoriteButtonProps {
@@ -14,22 +15,24 @@ export default function FavoriteButton({ recipeId, inline }: FavoriteButtonProps
   const [loading, setLoading] = useState(false)
   const [animating, setAnimating] = useState(false)
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) return
+    if (!isAuthenticated) {
+      setIsFavorited(false)
+      return
+    }
     getFavoriteStatus(recipeId).then(res => {
       const data = res.data || res
       setIsFavorited(data.isFavorited === true)
     }).catch(() => {})
-  }, [recipeId])
+  }, [recipeId, isAuthenticated])
 
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
     if (loading) return
-    const token = localStorage.getItem('token')
-    if (!token) {
+    if (!isAuthenticated) {
       navigate('/login')
       return
     }
