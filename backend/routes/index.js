@@ -33,6 +33,10 @@ router.use('/auth', authRoutes)
 
 // 评论路由必须在食谱路由之前，确保 /recipes/:recipeId/comments 不被 /recipes/:id 拦截
 router.use('/', commentRoutes)
+
+// 食谱对比（无需认证，必须在 recipeRoutes 之前避免 /:id 拦截 /compare）
+router.use('/recipes', compareRoutes)
+
 router.use('/recipes', recipeRoutes)
 router.use('/users', userRoutes)
 
@@ -46,9 +50,6 @@ router.use('/feed', auth, feedRoutes)
 router.use('/collections', auth, collectionRoutes)
 router.use('/shopping-list', auth, shoppingListRoutes)
 router.use('/recipes/import', importRoutes)
-
-// 食谱对比（无需认证）
-router.use('/recipes', compareRoutes)
 
 // 用户偏好（需认证）
 router.use('/preferences', preferencesRoutes)
