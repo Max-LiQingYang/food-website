@@ -41,11 +41,13 @@ module.exports = (sequelize, DataTypes) => {
   CollectionRecipe.associate = (models) => {
     CollectionRecipe.belongsTo(models.Collection, {
       foreignKey: 'collectionId',
-      as: 'collection'
+      as: 'collection',
+      constraints: false
     })
     CollectionRecipe.belongsTo(models.Recipe, {
       foreignKey: 'recipeId',
-      as: 'Recipe'
+      as: 'Recipe',
+      constraints: false
     })
   }
 
