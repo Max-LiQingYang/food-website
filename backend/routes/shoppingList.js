@@ -234,4 +234,27 @@ router.put('/:id', auth, async (req, res) => {
   }
 })
 
+// ─────────────────────────────────────────────────────────────────
+// DELETE /:id — 删除购物清单
+// ─────────────────────────────────────────────────────────────────
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+    const list = await ShoppingList.findOne({
+      where: { id, userId: req.userId }
+    })
+
+    if (!list) {
+      return res.status(404).json(resJSON(404, '购物清单不存在', null))
+    }
+
+    await list.destroy()
+
+    return res.status(200).json(resJSON(0, '删除成功', null))
+  } catch (err) {
+    console.error('[DELETE /shopping-list/:id] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   getShoppingLists,
   updateShoppingList,
+  deleteShoppingList,
   type ShoppingList,
   type ShoppingListItem,
 } from '../api'
@@ -88,6 +89,18 @@ export default function ShoppingListPage() {
     fetchLists()
   }
 
+  const handleDeleteList = async (e: React.MouseEvent, listId: string) => {
+    e.stopPropagation()
+    if (!window.confirm('确定删除此购物清单？')) return
+    try {
+      await deleteShoppingList(listId)
+      setLists(prev => prev.filter(l => l.id !== listId))
+      toast.success('已删除')
+    } catch (err: any) {
+      toast.error(err?.message || '删除失败')
+    }
+  }
+
   // ── List View ──
   if (!selectedList) {
     if (loading) {
@@ -136,7 +149,16 @@ export default function ShoppingListPage() {
                   className="shop-card"
                   onClick={() => setSelectedList(list)}
                 >
-                  <div className="shop-card__icon">🛒</div>
+                  <div className="shop-card__header">
+                    <div className="shop-card__icon">🛒</div>
+                    <button
+                      className="shop-card__delete"
+                      onClick={(e) => handleDeleteList(e, list.id)}
+                      title="删除清单"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                   <h3 className="shop-card__name">{list.name}</h3>
                   <p className="shop-card__meta">
                     {totalCount} 项

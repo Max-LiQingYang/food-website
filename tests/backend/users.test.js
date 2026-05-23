@@ -39,6 +39,21 @@ beforeEach(async () => {
       userId: USER_A_ID
     })
   }
+
+  // 为用户B收藏2条食谱
+  const aRecipes = await db.Recipe.findAll({ where: { userId: USER_A_ID } })
+  for (let i = 0; i < Math.min(2, aRecipes.length); i++) {
+    await db.Favorite.create({ id: uuidv4(), userId: USER_B_ID, recipeId: aRecipes[i].id, isDeleted: false })
+  }
+
+  // 为用户B添加1条评论
+  await db.Comment.create({
+    id: 1,
+    content: '好菜！',
+    rating: 5,
+    userId: USER_B_ID,
+    recipeId: aRecipes[0].id
+  })
 })
 
 afterAll(async () => {
@@ -162,5 +177,93 @@ describe('GET /api/users/:id/recipes — 用户食谱列表', () => {
     // 列表接口不应返回完整的步骤和食材
     expect(recipe.steps).toBeUndefined()
     expect(recipe.ingredients).toBeUndefined()
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /api/users/:id/stats — 用户烹饪统计
+// ─────────────────────────────────────────────────────────────────
+describe('GET /api/users/:id/stats — 用户统计', () => {
+  test('应返回用户统计信息', async () => {
+    const res = await request(app).get(`/api/users/${USER_B_ID}/stats`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.recipeCount).toBe(0)
+    expect(res.body.data.favoriteCount).toBe(2)
+    expect(res.body.data.commentCount).toBe(1)
+  })
+
+  test('零统计用户应返回 0 计数', async () => {
+    const res = await request(app).get(`/api/users/${USER_A_ID}/stats`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.recipeCount).toBe(3)
+    expect(res.body.data.favoriteCount).toBe(0)
+    expect(res.body.data.commentCount).toBe(0)
+  })
+
+  test('不存在的用户应返回 404', async () => {
+    const res = await request(app).get(`/api/users/${uuidv4()}/stats`)
+
+    expect(res.status).toBe(404)
+  })
+
+  test('应包含所有三个统计字段', async () => {
+    const res = await request(app).get(`/api/users/${USER_B_ID}/stats`)
+
+    expect(res.body.data).toHaveProperty('userId')
+    expect(res.body.data).toHaveProperty('recipeCount')
+    expect(res.body.data).toHaveProperty('favoriteCount')
+    expect(res.body.data).toHaveProperty('commentCount')
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /api/users/:id/favorites — 用户收藏的食谱
+// ─────────────────────────────────────────────────────────────────
+describe('GET /api/users/:id/favorites — 用户收藏食谱', () => {
+  test('应返回用户收藏的食谱列表', async () => {
+    const res = await request(app).get(`/api/users/${USER_B_ID}/favorites`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.list).toHaveLength(2)
+    expect(res.body.data.total).toBe(2)
+  })
+
+  test('无收藏的用户应返回空列表', async () => {
+    const res = await request(app).get(`/api/users/${USER_A_ID}/favorites`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.list).toHaveLength(0)
+    expect(res.body.data.total).toBe(0)
+  })
+
+  test('应支持分页', async () => {
+    const res = await request(app)
+      .get(`/api/users/${USER_B_ID}/favorites`)
+      .query({ page: 1, pageSize: 1 })
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.list).toHaveLength(1)
+    expect(res.body.data.total).toBe(2)
+  })
+
+  test('不存在的用户应返回 404', async () => {
+    const res = await request(app).get(`/api/users/${uuidv4()}/favorites`)
+
+    expect(res.status).toBe(404)
+  })
+
+  test('不应包含软删除的收藏', async () => {
+    // 软删除一条收藏
+    const favs = await db.Favorite.findAll({ where: { userId: USER_B_ID } })
+    await favs[0].update({ isDeleted: true })
+
+    const res = await request(app).get(`/api/users/${USER_B_ID}/favorites`)
+
+    expect(res.body.data.list).toHaveLength(1)
+    expect(res.body.data.total).toBe(1)
   })
 })

@@ -234,6 +234,31 @@ export function getUserRecipes(params: { userId: string; page?: number; pageSize
   })
 }
 
+/**
+ * 获取用户烹饪统计
+ * GET /api/users/:id/stats
+ */
+export interface UserStats {
+  userId: string
+  recipeCount: number
+  favoriteCount: number
+  commentCount: number
+}
+
+export function getUserStats(id: string): Promise<UserStats> {
+  return apiClient.get(`/users/${id}/stats`)
+}
+
+/**
+ * 获取用户收藏的食谱
+ * GET /api/users/:id/favorites?page=1&pageSize=20
+ */
+export function getUserFavorites(params: { userId: string; page?: number; pageSize?: number }) {
+  return apiClient.get(`/users/${params.userId}/favorites`, {
+    params: { page: params.page || 1, pageSize: params.pageSize || 20 },
+  })
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Comments API
 // ─────────────────────────────────────────────────────────────────
@@ -518,6 +543,14 @@ export function updateShoppingList(id: string, data: { name?: string; items?: Sh
   return apiClient.put(`/shopping-list/${id}`, data).then((res: any) => res.data)
 }
 
+/**
+ * 删除购物清单
+ * DELETE /api/shopping-list/:id
+ */
+export function deleteShoppingList(id: string): Promise<void> {
+  return apiClient.delete(`/shopping-list/${id}`).then((res: any) => res.data)
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Share API
 // ─────────────────────────────────────────────────────────────────
@@ -551,6 +584,8 @@ export default {
   recommendRecipes,
   getUserProfile,
   getUserRecipes,
+  getUserStats,
+  getUserFavorites,
   createRecipe,
   updateRecipe,
   deleteRecipe,
@@ -568,5 +603,6 @@ export default {
   generateShoppingList,
   getShoppingLists,
   updateShoppingList,
+  deleteShoppingList,
   getShareInfo,
 }

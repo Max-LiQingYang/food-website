@@ -9,7 +9,8 @@
  */
 
 const express = require('express')
-const { User, Recipe } = require('../models')
+const { User, Recipe, Comment, Favorite, Collection, ShoppingList } = require('../models')
+const { Op } = require('sequelize')
 
 const router = express.Router()
 
@@ -82,6 +83,90 @@ router.get('/:id/recipes', async (req, res) => {
     )
   } catch (err) {
     console.error('[GET /users/:id/recipes] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/stats — 用户烹饪统计
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/stats', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const user = await User.findByPk(id, { attributes: ['id'] })
+    if (!user) {
+      return res.status(404).json(resJSON(404, '用户不存在', null))
+    }
+
+    const [recipeCount, favoriteCount, commentCount] = await Promise.all([
+      Recipe.count({ where: { userId: id } }),
+      Favorite.count({ where: { userId: id, isDeleted: false } }),
+      Comment.count({ where: { userId: id } })
+    ])
+
+    return res.status(200).json(
+      resJSON(0, 'ok', {
+        userId: id,
+        recipeCount,
+        favoriteCount,
+        commentCount
+      })
+    )
+  } catch (err) {
+    console.error('[GET /users/:id/stats] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/favorites — 用户收藏的食谱列表
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/favorites', async (req, res) => {
+  try {
+    const { id } = req.params
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1)
+    const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize, 10) || 20))
+
+    const user = await User.findByPk(id, { attributes: ['id'] })
+    if (!user) {
+      return res.status(404).json(resJSON(404, '用户不存在', null))
+    }
+
+    const offset = (page - 1) * pageSize
+
+    const { count, rows } = await Favorite.findAndCountAll({
+      where: { userId: id, isDeleted: false },
+      order: [['createdAt', 'DESC']],
+      offset,
+      limit: pageSize
+    })
+
+    // Fetch associated recipes preserving favorite order
+    const recipeIds = rows.map(f => f.recipeId)
+    const recipes = recipeIds.length > 0
+      ? await Recipe.findAll({
+          where: { id: { [Op.in]: recipeIds } },
+          attributes: LIST_ATTRIBUTES
+        })
+      : []
+
+    const recipeMap = {}
+    for (const r of recipes) {
+      recipeMap[r.id] = r
+    }
+    const list = rows.map(f => recipeMap[f.recipeId]).filter(Boolean)
+
+    return res.status(200).json(
+      resJSON(0, 'ok', {
+        list,
+        total: count,
+        page,
+        pageSize
+      })
+    )
+  } catch (err) {
+    console.error('[GET /users/:id/favorites] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })
