@@ -181,6 +181,8 @@ export default function CreateRecipePage() {
   }, [steps])
 
   // ── 导入数据 ──
+  const formRef = useRef<HTMLFormElement>(null)
+
   const handleImportData = (imported: ImportedRecipe) => {
     setTitle(imported.title || '')
     setDescription(imported.description || '')
@@ -194,11 +196,13 @@ export default function CreateRecipePage() {
     if (imported.steps?.length) {
       setSteps(imported.steps)
     }
-    // 如果有营养数据，encode 到 tips 或 description 中方便用户参考
-    // （实际创建时 nutrition 由后端种子脚本填充）
     if (imported.description && !description) {
       setDescription(imported.description)
     }
+    // 导入成功后滚动到表单区域
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 500)
     toast.success('已导入食谱数据，请确认后发布')
   }
 
@@ -284,7 +288,7 @@ export default function CreateRecipePage() {
           {!isEdit && (
             <ImportFromUrl onImport={handleImportData} />
           )}
-          <form className="create-form" onSubmit={handleSubmit}>
+          <form ref={formRef} className="create-form" onSubmit={handleSubmit}>
             {/* 标题 */}
             <div className="form-group">
               <label className="form-label">食谱标题 *</label>

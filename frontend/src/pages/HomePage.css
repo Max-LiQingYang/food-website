@@ -250,3 +250,48 @@
 .dark .home-section__title {
   border-bottom-color: var(--color-border, #3a3530);
 }
+/* 排行榜入口 */
+.rankings-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
+  border-radius: var(--radius-lg, 16px);
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rankings-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(232, 102, 62, 0.15);
+}
+
+.rankings-entry__icon {
+  font-size: 28px;
+}
+
+.rankings-entry__text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #c94f2a;
+}
+
+.rankings-entry__sub {
+  margin-left: auto;
+  font-size: 13px;
+  color: #e8663e;
+}
+
+body.dark .rankings-entry {
+  background: linear-gradient(135deg, rgba(232, 102, 62, 0.15), rgba(232, 102, 62, 0.08));
+}
+
+body.dark .rankings-entry__text {
+  color: #ff8a65;
+}
+
+body.dark .rankings-entry__sub {
+  color: #ffab91;
+}

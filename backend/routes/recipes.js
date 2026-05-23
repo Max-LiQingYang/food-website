@@ -649,6 +649,110 @@ router.get('/featured', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// GET /rankings — 食谱排行榜（Top 20）
+// 参数: ?period=week|month|all（默认 all）
+// 排序: commentCount * 3 + favoriteCount * 2 + qualityScore
+// ─────────────────────────────────────────────────────────────────
+router.get('/rankings', async (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=120, s-maxage=300',
+  })
+
+  try {
+    const { period = 'all' } = req.query
+
+    // 计算时间范围
+    let dateWhere = {}
+    if (period === 'week') {
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 7)
+      dateWhere = { createdAt: { [Op.gte]: weekAgo } }
+    } else if (period === 'month') {
+      const monthAgo = new Date()
+      monthAgo.setMonth(monthAgo.getMonth() - 1)
+      dateWhere = { createdAt: { [Op.gte]: monthAgo } }
+    }
+
+    const recipes = await Recipe.findAll({
+      where: dateWhere,
+      attributes: LIST_ATTRIBUTES,
+      order: [
+        // 综合排序：favoriteCount * 2 + commentCount * 3
+        ['favoriteCount', 'DESC'],
+        ['commentCount', 'DESC'],
+        ['createdAt', 'DESC'],
+      ],
+      limit: 50,
+    })
+
+    // 计算综合评分并排序
+    let ranked = recipes.map((r, i) => {
+      const data = r.toJSON()
+      const fav = data.favoriteCount || 0
+      const com = data.commentCount || 0
+      const compositeScore = fav * 2 + com * 3
+      return {
+        ...data,
+        compositeScore,
+        rank: 0, // 将在下方赋值
+        qualityLabel: compositeScore >= 10 ? '🔥 热门' : compositeScore >= 3 ? '📈 高分' : null,
+      }
+    })
+
+    // 按综合评分降序
+    ranked.sort((a, b) => b.compositeScore - a.compositeScore)
+
+    // 取 Top 20 并赋予排名
+    ranked = ranked.slice(0, 20).map((item, i) => ({
+      ...item,
+      rank: i + 1,
+    }))
+
+    return res.json(resJSON(0, 'ok', { period, list: ranked }))
+  } catch (err) {
+    console.error('[GET /recipes/rankings] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/versions — 食谱版本历史
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/versions', async (req, res) => {
+  res.set({
+    'Cache-Control': 'private, max-age=30',
+  })
+
+  try {
+    const { id } = req.params
+    const { RecipeVersion } = require('../models')
+
+    const versions = await RecipeVersion.findAll({
+      where: { recipeId: id },
+      order: [['version', 'DESC']],
+      limit: 20,
+    })
+
+    const parsed = versions.map(v => {
+      const d = v.toJSON()
+      if (d.changes) {
+        try {
+          d.changes = JSON.parse(d.changes)
+        } catch {
+          d.changes = {}
+        }
+      }
+      return d
+    })
+
+    return res.json(resJSON(0, 'ok', parsed))
+  } catch (err) {
+    console.error('[GET /recipes/:id/versions] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
 // GET /:id/similar — 相似食谱推荐（基于 categoryTags 或 category）
 // ─────────────────────────────────────────────────────────────────
 router.get('/:id/similar', async (req, res) => {
@@ -976,6 +1080,50 @@ router.put('/:id', auth, async (req, res) => {
     updateData.updatedAt = new Date()
 
     await Recipe.update(updateData, { where: { id } })
+
+    // ── 创建版本快照 ──
+    setImmediate(async () => {
+      try {
+        const { RecipeVersion } = require('../models')
+        const lastVersion = await RecipeVersion.findOne({
+          where: { recipeId: id },
+          order: [['version', 'DESC']],
+        })
+        const newVersion = lastVersion ? lastVersion.version + 1 : 1
+
+        // 生成变更摘要
+        const changedFields = Object.keys(updateData).filter(k => k !== 'updatedAt')
+        const summaries = []
+        if (changedFields.includes('title')) summaries.push('标题')
+        if (changedFields.includes('ingredients')) summaries.push('食材')
+        if (changedFields.includes('steps')) summaries.push('步骤')
+        if (changedFields.includes('description')) summaries.push('简介')
+        if (changedFields.includes('tips')) summaries.push('小贴士')
+        if (changedFields.includes('nutrition')) summaries.push('营养信息')
+        if (changedFields.includes('category')) summaries.push('分类')
+        if (changedFields.includes('difficulty')) summaries.push('难度')
+        if (changedFields.includes('cookTime')) summaries.push('烹饪时长')
+        if (changedFields.includes('coverImage')) summaries.push('封面图片')
+        if (changedFields.includes('servings')) summaries.push('份数')
+        const summary = summaries.length > 0 ? `更新了${summaries.join('、')}` : '更新了食谱'
+
+        await RecipeVersion.create({
+          recipeId: id,
+          version: newVersion,
+          changes: JSON.stringify({
+            changedFields,
+            snapshot: {
+              title: updateData.title || recipe.title,
+              description: updateData.description !== undefined ? updateData.description : recipe.description,
+            },
+          }),
+          userId: req.userId,
+          summary,
+        })
+      } catch (verr) {
+        console.error('[RecipeVersion] Error creating version:', verr)
+      }
+    })
 
     const updated = await Recipe.findByPk(id)
     const data = updated.toJSON()

@@ -86,3 +86,89 @@ body.dark .import-url__input {
     width: 100%;
   }
 }
+/* ── 输入框包裹（含剪贴板指示器） ── */
+.import-url__input-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.import-url__clipboard-indicator {
+  position: absolute;
+  top: -18px;
+  right: 4px;
+  font-size: 11px;
+  color: var(--color-primary, #e8663e);
+  background: var(--color-card, #fff);
+  padding: 0 6px;
+  border-radius: 4px;
+  animation: fadeInDown 0.3s ease;
+  white-space: nowrap;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 进度条 ── */
+.import-url__progress-bar {
+  margin-top: 12px;
+  height: 4px;
+  background: var(--color-border, #e8e0d8);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.import-url__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary, #e8663e), #f5a623);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ── 错误详情 ── */
+.import-url__error {
+  margin-top: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #fff0f0;
+  border: 1px solid #f5c6c6;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #c0392b;
+  line-height: 1.5;
+}
+
+.import-url__error-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.import-url__error-text {
+  flex: 1;
+}
+
+body.dark .import-url__clipboard-indicator {
+  background: var(--color-card-dark, #222);
+}
+
+body.dark .import-url__progress-bar {
+  background: var(--color-border-dark, #333);
+}
+
+body.dark .import-url__error {
+  background: rgba(192, 57, 43, 0.1);
+  border-color: rgba(192, 57, 43, 0.3);
+  color: #ff6b6b;
+}
+
+@media (max-width: 480px) {
+  .import-url__clipboard-indicator {
+    top: -16px;
+    font-size: 10px;
+  }
+}

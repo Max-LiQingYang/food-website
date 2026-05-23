@@ -1,0 +1,263 @@
+/* RankingsPage — 食谱排行榜 */
+
+.rankings-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.rankings-page__header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.rankings-page__header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0 0 8px;
+}
+
+.rankings-page__subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted, #999);
+  margin: 0;
+}
+
+/* 时间段切换 */
+.rankings-page__tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.rankings-page__tab {
+  padding: 8px 20px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 20px;
+  background: var(--color-card, #fff);
+  color: var(--color-text, #333);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rankings-page__tab:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.rankings-page__tab.active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+/* 加载骨架 */
+.rankings-page__loading {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rank-card-skeleton {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+}
+
+.skeleton-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-line.w-60 { width: 60%; }
+.skeleton-line.w-40 { width: 40%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 空状态 */
+.rankings-page__empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--color-text-muted, #999);
+}
+
+.rankings-page__back-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--color-primary, #e8663e);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* 排名列表 */
+.rankings-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rank-card {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.rank-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* 排名徽章 */
+.rank-card__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* 分数柱 */
+.rank-card__score-bar {
+  width: 6px;
+  border-radius: 3px;
+  background: var(--color-border, #e8e0d8);
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.rank-card__score-fill {
+  width: 100%;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #f5a623, #e8663e);
+  min-height: 4px;
+  transition: height 0.6s ease;
+}
+
+/* 卡片内容 */
+.rank-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 统计区 */
+.rank-card__stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 64px;
+  padding-left: 8px;
+  border-left: 1px solid var(--color-border, #e8e0d8);
+}
+
+.rank-card__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.rank-card__stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary, #e8663e);
+}
+
+.rank-card__stat-label {
+  font-size: 11px;
+  color: var(--color-text-muted, #999);
+}
+
+.rank-card__quality-tag {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fff3e0;
+  color: #e8663e;
+  white-space: nowrap;
+}
+
+/* 暗色模式 */
+body.dark .rankings-page__header h1 {
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .rank-card {
+  background: var(--color-card-dark, #222);
+}
+
+body.dark .rank-card__score-bar {
+  background: var(--color-border-dark, #333);
+}
+
+body.dark .rank-card__stats {
+  border-color: var(--color-border-dark, #333);
+}
+
+body.dark .rank-card__quality-tag {
+  background: rgba(232, 102, 62, 0.15);
+}
+
+body.dark .skeleton-line,
+body.dark .skeleton-img {
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+}
+
+body.dark .rankings-page__tab {
+  background: var(--color-card-dark, #222);
+  border-color: var(--color-border-dark, #333);
+  color: var(--color-text-dark, #eee);
+}
+
+/* 移动端 */
+@media (max-width: 600px) {
+  .rank-card__stats {
+    min-width: 48px;
+  }
+
+  .rank-card__badge {
+    min-width: 36px;
+    font-size: 20px;
+  }
+
+  .rank-card__stat-value {
+    font-size: 14px;
+  }
+}

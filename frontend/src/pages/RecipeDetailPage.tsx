@@ -12,6 +12,7 @@ import ImagePlaceholder from '../components/ImagePlaceholder'
 import ShareModal from '../components/ShareModal'
 import AddToCollectionDropdown from '../components/AddToCollectionDropdown'
 import AddToShoppingListButton from '../components/AddToShoppingListButton'
+import RecipeVersionPanel from '../components/RecipeVersionPanel'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
 import { useRecipeStructuredData, useMetaTags, usePageTitle } from '../hooks/useSEO'
@@ -544,6 +545,13 @@ export default function RecipeDetailPage() {
         {id && (
           <div className="detail-container__section">
             <SimilarRecipes recipeId={id} />
+          </div>
+        )}
+
+        {/* 版本历史 */}
+        {id && (
+          <div className="detail-container__section">
+            <RecipeVersionPanel recipeId={id} />
           </div>
         )}
 

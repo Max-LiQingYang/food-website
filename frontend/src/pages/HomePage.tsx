@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { getRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
@@ -150,6 +150,15 @@ export default function HomePage() {
       {showFullLayout && <HeroSection recipes={heroRecipes} />}
 
       {/* ── 分类快速入口 ── */}
+      {/* 排行榜入口 */}
+      {showFullLayout && (
+        <Link to="/rankings" className="rankings-entry">
+          <span className="rankings-entry__icon">🏆</span>
+          <span className="rankings-entry__text">食谱排行榜</span>
+          <span className="rankings-entry__sub">发现最受欢迎的食谱 →</span>
+        </Link>
+      )}
+
       {showFullLayout && <CategoryCards />}
 
       {/* ── 搜索栏 ── */}

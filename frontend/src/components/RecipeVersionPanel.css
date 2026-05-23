@@ -1,0 +1,201 @@
+/* RecipeVersionPanel — 版本历史面板 */
+
+.recipe-version-panel {
+  margin: 24px 0;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+}
+
+.recipe-version-panel__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--color-card, #fff);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  transition: background 0.2s;
+  touch-action: manipulation;
+}
+
+.recipe-version-panel__toggle:hover {
+  background: var(--color-primary-bg, #fff3ed);
+}
+
+.recipe-version-panel__arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.recipe-version-panel__body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--color-border, #e8e0d8);
+}
+
+/* 加载骨架 */
+.recipe-version-panel__loading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.version-skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: v-shimmer 1.5s infinite;
+}
+
+.version-skeleton-line.w-60 { width: 60%; }
+
+@keyframes v-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 空状态 */
+.recipe-version-panel__empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--color-text-muted, #999);
+  font-size: 13px;
+}
+
+/* 时间线 */
+.recipe-version-panel__timeline {
+  padding: 12px 0;
+}
+
+.version-item {
+  display: flex;
+  position: relative;
+  padding-left: 28px;
+  padding-bottom: 20px;
+}
+
+.version-item:last-child {
+  padding-bottom: 0;
+}
+
+.version-item__dot {
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-primary, #e8663e);
+  border: 2px solid var(--color-card, #fff);
+  z-index: 1;
+}
+
+.version-item__line {
+  position: absolute;
+  left: 10px;
+  top: 16px;
+  width: 2px;
+  bottom: 0;
+  background: var(--color-border, #e8e0d8);
+}
+
+.version-item__content {
+  flex: 1;
+}
+
+.version-item__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.version-item__version {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary, #e8663e);
+  background: rgba(232, 102, 62, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.version-item__date {
+  font-size: 12px;
+  color: var(--color-text-muted, #999);
+}
+
+.version-item__summary {
+  font-size: 13px;
+  color: var(--color-text, #333);
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.version-item__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.version-item__field-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  background: var(--color-primary-bg, #fff3ed);
+  color: var(--color-primary-dark, #c94f2a);
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* 暗色模式 */
+body.dark .recipe-version-panel {
+  border-color: var(--color-border-dark, #333);
+}
+
+body.dark .recipe-version-panel__toggle {
+  background: var(--color-card-dark, #222);
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .recipe-version-panel__toggle:hover {
+  background: rgba(232, 102, 62, 0.08);
+}
+
+body.dark .recipe-version-panel__body {
+  border-color: var(--color-border-dark, #333);
+}
+
+body.dark .version-skeleton-line {
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+}
+
+body.dark .version-item__line {
+  background: var(--color-border-dark, #333);
+}
+
+body.dark .version-item__dot {
+  border-color: var(--color-card-dark, #222);
+}
+
+body.dark .version-item__summary {
+  color: var(--color-text-dark, #eee);
+}
+
+body.dark .version-item__field-tag {
+  background: rgba(232, 102, 62, 0.12);
+}
+
+/* 移动端 */
+@media (max-width: 480px) {
+  .recipe-version-panel__toggle {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+}

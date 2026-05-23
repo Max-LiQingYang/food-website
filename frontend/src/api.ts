@@ -722,6 +722,63 @@ export function getFollowStatus(id: string): Promise<FollowStatus> {
   return apiClient.get(`/users/${id}/follow-status`).then(r => r.data?.data || r.data)
 }
 
+// ─────────────────────────────────────────────────────────────────
+// 排行榜相关类型与 API
+// ─────────────────────────────────────────────────────────────────
+
+export interface RankedRecipe {
+  id: string
+  title: string
+  coverImage: string
+  category: string
+  difficulty: string
+  cookTime: number
+  description: string
+  favoriteCount: number
+  commentCount: number
+  compositeScore: number
+  rank: number
+  qualityLabel: string | null
+}
+
+export interface RankingResponse {
+  period: string
+  list: RankedRecipe[]
+}
+
+/**
+ * 获取食谱排行榜
+ * GET /api/recipes/rankings
+ * @param period week | month | all
+ */
+export function getRankings(period: string = 'all'): Promise<RankingResponse> {
+  return apiClient.get('/recipes/rankings', { params: { period } }).then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 版本历史相关类型与 API
+// ─────────────────────────────────────────────────────────────────
+
+export interface RecipeVersion {
+  id: string
+  recipeId: string
+  version: number
+  changes: {
+    changedFields: string[]
+    snapshot: Record<string, string>
+  } | null
+  summary: string | null
+  createdAt: string
+}
+
+/**
+ * 获取食谱版本历史
+ * GET /api/recipes/:id/versions
+ */
+export function getRecipeVersions(id: string): Promise<RecipeVersion[]> {
+  return apiClient.get(`/recipes/${id}/versions`).then(r => r.data?.data || r.data)
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -763,4 +820,6 @@ export default {
   getFollowers,
   getFollowing,
   getFollowStatus,
+  getRankings,
+  getRecipeVersions,
 }
