@@ -10,6 +10,7 @@ import CategoryCards from '../components/CategoryCards'
 import FeaturedSection from '../components/FeaturedSection'
 import SeasonalRecommendations from '../components/SeasonalRecommendations'
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations'
+import HomeTagsSection from '../components/HomeTagsSection'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -196,6 +197,9 @@ export default function HomePage() {
 
       {/* 季节性推荐 */}
       {showFullLayout && <SeasonalRecommendations />}
+
+      {/* 热门标签快捷入口 */}
+      {showFullLayout && <HomeTagsSection />}
 
       {/* 个性化推荐（编辑精选/热门/新手） */}
       {showFullLayout && <PersonalizedRecommendations />}

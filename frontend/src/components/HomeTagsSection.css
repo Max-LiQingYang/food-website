@@ -1,0 +1,85 @@
+.home-tags-section {
+  margin-bottom: 28px;
+}
+
+.home-tags-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .home-tags-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.home-tags-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--color-bg-secondary, #f8f8f8);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  animation: homeTagsFadeIn 0.4s ease both;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+@keyframes homeTagsFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.home-tags-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.15);
+  border-color: var(--color-primary, #e74c3c);
+  background: var(--color-bg, #fff);
+}
+
+.home-tags-card:focus-visible {
+  outline: 2px solid var(--color-primary, #e74c3c);
+  outline-offset: 2px;
+}
+
+.home-tags-card__label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text, #333);
+}
+
+.home-tags-card__arrow {
+  font-size: 14px;
+  color: var(--color-text-secondary, #bbb);
+  transition: transform 0.2s;
+}
+
+.home-tags-card:hover .home-tags-card__arrow {
+  transform: translateX(4px);
+  color: var(--color-primary, #e74c3c);
+}
+
+.home-tags-more {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--color-primary, #e74c3c);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.home-tags-more:hover {
+  opacity: 0.8;
+}
+
+/* Dark mode */
+[data-theme="dark"] .home-tags-card {
+  background: #2d2d2d;
+}
+
+[data-theme="dark"] .home-tags-card:hover {
+  background: #3a3a3a;
+}

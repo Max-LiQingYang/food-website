@@ -4,8 +4,28 @@
   height: 260px;
   border-radius: var(--radius-lg, 16px);
   overflow: hidden;
-  margin-bottom: 28px;
+  margin-bottom: 8px;
   box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
+}
+
+/* 季节性标语条 */
+.hero-seasonal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #5a3e2b;
+  transition: background 0.5s ease;
+}
+
+.hero-seasonal__emoji {
+  font-size: 22px;
+}
+
+.hero-seasonal__text {
+  line-height: 1.4;
 }
 
 @media (max-width: 480px) {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './HeroSection.css'
 
@@ -13,6 +13,52 @@ interface HeroSectionProps {
   recipes?: HeroRecipe[]
 }
 
+/** Seasonal configuration based on current month */
+function getSeasonConfig(): { season: string; tagline: string; gradient: string; emoji: string; overlayColor: string } {
+  const month = new Date().getMonth() // 0=Jan
+  if (month >= 2 && month <= 4) {
+    return {
+      season: 'spring',
+      tagline: '🌸 春鲜正当时 — 当季时蔬，简单烹饪就很好',
+      gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #a8edea 100%)',
+      emoji: '🌸',
+      overlayColor: 'rgba(232, 126, 109, 0.15)',
+    }
+  }
+  if (month >= 5 && month <= 7) {
+    return {
+      season: 'summer',
+      tagline: '☀️ 夏日的味道 — 清爽凉拌，冰镇甜品，消暑一夏',
+      gradient: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 30%, #ffecd2 100%)',
+      emoji: '☀️',
+      overlayColor: 'rgba(255, 183, 77, 0.12)',
+    }
+  }
+  if (month >= 8 && month <= 10) {
+    return {
+      season: 'autumn',
+      tagline: '🍂 秋日滋补 — 一锅暖汤，满屋飘香，暖心暖胃',
+      gradient: 'linear-gradient(135deg, #d4a762 0%, #e8d5b7 50%, #ffecd2 100%)',
+      emoji: '🍂',
+      overlayColor: 'rgba(212, 167, 98, 0.15)',
+    }
+  }
+  return {
+    season: 'winter',
+    tagline: '❄️ 冬日暖锅 — 热气腾腾，围炉共食，幸福满满',
+    gradient: 'linear-gradient(135deg, #e0e5ec 0%, #b8c6db 40%, #f5f7fa 100%)',
+    emoji: '❄️',
+    overlayColor: 'rgba(184, 198, 219, 0.2)',
+  }
+}
+
+const SEASONAL_TAGLINES: Record<string, string> = {
+  spring: '春暖花开，用美食迎接新季节',
+  summer: '炎炎夏日，清爽食谱帮你降温',
+  autumn: '秋高气爽，来一锅温暖炖菜吧',
+  winter: '寒冷冬日，暖心食谱陪你过冬',
+}
+
 const FALLBACK_RECIPES: HeroRecipe[] = [
   { id: '', title: '宫保鸡丁', image: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=800&h=500&fit=crop', category: '中餐' },
   { id: '', title: '红烧肉', image: 'https://images.unsplash.com/photo-1623689046286-01cd25b32d79?w=800&h=500&fit=crop', category: '中餐' },
@@ -25,6 +71,8 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
   const items = recipes && recipes.length >= 3 ? recipes : FALLBACK_RECIPES
   const [current, setCurrent] = useState(0)
   const navigate = useNavigate()
+
+  const seasonCfg = useMemo(() => getSeasonConfig(), [])
 
   const goTo = useCallback((idx: number) => {
     setCurrent(idx)
@@ -50,6 +98,12 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
 
   return (
     <div className="hero-section">
+      {/* 季节性标语 + 动态渐变背景 */}
+      <div className="hero-seasonal" style={{ background: seasonCfg.gradient }}>
+        <span className="hero-seasonal__emoji">{seasonCfg.emoji}</span>
+        <span className="hero-seasonal__text">{seasonCfg.tagline}</span>
+      </div>
+
       <div className="hero-track" style={{ transform: `translateX(-${current * 100}%)` }}>
         {items.map((recipe, idx) => (
           <div
@@ -58,7 +112,7 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
             onClick={() => handleRecipeClick(recipe)}
           >
             <img src={recipe.image} alt={recipe.title} className="hero-slide__img" />
-            <div className="hero-slide__overlay" />
+            <div className="hero-slide__overlay" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, ${seasonCfg.overlayColor} 100%)` }} />
             <div className="hero-slide__content">
               <h2 className="hero-slide__title">{recipe.title}</h2>
               {recipe.category && <span className="hero-slide__tag">{recipe.category}</span>}

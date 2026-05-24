@@ -668,8 +668,28 @@
 
 .skeleton-cover {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 0;
+  height: 320px;
+  border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-cover__shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: coverShine 2s ease-in-out infinite;
+}
+
+@keyframes coverShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .skeleton-body {

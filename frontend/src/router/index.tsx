@@ -7,6 +7,8 @@ import Breadcrumb from '../components/Breadcrumb'
 import ErrorBoundary from '../components/ErrorBoundary'
 import PWAInstallPrompt from '../components/PWAInstallPrompt'
 import SkipLink from '../components/SkipLink'
+import KeyboardShortcutsProvider from '../components/KeyboardShortcuts'
+import WelcomeTour from '../components/WelcomeTour'
 import '../components/PageTransition.css'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
@@ -38,21 +40,24 @@ const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载�
 
 function Layout() {
   return (
-    <ErrorBoundary>
-      <SkipLink />
-      <Navbar />
-      <Breadcrumb />
-      <main id="main-content">
-        <Suspense fallback={<Fallback />}>
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
-        </Suspense>
-      </main>
-      <MobileBottomNav />
-      <BackToTop />
-      <PWAInstallPrompt />
-    </ErrorBoundary>
+    <KeyboardShortcutsProvider>
+      <ErrorBoundary>
+        <SkipLink />
+        <Navbar />
+        <Breadcrumb />
+        <main id="main-content">
+          <Suspense fallback={<Fallback />}>
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
+          </Suspense>
+        </main>
+        <MobileBottomNav />
+        <BackToTop />
+        <PWAInstallPrompt />
+      <WelcomeTour />
+      </ErrorBoundary>
+    </KeyboardShortcutsProvider>
   )
 }
 

@@ -10,6 +10,7 @@ vi.mock('../api', () => ({
   getSeasonalRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
   searchRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
   getPopularRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
+  getPopularTags: vi.fn().mockResolvedValue({ list: [], total: 0 }),
   getNewUserRecommend: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
   addFavorite: vi.fn().mockResolvedValue({ data: {} }),
   removeFavorite: vi.fn().mockResolvedValue({ data: {} }),

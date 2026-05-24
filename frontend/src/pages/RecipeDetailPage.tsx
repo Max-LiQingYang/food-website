@@ -243,18 +243,22 @@ export default function RecipeDetailPage() {
       return
     }
 
+    // Optimistic UI: 立即切换收藏状态
+    const prevState = isFavorited
+    setIsFavorited(!prevState)
     setFavLoading(true)
+
     try {
-      if (isFavorited) {
+      if (prevState) {
         await removeFavorite(id)
-        setIsFavorited(false)
         toast.success('已取消收藏')
       } else {
         await addFavorite(id)
-        setIsFavorited(true)
         toast.success('已收藏')
       }
     } catch (err: any) {
+      // Revert on failure
+      setIsFavorited(prevState)
       toast.error(err?.message || '操作失败')
     } finally {
       setFavLoading(false)
@@ -292,13 +296,42 @@ export default function RecipeDetailPage() {
     return (
       <div className="detail-page">
         <div className="detail-skeleton">
-          <div className="skeleton-cover skeleton-box" />
+          {/* 封面图骨架 */}
+          <div className="skeleton-cover skeleton-box" style={{ height: 320, borderRadius: 'var(--radius-lg, 16px)' }}>
+            <div className="skeleton-cover__shine" />
+          </div>
           <div className="skeleton-body">
-            <div className="skeleton-box skeleton-heading" />
-            <div className="skeleton-box skeleton-line" />
-            <div className="skeleton-box skeleton-line short" />
-            <div className="skeleton-box skeleton-line" />
-            <div className="skeleton-box skeleton-line short" />
+            {/* 标题 + 元信息 */}
+            <div className="skeleton-box skeleton-heading" style={{ width: '60%', height: 28 }} />
+            <div className="skeleton-box skeleton-line" style={{ width: '40%', height: 14, marginTop: 8 }} />
+            <div className="skeleton-box skeleton-line" style={{ width: '25%', height: 14 }} />
+            
+            {/* 操作按钮区 */}
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              <div className="skeleton-box" style={{ width: 80, height: 36, borderRadius: 8 }} />
+              <div className="skeleton-box" style={{ width: 80, height: 36, borderRadius: 8 }} />
+              <div className="skeleton-box" style={{ width: 80, height: 36, borderRadius: 8 }} />
+            </div>
+
+            {/* 食材区域骨架 */}
+            <div style={{ marginTop: 28 }}>
+              <div className="skeleton-box skeleton-heading" style={{ width: '30%', height: 22 }} />
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="skeleton-box skeleton-line" style={{ width: `${50 + i * 10}%`, height: 14, marginTop: 8 }} />
+              ))}
+            </div>
+
+            {/* 步骤区域骨架 */}
+            <div style={{ marginTop: 28 }}>
+              <div className="skeleton-box skeleton-heading" style={{ width: '20%', height: 22 }} />
+              {[1, 2, 3].map(i => (
+                <div key={i} style={{ marginTop: 16 }}>
+                  <div className="skeleton-box" style={{ width: '100%', height: 160, borderRadius: 12 }} />
+                  <div className="skeleton-box skeleton-line" style={{ width: '90%', marginTop: 8 }} />
+                  <div className="skeleton-box skeleton-line short" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
