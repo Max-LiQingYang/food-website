@@ -29,6 +29,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
         comment: '创建者用户 ID'
+      },
+      isPublic: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: '是否公开可见'
+      },
+      subscriberCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        comment: '订阅者数量'
       }
     },
     {
@@ -38,6 +48,10 @@ module.exports = (sequelize, DataTypes) => {
         {
           name: 'idx_collection_userId',
           fields: ['userId']
+        },
+        {
+          name: 'idx_collection_public',
+          fields: ['isPublic']
         }
       ]
     }

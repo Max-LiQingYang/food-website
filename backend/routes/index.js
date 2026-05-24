@@ -52,19 +52,30 @@ router.use('/users', followRoutes)
 // 动态流
 router.use('/feed', auth, feedRoutes)
 
-// 需要 auth 的路由（collections, shopping-list, import）
-router.use('/collections', auth, collectionRoutes)
+// 需要 auth 的路由（shopping-list, import）
 router.use('/shopping-list', auth, shoppingListRoutes)
 router.use('/recipes/import', importRoutes)
 
+// 收藏夹（auth 在内部按需处理，/public 无需认证）
+router.use('/collections', collectionRoutes)
+
 // 用户偏好（需认证）
 router.use('/preferences', preferencesRoutes)
+
+// 通知系统（全部需认证）
+router.use('/notifications', require('./notification'))
+
+// 成就系统（按需处理 auth）
+router.use('/achievements', require('./achievement'))
 
 // 每周餐单计划（需认证）
 router.use('/meal-plans', auth, mealPlanRoutes)
 
 // 烹饪日志（需认证）
 router.use('/cooking-logs', auth, cookingLogRoutes)
+
+// 举报系统
+router.use('/reports', require('./reports'))
 
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)

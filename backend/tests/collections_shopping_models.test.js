@@ -15,6 +15,7 @@ const Collection = sequelize.define('Collection', {
   name: { type: DataTypes.STRING, allowNull: false },
   description: { type: DataTypes.TEXT, allowNull: true },
   isPublic: { type: DataTypes.BOOLEAN, defaultValue: false },
+  subscriberCount: { type: DataTypes.INTEGER, defaultValue: 0 },
   recipeCount: { type: DataTypes.INTEGER, defaultValue: 0 },
   coverImage: { type: DataTypes.STRING, allowNull: true },
 }, { tableName: 'collections', timestamps: true })
@@ -374,5 +375,63 @@ describe('数据边界情况', () => {
     await CollectionRecipe.create({ collectionId: c2.id, recipeId: 'r1' })
     const items = await CollectionRecipe.findAll({ where: { recipeId: 'r1' } })
     expect(items).toHaveLength(2)
+  })
+})
+
+describe('Collection Discovery (Public)', () => {
+  beforeAll(async () => {
+    await sequelize.sync({ force: true })
+  })
+
+  beforeEach(async () => {
+    await Collection.destroy({ where: {} })
+  })
+
+  it('公开收藏夹按订阅数排序', async () => {
+    const c1 = await Collection.create({ userId: 'u1', name: '热门', isPublic: true, subscriberCount: 100 })
+    const c2 = await Collection.create({ userId: 'u1', name: '冷门', isPublic: true, subscriberCount: 5 })
+    const list = await Collection.findAll({ where: { isPublic: true }, order: [['subscriberCount', 'DESC']] })
+    expect(list[0].name).toBe('热门')
+    expect(list[1].name).toBe('冷门')
+  })
+
+  it('私有收藏夹不出现在公开列表', async () => {
+    await Collection.create({ userId: 'u1', name: '公开', isPublic: true })
+    await Collection.create({ userId: 'u1', name: '私密', isPublic: false })
+    const publicOnes = await Collection.findAll({ where: { isPublic: true } })
+    expect(publicOnes).toHaveLength(1)
+  })
+
+  it('subscriberCount 自增和自减', async () => {
+    const c = await Collection.create({ userId: 'u1', name: '订阅测试', isPublic: true, subscriberCount: 0 })
+    c.subscriberCount += 1
+    await c.save()
+    expect(c.subscriberCount).toBe(1)
+    c.subscriberCount = Math.max(0, c.subscriberCount - 1)
+    await c.save()
+    expect(c.subscriberCount).toBe(0)
+  })
+
+  it('批量创建公开收藏夹', async () => {
+    for (let i = 0; i < 5; i++) {
+      await Collection.create({ userId: 'u2', name: '集' + i, isPublic: true, subscriberCount: i * 10 })
+    }
+    const all = await Collection.findAll({ where: { isPublic: true } })
+    expect(all.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('isPublic 默认值为 false', async () => {
+    const c = await Collection.create({ userId: 'u1', name: '默认' })
+    expect(c.isPublic).toBe(false)
+  })
+
+  it('可以切换 isPublic 状态', async () => {
+    const c = await Collection.create({ userId: 'u1', name: '可切换', isPublic: false })
+    c.isPublic = true
+    await c.save()
+    expect(c.isPublic).toBe(true)
+    c.isPublic = false
+    await c.save()
+    expect(c.isPublic).toBe(false)
   })
 })

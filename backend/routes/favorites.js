@@ -2,7 +2,9 @@
 
 const { createActivity } = require('../utils/activity')
 const favoriteService = require('../services/favoriteService')
-const { Recipe } = require('../models')
+const { Recipe, User } = require('../models')
+const { createNotification } = require('../utils/notificationHelper')
+const { checkAllAchievements } = require('../utils/achievementChecker')
 
 /**
  * 通用响应封装
@@ -54,11 +56,25 @@ async function addFavorite(req, res) {
 
     if (result.isNew) {
       // 新增，返回 201
-      // 记录活动 + 更新食谱收藏计数（不阻塞响应）
       setImmediate(() => {
         createActivity(userId, 'favorite', recipeId, 'recipe', null)
         Recipe.increment('favoriteCount', { by: 1, where: { id: recipeId } }).catch(err => {
           console.error('[favoriteCount increment error]', err)
+        })
+        // 通知食谱作者
+        Recipe.findByPk(recipeId, { attributes: ['userId', 'title'] }).then(recipe => {
+          if (recipe && recipe.userId && recipe.userId !== userId) {
+            createNotification({
+              userId: recipe.userId,
+              type: 'favorite',
+              message: '有人收藏了你的食谱「' + recipe.title + '」',
+              link: '/recipe/' + recipeId
+            }).catch(err => console.error('[fav notif err]', err))
+          }
+        }).catch(err => console.error('[fav notif lookup err]', err))
+        // 成就检查
+        checkAllAchievements(userId, ['favorite-10', 'favorite-50']).catch(err => {
+          console.error('[fav achievement err]', err)
         })
       })
       return res.status(201).json(resJSON(0, '收藏成功', result.data))

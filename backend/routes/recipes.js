@@ -18,6 +18,7 @@ const { Op, fn, col } = require('sequelize')
 const auth = require('../middleware/auth')
 
 const { createActivity } = require('../utils/activity')
+const { checkAllAchievements } = require('../utils/achievementChecker')
 
 const router = express.Router()
 
@@ -1163,15 +1164,32 @@ router.get('/quality-check', async (req, res) => {
     const offset = (page - 1) * pageSize
 
     const { count, rows } = await Recipe.findAndCountAll({
-      attributes: ['id', 'title', 'description', 'coverImage', 'steps', 'nutrition', 'tips', 'cookTime', 'difficulty', 'servings', 'category'],
+      attributes: ['id', 'title', 'description', 'coverImage', 'steps', 'nutrition', 'tips', 'cookTime', 'difficulty', 'servings', 'category', 'viewCount', 'favoriteCount', 'commentCount', 'createdAt', 'updatedAt', 'userId'],
       offset,
       limit: pageSize,
       order: [['createdAt', 'DESC']],
     })
 
+    // 收集举报统计
+    const { Report } = require('../models')
+    const recipeIds = rows.map(r => r.id)
+    const reportCounts = {}  
+    if (recipeIds.length > 0) {
+      const reports = await Report.findAll({
+        where: { recipeId: { [Op.in]: recipeIds } },
+        attributes: ['recipeId', 'status']
+      })
+      for (const r of reports) {
+        if (!reportCounts[r.recipeId]) reportCounts[r.recipeId] = { total: 0, pending: 0 }
+        reportCounts[r.recipeId].total++
+        if (r.status === 'pending') reportCounts[r.recipeId].pending++
+      }
+    }
+
     const list = rows.map(r => {
       const recipe = r.toJSON()
       const issues = []
+      const rc = reportCounts[recipe.id] || { total: 0, pending: 0 }
 
       // 标题长度
       if (!recipe.title || String(recipe.title).trim().length < 3) {
@@ -1197,6 +1215,24 @@ router.get('/quality-check', async (req, res) => {
       // Tips
       if (!recipe.tips || String(recipe.tips).trim().length === 0) {
         issues.push('缺少小贴士')
+      }
+      // 社区互动（社区反馈维度）
+      if (recipe.viewCount < 10 && recipe.favoriteCount < 1) {
+        issues.push('社区互动不足（缺少曝光/收藏）')
+      }
+      // 🚨 举报风险
+      if (rc.pending >= 2) {
+        issues.push('待处理举报量高（' + rc.pending + '条）')
+      }
+      if (rc.total >= 3) {
+        issues.push('历史举报频繁（累计' + rc.total + '次）')
+      }
+      // 时效性：超过60天未更新且互动低
+      const daysSinceUpdate = recipe.updatedAt
+        ? Math.floor((Date.now() - new Date(recipe.updatedAt).getTime()) / 86400000)
+        : 999
+      if (daysSinceUpdate > 60 && recipe.commentCount === 0 && recipe.favoriteCount < 5) {
+        issues.push('内容陈旧且缺乏互动（超过60天未更新）')
       }
 
       // 质量评分（0-100）
@@ -1430,10 +1466,13 @@ router.post('/', auth, async (req, res) => {
       userId: req.userId,
     })
 
-    // 记录活动（不阻塞响应）
+    // 记录活动 + 成就检查（不阻塞响应）
     setImmediate(() => {
       createActivity(req.userId, 'create_recipe', recipe.id, 'recipe', {
         title: recipe.title
+      })
+      checkAllAchievements(req.userId, ['first-recipe', 'recipe-10', 'recipe-50', 'master-chef']).catch(err => {
+        console.error('[recipe achievement err]', err)
       })
     })
 

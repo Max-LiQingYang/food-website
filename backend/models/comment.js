@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         comment: '评论唯一标识符'
       },
+      parentId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        comment: '父评论ID（回复关系）'
+      },
       content: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -76,6 +81,10 @@ module.exports = (sequelize, DataTypes) => {
         {
           name: 'idx_comment_recipeId_createdAt',
           fields: ['recipeId', 'createdAt']
+        },
+        {
+          name: 'idx_comment_parentId',
+          fields: ['parentId']
         }
       ]
     }

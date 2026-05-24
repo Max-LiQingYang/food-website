@@ -17,6 +17,8 @@ const express = require('express')
 const { User, Follow } = require('../models')
 const auth = require('../middleware/auth')
 const { createActivity } = require('../utils/activity')
+const { createNotification } = require('../utils/notificationHelper')
+const { checkAllAchievements } = require('../utils/achievementChecker')
 const { Op } = require('sequelize')
 
 const router = express.Router()
@@ -59,6 +61,26 @@ router.post('/:id/follow', auth, async (req, res) => {
 
     createActivity(followerId, 'follow', followingId, 'user', {
       targetUsername: targetUser.username
+    })
+
+    // 通知被关注用户 + 成就检查（不阻塞）
+    setImmediate(() => {
+      User.findByPk(followerId, { attributes: ['id', 'nickname', 'username'] }).then(follower => {
+        const name = (follower && (follower.nickname || follower.username)) || '某用户'
+        createNotification({
+          userId: followingId,
+          type: 'follow',
+          message: name + ' 关注了你',
+          link: '/user/' + followerId
+        }).catch(err => console.error('[follow notif err]', err))
+      }).catch(err => console.error('[follow notif lookup err]', err))
+
+      checkAllAchievements(followerId, ['social-butterfly']).catch(err => {
+        console.error('[follow achievement err]', err)
+      })
+      checkAllAchievements(followingId, ['social-butterfly']).catch(err => {
+        console.error('[follow achievement err2]', err)
+      })
     })
 
     return res.status(201).json(resJSON(0, 'ok', { followed: true }))
