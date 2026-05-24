@@ -44,8 +44,6 @@ const LIST_ATTRIBUTES = [
   'commentCount',
   'isFeatured',
   'viewCount',
-  'nutriScore',
-  'smartDifficulty',
 ]
 
 /**
