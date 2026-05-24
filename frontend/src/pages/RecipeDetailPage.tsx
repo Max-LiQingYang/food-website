@@ -15,6 +15,9 @@ import AddToCollectionDropdown from '../components/AddToCollectionDropdown'
 import AddToShoppingListButton from '../components/AddToShoppingListButton'
 import RecipeVersionPanel from '../components/RecipeVersionPanel'
 import VideoPlayer from '../components/VideoPlayer'
+import QualityScoreModal from '../components/QualityScoreModal'
+import ExportMenu from '../components/ExportMenu'
+import { trackBehavior, trackBehaviorAnonymous } from '../api'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
 import { useRecipeStructuredData, useMetaTags, usePageTitle } from '../hooks/useSEO'
@@ -75,6 +78,7 @@ export default function RecipeDetailPage() {
   const [activeStep, setActiveStep] = useState<number | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [showShareModal, setShowShareModal] = useState(false)
+  const [showQualityModal, setShowQualityModal] = useState(false)
 
   // 收集所有可查看的图片（封面 + 步骤图片）
   const allImages = [
@@ -215,6 +219,20 @@ export default function RecipeDetailPage() {
       })
       .finally(() => setLoading(false))
   }, [id])
+
+  // 迭代#35: 记录浏览行为
+  useEffect(() => {
+    if (!id || !recipe) return
+    // 延迟记录，避免干扰首屏渲染
+    const timer = setTimeout(() => {
+      if (user) {
+        trackBehavior(user.id, 'view', { targetId: id, targetType: 'recipe' }).catch(() => {})
+      } else {
+        trackBehaviorAnonymous('view', { targetId: id, targetType: 'recipe' }).catch(() => {})
+      }
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [id, recipe, user])
 
   const handleFavoriteToggle = async () => {
     if (!id || favLoading) return
@@ -399,6 +417,10 @@ export default function RecipeDetailPage() {
             </button>
             <button className="detail-share-btn" onClick={() => window.print()} title="打印食谱">
               🖨️ 打印
+            </button>
+            <ExportMenu recipeId={recipe.id} recipeTitle={recipe.title} />
+            <button className="detail-share-btn" onClick={() => setShowQualityModal(true)} title="查看质量评分">
+              📊 评分
             </button>
           </div>
 
@@ -672,6 +694,17 @@ export default function RecipeDetailPage() {
         </button>
 
         {recipe && (
+          <ExportMenu recipeId={recipe.id} recipeTitle={recipe.title} mobile />
+        )}
+
+        {recipe && (
+          <button className="fab-btn" onClick={() => setShowQualityModal(true)} title="查看质量评分">
+            <span className="fab-btn__icon">📊</span>
+            <span>评分</span>
+          </button>
+        )}
+
+        {recipe && (
           <button className="fab-btn" onClick={handleCopyIngredients} title="复制食材">
             <span className="fab-btn__icon">📋</span>
             <span>食材</span>
@@ -696,6 +729,12 @@ export default function RecipeDetailPage() {
           recipeImage={recipe.coverImage}
           recipeDesc={recipe.description}
           onClose={() => setShowShareModal(false)}
+        />
+      )}
+      {showQualityModal && (
+        <QualityScoreModal
+          recipeId={id!}
+          onClose={() => setShowQualityModal(false)}
         />
       )}
     </div>

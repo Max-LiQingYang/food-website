@@ -1324,6 +1324,145 @@ export function batchAddMyTools(toolIds: string[]): Promise<{ added: number }> {
   return apiClient.post('/my-tools/batch', { toolIds }).then(r => r.data?.data || { added: 0 })
 }
 
+// ─────────────────────────────────────────────────────────────────
+// 迭代#35: 标签系统
+// ─────────────────────────────────────────────────────────────────
+
+export interface TagItem {
+  tag: string
+  category?: string
+  count: number
+}
+
+/**
+ * 获取热门标签
+ * GET /api/tags/popular
+ */
+export function getPopularTags(params?: { limit?: number; category?: string; minCount?: number }): Promise<{ list: TagItem[]; total: number }> {
+  return apiClient.get('/tags/popular', { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 搜索标签
+ * GET /api/tags/search
+ */
+export function searchTags(q: string): Promise<{ list: TagItem[]; total: number }> {
+  return apiClient.get('/tags/search', { params: { q } }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 记录标签点击
+ * POST /api/tags/log
+ */
+export function logTag(tag: string, category?: string): Promise<{ code: number }> {
+  return apiClient.post('/tags/log', { tag, category }).then(r => r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 迭代#35: 质量评分详情
+// ─────────────────────────────────────────────────────────────────
+
+export interface QualityDetail {
+  score: number
+  maxScore: number
+  detail: string
+}
+
+export interface QualityDetailsData {
+  recipeId: string
+  recipeTitle: string
+  overall: QualityDetail & { label: string }
+  ingredientCompleteness: QualityDetail & { ingredientCount: number; hasRichDesc: boolean }
+  stepClarity: QualityDetail & { stepCount: number; stepsWithTime: number; stepsWithDetail: number }
+  nutritionInfo: QualityDetail & { filledCount: number; totalCount: number; filled: string; missing: string }
+}
+
+/**
+ * 获取质量评分详情
+ * GET /api/recipes/:id/quality-details
+ */
+export function getQualityDetails(id: string): Promise<QualityDetailsData> {
+  return apiClient.get(`/recipes/${id}/quality-details`).then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 迭代#35: 用户行为追踪
+// ─────────────────────────────────────────────────────────────────
+
+export type BehaviorEventType = 'view' | 'favorite' | 'cook' | 'share'
+
+export interface BehaviorHistoryItem {
+  id: string
+  eventType: BehaviorEventType
+  recipeId: string
+  timestamp: string
+  recipe?: Recipe | null
+}
+
+export interface BehaviorStats {
+  viewCount: number
+  favoriteCount: number
+  cookCount: number
+  shareCount: number
+  total: number
+}
+
+/**
+ * 记录用户行为
+ * POST /api/behaviors/track
+ */
+export function trackBehavior(eventType: BehaviorEventType, recipeId: string, metadata?: any): Promise<{ code: number; eventId?: string; deduped?: boolean }> {
+  return apiClient.post('/behaviors/track', { eventType, recipeId, metadata }).then(r => r.data)
+}
+
+/**
+ * 匿名追踪
+ * POST /api/behaviors/track-anonymous
+ */
+export function trackBehaviorAnonymous(eventType: 'view' | 'share', recipeId: string): Promise<{ code: number }> {
+  return apiClient.post('/behaviors/track-anonymous', { eventType, recipeId }).then(r => r.data)
+}
+
+/**
+ * 获取行为历史
+ * GET /api/behaviors/history
+ */
+export function getBehaviorHistory(params?: { limit?: number; offset?: number; eventType?: BehaviorEventType }): Promise<{ list: BehaviorHistoryItem[]; total: number }> {
+  return apiClient.get('/behaviors/history', { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 获取行为统计
+ * GET /api/behaviors/stats
+ */
+export function getBehaviorStats(): Promise<BehaviorStats> {
+  return apiClient.get('/behaviors/stats').then(r => r.data?.data || {})
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 迭代#35: 食谱导出
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * 导出食谱 Markdown
+ * GET /api/recipes/:id/export?format=md
+ */
+export function exportRecipeMD(id: string): Promise<Blob | string> {
+  return apiClient.get(`/recipes/${id}/export?format=md`, {
+    responseType: 'blob',
+  }).then(r => r.data)
+}
+
+/**
+ * 导出食谱 PDF
+ * GET /api/recipes/:id/export?format=pdf
+ */
+export function exportRecipePDF(id: string): Promise<Blob> {
+  return apiClient.get(`/recipes/${id}/export?format=pdf`, {
+    responseType: 'blob',
+  }).then(r => r.data)
+}
+
 export default {
   addFavorite,
   removeFavorite,

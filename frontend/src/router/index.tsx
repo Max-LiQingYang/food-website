@@ -32,6 +32,7 @@ const ChallengeDetailPage = lazy(() => import('../pages/ChallengeDetailPage'))
 const IngredientSearchPage = lazy(() => import('../pages/IngredientSearchPage'))
 const KitchenToolsPage = lazy(() => import('../pages/KitchenToolsPage'))
 const MyToolsPage = lazy(() => import('../pages/MyToolsPage'))
+const TagsPage = lazy(() => import('../pages/TagsPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -86,6 +87,8 @@ const router = createBrowserRouter([
       // 迭代#34: 厨房工具管理
       { path: '/tools', element: <KitchenToolsPage /> },
       { path: '/my-tools', element: <MyToolsPage /> },
+      // 迭代#35: 标签探索
+      { path: '/tags', element: <TagsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

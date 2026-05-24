@@ -1,0 +1,128 @@
+.tag-cloud-container {
+  padding: 24px 0;
+}
+
+.tag-cloud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tag-cloud-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--color-text);
+}
+
+.tag-search-input {
+  padding: 8px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  font-size: 14px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+  width: 200px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.tag-search-input:focus {
+  border-color: var(--color-primary);
+}
+
+.tag-cloud-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px;
+  background: var(--color-bg-secondary);
+  border-radius: 12px;
+  min-height: 100px;
+}
+
+.tag-cloud-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+  white-space: nowrap;
+}
+
+.tag-cloud-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.tag-cloud-item .tag-name {
+  font-weight: 500;
+}
+
+.tag-cloud-item .tag-count {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.tag-cloud-empty {
+  color: var(--color-text-secondary);
+  text-align: center;
+  width: 100%;
+  padding: 24px;
+}
+
+.tag-cloud-loading {
+  color: var(--color-text-secondary);
+  text-align: center;
+  width: 100%;
+  padding: 24px;
+}
+
+/* 标签大小级别 */
+.tag-size-xxs { font-size: 11px; }
+.tag-size-xs { font-size: 12px; }
+.tag-size-sm { font-size: 13px; }
+.tag-size-md { font-size: 14px; }
+.tag-size-lg { font-size: 16px; }
+.tag-size-xl { font-size: 18px; }
+.tag-size-xxl { font-size: 22px; }
+.tag-size-huge { font-size: 26px; }
+
+/* 标签颜色 — 按分类 */
+.tag-cuisine { background: #e8f5e9; color: #2e7d32; }
+.tag-flavor { background: #fff3e0; color: #e65100; }
+.tag-meal { background: #e3f2fd; color: #1565c0; }
+.tag-difficulty { background: #fce4ec; color: #c62828; }
+.tag-ingredient { background: #f3e5f5; color: #6a1b9a; }
+.tag-season { background: #e0f7fa; color: #00838f; }
+.tag-default { background: #f5f5f5; color: #616161; }
+.tag-cooking { background: #fff8e1; color: #f57f17; }
+
+.dark .tag-cuisine { background: #1b3d1b; color: #a5d6a7; }
+.dark .tag-flavor { background: #3d2e1b; color: #ffab91; }
+.dark .tag-meal { background: #1b2d3d; color: #90caf9; }
+.dark .tag-difficulty { background: #3d1b1b; color: #ef9a9a; }
+.dark .tag-ingredient { background: #2d1b3d; color: #ce93d8; }
+.dark .tag-season { background: #1b2d2d; color: #80deea; }
+.dark .tag-default { background: #333; color: #bbb; }
+.dark .tag-cooking { background: #3d3d1b; color: #ffd54f; }
+
+.log-tag-btn {
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  background: none;
+  border: none;
+  padding: 2px;
+}
+
+.tag-cloud-item:hover .log-tag-btn {
+  opacity: 1;
+}

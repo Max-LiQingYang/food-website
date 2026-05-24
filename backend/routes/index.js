@@ -89,6 +89,18 @@ router.use('/', require('./ingredientSearch'))
 // 迭代#34: 厨房工具管理
 router.use('/', require('./kitchenTools'))
 
+// 迭代#35: 标签系统（热门标签 / 标签搜索 / 标签建议）
+router.use('/', require('./tags'))
+
+// 迭代#35: 质量评分详情（多维评分）
+router.use('/', require('./quality'))
+
+// 迭代#35: 用户行为追踪
+router.use('/', require('./behaviors'))
+
+// 迭代#35: 食谱导出（Markdown/PDF）
+router.use('/', require('./export'))
+
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)
 router.get('/favorites', favoriteRoutes.getFavorites)

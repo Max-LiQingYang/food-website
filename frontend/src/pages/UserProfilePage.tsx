@@ -12,15 +12,17 @@ import {
   type Collection,
 } from '../api'
 import RecipeCard from '../components/RecipeCard'
+import BrowsingHistory from '../components/BrowsingHistory'
 import './UserProfilePage.css'
 
 type TabType = 'recipes' | 'favorites' | 'collections'
+type TabTypeWithHistory = TabType | 'history'
 
 export default function UserProfilePage() {
   const { id } = useParams<{ id: string }>()
   const [profile, setProfile] = useState<any>(null)
   const [stats, setStats] = useState<UserStats | null>(null)
-  const [activeTab, setActiveTab] = useState<TabType>('recipes')
+  const [activeTab, setActiveTab] = useState<TabTypeWithHistory>('recipes')
   const [isOwnProfile, setIsOwnProfile] = useState(false)
 
   // Recipes state
@@ -323,11 +325,23 @@ export default function UserProfilePage() {
           收藏夹{' '}
           {collections.length > 0 && <span className="profile-tab__count">({collections.length})</span>}
         </button>
+        {isOwnProfile && (
+          <button
+            className={`profile-tab ${activeTab === 'history' ? 'profile-tab--active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            👣 足迹
+          </button>
+        )}
       </div>
 
       {/* Content */}
       <div className="profile-content">
-        {activeTab === 'collections' ? (
+        {activeTab === 'history' ? (
+          <div style={{ padding: '0 0 20px' }}>
+            <BrowsingHistory />
+          </div>
+        ) : activeTab === 'collections' ? (
           <>
             {collectionsLoading ? (
               <div className="profile-grid">

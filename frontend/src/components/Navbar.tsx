@@ -54,6 +54,9 @@ export default function Navbar() {
           <Link to="/favorites" className="navbar__link" onClick={handleNavClick}>
             我的收藏
           </Link>
+          <Link to="/tags" className="navbar__link" onClick={handleNavClick}>
+            🏷️ 标签
+          </Link>
           <Link to="/meal-planner" className="navbar__link" onClick={handleNavClick}>
             📅 餐单计划
           </Link>

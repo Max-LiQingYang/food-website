@@ -1,0 +1,128 @@
+.quality-score-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.quality-score-modal {
+  background: var(--color-bg);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.quality-score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.quality-score-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-text);
+}
+
+.quality-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.quality-close-btn:hover {
+  background: var(--color-bg-secondary);
+}
+
+.quality-overall {
+  text-align: center;
+  padding: 20px;
+  margin-bottom: 20px;
+  background: var(--color-bg-secondary);
+  border-radius: 12px;
+}
+
+.quality-overall-score {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.quality-overall-label {
+  font-size: 18px;
+  font-weight: 500;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.quality-overall-max {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.quality-dimension {
+  margin-bottom: 18px;
+}
+
+.quality-dimension-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.quality-dimension-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.quality-dimension-score {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.quality-progress-bar {
+  height: 8px;
+  background: var(--color-bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.quality-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.quality-dimension-detail {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}/* 分数颜色 */
+.score-excellent { color: #2e7d32; }
+.score-good { color: #f57f17; }
+.score-average { color: #e65100; }
+.score-poor { color: #c62828; }
+.score-bad { color: #b71c1c; }
+
+.dark .score-excellent { color: #66bb6a; }
+.dark .score-good { color: #ffca28; }
+.dark .score-average { color: #ff8a65; }
+.dark .score-poor { color: #ef5350; }
+.dark .score-bad { color: #e57373; }

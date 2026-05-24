@@ -1,0 +1,143 @@
+.browsing-history-container {
+  padding: 16px 0;
+}
+
+.browsing-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.browsing-history-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--color-text);
+}
+
+.browsing-filter-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.browsing-filter-tab {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.browsing-filter-tab.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.browsing-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.browsing-history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: background 0.2s;
+}
+
+.browsing-history-item:hover {
+  background: var(--color-bg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.browsing-history-type-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.browsing-history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.browsing-history-title {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.browsing-history-meta {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.browsing-history-time {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.browsing-history-empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.browsing-stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.browsing-stat {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
+}
+
+.browsing-stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.browsing-stat-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .browsing-stats-row {
+    flex-wrap: wrap;
+  }
+  .browsing-stat {
+    flex: 1 1 40%;
+  }
+  .browsing-history-item {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,35 @@
+.toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toggle-list__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-secondary, #666);
+  align-self: flex-start;
+  transition: all 0.2s;
+}
+
+.toggle-list__btn:hover {
+  background: var(--color-bg-secondary, #f5f5f5);
+  color: var(--color-primary, #e74c3c);
+  border-color: var(--color-primary, #e74c3c);
+}
+
+.toggle-list__arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.toggle-list__arrow--up {
+  transform: rotate(180deg);
+}
