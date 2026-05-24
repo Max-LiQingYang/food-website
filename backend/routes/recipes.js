@@ -288,7 +288,7 @@ router.get('/', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
-// GET /search — 搜索食谱（标题 + 食材）
+// GET /search — 搜索食谱（标题 + 食材 + 描述，带权重排序 + 拼写纠错）
 // ─────────────────────────────────────────────────────────────────
 router.get('/search', async (req, res) => {
   // 搜索结果短时缓存
@@ -311,10 +311,17 @@ router.get('/search', async (req, res) => {
       return res.status(400).json(resJSON(400, '搜索关键词不能为空', null))
     }
 
-    const keyword = `%${q.trim()}%`
+    const query = q.trim()
+    const keyword = `%${query}%`
 
+    // ── 带权重的搜索条件 ──
+    // 标题匹配权重最高，描述次之，食材最低
     const where = {
-      [Op.or]: [{ title: { [Op.like]: keyword } }, { ingredients: { [Op.like]: keyword } }],
+      [Op.or]: [
+        { title: { [Op.like]: keyword } },
+        { description: { [Op.like]: keyword } },
+        { ingredients: { [Op.like]: keyword } },
+      ],
     }
 
     // 分类筛选
@@ -330,15 +337,12 @@ router.get('/search', async (req, res) => {
     // 食材排除
     const excludeCond = buildExcludeCondition(exclude)
     if (excludeCond) {
-      // 合并 AND 条件
       const andConds = [excludeCond]
       if (category || difficulty) {
-        // where already has direct fields, need to use Op.and
         const directWhere = {}
         if (category) directWhere.category = category
         if (difficulty) directWhere.difficulty = difficulty
         andConds.push(directWhere)
-        // remove direct fields from where
         delete where.category
         delete where.difficulty
       }
@@ -357,15 +361,97 @@ router.get('/search', async (req, res) => {
 
     const { count, rows } = await Recipe.findAndCountAll({
       where,
-      order: [['createdAt', 'DESC']],
+      order,
       offset,
       limit: pageSize,
       attributes: LIST_ATTRIBUTES,
     })
 
-    const list = rows.map(r => r.toJSON())
+    let list = rows.map(r => r.toJSON())
+
+    // ── 搜索结果相关性权重排序 ──
+    // 当多词搜索时，精确标题匹配优先
+    const queryLower = query.toLowerCase()
+    const queryWords = queryLower.split(/[\s,，、]+/).filter(Boolean)
+    if (queryWords.length > 1) {
+      list.sort((a, b) => {
+        const titleA = (a.title || '').toLowerCase()
+        const titleB = (b.title || '').toLowerCase()
+        // 精确标题匹配优先
+        const exactA = titleA === queryLower ? 100 : 0
+        const exactB = titleB === queryLower ? 100 : 0
+        // 开头匹配次之
+        const prefixA = titleA.startsWith(queryLower) ? 50 : 0
+        const prefixB = titleB.startsWith(queryLower) ? 50 : 0
+        // 所有词都出现在标题中
+        const allWordsA = queryWords.every(w => titleA.includes(w)) ? 20 : 0
+        const allWordsB = queryWords.every(w => titleB.includes(w)) ? 20 : 0
+        // 收藏数排序
+        const favA = parseInt(a.favoriteCount || 0, 10)
+        const favB = parseInt(b.favoriteCount || 0, 10)
+
+        const scoreA = exactA + prefixA + allWordsA + favA * 0.1
+        const scoreB = exactB + prefixB + allWordsB + favB * 0.1
+        return scoreB - scoreA
+      })
+    }
+
     await attachRatingInfo(list)
     attachContentScore(list)
+
+    // ── 拼写纠错：无结果时尝试模糊匹配 ──
+    let spellSuggestion = null
+    if (count === 0 && query.length >= 2) {
+      // 1. 尝试去掉最后一个字
+      if (query.length > 2) {
+        const truncated = query.slice(0, -1)
+        const altCount = await Recipe.count({
+          where: {
+            [Op.or]: [
+              { title: { [Op.like]: `%${truncated}%` } },
+              { ingredients: { [Op.like]: `%${truncated}%` } },
+            ],
+          },
+        })
+        if (altCount > 0) spellSuggestion = truncated
+      }
+
+      // 2. 尝试逐字拆解（取首字+尾字）
+      if (!spellSuggestion && query.length > 3) {
+        const fuzzyQ = query[0] + '%' + query[query.length - 1]
+        const fuzzyCount = await Recipe.count({
+          where: {
+            [Op.or]: [
+              { title: { [Op.like]: fuzzyQ } },
+              { ingredients: { [Op.like]: fuzzyQ } },
+            ],
+          },
+        })
+        // 不返回具体建议，只标记可尝试其他关键词
+      }
+
+      // 3. 尝试热门或常见食材补全
+      const commonKeywords = ['鸡', '肉', '蛋', '菜', '饭', '汤', '鱼', '牛', '猪', '虾', '豆腐', '番茄', '土豆', '鸡蛋', '面', '粉', '饼', '包', '饺']
+      if (!spellSuggestion) {
+        for (const ck of commonKeywords) {
+          if (query.includes(ck)) {
+            const found = await Recipe.count({
+              where: {
+                [Op.or]: [
+                  { title: { [Op.like]: `%${ck}%` } },
+                  { ingredients: { [Op.like]: `%${ck}%` } },
+                ],
+              },
+              limit: 1,
+            })
+            if (found > 0) {
+              spellSuggestion = ck
+              break
+            }
+          }
+        }
+      }
+    }
 
     return res.status(200).json(
       resJSON(0, 'ok', {
@@ -373,6 +459,7 @@ router.get('/search', async (req, res) => {
         total: count,
         page,
         pageSize,
+        spellSuggestion,
       })
     )
   } catch (err) {
@@ -1633,6 +1720,518 @@ router.delete('/:id', auth, async (req, res) => {
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })
+
+/**
+ * 食材替代建议映射表
+ * 基于常见类别进行食材替代推荐
+ */
+const SUBSTITUTION_MAP = {
+  '五花肉': ['去皮五花肉', '猪肩肉', '猪腩肉'],
+  '猪肉': ['鸡腿肉', '牛肉', '羊肉'],
+  '牛肉': ['羊肉', '猪肉', '鸡腿肉'],
+  '鸡胸肉': ['鸡腿肉', '鸡翅', '豆腐'],
+  '鸡腿': ['鸡翅', '鸡胸肉', '鸭腿'],
+  '羊肉': ['牛肉', '猪肉', '鸡腿肉'],
+  '排骨': ['猪肩肉', '鸡腿', '牛肋条'],
+  '培根': ['火腿片', '烟熏三文鱼', '素培根'],
+  '火腿': ['培根', '午餐肉', '熏肉'],
+  '香肠': ['火腿肠', '腊肠', '素香肠'],
+  '虾': ['虾仁', '鱿鱼', '扇贝', '鱼肉'],
+  '鱼': ['虾', '鱿鱼', '豆腐', '鸡胸肉'],
+  '三文鱼': ['鳕鱼', '金枪鱼', '鲈鱼'],
+  '鱿鱼': ['虾仁', '墨鱼', '扇贝'],
+  '扇贝': ['虾仁', '鱿鱼', '带子'],
+  '鸡蛋': ['鸭蛋', '鹌鹑蛋', '嫩豆腐'],
+  '牛奶': ['豆奶', '杏仁奶', '燕麦奶', '椰奶'],
+  '黄油': ['椰子油', '橄榄油', '人造黄油'],
+  '奶酪': ['豆腐乳', '素奶酪', '营养酵母'],
+  '奶油': ['椰奶', '豆奶', '牛奶'],
+  '番茄': ['圣女果', '番茄罐头', '红椒'],
+  '土豆': ['红薯', '芋头', '山药', '南瓜'],
+  '胡萝卜': ['白萝卜', '南瓜', '红薯'],
+  '洋葱': ['青葱', '红葱头', '韭葱'],
+  '大蒜': ['蒜苗', '蒜粉', '洋葱'],
+  '姜': ['姜粉', '沙姜', '高良姜'],
+  '白菜': ['娃娃菜', '卷心菜', '菠菜'],
+  '菠菜': ['小油菜', '苋菜', '芝麻菜'],
+  '西兰花': ['菜花', '芥蓝', '芦笋'],
+  '茄子': ['西葫芦', '南瓜', '青椒'],
+  '蘑菇': ['香菇', '杏鲍菇', '金针菇'],
+  '玉米': ['豌豆', '毛豆', '青豆'],
+  '豆腐': ['豆干', '腐竹', '素鸡', '嫩豆腐'],
+  '大米': ['糙米', '小米', '藜麦', '糯米'],
+  '面条': ['意面', '米粉', '乌冬面', '拉面'],
+  '面粉': ['全麦面粉', '米粉', '杏仁粉'],
+  '面包': ['馒头', '法棍', '吐司'],
+  '酱油': ['老抽', '生抽', '蒸鱼豉油', '日式酱油'],
+  '醋': ['香醋', '陈醋', '米醋', '白醋'],
+  '料酒': ['米酒', '黄酒', '清酒'],
+  '糖': ['蜂蜜', '枫糖浆', '代糖', '椰糖'],
+  '盐': ['海盐', '岩盐', '低钠盐'],
+  '胡椒粉': ['花椒粉', '辣椒粉', '五香粉'],
+  '辣椒': ['干辣椒', '辣椒粉', '辣酱', '青椒'],
+  '花椒': ['麻椒', '藤椒油', '花椒粉'],
+  '八角': ['五香粉', '桂皮', '小茴香'],
+  '肉桂': ['肉桂粉', '豆蔻', '丁香'],
+  '蜂蜜': ['枫糖浆', '龙舌兰蜜', '白糖'],
+  '植物油': ['橄榄油', '椰子油', '葵花籽油', '芝麻油'],
+  '橄榄油': ['植物油', '牛油果油', '葡萄籽油'],
+  '芝麻油': ['橄榄油', '花生油', '辣椒油'],
+}
+
+// POST /:id/substitutions — 食材替代建议
+router.post('/:id/substitutions', async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id, {
+      attributes: ['id', 'title', 'ingredients', 'categoryTags'],
+    })
+    if (!recipe) {
+      return res.status(404).json(resJSON(404, '食谱不存在', null))
+    }
+    let ingredients = recipe.ingredients
+    if (typeof ingredients === 'string') {
+      try { ingredients = JSON.parse(ingredients) } catch { ingredients = [] }
+    }
+    if (!Array.isArray(ingredients)) ingredients = []
+
+    const ingredientNames = ingredients.map(function(i) {
+      if (typeof i === 'string') return i
+      return i.name || i.ingredient || ''
+    }).filter(Boolean)
+
+    const substitutions = {}
+    ingredientNames.forEach(function(name) {
+      if (SUBSTITUTION_MAP[name]) {
+        substitutions[name] = SUBSTITUTION_MAP[name]
+        return
+      }
+      for (var key in SUBSTITUTION_MAP) {
+        if (SUBSTITUTION_MAP.hasOwnProperty(key)) {
+          if (name.indexOf(key) !== -1 || key.indexOf(name) !== -1) {
+            substitutions[name] = SUBSTITUTION_MAP[key]
+            return
+          }
+        }
+      }
+    })
+
+    return res.status(200).json(resJSON(0, 'ok', {
+      recipeTitle: recipe.title,
+      substitutions: Object.keys(substitutions).length > 0 ? substitutions : null,
+      message: Object.keys(substitutions).length > 0
+        ? '已为您找到可替代的食材选项'
+        : '未找到明确替代建议，可按类别尝试替换',
+    }))
+  } catch (err) {
+    console.error('[POST /recipes/:id/substitutions] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// GET /:id/estimated-cook-time — 智能烹饪时间估算
+router.get('/:id/estimated-cook-time', async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id, {
+      attributes: ['id', 'title', 'cookTime', 'steps', 'ingredients', 'difficulty', 'categoryTags'],
+    })
+    if (!recipe) {
+      return res.status(404).json(resJSON(404, '食谱不存在', null))
+    }
+    let steps = recipe.steps
+    if (typeof steps === 'string') {
+      try { steps = JSON.parse(steps) } catch { steps = [] }
+    }
+    if (!Array.isArray(steps)) steps = []
+    let ingredients = recipe.ingredients
+    if (typeof ingredients === 'string') {
+      try { ingredients = JSON.parse(ingredients) } catch { ingredients = [] }
+    }
+    if (!Array.isArray(ingredients)) ingredients = []
+
+    var estimatedMinutes = steps.length * 5
+    var slowCookingPattern = /(炖|卤|焖|熬|煮|煲|慢|煨|蒸|烤|腌|发酵|醒面|松弛)/
+
+    steps.forEach(function(s) {
+      var text = typeof s === 'string' ? s : (s.description || s.text || s.step || '')
+      var timeMatches = text.match(/\d+\s*(分钟|小时)/g)
+      if (timeMatches) {
+        timeMatches.forEach(function(m) {
+          var val = parseInt(m, 10)
+          if (m.indexOf('小时') !== -1) estimatedMinutes += val * 60
+          else estimatedMinutes += val
+        })
+      } else if (slowCookingPattern.test(text)) {
+        estimatedMinutes += 20
+      }
+    })
+
+    estimatedMinutes += ingredients.length * 2
+
+    var originalTime = parseInt(recipe.cookTime || 0, 10)
+    if (originalTime > 0) {
+      estimatedMinutes = originalTime
+    }
+
+    var rangeMin = Math.max(5, Math.round(estimatedMinutes * 0.8))
+    var rangeMax = Math.round(estimatedMinutes * 1.2)
+
+    var timeLabel = '快菜'
+    if (estimatedMinutes >= 120) timeLabel = '慢炖'
+    else if (estimatedMinutes >= 60) timeLabel = '耗时'
+    else if (estimatedMinutes >= 30) timeLabel = '中等'
+
+    return res.status(200).json(resJSON(0, 'ok', {
+      recipeId: recipe.id,
+      recipeTitle: recipe.title,
+      estimatedMinutes: estimatedMinutes,
+      timeRange: String(rangeMin) + '-' + String(rangeMax),
+      timeLabel: timeLabel,
+      originalCookTime: originalTime || null,
+      confidence: originalTime > 0 ? 'high' : 'medium',
+    }))
+  } catch (err) {
+    console.error('[GET /recipes/:id/estimated-cook-time] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// GET /:id/enhanced-difficulty — 增强难度评估
+router.get('/:id/enhanced-difficulty', async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id, {
+      attributes: ['id', 'title', 'cookTime', 'steps', 'ingredients', 'difficulty', 'categoryTags', 'tips'],
+    })
+    if (!recipe) {
+      return res.status(404).json(resJSON(404, '食谱不存在', null))
+    }
+    let steps = recipe.steps
+    if (typeof steps === 'string') {
+      try { steps = JSON.parse(steps) } catch { steps = [] }
+    }
+    if (!Array.isArray(steps)) steps = []
+    let ingredients = recipe.ingredients
+    if (typeof ingredients === 'string') {
+      try { ingredients = JSON.parse(ingredients) } catch { ingredients = [] }
+    }
+    if (!Array.isArray(ingredients)) ingredients = []
+
+    var techniqueWords = ['焯水', '过油', '挂糊', '上浆', '勾芡', '爆炒', '滑炒', '干煸', '炝锅', '熘', '扣', '卷', '酿', '雕花', '裱花', '打发', '乳化', '焦糖化', '低温慢煮', '发酵', '揉面', '出膜', '醒面', '翻糖', '拉丝', '酥皮', '千层', '慕斯', '舒芙蕾']
+    var specialTools = ['烤箱', '空气炸锅', '蒸箱', '厨师机', '搅拌机', '破壁机', '料理机', '面包机', '压面机', '面条机', '绞肉机', '模具', '裱花袋', '裱花嘴', '擀面杖', '称', '温度计', '计时器']
+
+    var techniqueCount = 0
+    var toolCount = 0
+    var matchedTechniques = []
+    var matchedTools = []
+
+    var allTextParts = []
+    steps.forEach(function(s) {
+      allTextParts.push(typeof s === 'string' ? s : (s.description || s.text || ''))
+    })
+    ingredients.forEach(function(i) {
+      allTextParts.push(typeof i === 'string' ? i : (i.name || ''))
+    })
+    if (recipe.tips) allTextParts.push(recipe.tips)
+    var allText = allTextParts.join(' ')
+
+    techniqueWords.forEach(function(tw) {
+      if (allText.indexOf(tw) !== -1) {
+        techniqueCount++
+        matchedTechniques.push(tw)
+      }
+    })
+    specialTools.forEach(function(st) {
+      if (allText.indexOf(st) !== -1) {
+        toolCount++
+        matchedTools.push(st)
+      }
+    })
+
+    var ct = parseInt(recipe.cookTime || 0, 10)
+    var complexity = ct >= 90 ? 3 : (ct >= 45 ? 2 : (ct >= 20 ? 1 : 0))
+
+    var stepsCount = steps.length
+    if (stepsCount >= 10) complexity += 4
+    else if (stepsCount >= 8) complexity += 3
+    else if (stepsCount >= 5) complexity += 2
+    else if (stepsCount >= 3) complexity += 1
+
+    var ingredientCount = ingredients.length
+    if (ingredientCount >= 15) complexity += 3
+    else if (ingredientCount >= 10) complexity += 2
+    else if (ingredientCount >= 6) complexity += 1
+
+    if (techniqueCount >= 5) complexity += 4
+    else if (techniqueCount >= 3) complexity += 2
+    else if (techniqueCount >= 1) complexity += 1
+
+    if (toolCount >= 3) complexity += 3
+    else if (toolCount >= 1) complexity += 1
+
+    var level
+    if (complexity >= 10) level = 'advanced'
+    else if (complexity >= 6) level = 'intermediate'
+    else level = 'beginner'
+
+    var levelMap = { advanced: '高级', intermediate: '中等', beginner: '初级' }
+
+    return res.status(200).json(resJSON(0, 'ok', {
+      recipeId: recipe.id,
+      recipeTitle: recipe.title,
+      difficulty: recipe.difficulty,
+      enhancedDifficulty: level,
+      enhancedDifficultyCN: levelMap[level],
+      complexity: complexity,
+      details: {
+        stepCount: stepsCount,
+        ingredientCount: ingredientCount,
+        cookTimeMinutes: ct,
+        techniqueCount: techniqueCount,
+        matchedTechniques: matchedTechniques,
+        toolCount: toolCount,
+        matchedTools: matchedTools,
+      },
+    }))
+  } catch (err) {
+    console.error('[GET /recipes/:id/enhanced-difficulty] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// POST /:id/substitutions — 食材替代建议
+// ─────────────────────────────────────────────────────────────────
+const INGREDIENT_CATEGORIES = {
+  '蛋白质·肉': ['猪肉', '牛肉', '羊肉', '鸡肉', '鸭肉', '五花肉', '里脊', '排骨', '鸡胸肉', '鸡腿', '牛腩', '牛腱', '肉末', '腊肉', '培根', '火腿'],
+  '蛋白质·水产': ['鱼', '虾', '蟹', '鱿鱼', '蛤蜊', '虾仁', '三文鱼', '鲈鱼', '带鱼', '龙利鱼', '鳕鱼', '贝'],
+  '蛋白质·蛋豆': ['鸡蛋', '鸭蛋', '豆腐', '豆腐干', '千张', '腐竹', '豆皮', '豆浆', '毛豆', '黄豆', '黑豆', '纳豆', '豆豉'],
+  '蔬菜·叶菜': ['白菜', '菠菜', '生菜', '油菜', '空心菜', '苋菜', '韭菜', '卷心菜', '羽衣甘蓝'],
+  '蔬菜·根茎': ['土豆', '胡萝卜', '萝卜', '红薯', '山药', '芋头', '莲藕', '竹笋', '莴笋'],
+  '蔬菜·瓜果': ['番茄', '茄子', '青椒', '甜椒', '黄瓜', '冬瓜', '南瓜', '丝瓜', '苦瓜', '西葫芦', '秋葵'],
+  '蔬菜·菌菇': ['香菇', '蘑菇', '金针菇', '杏鲍菇', '木耳', '银耳', '平菇', '茶树菇'],
+  '调味料·酱': ['生抽', '老抽', '酱油', '醋', '料酒', '蚝油', '豆瓣酱', '番茄酱', '辣椒酱', '甜面酱', '芝麻酱', '腐乳'],
+  '调味料·香辛': ['盐', '糖', '姜', '蒜', '葱', '花椒', '八角', '桂皮', '香叶', '干辣椒', '胡椒粉', '五香粉', '孜然'],
+  '主食·米面': ['大米', '糯米', '面粉', '面条', '米粉', '意面', '面包', '馒头', '饺子皮', '馄饨皮', '年糕'],
+  '奶制品': ['牛奶', '酸奶', '黄油', '奶油', '奶酪', '芝士', '炼乳', '淡奶油'],
+  '干货·果仁': ['花生', '核桃', '杏仁', '腰果', '松子', '芝麻', '枸杞', '红枣', '桂圆', '葡萄干'],
+}
+
+/** 食材到类别的快速查找 */
+function findIngredientCategory(name) {
+  if (!name) return null
+  const lower = name.toLowerCase()
+  for (const [cat, items] of Object.entries(INGREDIENT_CATEGORIES)) {
+    if (items.some(i => lower.includes(i.toLowerCase()) || i.toLowerCase().includes(lower))) {
+      return cat
+    }
+  }
+  return null
+}
+
+router.post('/:id/substitutions', async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id, {
+      attributes: ['id', 'title', 'ingredients'],
+    })
+
+    if (!recipe) {
+      return res.status(404).json(resJSON(404, '食谱不存在'))
+    }
+
+    let ingredients = recipe.ingredients
+    if (typeof ingredients === 'string') {
+      try { ingredients = JSON.parse(ingredients) } catch { ingredients = [] }
+    }
+    if (!Array.isArray(ingredients)) ingredients = []
+
+    const ingredientNames = ingredients.map(i => {
+      if (typeof i === 'string') return i
+      return i.name || i.ingredient || ''
+    }).filter(Boolean)
+
+    // 建类别索引
+    const categorized = {}
+    ingredientNames.forEach(name => {
+      const cat = findIngredientCategory(name)
+      if (cat) {
+        if (!categorized[cat]) categorized[cat] = []
+        categorized[cat].push(name)
+      }
+    })
+
+    // 为每个已分类的食材推荐同类别替代品
+    const substitutions = {}
+    Object.entries(categorized).forEach(([cat, names]) => {
+      const available = INGREDIENT_CATEGORIES[cat] || []
+      const alternatives = available.filter(a => !names.some(n => n.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(n.toLowerCase())))
+      if (alternatives.length > 0) {
+        names.forEach(n => {
+          substitutions[n] = alternatives.slice(0, 3)
+        })
+      }
+    })
+
+    // 未分类食材提示
+    const uncategorized = ingredientNames.filter(n => !findIngredientCategory(n))
+
+    return res.json(resJSON(0, 'ok', {
+      substitutions,
+      uncategorized,
+      totalIngredients: ingredientNames.length,
+      categorizedCount: Object.keys(categorized).length,
+    }))
+  } catch (err) {
+    console.error('[POST /recipes/:id/substitutions] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误'))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/metadata — 智能元数据增强（烹饪时间估算 + 难度增强）
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/metadata', async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id, {
+      attributes: ['id', 'title', 'steps', 'ingredients', 'categoryTags', 'cookTime', 'difficulty', 'nutrition'],
+    })
+
+    if (!recipe) {
+      return res.status(404).json(resJSON(404, '食谱不存在'))
+    }
+
+    let steps = recipe.steps
+    if (typeof steps === 'string') {
+      try { steps = JSON.parse(steps) } catch { steps = [] }
+    }
+
+    let ingredients = recipe.ingredients
+    if (typeof ingredients === 'string') {
+      try { ingredients = JSON.parse(ingredients) } catch { ingredients = [] }
+    }
+
+    // 烹饪时间智能估算
+    const estimatedCookTime = estimateCookTime(steps, recipe.cookTime)
+
+    // 难度增强
+    const enhancedDifficulty = enhanceDifficulty(recipe, steps, ingredients)
+
+    // 获取步骤中的技术词
+    const techTerms = extractTechTerms(steps)
+
+    return res.json(resJSON(0, 'ok', {
+      estimatedCookTime,
+      enhancedDifficulty,
+      techTerms,
+      stepCount: Array.isArray(steps) ? steps.length : 0,
+      ingredientCount: Array.isArray(ingredients) ? ingredients.length : 0,
+    }))
+  } catch (err) {
+    console.error('[GET /recipes/:id/metadata] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误'))
+  }
+})
+
+/** 根据步骤内容估算烹饪时间（分钟） */
+function estimateCookTime(steps, existingCookTime) {
+  // 如果已有准确烹饪时间且不为0，直接返回
+  if (existingCookTime && parseInt(existingCookTime, 10) > 5) {
+    return parseInt(existingCookTime, 10)
+  }
+
+  if (!Array.isArray(steps) || steps.length === 0) {
+    return existingCookTime || 30
+  }
+
+  // 从步骤中提取时间标注
+  const timePattern = /(\d+)\s*(分钟|min|m)|(\d+)\s*(小时|h|hour)/gi
+  let totalFromSteps = 0
+  let timeFound = false
+
+  steps.forEach(s => {
+    const text = typeof s === 'string' ? s : (s.description || s.text || s.step || '')
+    let match
+    while ((match = timePattern.exec(text)) !== null) {
+      if (match[1] && match[2]) {
+        totalFromSteps += parseInt(match[1], 10)
+        timeFound = true
+      } else if (match[3] && match[4]) {
+        totalFromSteps += parseInt(match[3], 10) * 60
+        timeFound = true
+      }
+    }
+  })
+
+  if (timeFound && totalFromSteps > 0) {
+    return totalFromSteps
+  }
+
+  // 基于步骤复杂度和慢烹饪动作估算
+  const slowActionPattern = /(炖|卤|焖|熬|蒸|煮|烤|慢|发酵|醒面|腌制|卤制|煲)/
+  let baseTime = 20 + steps.length * 8
+
+  steps.forEach(s => {
+    const text = typeof s === 'string' ? s : (s.description || s.text || s.step || '')
+    if (slowActionPattern.test(text)) {
+      baseTime += 20  // 慢动作增加20分钟
+    }
+  })
+
+  // 如果步骤超过6步，时间更充足
+  if (steps.length >= 8) baseTime += 20
+  else if (steps.length >= 5) baseTime += 10
+
+  return Math.min(Math.max(baseTime, 10), 240)
+}
+
+/** 增强的难度评估 */
+const TECHNIQUE_WORDS = [
+  '切丝', '切片', '切丁', '剁', '斩', '片', '滚刀', '雕花',
+  '爆炒', '滑炒', '煸', '溜', '汆', '焯', '过油', '走油',
+  '挂糊', '上浆', '拍粉', '勾芡', '淋芡',
+  '油温', '温油', '热油', '旺火', '文火', '中火', '大火', '小火', '火候',
+  '酥皮', '起酥', '澄面', '烫面', '发面', '揉面', '醒面', '出膜',
+  '焦糖', '乳化', '打发', '翻拌', '切拌', '水浴', '隔水',
+  '去腥', '腌制', '码味', '上色',
+  '雕', '卷', '包', '捏褶皱',
+]
+
+function enhanceDifficulty(recipe, steps, ingredients) {
+  const existing = computeSmartDifficulty(recipe)
+  if (!Array.isArray(steps)) return existing
+
+  // 统计技术词
+  let techCount = 0
+  steps.forEach(s => {
+    const text = typeof s === 'string' ? s : (s.description || s.text || s.step || '')
+    TECHNIQUE_WORDS.forEach(tw => {
+      if (text.includes(tw)) techCount++
+    })
+  })
+
+  const ingCount = Array.isArray(ingredients) ? ingredients.length : 0
+  const stepCount = steps.length
+
+  // 综合判断
+  if (techCount >= 5 || stepCount >= 10 || ingCount >= 15) return 'advanced'
+  if (techCount >= 3 || stepCount >= 6 || ingCount >= 8) {
+    if (existing === 'beginner') return 'intermediate'
+    return existing
+  }
+
+  return existing
+}
+
+/** 提取步骤中的关键技术词汇 */
+function extractTechTerms(steps) {
+  if (!Array.isArray(steps) || steps.length === 0) return []
+  const found = new Set()
+  steps.forEach(s => {
+    const text = typeof s === 'string' ? s : (s.description || s.text || s.step || '')
+    TECHNIQUE_WORDS.forEach(tw => {
+      if (text.includes(tw)) found.add(tw)
+    })
+  })
+  return [...found].slice(0, 10)
+}
 
 module.exports = router
 module.exports.auth = auth

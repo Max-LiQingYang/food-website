@@ -31,6 +31,12 @@ const seasonalRoutes = require('./seasonal')
 const mealPlanRoutes = require('./mealPlan')
 const cookingLogRoutes = require('./cookingLog')
 
+// 迭代#38: SEO — sitemap.xml / robots.txt （必须在 recipes 之前防止 /:id 拦截）
+router.use('/', require('./seo'))
+
+// 迭代#38: 管理后台 — 质量报告
+router.use('/', require('./admin'))
+
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
 
