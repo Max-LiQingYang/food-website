@@ -1,0 +1,101 @@
+.pwa-prompt {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 16px 20px;
+  max-width: 380px;
+  width: calc(100% - 32px);
+  animation: pwa-slide-up 0.3s ease-out;
+}
+
+@keyframes pwa-slide-up {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.pwa-prompt__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--color-text-secondary, #888);
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.pwa-prompt__close:hover {
+  background: var(--color-bg, #f5f5f5);
+}
+
+.pwa-prompt__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pwa-prompt__icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.pwa-prompt__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-prompt__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0;
+}
+
+.pwa-prompt__subtitle {
+  font-size: 12px;
+  color: var(--color-text-secondary, #888);
+  margin: 2px 0 0;
+}
+
+.pwa-prompt__install {
+  padding: 8px 20px;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.pwa-prompt__install:hover {
+  opacity: 0.9;
+}
+
+.pwa-prompt__install:focus-visible {
+  outline: 2px solid var(--color-primary, #e8663e);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .pwa-prompt {
+    bottom: 12px;
+    padding: 12px 16px;
+  }
+}

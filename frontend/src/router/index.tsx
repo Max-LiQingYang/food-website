@@ -5,6 +5,8 @@ import MobileBottomNav from '../components/MobileBottomNav'
 import BackToTop from '../components/BackToTop'
 import Breadcrumb from '../components/Breadcrumb'
 import ErrorBoundary from '../components/ErrorBoundary'
+import PWAInstallPrompt from '../components/PWAInstallPrompt'
+import SkipLink from '../components/SkipLink'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))
@@ -28,15 +30,19 @@ const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载�
 function Layout() {
   return (
     <ErrorBoundary>
+      <SkipLink />
       <Navbar />
       <Breadcrumb />
-      <Suspense fallback={<Fallback />}>
-        <ErrorBoundary>
-          <Outlet />
-        </ErrorBoundary>
-      </Suspense>
+      <main id="main-content">
+        <Suspense fallback={<Fallback />}>
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
+        </Suspense>
+      </main>
       <MobileBottomNav />
       <BackToTop />
+      <PWAInstallPrompt />
     </ErrorBoundary>
   )
 }

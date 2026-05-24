@@ -8,6 +8,7 @@ import CommentSection from '../components/CommentSection'
 import NutritionCard from '../components/NutritionCard'
 import SimilarRecipes from '../components/SimilarRecipes'
 import ImageLightbox from '../components/ImageLightbox'
+import StepTimer from '../components/StepTimer'
 import ImagePlaceholder from '../components/ImagePlaceholder'
 import ShareModal from '../components/ShareModal'
 import AddToCollectionDropdown from '../components/AddToCollectionDropdown'
@@ -71,8 +72,17 @@ export default function RecipeDetailPage() {
   const [favLoading, setFavLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [activeStep, setActiveStep] = useState<number | null>(null)
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [showShareModal, setShowShareModal] = useState(false)
+
+  // 收集所有可查看的图片（封面 + 步骤图片）
+  const allImages = [
+    ...(recipe?.coverImage ? [{ src: recipe.coverImage, alt: recipe.title }] : []),
+    ...((recipe?.steps || [])
+      .filter(s => s.image)
+      .map(s => ({ src: s.image!, alt: `步骤 ${s.stepNumber}: ${typeof s === 'string' ? s : (s as any).content || ''}` }))
+    ),
+  ]
 
   // ── 份量缩放 ──
   const scaleKey = id ? `serving_scale_${id}` : ''
@@ -326,8 +336,15 @@ export default function RecipeDetailPage() {
           ← 返回
         </button>
 
-        {/* 封面图 */}
-        <div className="detail-cover">
+        {/* 封面图 - 点击打开灯箱 */}
+        <div
+          className="detail-cover"
+          role="button"
+          tabIndex={0}
+          aria-label={`点击查看 ${recipe.title} 的大图`}
+          onClick={() => setLightboxIndex(0)}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setLightboxIndex(0) } }}
+        >
           {recipe.coverImage ? (
             <ImagePlaceholder
               src={recipe.coverImage}
@@ -557,16 +574,23 @@ export default function RecipeDetailPage() {
                     <div className="step-number">{step.stepNumber}</div>
                     <div className="step-body">
                       <p className="step-content">{step.content}</p>
+                      <StepTimer stepNumber={step.stepNumber} stepContent={step.content} />
                       {step.image && (
                         <img
                           src={step.image}
-                          alt={`步骤 ${step.stepNumber}`}
+                          alt={`步骤 ${step.stepNumber}: ${step.content}`}
                           className="step-image"
                           loading="lazy"
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`点击查看步骤 ${step.stepNumber} 的图片`}
                           onClick={e => {
                             e.stopPropagation()
-                            setLightboxSrc(step.image!)
+                            const stepIdx = (steps || []).findIndex(s => s.image === step.image)
+                            const imgIdx = 1 + stepIdx // +1 因为 index 0 是封面
+                            setLightboxIndex(imgIdx >= 0 ? imgIdx : 0)
                           }}
+                          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); (e.target as HTMLElement).click() } }}
                         />
                       )}
                     </div>
@@ -610,12 +634,12 @@ export default function RecipeDetailPage() {
         )}
       </div>
 
-      {/* 步骤图片灯箱 */}
-      {lightboxSrc && (
+      {/* 图片灯箱 */}
+      {lightboxIndex !== null && allImages.length > 0 && (
         <ImageLightbox
-          src={lightboxSrc}
-          alt="步骤图片"
-          onClose={() => setLightboxSrc(null)}
+          images={allImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
         />
       )}
 

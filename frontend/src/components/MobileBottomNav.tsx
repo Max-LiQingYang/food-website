@@ -13,9 +13,8 @@ export default function MobileBottomNav() {
   const location = useLocation()
 
   return (
-    <nav className="mobile-bottom-nav">
+    <nav className="mobile-bottom-nav" aria-label="页脚导航">
       {NAV_ITEMS.map(item => {
-        // Determine active: exact path match for home, prefix match for others
         const isActive =
           item.path === '/'
             ? location.pathname === '/'
@@ -26,8 +25,10 @@ export default function MobileBottomNav() {
             key={item.path}
             to={item.path}
             className={`mobile-bottom-nav__item ${isActive ? 'is-active' : ''}`}
+            aria-label={item.label}
+            aria-current={isActive ? 'page' : undefined}
           >
-            <span className="mobile-bottom-nav__icon">{item.icon}</span>
+            <span className="mobile-bottom-nav__icon" aria-hidden="true">{item.icon}</span>
             <span className="mobile-bottom-nav__label">{item.label}</span>
           </NavLink>
         )

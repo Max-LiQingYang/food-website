@@ -1,0 +1,123 @@
+.step-timer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--color-bg, #f5f5f5);
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--color-border, #e0d8d0);
+  flex-wrap: wrap;
+  transition: all 0.2s ease;
+}
+
+.step-timer--running {
+  border-color: var(--color-primary, #e8663e);
+  background: var(--color-primary-bg, #fff3ed);
+}
+
+.step-timer--done {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.step-timer__display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.step-timer__time {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text, #333);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  letter-spacing: 1px;
+}
+
+.step-timer__done-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #22c55e;
+  animation: timer-pop 0.3s ease;
+}
+
+@keyframes timer-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.step-timer__bar {
+  flex: 1;
+  min-width: 60px;
+  height: 6px;
+  background: var(--color-border, #e0d8d0);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.step-timer__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary, #e8663e), #f0876a);
+  border-radius: 3px;
+  transition: width 0.5s linear;
+}
+
+.step-timer--done .step-timer__bar-fill {
+  background: #22c55e;
+  transition: none;
+}
+
+.step-timer__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.step-timer__btn {
+  padding: 5px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.step-timer__btn:hover {
+  opacity: 0.85;
+}
+
+.step-timer__btn:focus-visible {
+  outline: 2px solid var(--color-primary, #e8663e);
+  outline-offset: 2px;
+}
+
+.step-timer__btn--start {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+}
+
+.step-timer__btn--pause {
+  background: #eab308;
+  color: #fff;
+}
+
+.step-timer__btn--reset {
+  background: var(--color-border, #d0c8c0);
+  color: var(--color-text, #333);
+}
+
+@media (max-width: 480px) {
+  .step-timer {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .step-timer__time {
+    font-size: 16px;
+  }
+}

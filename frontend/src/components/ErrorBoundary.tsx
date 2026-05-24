@@ -4,7 +4,7 @@
  * ErrorBoundary.tsx
  *
  * 全局错误边界 —— 捕获子组件渲染错误，优雅降级显示错误页面
- * 支持重试、返回首页、错误日志上报
+ * 支持重试、返回首页、错误日志上报、焦点管理
  */
 
 import React, { Component, type ReactNode, type ErrorInfo } from 'react'
@@ -13,9 +13,7 @@ import './ErrorBoundary.css'
 
 interface ErrorBoundaryProps {
   children: ReactNode
-  /** 错误发生时的降级 UI 标题（可选） */
   fallbackTitle?: string
-  /** 是否将错误上报到后端（可选） */
   reportToServer?: boolean
 }
 
@@ -25,9 +23,12 @@ interface ErrorBoundaryState {
 }
 
 export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  errorRef: React.RefObject<HTMLDivElement | null>
+
   constructor(props: ErrorBoundaryProps) {
     super(props)
     this.state = { hasError: false, error: null }
+    this.errorRef = React.createRef<HTMLDivElement>()
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -35,14 +36,17 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // 本地记录
     console.error('[ErrorBoundary] Caught error:', error.message)
     console.error('[ErrorBoundary] Component stack:', info.componentStack)
 
-    // 可选：上报到后端
     if (this.props.reportToServer) {
       this.reportError(error, info)
     }
+
+    // 焦点移动到错误区域 for 屏幕阅读器
+    setTimeout(() => {
+      this.errorRef.current?.focus()
+    }, 0)
   }
 
   private reportError(error: Error, info: ErrorInfo) {
@@ -54,14 +58,13 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
         url: window.location.href,
         timestamp: new Date().toISOString(),
       })
-      // 使用 sendBeacon 避免阻塞页面
       if (navigator.sendBeacon) {
         navigator.sendBeacon('/api/report-error', body)
       } else {
         fetch('/api/report-error', { method: 'POST', body, keepalive: true }).catch(() => {})
       }
     } catch {
-      // 错误上报本身失败不做处理
+      // ignore
     }
   }
 
@@ -72,7 +75,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   render() {
     if (this.state.hasError) {
       return (
-        <div className="error-boundary">
+        <div className="error-boundary" ref={this.errorRef} tabIndex={-1} role="alert">
           <div className="error-boundary__card">
             <div className="error-boundary__icon">⚠️</div>
             <h1 className="error-boundary__title">

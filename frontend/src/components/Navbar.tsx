@@ -27,13 +27,15 @@ export default function Navbar() {
           className={`navbar__hamburger ${menuOpen ? 'open' : ''}`}
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="菜单"
+          aria-expanded={menuOpen}
+          aria-controls="navbar-menu"
         >
           <span />
           <span />
           <span />
         </button>
 
-        <div className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}>
+        <div className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`} id="navbar-menu" role="menubar">
           <Link to="/" className="navbar__link" onClick={handleNavClick}>
             首页
           </Link>
@@ -93,7 +95,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      {menuOpen && <div className="navbar__overlay" onClick={() => setMenuOpen(false)} />}
+      {menuOpen && <div className="navbar__overlay" onClick={() => setMenuOpen(false)} role="presentation" />}
     </nav>
   )
 }
