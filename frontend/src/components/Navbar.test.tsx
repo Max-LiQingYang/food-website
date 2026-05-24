@@ -121,3 +121,25 @@ describe('Navbar 移动端', () => {
     expect(screen.getAllByRole('link').length).toBeGreaterThan(0)
   })
 })
+
+describe('Navbar 新链接', () => {
+  it('包含手头食材链接', () => {
+    renderWithProviders(<Navbar />)
+    expect(screen.getByText(/手头食材/)).toBeDefined()
+  })
+
+  it('包含挑战赛链接', () => {
+    renderWithProviders(<Navbar />)
+    expect(screen.getByText(/挑战赛/)).toBeDefined()
+  })
+
+  it('包含工具库链接', () => {
+    renderWithProviders(<Navbar />)
+    expect(screen.getByText(/工具库/)).toBeDefined()
+  })
+
+  it('包含食材推荐链接', () => {
+    renderWithProviders(<Navbar />)
+    expect(screen.getByText(/食材推荐/)).toBeDefined()
+  })
+})

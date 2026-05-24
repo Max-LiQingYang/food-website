@@ -1084,6 +1084,246 @@ export function getCookingLogStats(): Promise<CookingLogStats> {
   return apiClient.get('/cooking-logs/stats').then(r => r.data?.data || {})
 }
 
+// ─────────────────────────────────────────────────────────────────
+// 迭代#34: 食谱视频嵌入
+// ─────────────────────────────────────────────────────────────────
+
+export interface VideoEmbed {
+  id: string
+  recipeId: string
+  videoUrl: string
+  platform: 'generic' | 'youtube' | 'bilibili' | 'tiktok'
+  coverImage?: string
+  title?: string
+  duration?: number
+  sortOrder: number
+  createdAt: string
+}
+
+/**
+ * 获取食谱视频列表
+ * GET /api/recipes/:recipeId/videos
+ */
+export function getRecipeVideos(recipeId: string): Promise<{ list: VideoEmbed[]; total: number }> {
+  return apiClient.get(`/recipes/${recipeId}/videos`).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 添加视频到食谱
+ * POST /api/recipes/:recipeId/videos
+ */
+export function addRecipeVideo(recipeId: string, data: { videoUrl: string; platform?: string; coverImage?: string; title?: string; duration?: number }): Promise<VideoEmbed> {
+  return apiClient.post(`/recipes/${recipeId}/videos`, data).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 删除视频
+ * DELETE /api/videos/:id
+ */
+export function deleteRecipeVideo(id: string): Promise<void> {
+  return apiClient.delete(`/videos/${id}`).then(r => r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 迭代#34: 挑战赛系统
+// ─────────────────────────────────────────────────────────────────
+
+export interface Challenge {
+  id: string
+  title: string
+  description?: string
+  theme: string
+  coverImage?: string
+  startDate?: string
+  endDate?: string
+  status: 'draft' | 'active' | 'voting' | 'closed'
+  rules?: string
+  prize?: string
+  submissionCount: number
+  voteCount: number
+  createdBy?: string
+  creator?: { id: string; username: string; nickname?: string }
+  createdAt: string
+}
+
+export interface ChallengeSubmission {
+  id: string
+  challengeId: string
+  recipeId: string
+  userId: string
+  description?: string
+  voteCount: number
+  createdAt: string
+  recipe?: Recipe
+  submitter?: { id: string; username: string; nickname?: string }
+}
+
+export interface ChallengeRanking {
+  rank: number
+  id: string
+  recipeId: string
+  recipe?: Recipe
+  submitter?: { id: string; username: string; nickname?: string }
+  voteCount: number
+  description?: string
+}
+
+/**
+ * 获取挑战列表
+ * GET /api/challenges
+ */
+export function getChallenges(params?: { status?: string; page?: number; pageSize?: number }): Promise<{ list: Challenge[]; total: number }> {
+  return apiClient.get('/challenges', { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 获取挑战详情
+ * GET /api/challenges/:id
+ */
+export function getChallenge(id: string): Promise<Challenge> {
+  return apiClient.get(`/challenges/${id}`).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 获取挑战投稿列表
+ * GET /api/challenges/:id/submissions
+ */
+export function getChallengeSubmissions(challengeId: string, params?: { page?: number; pageSize?: number }): Promise<{ list: ChallengeSubmission[]; total: number }> {
+  return apiClient.get(`/challenges/${challengeId}/submissions`, { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 用户投稿
+ * POST /api/challenges/:id/submit
+ */
+export function submitToChallenge(challengeId: string, data: { recipeId: string; description?: string }): Promise<ChallengeSubmission> {
+  return apiClient.post(`/challenges/${challengeId}/submit`, data).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 投票
+ * POST /api/challenges/:id/vote
+ */
+export function voteChallenge(challengeId: string, submissionId: string): Promise<{ message: string }> {
+  return apiClient.post(`/challenges/${challengeId}/vote`, { submissionId }).then(r => r.data)
+}
+
+/**
+ * 获取排行榜
+ * GET /api/challenges/:id/ranking
+ */
+export function getChallengeRanking(challengeId: string): Promise<{ list: ChallengeRanking[]; total: number }> {
+  return apiClient.get(`/challenges/${challengeId}/ranking`).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 获取我的投稿
+ * GET /api/my-submissions
+ */
+export function getMySubmissions(): Promise<{ list: any[]; total: number }> {
+  return apiClient.get('/my-submissions').then(r => r.data?.data || { list: [], total: 0 })
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 迭代#34: 智能食材搜索
+// ─────────────────────────────────────────────────────────────────
+
+export interface IngredientSearchResult {
+  id: string
+  title: string
+  coverImage?: string
+  description?: string
+  category?: string
+  difficulty?: string
+  cookTime?: number
+  servings?: number
+  favoriteCount: number
+  matchRatio: number
+  matchCount: number
+  totalIngredients: number
+  matchedIngredients: string[]
+  missingIngredients: string[]
+  nutrition?: any
+}
+
+/**
+ * 手头食材搜索匹配食谱
+ * POST /api/recipes/by-ingredients
+ */
+export function searchByIngredients(ingredients: string[]): Promise<{ list: IngredientSearchResult[]; total: number; userIngredients: string[] }> {
+  return apiClient.post('/recipes/by-ingredients', { ingredients }).then(r => r.data?.data || { list: [], total: 0, userIngredients: [] })
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 迭代#34: 厨房工具
+// ─────────────────────────────────────────────────────────────────
+
+export interface KitchenTool {
+  id: string
+  name: string
+  category: string
+  icon?: string
+  description?: string
+  essential: boolean
+  createdAt: string
+}
+
+/**
+ * 获取工具列表
+ * GET /api/tools
+ */
+export function getKitchenTools(params?: { category?: string; essential?: boolean }): Promise<{ list: KitchenTool[]; total: number }> {
+  return apiClient.get('/tools', { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 获取食谱所需工具
+ * GET /api/recipes/:recipeId/tools
+ */
+export function getRecipeTools(recipeId: string): Promise<{ list: KitchenTool[]; total: number }> {
+  return apiClient.get(`/recipes/${recipeId}/tools`).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 获取食谱缺少的工具
+ * GET /api/recipes/:recipeId/missing-tools
+ */
+export function getMissingTools(recipeId: string): Promise<{ list: KitchenTool[]; total: number }> {
+  return apiClient.get(`/recipes/${recipeId}/missing-tools`).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 获取我的工具库
+ * GET /api/my-tools
+ */
+export function getMyTools(): Promise<{ list: KitchenTool[]; total: number }> {
+  return apiClient.get('/my-tools').then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/**
+ * 添加工具到我的工具库
+ * POST /api/my-tools
+ */
+export function addMyTool(toolId: string): Promise<{ message: string }> {
+  return apiClient.post('/my-tools', { toolId }).then(r => r.data)
+}
+
+/**
+ * 从工具库移除工具
+ * DELETE /api/my-tools/:toolId
+ */
+export function removeMyTool(toolId: string): Promise<{ message: string }> {
+  return apiClient.delete(`/my-tools/${toolId}`).then(r => r.data)
+}
+
+/**
+ * 批量添加工具到工具库
+ * POST /api/my-tools/batch
+ */
+export function batchAddMyTools(toolIds: string[]): Promise<{ added: number }> {
+  return apiClient.post('/my-tools/batch', { toolIds }).then(r => r.data?.data || { added: 0 })
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -1146,4 +1386,23 @@ export default {
   updateCookingLog,
   deleteCookingLog,
   getCookingLogStats,
+  // 迭代#34
+  getRecipeVideos,
+  addRecipeVideo,
+  deleteRecipeVideo,
+  getChallenges,
+  getChallenge,
+  getChallengeSubmissions,
+  submitToChallenge,
+  voteChallenge,
+  getChallengeRanking,
+  getMySubmissions,
+  searchByIngredients,
+  getKitchenTools,
+  getRecipeTools,
+  getMissingTools,
+  getMyTools,
+  addMyTool,
+  removeMyTool,
+  batchAddMyTools,
 }

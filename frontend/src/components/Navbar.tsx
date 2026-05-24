@@ -42,6 +42,15 @@ export default function Navbar() {
           <Link to="/recommend" className="navbar__link" onClick={handleNavClick}>
             🥬 食材推荐
           </Link>
+          <Link to="/ingredient-search" className="navbar__link" onClick={handleNavClick}>
+            🔍 手头食材
+          </Link>
+          <Link to="/challenges" className="navbar__link" onClick={handleNavClick}>
+            🏆 挑战赛
+          </Link>
+          <Link to="/tools" className="navbar__link" onClick={handleNavClick}>
+            🔪 工具库
+          </Link>
           <Link to="/favorites" className="navbar__link" onClick={handleNavClick}>
             我的收藏
           </Link>

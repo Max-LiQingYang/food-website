@@ -14,6 +14,7 @@ import ShareModal from '../components/ShareModal'
 import AddToCollectionDropdown from '../components/AddToCollectionDropdown'
 import AddToShoppingListButton from '../components/AddToShoppingListButton'
 import RecipeVersionPanel from '../components/RecipeVersionPanel'
+import VideoPlayer from '../components/VideoPlayer'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
 import { useRecipeStructuredData, useMetaTags, usePageTitle } from '../hooks/useSEO'
@@ -519,6 +520,9 @@ export default function RecipeDetailPage() {
             <NutritionCard nutrition={nutrition} />
           </div>
         )}
+
+        {/* 视频教程 */}
+        {id && <VideoPlayer recipeId={id} />}
 
         {/* 食材清单 */}
         {recipe.ingredients && recipe.ingredients.length > 0 && (

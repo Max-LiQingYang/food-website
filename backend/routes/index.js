@@ -77,6 +77,18 @@ router.use('/cooking-logs', auth, cookingLogRoutes)
 // 举报系统
 router.use('/reports', require('./reports'))
 
+// 迭代#34: 食谱视频嵌入
+router.use('/', require('./videos'))
+
+// 迭代#34: 挑战赛系统
+router.use('/', require('./challenges'))
+
+// 迭代#34: 智能食材搜索
+router.use('/', require('./ingredientSearch'))
+
+// 迭代#34: 厨房工具管理
+router.use('/', require('./kitchenTools'))
+
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)
 router.get('/favorites', favoriteRoutes.getFavorites)

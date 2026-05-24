@@ -13,6 +13,7 @@ vi.mock('../api', () => ({
   addFavorite: vi.fn().mockResolvedValue({ data: {} }),
   removeFavorite: vi.fn().mockResolvedValue({ data: {} }),
   deleteRecipe: vi.fn().mockResolvedValue({}),
+  getRecipeVideos: vi.fn().mockResolvedValue({ list: [], total: 0 }),
 }))
 
 // ── Mock Toast ────────────────────────────────────────────────────────────────

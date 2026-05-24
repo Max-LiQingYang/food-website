@@ -27,6 +27,11 @@ const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
 const ComparePage = lazy(() => import('../pages/ComparePage'))
 const PreferencesPage = lazy(() => import('../pages/PreferencesPage'))
 const PreferenceRecommendations = lazy(() => import('../pages/PreferenceRecommendations'))
+const ChallengesPage = lazy(() => import('../pages/ChallengesPage'))
+const ChallengeDetailPage = lazy(() => import('../pages/ChallengeDetailPage'))
+const IngredientSearchPage = lazy(() => import('../pages/IngredientSearchPage'))
+const KitchenToolsPage = lazy(() => import('../pages/KitchenToolsPage'))
+const MyToolsPage = lazy(() => import('../pages/MyToolsPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -71,8 +76,16 @@ const router = createBrowserRouter([
       { path: '/compare', element: <ComparePage /> },
       { path: '/preferences', element: <PreferencesPage /> },
       { path: '/preferences/recommendations', element: <PreferenceRecommendations /> },
-      { path: '/meal-planner', element: <MealPlannerPage /> },
-      { path: '/cooking-journal', element: <CookingJournalPage /> },
+          { path: '/meal-planner', element: <MealPlannerPage /> },
+  { path: '/cooking-journal', element: <CookingJournalPage /> },
+      // 迭代#34: 挑战赛系统
+      { path: '/challenges', element: <ChallengesPage /> },
+      { path: '/challenges/:id', element: <ChallengeDetailPage /> },
+      // 迭代#34: 智能食材搜索
+      { path: '/ingredient-search', element: <IngredientSearchPage /> },
+      // 迭代#34: 厨房工具管理
+      { path: '/tools', element: <KitchenToolsPage /> },
+      { path: '/my-tools', element: <MyToolsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
