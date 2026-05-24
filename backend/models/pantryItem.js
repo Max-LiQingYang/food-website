@@ -86,16 +86,6 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(200),
       allowNull: true,
     },
-    addedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
   }, {
     sequelize,
     modelName: 'PantryItem',
