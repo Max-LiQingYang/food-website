@@ -6,11 +6,17 @@
   cursor: pointer;
   transition:
     transform var(--transition-normal, 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)),
-    box-shadow var(--transition-normal, 0.3s ease);
+    box-shadow var(--transition-normal, 0.3s ease),
+    border-color var(--transition-normal, 0.3s ease);
   position: relative;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   animation: cardFadeIn 0.4s ease both;
+  border: 1px solid var(--color-border, #eee);
+}
+
+body.dark .recipe-card {
+  border-color: var(--color-border-dark, #333);
 }
 
 @keyframes cardFadeIn {
@@ -25,8 +31,13 @@
 }
 
 .recipe-card:hover {
-  transform: translateY(-6px) scale(1.02);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.15));
+  border-color: var(--color-primary-light, #f0a080);
+}
+
+.recipe-card:hover .recipe-card__cover {
+  border-bottom: 2px solid var(--color-primary, #E8663E);
 }
 
 /* 悬浮预览覆盖层 */
@@ -256,7 +267,66 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-/* 智能难度 */
+/* ── 智能难度 ── */
 .recipe-card__smart-difficulty {
   font-size: 12px;
+}
+
+/* ── 紧凑标签行 ── */
+.recipe-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.recipe-card__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: transform 0.2s ease;
+}
+
+.recipe-card__tag:hover {
+  transform: scale(1.05);
+}
+
+.recipe-card__tag--category {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+}
+
+.recipe-card__tag--difficulty {
+  background: var(--color-tag-bg, #f0ebe6);
+  color: var(--color-tag-text, #666);
+}
+
+.recipe-card__tag--time {
+  background: rgba(232, 102, 62, 0.08);
+  color: var(--color-primary, #E8663E);
+}
+
+.recipe-card__tag--season {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+body.dark .recipe-card__tag--season {
+  background: rgba(46, 125, 50, 0.2);
+  color: #81c784;
+}
+
+.recipe-card__tag--smart {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+body.dark .recipe-card__tag--smart {
+  background: rgba(245, 127, 23, 0.2);
+  color: #ffb74d;
 }

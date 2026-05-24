@@ -561,3 +561,153 @@ body.dark .profile-tab--active {
     font-size: 14px;
   }
 }
+/* ── 数字滚动动画 ── */
+.countup-value {
+  display: inline-block;
+}
+
+/* ── 成就徽章区 ── */
+.profile-achievements {
+  margin-bottom: 20px;
+}
+
+.profile-achievements__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0 0 10px;
+}
+
+body.dark .profile-achievements__title {
+  color: var(--color-text-dark, #eee);
+}
+
+.profile-achievements__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.achievement-badge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px;
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--color-border, #e8e0d8);
+  min-width: 80px;
+  cursor: default;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.achievement-badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(232, 102, 62, 0.2);
+}
+
+body.dark .achievement-badge {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #333);
+}
+
+.achievement-badge__glow {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, rgba(232, 102, 62, 0.15), transparent);
+  animation: achievementGlow 2s ease-in-out infinite;
+}
+
+@keyframes achievementGlow {
+  0%, 100% { box-shadow: 0 0 4px rgba(232, 102, 62, 0.2); }
+  50% { box-shadow: 0 0 12px rgba(232, 102, 62, 0.4); }
+}
+
+.achievement-badge__icon {
+  font-size: 22px;
+}
+
+.achievement-badge__name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #666);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.dark .achievement-badge__name {
+  color: var(--color-text-secondary-dark, #aaa);
+}
+
+.achievement-badge__progress {
+  width: 100%;
+  height: 3px;
+  background: var(--color-bg-secondary, #f0ebe6);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.achievement-badge__progress-fill {
+  height: 100%;
+  background: var(--color-primary, #E8663E);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* ── 成就 tooltip ── */
+.achievement-badge__tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  min-width: 160px;
+  z-index: 20;
+  text-align: center;
+  white-space: normal;
+  animation: fadeIn 0.2s ease;
+}
+
+.achievement-badge:hover .achievement-badge__tooltip {
+  display: block;
+}
+
+.achievement-badge__tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: rgba(0,0,0,0.85);
+}
+
+.achievement-badge__tooltip-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.achievement-badge__tooltip-desc {
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.achievement-badge__tooltip-date {
+  opacity: 0.6;
+  font-size: 11px;
+}

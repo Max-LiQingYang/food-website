@@ -312,6 +312,59 @@ export function getUserFavorites(params: { userId: string; page?: number; pageSi
   })
 }
 
+/**
+ * 获取用户活跃热力图数据
+ * GET /api/users/:id/activity-heatmap?days=30
+ */
+export interface ActivityHeatmapDay {
+  date: string
+  recipeCount: number
+  favoriteCount: number
+  commentCount: number
+  total: number
+}
+
+export interface ActivityHeatmapResponse {
+  userId: string
+  days: number
+  daily: ActivityHeatmapDay[]
+  maxTotal: number
+}
+
+export function getActivityHeatmap(id: string, days = 30): Promise<ActivityHeatmapResponse> {
+  return apiClient.get(`/users/${id}/activity-heatmap`, { params: { days } })
+}
+
+/**
+ * 获取时令食材推荐食谱
+ * GET /api/recipes/seasonal-ingredients?ingredients=xxx
+ */
+export function getSeasonalIngredientRecipes(ingredients: string[]) {
+  return apiClient.get('/recipes/recommend', {
+    params: { ingredients: ingredients.join(','), pageSize: 8 },
+  })
+}
+
+/**
+ * 获取用户成就列表
+ * GET /api/achievements/user/:userId
+ */
+export interface AchievementItem {
+  id: string
+  userId: string
+  type: string
+  title: string
+  description: string
+  icon?: string
+  unlockedAt: string
+  progress?: number
+  maxProgress?: number
+}
+
+export function getUserAchievements(userId: string): Promise<AchievementItem[]> {
+  return apiClient.get(`/achievements/user/${userId}`)
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Comments API
 // ─────────────────────────────────────────────────────────────────
@@ -1646,6 +1699,9 @@ export default {
   getUserRecipes,
   getUserStats,
   getUserFavorites,
+  getActivityHeatmap,
+  getSeasonalIngredientRecipes,
+  getUserAchievements,
   createRecipe,
   updateRecipe,
   deleteRecipe,

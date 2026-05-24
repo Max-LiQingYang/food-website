@@ -1,0 +1,133 @@
+.activity-heatmap {
+  margin-bottom: 24px;
+}
+
+.activity-heatmap__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.activity-heatmap__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  max-width: 100%;
+}
+
+.activity-heatmap__cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  cursor: default;
+  position: relative;
+}
+
+.activity-heatmap__cell:hover {
+  transform: scale(1.35);
+  z-index: 2;
+}
+
+.activity-heatmap__cell--0 {
+  background: var(--color-bg-secondary, #f0ebe6);
+  opacity: 0.3;
+}
+
+.activity-heatmap__cell--1 {
+  background: #c8e6c9;
+}
+
+.activity-heatmap__cell--2 {
+  background: #81c784;
+}
+
+.activity-heatmap__cell--3 {
+  background: #4caf50;
+}
+
+.activity-heatmap__cell--4 {
+  background: #2e7d32;
+}
+
+.activity-heatmap__cell--5 {
+  background: #1b5e20;
+}
+
+.dark .activity-heatmap__cell--0 {
+  background: #333;
+  opacity: 0.4;
+}
+
+.dark .activity-heatmap__cell--1 {
+  background: #1b5e20;
+}
+
+.dark .activity-heatmap__cell--2 {
+  background: #2e7d32;
+}
+
+.dark .activity-heatmap__cell--3 {
+  background: #388e3c;
+}
+
+.dark .activity-heatmap__cell--4 {
+  background: #43a047;
+}
+
+.dark .activity-heatmap__cell--5 {
+  background: #66bb6a;
+}
+
+.activity-heatmap__tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  animation: fadeIn 0.15s ease;
+}
+
+.activity-heatmap__legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  justify-content: flex-end;
+  font-size: 11px;
+  color: var(--color-text-muted, #999);
+}
+
+.activity-heatmap__legend-label {
+  margin-right: 4px;
+}
+
+.activity-heatmap__legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.heatmap-loading {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted, #999);
+  font-size: 14px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

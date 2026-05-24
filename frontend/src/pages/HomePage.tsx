@@ -9,6 +9,7 @@ import HeroSection from '../components/HeroSection'
 import CategoryCards from '../components/CategoryCards'
 import FeaturedSection from '../components/FeaturedSection'
 import SeasonalRecommendations from '../components/SeasonalRecommendations'
+import SeasonalIngredients from '../components/SeasonalIngredients'
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations'
 import HomeTagsSection from '../components/HomeTagsSection'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
@@ -197,6 +198,9 @@ export default function HomePage() {
 
       {/* 季节性推荐 */}
       {showFullLayout && <SeasonalRecommendations />}
+
+      {/* 时令食材推荐 */}
+      {showFullLayout && <SeasonalIngredients />}
 
       {/* 热门标签快捷入口 */}
       {showFullLayout && <HomeTagsSection />}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   getUserProfile,
@@ -6,17 +6,97 @@ import {
   getUserFavorites,
   getUserStats,
   getCollections,
+  getUserAchievements,
   updateProfile,
   type Recipe,
   type UserStats,
   type Collection,
+  type AchievementItem,
 } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import BrowsingHistory from '../components/BrowsingHistory'
+import ActivityHeatmap from '../components/ActivityHeatmap'
 import './UserProfilePage.css'
 
 type TabType = 'recipes' | 'favorites' | 'collections'
 type TabTypeWithHistory = TabType | 'history'
+
+// ─── CountUp 组件 ───
+function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: number }) {
+  const [display, setDisplay] = useState(0)
+  const [started, setStarted] = useState(false)
+  const startTimeRef = useRef<number | null>(null)
+  const rafRef = useRef<number | null>(null)
+  const ref = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          setStarted(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.3 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [started])
+
+  useEffect(() => {
+    if (!started) return
+    startTimeRef.current = null
+    const step = (timestamp: number) => {
+      if (startTimeRef.current === null) startTimeRef.current = timestamp
+      const elapsed = timestamp - startTimeRef.current
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = progress * (2 - progress)
+      setDisplay(Math.round(value * eased))
+      if (progress < 1) rafRef.current = requestAnimationFrame(step)
+    }
+    rafRef.current = requestAnimationFrame(step)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [value, duration, started])
+
+  return <span ref={ref} className="countup-value">{display}</span>
+}
+
+// ─── Achievement 成就徽章组件 ───
+function AchievementBadge({ achievement }: { achievement: AchievementItem }) {
+  const defaultIcons: Record<string, string> = {
+    'first-recipe': '👨‍🍳',
+    'first-favorite': '💖',
+    'first-comment': '💬',
+    'popular-recipe': '🏆',
+    'favorite-50': '⭐',
+    'master-chef': '👑',
+  }
+  const icon = achievement.icon || defaultIcons[achievement.type] || '🎖️'
+
+  return (
+    <div className="achievement-badge" title={`${achievement.title}: ${achievement.description}`}>
+      <div className="achievement-badge__glow">
+        <span className="achievement-badge__icon">{icon}</span>
+      </div>
+      <span className="achievement-badge__name">{achievement.title}</span>
+      {achievement.progress != null && achievement.maxProgress != null && (
+        <div className="achievement-badge__progress">
+          <div
+            className="achievement-badge__progress-fill"
+            style={{ width: `${Math.min(100, (achievement.progress / achievement.maxProgress) * 100)}%` }}
+          />
+        </div>
+      )}
+      <div className="achievement-badge__tooltip">
+        <div className="achievement-badge__tooltip-title">{achievement.title}</div>
+        <div className="achievement-badge__tooltip-desc">{achievement.description}</div>
+        <div className="achievement-badge__tooltip-date">
+          获得于 {new Date(achievement.unlockedAt).toLocaleDateString('zh-CN')}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function UserProfilePage() {
   const { id } = useParams<{ id: string }>()
@@ -24,6 +104,7 @@ export default function UserProfilePage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [activeTab, setActiveTab] = useState<TabTypeWithHistory>('recipes')
   const [isOwnProfile, setIsOwnProfile] = useState(false)
+  const [achievements, setAchievements] = useState<AchievementItem[]>([])
 
   // Recipes state
   const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -64,7 +145,7 @@ export default function UserProfilePage() {
     }
   }, [id])
 
-  // Load profile + stats
+  // Load profile + stats + achievements
   useEffect(() => {
     if (!id) {
       setNotFound(true)
@@ -73,12 +154,18 @@ export default function UserProfilePage() {
     }
     setLoading(true)
 
-    Promise.all([getUserProfile(id), getUserStats(id)])
-      .then(([profileRes, statsRes]) => {
+    Promise.all([
+      getUserProfile(id),
+      getUserStats(id),
+      getUserAchievements(id),
+    ])
+      .then(([profileRes, statsRes, achRes]: [any, any, any]) => {
         const p = profileRes.data ?? profileRes
         const s = statsRes.data ?? statsRes
+        const a = Array.isArray(achRes) ? achRes : (achRes.data ?? [])
         setProfile(p)
         setStats(s)
+        setAchievements(a)
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false))
@@ -143,7 +230,6 @@ export default function UserProfilePage() {
       const updated = res.data ?? res
       setProfile(updated)
       setShowEditModal(false)
-      // Also update localStorage user
       try {
         const stored = localStorage.getItem('user')
         if (stored) {
@@ -166,17 +252,9 @@ export default function UserProfilePage() {
     return (
       <div className="profile-page">
         <div className="profile-skeleton">
-          <div
-            className="skeleton-box"
-            style={{ width: 80, height: 80, borderRadius: '50%', margin: '0 auto' }}
-          />
-          <div
-            className="skeleton-box skeleton-heading"
-            style={{ width: '40%', margin: '16px auto' }}
-          />
+          <div className="skeleton-box" style={{ width: 80, height: 80, borderRadius: '50%', margin: '0 auto' }} />
+          <div className="skeleton-box skeleton-heading" style={{ width: '40%', margin: '16px auto' }} />
           <div className="skeleton-box skeleton-line short" style={{ margin: '0 auto' }} />
-
-          {/* 统计卡片占位 */}
           <div className="profile-skeleton__stats">
             {[1, 2, 3].map(i => (
               <div key={i} className="profile-skeleton__stat-card">
@@ -186,15 +264,11 @@ export default function UserProfilePage() {
               </div>
             ))}
           </div>
-
-          {/* Tab 占位 */}
           <div className="profile-skeleton__tabs">
             {[1, 2, 3].map(i => (
               <div key={i} className="skeleton-box" style={{ width: 72, height: 32, borderRadius: 8 }} />
             ))}
           </div>
-
-          {/* 卡片网格占位 */}
           <div className="profile-grid" style={{ marginTop: 20 }}>
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="profile-card-skeleton">
@@ -218,9 +292,7 @@ export default function UserProfilePage() {
           <div className="profile-notfound__icon">👤</div>
           <h2>用户不存在</h2>
           <p>该用户可能已注销</p>
-          <Link to="/" className="btn btn--primary">
-            返回首页
-          </Link>
+          <Link to="/" className="btn btn--primary">返回首页</Link>
         </div>
       </div>
     )
@@ -271,36 +343,51 @@ export default function UserProfilePage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards with CountUp */}
       {stats && (
         <div className="profile-stats">
           <div className="profile-stats__card">
             <span className="profile-stats__icon">📝</span>
-            <span className="profile-stats__value">{stats.recipeCount ?? 0}</span>
+            <span className="profile-stats__value"><AnimatedNumber value={stats.recipeCount ?? 0} /></span>
             <span className="profile-stats__label">食谱</span>
           </div>
           <div className="profile-stats__card">
             <span className="profile-stats__icon">❤️</span>
-            <span className="profile-stats__value">{stats.favoriteCount ?? 0}</span>
+            <span className="profile-stats__value"><AnimatedNumber value={stats.favoriteCount ?? 0} /></span>
             <span className="profile-stats__label">收藏</span>
           </div>
           <div className="profile-stats__card">
             <span className="profile-stats__icon">💬</span>
-            <span className="profile-stats__value">{stats.commentCount ?? 0}</span>
+            <span className="profile-stats__value"><AnimatedNumber value={stats.commentCount ?? 0} /></span>
             <span className="profile-stats__label">评论</span>
           </div>
           <div className="profile-stats__card">
             <span className="profile-stats__icon">👥</span>
-            <span className="profile-stats__value">{stats.followersCount ?? 0}</span>
+            <span className="profile-stats__value"><AnimatedNumber value={stats.followersCount ?? 0} /></span>
             <span className="profile-stats__label">粉丝</span>
           </div>
           <div className="profile-stats__card">
             <span className="profile-stats__icon">➡️</span>
-            <span className="profile-stats__value">{stats.followingCount ?? 0}</span>
+            <span className="profile-stats__value"><AnimatedNumber value={stats.followingCount ?? 0} /></span>
             <span className="profile-stats__label">关注</span>
           </div>
         </div>
       )}
+
+      {/* 成就徽章区 */}
+      {achievements.length > 0 && (
+        <div className="profile-achievements">
+          <h4 className="profile-achievements__title">🏅 成就</h4>
+          <div className="profile-achievements__list">
+            {achievements.map(ach => (
+              <AchievementBadge key={ach.id} achievement={ach} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 烹饪热力图 */}
+      {id && <ActivityHeatmap userId={id} />}
 
       {/* Tabs */}
       <div className="profile-tabs">
@@ -338,9 +425,7 @@ export default function UserProfilePage() {
       {/* Content */}
       <div className="profile-content">
         {activeTab === 'history' ? (
-          <div style={{ padding: '0 0 20px' }}>
-            <BrowsingHistory />
-          </div>
+          <div style={{ padding: '0 0 20px' }}><BrowsingHistory /></div>
         ) : activeTab === 'collections' ? (
           <>
             {collectionsLoading ? (
@@ -361,19 +446,13 @@ export default function UserProfilePage() {
               <>
                 <div className="profile-collections-grid">
                   {collections.map(col => (
-                    <Link
-                      to={`/collections/${col.id}`}
-                      key={col.id}
-                      className="collection-card"
-                    >
+                    <Link to={`/collections/${col.id}`} key={col.id} className="collection-card">
                       <div className="collection-card__cover">
                         <span className="collection-card__icon">📁</span>
                       </div>
                       <div className="collection-card__info">
                         <h3 className="collection-card__name">{col.name}</h3>
-                        {col.description && (
-                          <p className="collection-card__desc">{col.description}</p>
-                        )}
+                        {col.description && <p className="collection-card__desc">{col.description}</p>}
                         <span className="collection-card__count">
                           {(col as any).recipes?.length ?? (col as any).recipeCount ?? 0} 个食谱
                         </span>
@@ -383,9 +462,7 @@ export default function UserProfilePage() {
                 </div>
                 {isOwnProfile && (
                   <div style={{ textAlign: 'center', marginTop: 24 }}>
-                    <Link to="/collections" className="btn btn--outline">
-                      管理所有收藏夹
-                    </Link>
+                    <Link to="/collections" className="btn btn--outline">管理所有收藏夹</Link>
                   </div>
                 )}
               </>
@@ -399,10 +476,7 @@ export default function UserProfilePage() {
                   <div key={i} className="profile-card-skeleton">
                     <div className="skeleton-box skeleton-cover" />
                     <div className="skeleton-box skeleton-line" style={{ margin: '12px 14px' }} />
-                    <div
-                      className="skeleton-box skeleton-line short"
-                      style={{ margin: '0 14px 14px' }}
-                    />
+                    <div className="skeleton-box skeleton-line short" style={{ margin: '0 14px 14px' }} />
                   </div>
                 ))}
               </div>
@@ -425,21 +499,11 @@ export default function UserProfilePage() {
                 </div>
                 {cur.total > pageSize && (
                   <div className="profile-pagination">
-                    <button
-                      className="pagination-btn"
-                      disabled={cur.page <= 1}
-                      onClick={() => cur.setPage(p => p - 1)}
-                    >
+                    <button className="pagination-btn" disabled={cur.page <= 1} onClick={() => cur.setPage(p => p - 1)}>
                       上一页
                     </button>
-                    <span className="pagination-info">
-                      {cur.page} / {Math.ceil(cur.total / pageSize)}
-                    </span>
-                    <button
-                      className="pagination-btn"
-                      disabled={cur.page >= Math.ceil(cur.total / pageSize)}
-                      onClick={() => cur.setPage(p => p + 1)}
-                    >
+                    <span className="pagination-info">{cur.page} / {Math.ceil(cur.total / pageSize)}</span>
+                    <button className="pagination-btn" disabled={cur.page >= Math.ceil(cur.total / pageSize)} onClick={() => cur.setPage(p => p + 1)}>
                       下一页
                     </button>
                   </div>
@@ -455,45 +519,24 @@ export default function UserProfilePage() {
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">编辑资料</h2>
-
             <div className="form-field">
               <label className="form-label">头像 URL</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="输入头像图片链接..."
-                value={editAvatar}
-                onChange={e => setEditAvatar(e.target.value)}
-              />
+              <input type="text" className="form-input" placeholder="输入头像图片链接..." value={editAvatar} onChange={e => setEditAvatar(e.target.value)} />
               {editAvatar && (
                 <div className="avatar-preview-wrapper">
                   <img src={editAvatar} alt="预览" className="avatar-preview" />
                 </div>
               )}
             </div>
-
             <div className="form-field">
               <label className="form-label">昵称</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="输入新昵称..."
-                value={editNickname}
-                onChange={e => setEditNickname(e.target.value)}
-              />
+              <input type="text" className="form-input" placeholder="输入新昵称..." value={editNickname} onChange={e => setEditNickname(e.target.value)} />
             </div>
-
             <div className="modal-actions">
-              <button
-                className="btn btn--primary"
-                disabled={saving}
-                onClick={handleSaveProfile}
-              >
+              <button className="btn btn--primary" disabled={saving} onClick={handleSaveProfile}>
                 {saving ? '保存中...' : '保存'}
               </button>
-              <button className="btn btn--outline" onClick={() => setShowEditModal(false)}>
-                取消
-              </button>
+              <button className="btn btn--outline" onClick={() => setShowEditModal(false)}>取消</button>
             </div>
           </div>
         </div>

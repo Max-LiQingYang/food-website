@@ -149,37 +149,50 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay }: R
           </span>
         )}
 
-        {/* 烹饪时间标签 */}
-        {recipe.cookTime != null && (
-          <span className="recipe-card__badge recipe-card__badge--time">
-            ⏱ {recipe.cookTime}分钟
-          </span>
-        )}
+        {/* 烹饪时间标签 (移除了，现在在tags行展示) */}
       </div>
 
       {/* 信息区 */}
       <div className="recipe-card__info">
         <h3 className="recipe-card__title">{titleContent}</h3>
 
+        {/* 紧凑标签行 */}
+        <div className="recipe-card__tags">
+          {/* 分类标签 */}
+          {recipe.category && (
+            <span className="recipe-card__tag recipe-card__tag--category">{recipe.category}</span>
+          )}
+
+          {/* 难度 */}
+          {difficulty && DIFFICULTY_LABELS[difficulty] && (
+            <span className="recipe-card__tag recipe-card__tag--difficulty">
+              {DIFFICULTY_ICONS[difficulty]} {DIFFICULTY_LABELS[difficulty]}
+            </span>
+          )}
+
+          {/* 烹饪时间 */}
+          {recipe.cookTime != null && (
+            <span className="recipe-card__tag recipe-card__tag--time">⏱ {recipe.cookTime}分钟</span>
+          )}
+
+          {/* 季节标签 */}
+          {recipe.season && recipe.season !== 'all' && SEASON_LABELS[recipe.season] && (
+            <span className="recipe-card__tag recipe-card__tag--season">{SEASON_LABELS[recipe.season]}</span>
+          )}
+
+          {/* 智能难度 */}
+          {recipe.smartDifficulty && !DIFFICULTY_LABELS[difficulty] && (
+            <span className="recipe-card__tag recipe-card__tag--smart">
+              {SMART_DIFFICULTY_ICONS[recipe.smartDifficulty] || '⚡'} {SMART_DIFFICULTY_LABELS[recipe.smartDifficulty] || recipe.smartDifficulty}
+            </span>
+          )}
+        </div>
+
         <div className="recipe-card__meta">
           {/* 作者 */}
           {recipe.author && (
             <span className="recipe-card__meta-item recipe-card__author">
               👨‍🍳 {recipe.author}
-            </span>
-          )}
-
-          {/* 难度 */}
-          {difficulty && DIFFICULTY_LABELS[difficulty] && (
-            <span className="recipe-card__meta-item recipe-card__difficulty">
-              {DIFFICULTY_ICONS[difficulty]} {DIFFICULTY_LABELS[difficulty]}
-            </span>
-          )}
-
-          {/* 智能难度 */}
-          {recipe.smartDifficulty && (
-            <span className="recipe-card__meta-item recipe-card__smart-difficulty">
-              {SMART_DIFFICULTY_ICONS[recipe.smartDifficulty] || '⚡'} {SMART_DIFFICULTY_LABELS[recipe.smartDifficulty] || recipe.smartDifficulty}
             </span>
           )}
 
@@ -194,22 +207,12 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay }: R
         {/* 评分星星 */}
         {recipe.avgRating != null && recipe.avgRating > 0 && (
           <span className="recipe-card__meta-item recipe-card__rating">
-            {"★".repeat(Math.round(recipe.avgRating))}{"☆".repeat(5 - Math.round(recipe.avgRating))} {" "}
+            {'★'.repeat(Math.round(recipe.avgRating))}{'☆'.repeat(5 - Math.round(recipe.avgRating))} {' '}
             {recipe.avgRating.toFixed(1)}
             {recipe.ratingCount != null && recipe.ratingCount > 0 && (
               <span className="recipe-card__rating-count">({recipe.ratingCount})</span>
             )}
           </span>
-        )}
-
-        {/* 分类标签 */}
-        {recipe.category && (
-          <span className="recipe-card__category">{recipe.category}</span>
-        )}
-
-        {/* 季节标签 */}
-        {recipe.season && recipe.season !== 'all' && SEASON_LABELS[recipe.season] && (
-          <span className="recipe-card__season">{SEASON_LABELS[recipe.season]}</span>
         )}
       </div>
     </div>
