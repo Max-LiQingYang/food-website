@@ -101,6 +101,12 @@ router.use('/', require('./behaviors'))
 // 迭代#35: 食谱导出（Markdown/PDF）
 router.use('/', require('./export'))
 
+// 迭代#37: 食材库存管理
+router.use('/pantry', require('./pantry'))
+
+// 迭代#37: 营养追踪
+router.use('/nutrition', require('./nutrition'))
+
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)
 router.get('/favorites', favoriteRoutes.getFavorites)

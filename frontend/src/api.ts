@@ -1463,6 +1463,173 @@ export function exportRecipePDF(id: string): Promise<Blob> {
   }).then(r => r.data)
 }
 
+// ═══════════════════════════════════════════════════════════
+// 迭代#37: 收藏夹增强
+// ═══════════════════════════════════════════════════════════
+
+/** 添加收藏夹评论 */
+export function addCollectionComment(collectionId: string, content: string): Promise<any> {
+  return apiClient.post(`/collections/${collectionId}/comments`, { content }).then(r => r.data?.data || r.data)
+}
+
+/** 获取收藏夹评论 */
+export function getCollectionComments(collectionId: string, params?: { page?: number; pageSize?: number }): Promise<{ list: any[]; total: number }> {
+  return apiClient.get(`/collections/${collectionId}/comments`, { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/** 删除收藏夹评论 */
+export function deleteCollectionComment(collectionId: string, commentId: string): Promise<any> {
+  return apiClient.delete(`/collections/${collectionId}/comments/${commentId}`).then(r => r.data)
+}
+
+// ═══════════════════════════════════════════════════════════
+// 迭代#37: 食材库存管理
+// ═══════════════════════════════════════════════════════════
+
+export interface PantryItem {
+  id: string
+  userId: string
+  name: string
+  quantity: number
+  unit: string
+  category: string
+  expiryDate: string | null
+  notes: string | null
+  addedAt: string
+  updatedAt: string
+}
+
+/** 获取库存列表 */
+export function getPantryItems(params?: { category?: string; expiring?: number; search?: string; page?: number; pageSize?: number; sortBy?: string; sortOrder?: string }): Promise<{ list: PantryItem[]; total: number }> {
+  return apiClient.get('/pantry', { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/** 添加库存项 */
+export function addPantryItem(data: { name: string; quantity?: number; unit?: string; category?: string; expiryDate?: string; notes?: string }): Promise<PantryItem> {
+  return apiClient.post('/pantry', data).then(r => r.data?.data)
+}
+
+/** 更新库存项 */
+export function updatePantryItem(id: string, data: { name?: string; quantity?: number; unit?: string; category?: string; expiryDate?: string; notes?: string }): Promise<PantryItem> {
+  return apiClient.put(`/pantry/${id}`, data).then(r => r.data?.data)
+}
+
+/** 删除库存项 */
+export function deletePantryItem(id: string): Promise<any> {
+  return apiClient.delete(`/pantry/${id}`).then(r => r.data)
+}
+
+/** 获取即将过期食材 */
+export function getExpiringItems(days: number = 3): Promise<{ list: PantryItem[]; count: number }> {
+  return apiClient.get('/pantry/expiring', { params: { days } }).then(r => r.data?.data || { list: [], count: 0 })
+}
+
+/** 获取已过期食材 */
+export function getExpiredItems(): Promise<{ list: PantryItem[]; count: number }> {
+  return apiClient.get('/pantry/expired').then(r => r.data?.data || { list: [], count: 0 })
+}
+
+/** 基于库存食谱推荐 */
+export function getPantrySuggestions(): Promise<{ list: any[]; total: number; message?: string }> {
+  return apiClient.get('/pantry/suggestions').then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/** 批量快速添加 */
+export function quickAddPantryItems(items: { name: string; quantity?: number; unit?: string; category?: string; expiryDate?: string }[]): Promise<{ list: PantryItem[]; count: number }> {
+  return apiClient.post('/pantry/quick-add', { items }).then(r => r.data?.data)
+}
+
+/** 批量删除库存项 */
+export function batchDeletePantryItems(ids: string[]): Promise<any> {
+  return apiClient.post('/pantry/batch-delete', { ids }).then(r => r.data)
+}
+
+// ═══════════════════════════════════════════════════════════
+// 迭代#37: 营养追踪
+// ═══════════════════════════════════════════════════════════
+
+export interface NutritionLog {
+  id: string
+  userId: string
+  recipeId: string
+  date: string
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack'
+  servings: number
+  calories: number
+  protein: number
+  fat: number
+  carbs: number
+  fiber: number
+  sodium: number
+  recipe?: any
+  createdAt: string
+}
+
+export interface NutritionGoal {
+  id: string
+  userId: string
+  calories: number
+  protein: number
+  fat: number
+  carbs: number
+  fiber: number
+}
+
+/** 添加饮食记录 */
+export function addNutritionLog(data: { recipeId: string; date: string; mealType: string; servings?: number }): Promise<NutritionLog> {
+  return apiClient.post('/nutrition/logs', data).then(r => r.data?.data)
+}
+
+/** 获取饮食记录 */
+export function getNutritionLogs(params?: { date?: string; mealType?: string; page?: number; pageSize?: number }): Promise<{ list: NutritionLog[]; total: number }> {
+  return apiClient.get('/nutrition/logs', { params }).then(r => r.data?.data || { list: [], total: 0 })
+}
+
+/** 更新饮食记录 */
+export function updateNutritionLog(id: string, data: { servings?: number; date?: string; mealType?: string }): Promise<NutritionLog> {
+  return apiClient.put(`/nutrition/logs/${id}`, data).then(r => r.data?.data)
+}
+
+/** 删除饮食记录 */
+export function deleteNutritionLog(id: string): Promise<any> {
+  return apiClient.delete(`/nutrition/logs/${id}`).then(r => r.data)
+}
+
+/** 获取营养目标 */
+export function getNutritionGoals(): Promise<NutritionGoal> {
+  return apiClient.get('/nutrition/goals').then(r => r.data?.data)
+}
+
+/** 设置营养目标 */
+export function setNutritionGoals(data: { calories?: number; protein?: number; fat?: number; carbs?: number; fiber?: number }): Promise<NutritionGoal> {
+  return apiClient.put('/nutrition/goals', data).then(r => r.data?.data)
+}
+
+/** 获取推荐营养值 */
+export function getRecommendedGoals(params?: { weight?: number; height?: number; age?: number; gender?: string; activity?: string }): Promise<NutritionGoal> {
+  return apiClient.get('/nutrition/goals/recommended', { params }).then(r => r.data?.data)
+}
+
+/** 每日统计 */
+export function getDailyNutritionStats(date?: string): Promise<any> {
+  return apiClient.get('/nutrition/stats/daily', { params: { date } }).then(r => r.data?.data)
+}
+
+/** 每周统计 */
+export function getWeeklyNutritionStats(start?: string, end?: string): Promise<any> {
+  return apiClient.get('/nutrition/stats/weekly', { params: { start, end } }).then(r => r.data?.data)
+}
+
+/** 月度趋势 */
+export function getMonthlyNutritionStats(year?: number, month?: number): Promise<any> {
+  return apiClient.get('/nutrition/stats/monthly', { params: { year, month } }).then(r => r.data?.data)
+}
+
+/** 饮食建议 */
+export function getNutritionSuggestions(date?: string): Promise<any> {
+  return apiClient.get('/nutrition/suggestions', { params: { date } }).then(r => r.data?.data)
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -1544,4 +1711,30 @@ export default {
   addMyTool,
   removeMyTool,
   batchAddMyTools,
+  // ═══ 迭代#37: 收藏夹增强 ═══
+  addCollectionComment,
+  getCollectionComments,
+  deleteCollectionComment,
+  // ═══ 迭代#37: 食材库存 ═══
+  getPantryItems,
+  addPantryItem,
+  updatePantryItem,
+  deletePantryItem,
+  getExpiringItems,
+  getExpiredItems,
+  getPantrySuggestions,
+  quickAddPantryItems,
+  batchDeletePantryItems,
+  // ═══ 迭代#37: 营养追踪 ═══
+  addNutritionLog,
+  getNutritionLogs,
+  updateNutritionLog,
+  deleteNutritionLog,
+  getNutritionGoals,
+  setNutritionGoals,
+  getRecommendedGoals,
+  getDailyNutritionStats,
+  getWeeklyNutritionStats,
+  getMonthlyNutritionStats,
+  getNutritionSuggestions,
 }

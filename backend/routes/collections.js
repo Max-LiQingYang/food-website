@@ -162,22 +162,38 @@ router.get('/:id', auth, async (req, res) => {
     if (pageSize > 100) pageSize = 100
     if (pageSize < 1) pageSize = 20
 
+    // Sort & filter support
+    const sortBy = req.query.sortBy || 'createdAt'
+    const sortOrder = req.query.sortOrder === 'asc' ? 'ASC' : 'DESC'
+    const allowedSorts = ['createdAt', 'title', 'cookTime', 'difficulty', 'favoriteCount']
+    const finalSort = allowedSorts.includes(sortBy) ? sortBy : 'createdAt'
+
+    const filterDifficulty = req.query.difficulty
+
     const totalCount = await CollectionRecipe.count({
       where: { collectionId: id }
     })
+
+    // Build recipe include where clause
+    const recipeWhere = {}
+    if (filterDifficulty) {
+      recipeWhere.difficulty = filterDifficulty
+    }
 
     const recipeRows = await CollectionRecipe.findAll({
       where: { collectionId: id },
       offset: (page - 1) * pageSize,
       limit: pageSize,
+      order: [[{ model: Recipe, as: 'Recipe' }, finalSort, sortOrder]],
       include: [
         {
           model: Recipe,
           as: 'Recipe',
+          where: Object.keys(recipeWhere).length > 0 ? recipeWhere : undefined,
           attributes: [
             'id', 'title', 'coverImage', 'author', 'cookTime',
             'description', 'category', 'categoryTags', 'servings',
-            'difficulty', 'userId', 'createdAt', 'updatedAt'
+            'difficulty', 'favoriteCount', 'userId', 'createdAt', 'updatedAt'
           ]
         }
       ]
@@ -284,6 +300,15 @@ router.post('/:id/recipes', auth, async (req, res) => {
       defaults: { collectionId: id, recipeId }
     })
 
+    // Auto-set coverImage from first recipe if not set
+    const c = collection.toJSON()
+    if (!c.coverImage && recipe.coverImage) {
+      await collection.update({ coverImage: recipe.coverImage })
+    }
+    // Update recipeCount
+    const recipeCount = await CollectionRecipe.count({ where: { collectionId: id } })
+    await collection.update({ recipeCount })
+
     return res.status(created ? 201 : 200).json(
       resJSON(0, created ? '已添加' : '已在收藏夹中', entry)
     )
@@ -381,6 +406,101 @@ router.delete('/:id/subscribe', auth, async (req, res) => {
     return res.status(200).json(resJSON(0, '已取消订阅', null))
   } catch (err) {
     console.error('[DELETE /:id/subscribe] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// Collection Comments — 收藏夹评论互动
+// ─────────────────────────────────────────────────────────────────
+
+// GET /:id/comments — 获取收藏夹评论列表
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const { id } = req.params
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1)
+    const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize, 10) || 20))
+
+    const collection = await Collection.findByPk(id)
+    if (!collection) {
+      return res.status(404).json(resJSON(404, '收藏夹不存在', null))
+    }
+
+    const { CollectionComment, User } = require('../models')
+    const { rows, count } = await CollectionComment.findAndCountAll({
+      where: { collectionId: id },
+      order: [['createdAt', 'DESC']],
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['id', 'username', 'nickname', 'avatar'],
+      }],
+    })
+
+    return res.status(200).json(resJSON(0, 'ok', { list: rows, total: count, page, pageSize }))
+  } catch (err) {
+    console.error('[GET /collections/:id/comments] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器错误', null))
+  }
+})
+
+// POST /:id/comments — 评论收藏夹 (auth)
+router.post('/:id/comments', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { content } = req.body
+
+    if (!content || String(content).trim().length === 0) {
+      return res.status(400).json(resJSON(400, '评论内容不能为空', null))
+    }
+
+    const collection = await Collection.findByPk(id)
+    if (!collection) {
+      return res.status(404).json(resJSON(404, '收藏夹不存在', null))
+    }
+    if (!collection.isPublic && collection.userId !== req.userId) {
+      return res.status(403).json(resJSON(403, '无权评论非公开收藏夹', null))
+    }
+
+    const { CollectionComment } = require('../models')
+    const comment = await CollectionComment.create({
+      collectionId: id,
+      userId: req.userId,
+      content: String(content).trim(),
+    })
+
+    return res.status(201).json(resJSON(0, 'ok', comment))
+  } catch (err) {
+    console.error('[POST /collections/:id/comments] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器错误', null))
+  }
+})
+
+// DELETE /:id/comments/:commentId — 删除评论 (auth, owner or admin only)
+router.delete('/:id/comments/:commentId', auth, async (req, res) => {
+  try {
+    const { commentId } = req.params
+    const { CollectionComment } = require('../models')
+    const comment = await CollectionComment.findByPk(commentId)
+
+    if (!comment) {
+      return res.status(404).json(resJSON(404, '评论不存在', null))
+    }
+
+    // Only comment author or collection owner can delete
+    if (comment.userId !== req.userId) {
+      const collection = await Collection.findByPk(comment.collectionId)
+      if (!collection || collection.userId !== req.userId) {
+        return res.status(403).json(resJSON(403, '无权删除此评论', null))
+      }
+    }
+
+    await comment.destroy()
+    return res.status(200).json(resJSON(0, 'ok', null))
+  } catch (err) {
+    console.error('[DELETE /collections/:id/comments/:commentId] Error:', err)
     return res.status(500).json(resJSON(500, '服务器错误', null))
   }
 })

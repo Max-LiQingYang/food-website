@@ -94,10 +94,17 @@ const router = createBrowserRouter([
       { path: '/my-tools', element: <MyToolsPage /> },
       // 迭代#35: 标签探索
       { path: '/tags', element: <TagsPage /> },
+      // 迭代#37: 食材库存管理
+      { path: '/pantry', element: <PantryPage /> },
+      // 迭代#37: 营养追踪
+      { path: '/nutrition', element: <NutritionDashboard /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])
+
+const PantryPage = lazy(() => import('../pages/PantryPage'))
+const NutritionDashboard = lazy(() => import('../pages/NutritionDashboard'))
 
 export default function Router() {
   // @ts-expect-error TS2786 with TS 5.9 + @types/react 18.3 — harmless render types mismatch

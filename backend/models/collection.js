@@ -39,6 +39,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
         comment: '订阅者数量'
+      },
+      recipeCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        comment: '食谱数量（冗余字段）'
+      },
+      coverImage: {
+        type: DataTypes.STRING(500),
+        allowNull: true,
+        comment: '封面图（自动从第一个食谱继承）'
       }
     },
     {
