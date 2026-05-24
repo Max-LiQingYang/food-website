@@ -28,6 +28,8 @@ const importRoutes = require('./import')
 const compareRoutes = require('./compare')
 const preferencesRoutes = require('./preferences')
 const seasonalRoutes = require('./seasonal')
+const mealPlanRoutes = require('./mealPlan')
+const cookingLogRoutes = require('./cookingLog')
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
@@ -57,6 +59,12 @@ router.use('/recipes/import', importRoutes)
 
 // 用户偏好（需认证）
 router.use('/preferences', preferencesRoutes)
+
+// 每周餐单计划（需认证）
+router.use('/meal-plans', auth, mealPlanRoutes)
+
+// 烹饪日志（需认证）
+router.use('/cooking-logs', auth, cookingLogRoutes)
 
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)

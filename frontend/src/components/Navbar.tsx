@@ -45,6 +45,12 @@ export default function Navbar() {
           <Link to="/favorites" className="navbar__link" onClick={handleNavClick}>
             我的收藏
           </Link>
+          <Link to="/meal-planner" className="navbar__link" onClick={handleNavClick}>
+            📅 餐单计划
+          </Link>
+          <Link to="/cooking-journal" className="navbar__link" onClick={handleNavClick}>
+            📖 烹饪日志
+          </Link>
           <Link to="/compare" className="navbar__link" onClick={handleNavClick}>
             📊 对比
           </Link>

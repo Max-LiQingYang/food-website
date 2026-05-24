@@ -20,6 +20,8 @@ const CollectionsPage = lazy(() => import('../pages/CollectionsPage'))
 const CollectionsDetailPage = lazy(() => import('../pages/CollectionsDetailPage'))
 const ShoppingListPage = lazy(() => import('../pages/ShoppingListPage'))
 const RankingsPage = lazy(() => import('../pages/RankingsPage'))
+const MealPlannerPage = lazy(() => import('../pages/MealPlannerPage'))
+const CookingJournalPage = lazy(() => import('../pages/CookingJournalPage'))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
 const ComparePage = lazy(() => import('../pages/ComparePage'))
 const PreferencesPage = lazy(() => import('../pages/PreferencesPage'))
@@ -68,6 +70,8 @@ const router = createBrowserRouter([
       { path: '/compare', element: <ComparePage /> },
       { path: '/preferences', element: <PreferencesPage /> },
       { path: '/preferences/recommendations', element: <PreferenceRecommendations /> },
+      { path: '/meal-planner', element: <MealPlannerPage /> },
+      { path: '/cooking-journal', element: <CookingJournalPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

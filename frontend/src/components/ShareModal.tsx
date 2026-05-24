@@ -6,6 +6,8 @@ import './ShareModal.css'
 interface ShareModalProps {
   recipeId: string
   recipeTitle: string
+  recipeImage?: string
+  recipeDesc?: string
   onClose: () => void
 }
 
@@ -13,14 +15,24 @@ const SOCIAL_PLATFORMS = [
   { name: '微信', icon: '💬', color: '#07C160' },
   { name: '微博', icon: '📢', color: '#E6162D' },
   { name: 'QQ', icon: '🐧', color: '#12B7F5' },
+  { name: 'Twitter', icon: '🐦', color: '#1DA1F2' },
+  { name: 'Facebook', icon: '📘', color: '#1877F2' },
   { name: '复制链接', icon: '🔗', color: '#666' },
 ]
 
-export default function ShareModal({ recipeId, recipeTitle, onClose }: ShareModalProps) {
+export default function ShareModal({
+  recipeId,
+  recipeTitle,
+  recipeImage,
+  recipeDesc,
+  onClose,
+}: ShareModalProps) {
   const [shareInfo, setShareInfo] = useState<ShareInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [showCard, setShowCard] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
   const toast = useToast()
 
   // Fetch share info
@@ -35,10 +47,9 @@ export default function ShareModal({ recipeId, recipeTitle, onClose }: ShareModa
       })
       .catch(() => {
         if (!cancelled) {
-          // Fallback: use window location
           setShareInfo({
             title: recipeTitle,
-            description: `来看看这道美食：${recipeTitle}`,
+            description: recipeDesc || `来看看这道美食：${recipeTitle}`,
             shareUrl: window.location.href,
             shareText: `来看看这道美食：${recipeTitle} — ${window.location.href}`,
           })
@@ -48,7 +59,7 @@ export default function ShareModal({ recipeId, recipeTitle, onClose }: ShareModa
         if (!cancelled) setLoading(false)
       })
     return () => { cancelled = true }
-  }, [recipeId, recipeTitle])
+  }, [recipeId, recipeTitle, recipeDesc])
 
   // Close on backdrop click
   const handleBackdrop = useCallback((e: React.MouseEvent) => {
@@ -71,27 +82,42 @@ export default function ShareModal({ recipeId, recipeTitle, onClose }: ShareModa
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
-      toast.success('链接已复制到剪贴板')
+      toast.showToast('链接已复制到剪贴板', 'success')
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      toast.error('复制失败，请手动复制')
+      toast.showToast('复制失败，请手动复制', 'error')
     }
   }
 
-  const handleWebShare = async () => {
-    if (!navigator.share) return
+  const handleCopyShareText = async (platform: string, text: string) => {
     try {
-      await navigator.share({
-        title: shareInfo?.title ?? recipeTitle,
-        text: shareInfo?.shareText ?? `来看看这道美食：${recipeTitle}`,
-        url: shareInfo?.shareUrl ?? window.location.href,
-      })
-      toast.success('分享成功')
-    } catch (err: any) {
-      if (err?.name !== 'AbortError') {
-        // Fallback to copy
-        handleCopyLink()
-      }
+      await navigator.clipboard.writeText(text)
+      toast.showToast(`已复制分享文本，打开${platform}粘贴即可`, 'success')
+    } catch {
+      toast.showToast('复制失败', 'error')
+    }
+  }
+
+  const generateShareText = (): string => {
+    const title = shareInfo?.title ?? recipeTitle
+    const desc = shareInfo?.description ?? recipeDesc ?? ''
+    const url = shareInfo?.shareUrl ?? window.location.href
+    return `【${title}】\n${desc}\n${url}`
+  }
+
+  // 社交媒体分享链接
+  const getSocialShareUrl = (platform: string): string => {
+    const url = encodeURIComponent(shareInfo?.shareUrl ?? window.location.href)
+    const text = encodeURIComponent(shareInfo?.title ?? recipeTitle)
+    switch (platform) {
+      case 'Twitter':
+        return `https://twitter.com/intent/tweet?text=${text}&url=${url}`
+      case 'Facebook':
+        return `https://www.facebook.com/sharer/sharer.php?u=${url}`
+      case '微博':
+        return `https://service.weibo.com/share/share.php?title=${text}&url=${url}`
+      default:
+        return ''
     }
   }
 
@@ -100,13 +126,12 @@ export default function ShareModal({ recipeId, recipeTitle, onClose }: ShareModa
       handleCopyLink()
       return
     }
-    // For now, copy text with share info
-    const text = shareInfo?.shareText ?? `来看看这道美食：${recipeTitle}\n${window.location.href}`
-    navigator.clipboard.writeText(text).then(() => {
-      toast.success(`已复制分享文本，打开${platform}粘贴即可`)
-    }).catch(() => {
-      toast.error('复制失败')
-    })
+    const shareUrl = getSocialShareUrl(platform)
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400')
+    } else {
+      handleCopyShareText(platform, generateShareText())
+    }
   }
 
   return (
@@ -124,15 +149,39 @@ export default function ShareModal({ recipeId, recipeTitle, onClose }: ShareModa
             <div className="share-modal__loading">加载中...</div>
           ) : (
             <>
-              <p className="share-modal__recipe-title">{recipeTitle}</p>
-
-              {shareInfo?.description && (
-                <p className="share-modal__desc">{shareInfo.description}</p>
-              )}
+              {/* 分享卡片预览 */}
+              <div className="share-modal__card" ref={cardRef}>
+                {recipeImage && (
+                  <img src={recipeImage} alt={recipeTitle} className="share-modal__card-img" />
+                )}
+                <div className="share-modal__card-content">
+                  <h4 className="share-modal__card-title">{recipeTitle}</h4>
+                  {(shareInfo?.description || recipeDesc) && (
+                    <p className="share-modal__card-desc">{shareInfo?.description || recipeDesc}</p>
+                  )}
+                  <div className="share-modal__card-footer">
+                    <span className="share-modal__card-site">🍽️ 美食食谱</span>
+                    <span className="share-modal__card-arrow">↗</span>
+                  </div>
+                </div>
+              </div>
 
               {/* Web Share API button */}
               {typeof navigator !== 'undefined' && typeof (navigator as any).share === 'function' && (
-                <button className="share-modal__native-btn" onClick={handleWebShare}>
+                <button className="share-modal__native-btn" onClick={async () => {
+                  try {
+                    await (navigator as any).share({
+                      title: shareInfo?.title ?? recipeTitle,
+                      text: generateShareText(),
+                      url: shareInfo?.shareUrl ?? window.location.href,
+                    })
+                    toast.showToast('分享成功', 'success')
+                  } catch (err: any) {
+                    if (err?.name !== 'AbortError') {
+                      handleCopyLink()
+                    }
+                  }
+                }}>
                   📤 系统分享
                 </button>
               )}
@@ -169,6 +218,18 @@ export default function ShareModal({ recipeId, recipeTitle, onClose }: ShareModa
                   {copied ? '✅ 已复制' : '复制'}
                 </button>
               </div>
+
+              {/* 分享文本 */}
+              <details className="share-modal__details">
+                <summary className="share-modal__details-summary">查看分享文本</summary>
+                <textarea
+                  className="share-modal__share-text"
+                  readOnly
+                  value={generateShareText()}
+                  rows={4}
+                  onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                />
+              </details>
             </>
           )}
         </div>

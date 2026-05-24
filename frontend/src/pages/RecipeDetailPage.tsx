@@ -168,6 +168,11 @@ export default function RecipeDetailPage() {
     'og:description': recipe?.description?.slice(0, 200) || '三餐四季，与美食相伴——每一个菜谱都值得分享',
     'og:image': recipe?.coverImage || '',
     'og:type': 'article',
+    'og:url': window.location.href,
+    'twitter:card': 'summary_large_image',
+    'twitter:title': recipe?.title || '美食食谱',
+    'twitter:description': recipe?.description?.slice(0, 200) || '',
+    'twitter:image': recipe?.coverImage || '',
   })
 
   // 复制食材清单
@@ -648,6 +653,8 @@ export default function RecipeDetailPage() {
         <ShareModal
           recipeId={id}
           recipeTitle={recipe.title}
+          recipeImage={recipe.coverImage}
+          recipeDesc={recipe.description}
           onClose={() => setShowShareModal(false)}
         />
       )}

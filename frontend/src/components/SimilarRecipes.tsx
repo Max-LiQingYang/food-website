@@ -30,7 +30,9 @@ export default function SimilarRecipes({ recipeId }: SimilarRecipesProps) {
       try {
         const res: any = await getSimilarRecipes(recipeId)
         const data = res.data || res
-        const list = (data.list || []).slice(0, 5)
+        const list = (data.list || []).slice(0, 5).map((item: any) =>
+          item.recipe ? item : { recipe: item, similarity: 0 }
+        )
         if (!cancelled) {
           setRecipes(list)
           setUseNewAPI(true)

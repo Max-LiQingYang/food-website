@@ -904,6 +904,158 @@ export function getRecipeVersions(id: string): Promise<RecipeVersion[]> {
   return apiClient.get(`/recipes/${id}/versions`).then(r => r.data?.data || r.data)
 }
 
+// ─────────────────────────────────────────────────────────────────
+// 每周餐单计划 (Meal Plan)
+// ─────────────────────────────────────────────────────────────────
+
+export interface MealPlanMeal {
+  day: number          // 0=周一 .. 6=周日
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack'
+  recipeId: string
+  recipeTitle: string
+  recipeImage?: string
+}
+
+export interface MealPlan {
+  id: string
+  userId: string
+  weekStart: string     // YYYY-MM-DD
+  meals: MealPlanMeal[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MealPlanListResponse {
+  code: number
+  message: string
+  data: MealPlan[]
+}
+
+/**
+ * 获取餐单列表
+ * GET /api/meal-plans?weekStart=
+ */
+export function getMealPlans(weekStart?: string): Promise<MealPlan[]> {
+  const params = weekStart ? { weekStart } : {}
+  return apiClient.get('/meal-plans', { params }).then(r => r.data?.data || [])
+}
+
+/**
+ * 创建餐单
+ * POST /api/meal-plans
+ */
+export function createMealPlan(weekStart: string, meals: MealPlanMeal[]): Promise<MealPlan> {
+  return apiClient.post('/meal-plans', { weekStart, meals }).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 更新餐单
+ * PUT /api/meal-plans/:id
+ */
+export function updateMealPlan(id: string, meals: MealPlanMeal[]): Promise<MealPlan> {
+  return apiClient.put(`/meal-plans/${id}`, { meals }).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 删除餐单
+ * DELETE /api/meal-plans/:id
+ */
+export function deleteMealPlan(id: string): Promise<void> {
+  return apiClient.delete(`/meal-plans/${id}`).then(() => {})
+}
+
+/**
+ * 从餐单生成购物清单
+ * POST /api/meal-plans/:id/generate-shopping-list
+ */
+export function generateShoppingListFromMealPlan(id: string): Promise<any> {
+  return apiClient.post(`/meal-plans/${id}/generate-shopping-list`).then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 烹饪日志 (Cooking Journal)
+// ─────────────────────────────────────────────────────────────────
+
+export interface CookingLog {
+  id: string
+  userId: string
+  recipeId: string
+  recipeTitle: string
+  recipeCategory: string | null
+  cookedAt: string
+  rating: number
+  notes: string | null
+  duration: number | null
+  photoUrl: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CookingLogStats {
+  totalCooked: number
+  thisMonthCount: number
+  byCategory: Record<string, number>
+  byMonth: Array<{ month: string; count: number }>
+  averageRating: number
+}
+
+export interface CookingLogListResponse {
+  code: number
+  message: string
+  data: {
+    list: CookingLog[]
+    total: number
+    page: number
+    pageSize: number
+  }
+}
+
+export interface CookingLogStatsResponse {
+  code: number
+  message: string
+  data: CookingLogStats
+}
+
+/**
+ * 获取烹饪日志列表
+ * GET /api/cooking-logs
+ */
+export function getCookingLogs(params: { page?: number; pageSize?: number; recipeId?: string } = {}): Promise<{ list: CookingLog[]; total: number; page: number; pageSize: number }> {
+  return apiClient.get('/cooking-logs', { params }).then(r => r.data?.data || { list: [], total: 0, page: 1, pageSize: 20 })
+}
+
+/**
+ * 创建烹饪日志
+ * POST /api/cooking-logs
+ */
+export function createCookingLog(data: { recipeId: string; cookedAt?: string; rating: number; notes?: string; duration?: number; photoUrl?: string }): Promise<CookingLog> {
+  return apiClient.post('/cooking-logs', data).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 更新烹饪日志
+ * PUT /api/cooking-logs/:id
+ */
+export function updateCookingLog(id: string, data: Partial<{ rating: number; notes: string; duration: number; photoUrl: string; cookedAt: string }>): Promise<CookingLog> {
+  return apiClient.put(`/cooking-logs/${id}`, data).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 删除烹饪日志
+ * DELETE /api/cooking-logs/:id
+ */
+export function deleteCookingLog(id: string): Promise<void> {
+  return apiClient.delete(`/cooking-logs/${id}`).then(() => {})
+}
+
+/**
+ * 获取烹饪统计
+ * GET /api/cooking-logs/stats
+ */
+export function getCookingLogStats(): Promise<CookingLogStats> {
+  return apiClient.get('/cooking-logs/stats').then(r => r.data?.data || {})
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -953,4 +1105,14 @@ export default {
   getRecommendByPreference,
   addShoppingListItems,
   deleteShoppingListItem,
+  getMealPlans,
+  createMealPlan,
+  updateMealPlan,
+  deleteMealPlan,
+  generateShoppingListFromMealPlan,
+  getCookingLogs,
+  createCookingLog,
+  updateCookingLog,
+  deleteCookingLog,
+  getCookingLogStats,
 }

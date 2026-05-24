@@ -1,0 +1,514 @@
+/* CookingJournalPage.css */
+
+.cooking-journal {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.cooking-journal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cooking-journal__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text, #333);
+}
+
+.cooking-journal__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cooking-journal__view-toggle {
+  display: flex;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cooking-journal__view-btn {
+  padding: 0.45rem 0.9rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text, #555);
+  transition: all 0.15s;
+}
+.cooking-journal__view-btn.active {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+}
+.cooking-journal__view-btn:not(.active):hover {
+  background: var(--color-bg-hover, #f5f5f5);
+}
+
+.cooking-journal__add-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.cooking-journal__add-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Loading / Empty */
+.cooking-journal__loading,
+.cooking-journal__empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+}
+.cooking-journal__empty p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Stats View */
+.cooking-journal__stats {
+  animation: fadeIn 0.3s ease;
+}
+
+.cooking-journal__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cooking-journal__stat-card {
+  background: var(--color-bg-secondary, #f8f8f8);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.cooking-journal__stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.cooking-journal__stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary, #E8663E);
+}
+
+.cooking-journal__stat-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.3rem;
+}
+
+/* Charts */
+.cooking-journal__chart {
+  background: var(--color-bg, #fff);
+  border: 1px solid var(--color-border, #eee);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.cooking-journal__chart-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: var(--color-text, #333);
+}
+
+.cooking-journal__chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 150px;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border, #eee);
+}
+
+.cooking-journal__chart-bar-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  position: relative;
+}
+
+.cooking-journal__chart-value {
+  font-size: 0.7rem;
+  color: #888;
+  margin-bottom: 0.2rem;
+}
+
+.cooking-journal__chart-bar {
+  width: 60%;
+  max-width: 30px;
+  background: linear-gradient(180deg, var(--color-primary, #E8663E), #f0a080);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.3s ease;
+}
+
+.cooking-journal__chart-label {
+  position: absolute;
+  bottom: -1.3rem;
+  font-size: 0.65rem;
+  color: #999;
+}
+
+/* Category distribution */
+.cooking-journal__category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cooking-journal__category-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cooking-journal__category-name {
+  width: 60px;
+  font-size: 0.85rem;
+  color: var(--color-text, #555);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cooking-journal__category-bar-bg {
+  flex: 1;
+  height: 12px;
+  background: var(--color-bg-secondary, #f0f0f0);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cooking-journal__category-bar {
+  height: 100%;
+  background: var(--color-primary, #E8663E);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.cooking-journal__category-count {
+  width: 30px;
+  font-size: 0.85rem;
+  color: #888;
+  text-align: right;
+}
+
+.cooking-journal__chart-empty {
+  text-align: center;
+  color: #999;
+  padding: 1rem;
+}
+
+/* List View */
+.cooking-journal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cooking-journal__card {
+  background: var(--color-bg, #fff);
+  border: 1px solid var(--color-border, #eee);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  transition: box-shadow 0.2s;
+}
+.cooking-journal__card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.cooking-journal__card-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.cooking-journal__card-info {
+  flex: 1;
+}
+
+.cooking-journal__card-title {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.05rem;
+  color: var(--color-text, #333);
+}
+
+.cooking-journal__card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.cooking-journal__card-cat {
+  background: var(--color-bg-secondary, #f0f0f0);
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.cooking-journal__card-notes {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary, #666);
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.cooking-journal__card-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.cooking-journal__action-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.cooking-journal__action-btn:hover {
+  background: var(--color-bg-hover, #f0f0f0);
+}
+.cooking-journal__action-btn--delete:hover {
+  background: #fde8e8;
+}
+
+/* Pagination */
+.cooking-journal__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cooking-journal__page-btn {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 6px;
+  background: var(--color-bg, #fff);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+.cooking-journal__page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.cooking-journal__page-btn:not(:disabled):hover {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  border-color: var(--color-primary, #E8663E);
+}
+
+.cooking-journal__page-info {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* Modal */
+.cooking-journal__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cooking-journal__modal {
+  background: var(--color-bg, #fff);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.cooking-journal__modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.cooking-journal__modal-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-text, #333);
+}
+
+.cooking-journal__modal-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.cooking-journal__form-group {
+  margin-bottom: 1rem;
+}
+.cooking-journal__form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text, #555);
+  margin-bottom: 0.35rem;
+}
+.cooking-journal__form-group input,
+.cooking-journal__form-group textarea,
+.cooking-journal__form-group select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  background: var(--color-bg, #fff);
+  color: var(--color-text, #333);
+}
+.cooking-journal__form-group input:focus,
+.cooking-journal__form-group textarea:focus {
+  border-color: var(--color-primary, #E8663E);
+}
+.cooking-journal__form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.cooking-journal__form-row {
+  display: flex;
+  gap: 1rem;
+}
+.cooking-journal__form-row .cooking-journal__form-group {
+  flex: 1;
+}
+
+.cooking-journal__recipe-id-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cooking-journal__recipe-title-preview {
+  font-size: 0.8rem;
+  color: #4a90d9;
+  padding-left: 0.25rem;
+}
+.cooking-journal__recipe-title-preview.error {
+  color: #e74c3c;
+}
+
+.cooking-journal__rating-select {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.cooking-journal__rating-star {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.15rem;
+  transition: transform 0.1s;
+}
+.cooking-journal__rating-star:hover {
+  transform: scale(1.2);
+}
+.cooking-journal__rating-star.active {
+  filter: none;
+}
+
+.cooking-journal__submit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s;
+  margin-top: 0.5rem;
+}
+.cooking-journal__submit-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode */
+[data-theme='dark'] .cooking-journal__stat-card {
+  background: #2a2a2a;
+}
+[data-theme='dark'] .cooking-journal__chart {
+  background: #1e1e1e;
+}
+[data-theme='dark'] .cooking-journal__card {
+  background: #1e1e1e;
+}
+[data-theme='dark'] .cooking-journal__modal {
+  background: #1e1e1e;
+}
+[data-theme='dark'] .cooking-journal__category-bar-bg {
+  background: #333;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .cooking-journal__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cooking-journal__header-actions {
+    justify-content: space-between;
+  }
+  .cooking-journal__stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cooking-journal__form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
