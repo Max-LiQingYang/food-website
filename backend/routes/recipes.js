@@ -1375,6 +1375,228 @@ router.delete('/:id', auth, async (req, res) => {
   }
 })
 
+// ─────────────────────────────────────────────────────────────────
+// GET /popular — 热门食谱（按 qualityScore 加权排序）
+// ─────────────────────────────────────────────────────────────────
+router.get('/popular', async (req, res) => {
+  try {
+    let page = parseInt(req.query.page, 10) || 1
+    let pageSize = parseInt(req.query.pageSize, 10) || 12
+    if (page < 1) page = 1
+    if (pageSize > 100) pageSize = 100
+    const offset = (page - 1) * pageSize
+
+    const { count, rows } = await Recipe.findAndCountAll({
+      attributes: LIST_ATTRIBUTES,
+      order: [['favoriteCount', 'DESC']],
+      offset,
+      limit: pageSize,
+    })
+
+    let list = rows.map(r => r.toJSON())
+    list = list.map(item => {
+      const q = computeQuality(item)
+      item.qualityScore = q.qualityScore
+      item.qualityLabel = q.qualityLabel
+      return item
+    })
+
+    // 按 qualityScore 降序重排
+    list.sort((a, b) => (b.qualityScore || 0) - (a.qualityScore || 0))
+
+    await attachRatingInfo(list)
+    attachContentScore(list)
+
+    return res.status(200).json(resJSON(0, 'ok', { list, total: count, page, pageSize }))
+  } catch (err) {
+    console.error('[Popular] Error:', err.message)
+    return res.status(500).json(resJSON(1, '服务器错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /new-user-recommend — 新用户引导推荐
+// ─────────────────────────────────────────────────────────────────
+router.get('/new-user-recommend', async (req, res) => {
+  try {
+    const { difficulty, season } = req.query
+    const where = {}
+    const { Op: OpSe } = require('sequelize')
+
+    if (difficulty) {
+      where.difficulty = difficulty
+    }
+    if (season) {
+      where[OpSe.or] = [
+        { season },
+        { season: 'all' }
+      ]
+    }
+
+    const rows = await Recipe.findAll({
+      where,
+      order: [['favoriteCount', 'DESC']],
+      limit: 6,
+      attributes: LIST_ATTRIBUTES,
+    })
+
+    let list = rows.map(r => r.toJSON())
+    list = list.map(item => {
+      const q = computeQuality(item)
+      item.qualityScore = q.qualityScore
+      item.qualityLabel = q.qualityLabel
+      item.recommendType = 'new-user'
+      return item
+    })
+
+    await attachRatingInfo(list)
+    attachContentScore(list)
+
+    return res.status(200).json(resJSON(0, 'ok', { list, matched: { difficulty, season } }))
+  } catch (err) {
+    console.error('[NewUserRecommend] Error:', err.message)
+    return res.status(500).json(resJSON(1, '服务器错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /quality-check — 自动质量检查
+// ─────────────────────────────────────────────────────────────────
+router.get('/quality-check', async (req, res) => {
+  try {
+    let page = parseInt(req.query.page, 10) || 1
+    let pageSize = parseInt(req.query.pageSize, 10) || 20
+    if (page < 1) page = 1
+    if (pageSize > 100) pageSize = 100
+    const offset = (page - 1) * pageSize
+
+    const { count, rows } = await Recipe.findAndCountAll({
+      attributes: ['id', 'title', 'description', 'coverImage', 'steps', 'nutrition', 'tips', 'cookTime', 'difficulty', 'servings', 'category'],
+      offset,
+      limit: pageSize,
+      order: [['createdAt', 'DESC']],
+    })
+
+    const list = rows.map(r => {
+      const recipe = r.toJSON()
+      const issues = []
+
+      // 标题长度
+      if (!recipe.title || String(recipe.title).trim().length < 3) {
+        issues.push('标题过短（<3字符）')
+      }
+      // 描述完整性
+      if (!recipe.description || String(recipe.description).trim().length < 10) {
+        issues.push('描述不完整（<10字符）')
+      }
+      // 步骤数
+      const steps = Array.isArray(recipe.steps) ? recipe.steps : []
+      if (steps.length < 3) {
+        issues.push('步骤数不足（<3步）')
+      }
+      // 封面图
+      if (!recipe.coverImage) {
+        issues.push('缺少封面图片')
+      }
+      // 营养数据
+      if (!recipe.nutrition || (typeof recipe.nutrition === 'object' && Object.keys(recipe.nutrition).length === 0)) {
+        issues.push('缺少营养数据')
+      }
+      // Tips
+      if (!recipe.tips || String(recipe.tips).trim().length === 0) {
+        issues.push('缺少小贴士')
+      }
+
+      // 质量评分（0-100）
+      let baseScore = 100
+      baseScore -= issues.length * 16  // 每项缺失扣16分
+      const qualityScore = Math.max(0, Math.min(100, baseScore))
+
+      return {
+        id: recipe.id,
+        title: recipe.title,
+        qualityScore,
+        issues,
+        passed: issues.length <= 1,  // 1个以下问题视为通过
+        dimensions: {
+          title: (recipe.title || '').length >= 3,
+          description: (recipe.description || '').length >= 10,
+          steps: steps.length >= 3,
+          coverImage: !!recipe.coverImage,
+          nutrition: !!(recipe.nutrition && typeof recipe.nutrition === 'object' && Object.keys(recipe.nutrition).length > 0),
+          tips: (recipe.tips || '').trim().length > 0,
+        }
+      }
+    })
+
+    const passedCount = list.filter(i => i.passed).length
+    const failedCount = list.length - passedCount
+
+    return res.status(200).json(resJSON(0, 'ok', {
+      list,
+      total: count,
+      page,
+      pageSize,
+      summary: { passedCount, failedCount, passRate: count > 0 ? Math.round((passedCount / count) * 100) : 0 }
+    }))
+  } catch (err) {
+    console.error('[QualityCheck] Error:', err.message)
+    return res.status(500).json(resJSON(1, '服务器错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /low-quality — 低质量食谱列表
+// ─────────────────────────────────────────────────────────────────
+router.get('/low-quality', async (req, res) => {
+  try {
+    let page = parseInt(req.query.page, 10) || 1
+    let pageSize = parseInt(req.query.pageSize, 10) || 20
+    if (page < 1) page = 1
+    if (pageSize > 100) pageSize = 100
+    const offset = (page - 1) * pageSize
+
+    const { count, rows } = await Recipe.findAndCountAll({
+      attributes: ['id', 'title', 'description', 'coverImage', 'steps', 'nutrition', 'tips', 'cookTime', 'difficulty', 'servings', 'category', 'favoriteCount', 'viewCount'],
+      offset,
+      limit: pageSize,
+      order: [['createdAt', 'DESC']],
+    })
+
+    const allWithQuality = rows.map(r => {
+      const recipe = r.toJSON()
+      const issues = []
+
+      if (!recipe.title || String(recipe.title).trim().length < 3) issues.push('标题过短')
+      if (!recipe.description || String(recipe.description).trim().length < 10) issues.push('描述不完整')
+      const steps = Array.isArray(recipe.steps) ? recipe.steps : []
+      if (steps.length < 3) issues.push('步骤不足')
+      if (!recipe.coverImage) issues.push('缺封面')
+      if (!recipe.nutrition || Object.keys(recipe.nutrition).length === 0) issues.push('缺营养数据')
+      if (!recipe.tips || !recipe.tips.trim()) issues.push('缺小贴士')
+
+      let baseScore = 100
+      baseScore -= issues.length * 16
+      const qualityScore = Math.max(0, Math.min(100, baseScore))
+
+      return { id: recipe.id, title: recipe.title, qualityScore, issues, passed: issues.length <= 1 }
+    })
+
+    const lowQuality = allWithQuality.filter(i => !i.passed)
+
+    return res.status(200).json(resJSON(0, 'ok', {
+      list: lowQuality,
+      total: lowQuality.length,
+      page,
+      pageSize,
+      allTotal: count,
+    }))
+  } catch (err) {
+    console.error('[LowQuality] Error:', err.message)
+    return res.status(500).json(resJSON(1, '服务器错误', null))
+  }
+})
+
 module.exports = router
 module.exports.auth = auth
 module.exports.attachRatingInfo = attachRatingInfo

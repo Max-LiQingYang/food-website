@@ -1,9 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { searchRecipes } from '../api'
+import { highlightText } from '../utils/highlightText'
 import './SearchAutocomplete.css'
 
 const HOT_SEARCHES = ['鸡蛋、番茄', '鸡肉、土豆', '红烧肉', '番茄炒蛋', '汤', '甜点']
 const HISTORY_KEY = 'search_history'
 const MAX_HISTORY = 8
+const DEBOUNCE_MS = 300
 
 function loadHistory(): string[] {
   try {
@@ -17,6 +20,10 @@ function saveToHistory(query: string) {
   const history = loadHistory()
   const deduped = [query, ...history.filter(h => h !== query)]
   localStorage.setItem(HISTORY_KEY, JSON.stringify(deduped.slice(0, MAX_HISTORY)))
+}
+
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY)
 }
 
 interface SearchAutocompleteProps {
@@ -39,11 +46,57 @@ export default function SearchAutocomplete({
 }: SearchAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [apiSuggestions, setApiSuggestions] = useState<string[]>([])
+  const [isApiLoading, setIsApiLoading] = useState(false)
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Compute suggestions
-  const suggestions = getSuggestions(value, showHotSearches)
+  // Compute local suggestions
+  const localSuggestions = useMemo(() => getSuggestions(value, showHotSearches), [value, showHotSearches])
+
+  // Debounced API search for live suggestions
+  useEffect(() => {
+    const trimmed = value.trim()
+    if (trimmed.length < 2) {
+      setApiSuggestions([])
+      setIsApiLoading(false)
+      return
+    }
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    debounceTimerRef.current = setTimeout(async () => {
+      setIsApiLoading(true)
+      try {
+        const res: any = await searchRecipes({ q: trimmed, pageSize: 5 })
+        const data = res.data || res
+        const list = data.list || []
+        const titles = list.map((r: any) => r.title).filter(Boolean)
+        setApiSuggestions(titles)
+      } catch {
+        setApiSuggestions([])
+      } finally {
+        setIsApiLoading(false)
+      }
+    }, DEBOUNCE_MS)
+
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    }
+  }, [value])
+
+  // Merge suggestions: local first (history+hot), then API for fresh results
+  const suggestions = useMemo(() => {
+    const s = new Set(localSuggestions)
+    const merged = [...localSuggestions]
+    for (const api of apiSuggestions) {
+      if (!s.has(api)) merged.push(api)
+    }
+    return merged
+  }, [localSuggestions, apiSuggestions])
 
   // Close on outside click
   useEffect(() => {
@@ -72,7 +125,8 @@ export default function SearchAutocomplete({
   )
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || suggestions.length === 0) {
+    const visibleLength = suggestions.length + (value.trim().length >= 2 && apiSuggestions.length === 0 && !isApiLoading ? 1 : 0) + (!value.trim() && loadHistory().length > 0 ? 1 : 0)
+    if (!isOpen || visibleLength === 0) {
       if (e.key === 'Enter') {
         handleSubmit(value)
       }
@@ -82,11 +136,11 @@ export default function SearchAutocomplete({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : 0))
+        setActiveIndex(prev => (prev < visibleLength - 1 ? prev + 1 : 0))
         break
       case 'ArrowUp':
         e.preventDefault()
-        setActiveIndex(prev => (prev > 0 ? prev - 1 : suggestions.length - 1))
+        setActiveIndex(prev => (prev > 0 ? prev - 1 : visibleLength - 1))
         break
       case 'Enter':
         e.preventDefault()
@@ -94,6 +148,8 @@ export default function SearchAutocomplete({
           const selected = suggestions[activeIndex]
           onChange(selected)
           handleSubmit(selected)
+        } else if (activeIndex === suggestions.length && value.trim().length >= 2) {
+          handleSubmit(value)
         } else {
           handleSubmit(value)
         }
@@ -136,11 +192,29 @@ export default function SearchAutocomplete({
               onMouseEnter={() => setActiveIndex(index)}
             >
               <span className="search-autocomplete__icon">
-                {value && suggestion.toLowerCase().includes(value.toLowerCase()) ? '🔍' : '🕐'}
+                {apiSuggestions.includes(suggestion) ? '🔍' : value && suggestion.toLowerCase().includes(value.toLowerCase()) ? '🔍' : '🕐'}
               </span>
-              {suggestion}
+              {highlightText(suggestion, value)}
             </li>
           ))}
+          {isApiLoading && (
+            <li className="search-autocomplete__item search-autocomplete__loading">
+              <span className="search-autocomplete__loading-icon" />
+              搜索中...
+            </li>
+          )}
+          {value.trim().length >= 2 && apiSuggestions.length === 0 && !isApiLoading && (
+            <li className="search-autocomplete__item search-autocomplete__hint"
+              onMouseDown={e => { e.preventDefault(); handleSubmit(value) }}>
+              按回车搜索「{value}」
+            </li>
+          )}
+          {!value.trim() && loadHistory().length > 0 && (
+            <li className="search-autocomplete__item search-autocomplete__clear"
+              onMouseDown={e => { e.preventDefault(); clearHistory(); setIsOpen(false); onChange('') }}>
+              清除搜索历史
+            </li>
+          )}
         </ul>
       )}
     </div>
@@ -153,16 +227,11 @@ function getSuggestions(input: string, showHotSearches: boolean): string[] {
   const history = loadHistory()
 
   if (!trimmed) {
-    // Empty input: show history first, then hot searches
     const hot = showHotSearches ? HOT_SEARCHES.filter(h => !history.includes(h)) : []
     return [...history, ...hot]
   }
 
-  // Filtering mode: match against combined set
-  const combined = [
-    ...history,
-    ...(showHotSearches ? HOT_SEARCHES : []),
-  ]
+  const combined = [...history, ...(showHotSearches ? HOT_SEARCHES : [])]
   const unique = [...new Set(combined)]
   return unique.filter(s => s.toLowerCase().includes(trimmed))
 }

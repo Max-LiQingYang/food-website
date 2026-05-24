@@ -1,0 +1,122 @@
+.personalized-rec {
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+.personalized-rec__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.personalized-rec__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text, #333);
+}
+
+.personalized-rec__tabs {
+  display: flex;
+  gap: 0.375rem;
+  background: var(--color-bg-secondary, #f5f5f5);
+  border-radius: 999px;
+  padding: 0.25rem;
+}
+
+.personalized-rec__tab {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary, #666);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.personalized-rec__tab:hover {
+  color: var(--color-text, #333);
+  background: var(--color-bg-hover, rgba(0,0,0,0.05));
+}
+
+.personalized-rec__tab.active {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(232, 102, 62, 0.3);
+}
+
+.personalized-rec__content {
+  min-height: 200px;
+}
+
+.personalized-rec__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.personalized-rec__empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-secondary, #999);
+}
+
+.personalized-rec__empty-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* Dark mode */
+[data-theme="dark"] .personalized-rec__tabs {
+  background: var(--color-bg-secondary-dark, #2a2a2a);
+}
+
+[data-theme="dark"] .personalized-rec__tab:hover {
+  background: var(--color-bg-hover-dark, rgba(255,255,255,0.08));
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .personalized-rec__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .personalized-rec__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .personalized-rec__grid {
+    grid-template-columns: 1fr;
+  }
+  .personalized-rec__tab {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Tab animation */
+.personalized-rec__tab.active {
+  animation: tabActivate 0.25s ease;
+}
+
+@keyframes tabActivate {
+  0% { transform: scale(0.92); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}

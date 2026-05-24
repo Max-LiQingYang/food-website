@@ -1,0 +1,2662 @@
+[
+  {
+    "title": "水煮鱼",
+    "description": "鲜嫩鱼片在红油中翻滚，麻辣鲜香。",
+    "category": "chinese",
+    "season": "winter",
+    "difficulty": "hard",
+    "cookTime": 40,
+    "servings": 4,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1583223667854-e0e05b2ad1e8?w=800",
+    "ingredients": [
+      {
+        "name": "草鱼",
+        "amount": 1,
+        "unit": "条"
+      },
+      {
+        "name": "豆芽",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "干辣椒",
+        "amount": 30,
+        "unit": "g"
+      },
+      {
+        "name": "花椒",
+        "amount": 10,
+        "unit": "g"
+      },
+      {
+        "name": "郫县豆瓣酱",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "料酒",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "蛋清",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "蒜",
+        "amount": 6,
+        "unit": "瓣"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "草鱼片成薄片，用料酒、蛋清、淀粉腌制15分钟"
+      },
+      {
+        "stepNumber": 2,
+        "content": "豆芽焯水铺在大碗底部"
+      },
+      {
+        "stepNumber": 3,
+        "content": "锅中热油，下豆瓣酱炒出红油，加姜蒜爆香"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加水烧开，放入鱼片煮至变色"
+      },
+      {
+        "stepNumber": 5,
+        "content": "鱼片捞出铺在豆芽上，浇入汤汁"
+      },
+      {
+        "stepNumber": 6,
+        "content": "撒干辣椒段和花椒，浇热油激香"
+      }
+    ],
+    "nutrition": {
+      "calories": 380,
+      "protein": 32,
+      "fat": 24,
+      "carbs": 8,
+      "fiber": 2,
+      "sodium": 920
+    },
+    "tips": "鱼片不要煮太久，变色即可捞出。最后浇热油不能省。",
+    "categoryTags": {
+      "ingredient": [
+        "鱼",
+        "豆芽"
+      ],
+      "method": [
+        "水煮"
+      ],
+      "cuisine": [
+        "川菜"
+      ],
+      "flavor": [
+        "麻辣"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "回锅肉",
+    "description": "肥而不腻的回锅肉，米饭杀手。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 25,
+    "servings": 3,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800",
+    "ingredients": [
+      {
+        "name": "五花肉",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "蒜苗",
+        "amount": 4,
+        "unit": "根"
+      },
+      {
+        "name": "青椒",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "郫县豆瓣酱",
+        "amount": 1.5,
+        "unit": "勺"
+      },
+      {
+        "name": "豆豉",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "糖",
+        "amount": 1,
+        "unit": "小勺"
+      },
+      {
+        "name": "姜",
+        "amount": 3,
+        "unit": "片"
+      },
+      {
+        "name": "料酒",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "五花肉冷水下锅，加姜片料酒煮至八成熟"
+      },
+      {
+        "stepNumber": 2,
+        "content": "捞出过凉水，切薄片约3mm"
+      },
+      {
+        "stepNumber": 3,
+        "content": "锅中不放油，小火煸炒肉片至出油微卷"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加入豆瓣酱和豆豉炒出红油"
+      },
+      {
+        "stepNumber": 5,
+        "content": "下蒜苗段和青椒炒至断生"
+      },
+      {
+        "stepNumber": 6,
+        "content": "加少许糖提鲜，翻炒均匀出锅"
+      }
+    ],
+    "nutrition": {
+      "calories": 420,
+      "protein": 22,
+      "fat": 34,
+      "carbs": 6,
+      "fiber": 1,
+      "sodium": 850
+    },
+    "tips": "五花肉冷冻半小时更好切薄片。小火慢慢逼出油脂才不腻。",
+    "categoryTags": {
+      "ingredient": [
+        "猪肉",
+        "蒜苗"
+      ],
+      "method": [
+        "煮",
+        "煸炒"
+      ],
+      "cuisine": [
+        "川菜"
+      ],
+      "flavor": [
+        "咸鲜",
+        "微辣"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "辣子鸡",
+    "description": "干香麻辣的辣子鸡丁。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 30,
+    "servings": 3,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=800",
+    "ingredients": [
+      {
+        "name": "鸡腿",
+        "amount": 3,
+        "unit": "个"
+      },
+      {
+        "name": "干辣椒",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "花椒",
+        "amount": 15,
+        "unit": "g"
+      },
+      {
+        "name": "蒜",
+        "amount": 5,
+        "unit": "瓣"
+      },
+      {
+        "name": "姜",
+        "amount": 1,
+        "unit": "块"
+      },
+      {
+        "name": "生抽",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "淀粉",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "白芝麻",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "鸡腿去骨切小块，用生抽、淀粉腌制20分钟"
+      },
+      {
+        "stepNumber": 2,
+        "content": "油温六成热，下鸡块炸至金黄捞出"
+      },
+      {
+        "stepNumber": 3,
+        "content": "油温升高后复炸1分钟至酥脆"
+      },
+      {
+        "stepNumber": 4,
+        "content": "锅中留底油，小火炒香干辣椒段和花椒"
+      },
+      {
+        "stepNumber": 5,
+        "content": "下姜蒜末爆香，倒入鸡块翻炒"
+      },
+      {
+        "stepNumber": 6,
+        "content": "加糖、撒白芝麻，翻炒均匀出锅"
+      }
+    ],
+    "nutrition": {
+      "calories": 450,
+      "protein": 30,
+      "fat": 30,
+      "carbs": 10,
+      "fiber": 1,
+      "sodium": 680
+    },
+    "tips": "复炸是酥脆的关键。辣椒花椒用温水泡一下不易炒糊。",
+    "categoryTags": {
+      "ingredient": [
+        "鸡肉",
+        "辣椒"
+      ],
+      "method": [
+        "油炸",
+        "爆炒"
+      ],
+      "cuisine": [
+        "川菜"
+      ],
+      "flavor": [
+        "麻辣",
+        "干香"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "避风塘炒蟹",
+    "description": "蒜香酥脆的避风塘炒蟹。",
+    "category": "chinese",
+    "season": "autumn",
+    "difficulty": "hard",
+    "cookTime": 35,
+    "servings": 3,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800",
+    "ingredients": [
+      {
+        "name": "梭子蟹",
+        "amount": 2,
+        "unit": "只"
+      },
+      {
+        "name": "蒜",
+        "amount": 1,
+        "unit": "整头"
+      },
+      {
+        "name": "面包糠",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "干辣椒",
+        "amount": 5,
+        "unit": "个"
+      },
+      {
+        "name": "豆豉",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "淀粉",
+        "amount": 3,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "蟹洗净斩块，切口蘸淀粉"
+      },
+      {
+        "stepNumber": 2,
+        "content": "油温七成热，蟹块炸至金黄捞出"
+      },
+      {
+        "stepNumber": 3,
+        "content": "蒜切成蒜末，洗去粘液沥干"
+      },
+      {
+        "stepNumber": 4,
+        "content": "小火慢炸蒜末至金黄酥脆"
+      },
+      {
+        "stepNumber": 5,
+        "content": "锅中留底油，炒香豆豉和干辣椒，下面包糠翻炒"
+      },
+      {
+        "stepNumber": 6,
+        "content": "倒入炸好的蟹块和蒜酥，加糖翻匀"
+      }
+    ],
+    "nutrition": {
+      "calories": 320,
+      "protein": 28,
+      "fat": 18,
+      "carbs": 12,
+      "fiber": 1,
+      "sodium": 620
+    },
+    "tips": "蒜末洗去粘液后炸不容易糊。",
+    "categoryTags": {
+      "ingredient": [
+        "蟹",
+        "蒜"
+      ],
+      "method": [
+        "油炸",
+        "爆炒"
+      ],
+      "cuisine": [
+        "粤菜"
+      ],
+      "flavor": [
+        "蒜香",
+        "咸鲜"
+      ],
+      "price": [
+        "高档"
+      ]
+    }
+  },
+  {
+    "title": "干炒牛河",
+    "description": "粤式经典，镬气十足。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "hard",
+    "cookTime": 15,
+    "servings": 2,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1555126634-323283e090fa?w=800",
+    "ingredients": [
+      {
+        "name": "河粉",
+        "amount": 400,
+        "unit": "g"
+      },
+      {
+        "name": "牛肉",
+        "amount": 150,
+        "unit": "g"
+      },
+      {
+        "name": "豆芽",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "韭黄",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "生抽",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "老抽",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "淀粉",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "牛肉切薄片，用生抽、淀粉腌制10分钟"
+      },
+      {
+        "stepNumber": 2,
+        "content": "河粉微波炉加热30秒抖散"
+      },
+      {
+        "stepNumber": 3,
+        "content": "大火热油，牛肉滑炒至变色盛出"
+      },
+      {
+        "stepNumber": 4,
+        "content": "爆香豆芽，下河粉大火快炒"
+      },
+      {
+        "stepNumber": 5,
+        "content": "加入生抽老抽调味，翻炒均匀"
+      },
+      {
+        "stepNumber": 6,
+        "content": "牛肉回锅，下韭黄炒20秒出锅"
+      }
+    ],
+    "nutrition": {
+      "calories": 480,
+      "protein": 25,
+      "fat": 14,
+      "carbs": 64,
+      "fiber": 2,
+      "sodium": 720
+    },
+    "tips": "全程大火才能有镬气。",
+    "categoryTags": {
+      "ingredient": [
+        "牛肉",
+        "河粉"
+      ],
+      "method": [
+        "炒"
+      ],
+      "cuisine": [
+        "粤菜"
+      ],
+      "flavor": [
+        "咸鲜"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "虾饺",
+    "description": "晶莹剔透的虾饺，粤式早茶四大天王。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "hard",
+    "cookTime": 45,
+    "servings": 4,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800",
+    "ingredients": [
+      {
+        "name": "虾仁",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "澄面",
+        "amount": 150,
+        "unit": "g"
+      },
+      {
+        "name": "玉米淀粉",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "肥猪肉",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "笋丁",
+        "amount": 30,
+        "unit": "g"
+      },
+      {
+        "name": "猪油",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "盐",
+        "amount": 2,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "虾仁一半剁泥一半切粒，肥猪肉切细丁"
+      },
+      {
+        "stepNumber": 2,
+        "content": "混合虾泥、虾粒、肥肉丁、笋丁，加盐糖搅至上劲"
+      },
+      {
+        "stepNumber": 3,
+        "content": "澄面和玉米淀粉混合，沸水烫面揉成面团"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加入猪油揉匀，醒面15分钟"
+      },
+      {
+        "stepNumber": 5,
+        "content": "面团擀薄皮包入馅料"
+      },
+      {
+        "stepNumber": 6,
+        "content": "捏褶成型，大火蒸8分钟即可"
+      }
+    ],
+    "nutrition": {
+      "calories": 180,
+      "protein": 16,
+      "fat": 8,
+      "carbs": 14,
+      "fiber": 0,
+      "sodium": 420
+    },
+    "tips": "烫面要用刚烧开的沸水。面皮越薄越晶莹。",
+    "categoryTags": {
+      "ingredient": [
+        "虾",
+        "澄面"
+      ],
+      "method": [
+        "蒸",
+        "烫面"
+      ],
+      "cuisine": [
+        "粤菜"
+      ],
+      "flavor": [
+        "鲜甜"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "剁椒鱼头",
+    "description": "湘菜扛鼎之作，鲜辣醇厚。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 25,
+    "servings": 3,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800",
+    "ingredients": [
+      {
+        "name": "胖头鱼头",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "剁椒",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "姜",
+        "amount": 1,
+        "unit": "块"
+      },
+      {
+        "name": "葱",
+        "amount": 3,
+        "unit": "根"
+      },
+      {
+        "name": "蒜",
+        "amount": 5,
+        "unit": "瓣"
+      },
+      {
+        "name": "料酒",
+        "amount": 3,
+        "unit": "勺"
+      },
+      {
+        "name": "蒸鱼豉油",
+        "amount": 2,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "鱼头去腮洗净，从中间劈开但不切断"
+      },
+      {
+        "stepNumber": 2,
+        "content": "鱼身抹料酒和姜片腌制10分钟"
+      },
+      {
+        "stepNumber": 3,
+        "content": "剁椒、蒜末混合均匀"
+      },
+      {
+        "stepNumber": 4,
+        "content": "鱼头摆盘，铺上剁椒酱"
+      },
+      {
+        "stepNumber": 5,
+        "content": "水开后大火蒸12分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "撒葱花，浇热油激香"
+      }
+    ],
+    "nutrition": {
+      "calories": 290,
+      "protein": 35,
+      "fat": 14,
+      "carbs": 4,
+      "fiber": 1,
+      "sodium": 980
+    },
+    "tips": "鱼头不要蒸太久。剁椒有咸味控制盐量。",
+    "categoryTags": {
+      "ingredient": [
+        "鱼头",
+        "辣椒"
+      ],
+      "method": [
+        "蒸"
+      ],
+      "cuisine": [
+        "湘菜"
+      ],
+      "flavor": [
+        "鲜辣"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "小炒黄牛肉",
+    "description": "湘菜馆点击率最高的下饭菜。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 15,
+    "servings": 3,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1604909052743-94e838986d24?w=800",
+    "ingredients": [
+      {
+        "name": "黄牛肉",
+        "amount": 250,
+        "unit": "g"
+      },
+      {
+        "name": "小米辣",
+        "amount": 5,
+        "unit": "个"
+      },
+      {
+        "name": "蒜",
+        "amount": 4,
+        "unit": "瓣"
+      },
+      {
+        "name": "香菜",
+        "amount": 1,
+        "unit": "把"
+      },
+      {
+        "name": "生抽",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "老抽",
+        "amount": 0.5,
+        "unit": "勺"
+      },
+      {
+        "name": "淀粉",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "牛肉逆纹切薄片，用生抽、淀粉腌制"
+      },
+      {
+        "stepNumber": 2,
+        "content": "小米辣切圈，香菜切段"
+      },
+      {
+        "stepNumber": 3,
+        "content": "热锅凉油，牛肉滑炒至变色盛出"
+      },
+      {
+        "stepNumber": 4,
+        "content": "锅中爆香蒜末和小米辣"
+      },
+      {
+        "stepNumber": 5,
+        "content": "牛肉回锅大火快炒，加老抽"
+      },
+      {
+        "stepNumber": 6,
+        "content": "下香菜段翻炒10秒出锅"
+      }
+    ],
+    "nutrition": {
+      "calories": 240,
+      "protein": 28,
+      "fat": 12,
+      "carbs": 4,
+      "fiber": 1,
+      "sodium": 560
+    },
+    "tips": "牛肉一定要逆纹切，全程大火快炒。",
+    "categoryTags": {
+      "ingredient": [
+        "牛肉",
+        "辣椒"
+      ],
+      "method": [
+        "炒"
+      ],
+      "cuisine": [
+        "湘菜"
+      ],
+      "flavor": [
+        "香辣"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "法式洋葱汤",
+    "description": "焦糖化洋葱与焗烤芝士的完美结合。",
+    "category": "western",
+    "season": "winter",
+    "difficulty": "medium",
+    "cookTime": 60,
+    "servings": 4,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800",
+    "ingredients": [
+      {
+        "name": "洋葱",
+        "amount": 4,
+        "unit": "个"
+      },
+      {
+        "name": "黄油",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "牛肉高汤",
+        "amount": 1,
+        "unit": "升"
+      },
+      {
+        "name": "法棍面包",
+        "amount": 4,
+        "unit": "片"
+      },
+      {
+        "name": "格鲁耶尔芝士",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "白葡萄酒",
+        "amount": 100,
+        "unit": "ml"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "洋葱切细丝"
+      },
+      {
+        "stepNumber": 2,
+        "content": "黄油融化，小火慢炒洋葱45分钟至深褐色"
+      },
+      {
+        "stepNumber": 3,
+        "content": "加入白葡萄酒收干"
+      },
+      {
+        "stepNumber": 4,
+        "content": "倒入牛肉高汤煮20分钟"
+      },
+      {
+        "stepNumber": 5,
+        "content": "汤盛入烤碗，放法棍片和芝士"
+      },
+      {
+        "stepNumber": 6,
+        "content": "220C烤10分钟至芝士焦黄冒泡"
+      }
+    ],
+    "nutrition": {
+      "calories": 350,
+      "protein": 14,
+      "fat": 18,
+      "carbs": 30,
+      "fiber": 4,
+      "sodium": 780
+    },
+    "tips": "洋葱炒焦糖化至少40分钟。",
+    "categoryTags": {
+      "ingredient": [
+        "洋葱",
+        "芝士"
+      ],
+      "method": [
+        "熬煮",
+        "焗烤"
+      ],
+      "cuisine": [
+        "法餐"
+      ],
+      "flavor": [
+        "浓香",
+        "咸鲜"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "普罗旺斯炖菜",
+    "description": "南法阳光的味道，多蔬菜慢炖。",
+    "category": "western",
+    "season": "summer",
+    "difficulty": "medium",
+    "cookTime": 50,
+    "servings": 4,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1572453800999-e8d2d1589b7c?w=800",
+    "ingredients": [
+      {
+        "name": "茄子",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "西葫芦",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "番茄",
+        "amount": 3,
+        "unit": "个"
+      },
+      {
+        "name": "彩椒",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "洋葱",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "大蒜",
+        "amount": 4,
+        "unit": "瓣"
+      },
+      {
+        "name": "橄榄油",
+        "amount": 3,
+        "unit": "勺"
+      },
+      {
+        "name": "普罗旺斯香料",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "所有蔬菜切薄片或小块"
+      },
+      {
+        "stepNumber": 2,
+        "content": "橄榄油炒香洋葱蒜末"
+      },
+      {
+        "stepNumber": 3,
+        "content": "加入番茄酱和番茄块炒出汁"
+      },
+      {
+        "stepNumber": 4,
+        "content": "其他蔬菜码入锅中"
+      },
+      {
+        "stepNumber": 5,
+        "content": "撒普罗旺斯香料小火焖煮30分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "开盖大火收汁调味"
+      }
+    ],
+    "nutrition": {
+      "calories": 180,
+      "protein": 5,
+      "fat": 10,
+      "carbs": 20,
+      "fiber": 8,
+      "sodium": 320
+    },
+    "tips": "没有普罗旺斯香料可用迷迭香加百里香代替。",
+    "categoryTags": {
+      "ingredient": [
+        "茄子",
+        "番茄",
+        "西葫芦"
+      ],
+      "method": [
+        "炖煮"
+      ],
+      "cuisine": [
+        "法餐"
+      ],
+      "flavor": [
+        "清香"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "焦糖布丁",
+    "description": "丝滑细腻的法式布丁。",
+    "category": "dessert",
+    "season": "all",
+    "difficulty": "hard",
+    "cookTime": 60,
+    "servings": 6,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=800",
+    "ingredients": [
+      {
+        "name": "鸡蛋",
+        "amount": 4,
+        "unit": "个"
+      },
+      {
+        "name": "牛奶",
+        "amount": 500,
+        "unit": "ml"
+      },
+      {
+        "name": "糖",
+        "amount": 120,
+        "unit": "g"
+      },
+      {
+        "name": "香草荚",
+        "amount": 1,
+        "unit": "根"
+      },
+      {
+        "name": "水",
+        "amount": 50,
+        "unit": "ml"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "糖加水小火煮至琥珀色焦糖倒入模具底部"
+      },
+      {
+        "stepNumber": 2,
+        "content": "牛奶加香草籽小火加热至微沸"
+      },
+      {
+        "stepNumber": 3,
+        "content": "鸡蛋加糖打散缓慢倒入温牛奶搅拌"
+      },
+      {
+        "stepNumber": 4,
+        "content": "蛋奶液过滤两次倒入模具"
+      },
+      {
+        "stepNumber": 5,
+        "content": "烤盘注入热水150C烤40分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "冷藏4小时以上脱模倒扣"
+      }
+    ],
+    "nutrition": {
+      "calories": 220,
+      "protein": 8,
+      "fat": 10,
+      "carbs": 28,
+      "fiber": 0,
+      "sodium": 100
+    },
+    "tips": "水浴法防气泡。冷藏过夜口感最好。",
+    "categoryTags": {
+      "ingredient": [
+        "鸡蛋",
+        "牛奶"
+      ],
+      "method": [
+        "烤",
+        "水浴"
+      ],
+      "cuisine": [
+        "法餐"
+      ],
+      "flavor": [
+        "甜"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "天妇罗",
+    "description": "外酥里嫩的日式炸物。",
+    "category": "japanese",
+    "season": "spring",
+    "difficulty": "hard",
+    "cookTime": 30,
+    "servings": 3,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1615361200141-f45040f367be?w=800",
+    "ingredients": [
+      {
+        "name": "大虾",
+        "amount": 6,
+        "unit": "只"
+      },
+      {
+        "name": "红薯",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "茄子",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "低筋面粉",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "鸡蛋",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "冰水",
+        "amount": 150,
+        "unit": "ml"
+      },
+      {
+        "name": "天妇罗蘸汁",
+        "amount": 100,
+        "unit": "ml"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "大虾去壳留尾背部开刀去虾线"
+      },
+      {
+        "stepNumber": 2,
+        "content": "红薯茄子切片吸干水分"
+      },
+      {
+        "stepNumber": 3,
+        "content": "冰水加蛋筛入面粉轻拌"
+      },
+      {
+        "stepNumber": 4,
+        "content": "油温170C食材蘸薄面衣入锅"
+      },
+      {
+        "stepNumber": 5,
+        "content": "炸2-3分钟至金黄捞出控油"
+      },
+      {
+        "stepNumber": 6,
+        "content": "配蘸汁和白萝卜泥上桌"
+      }
+    ],
+    "nutrition": {
+      "calories": 280,
+      "protein": 18,
+      "fat": 14,
+      "carbs": 22,
+      "fiber": 3,
+      "sodium": 480
+    },
+    "tips": "面糊用冰水不要过度搅拌。",
+    "categoryTags": {
+      "ingredient": [
+        "虾",
+        "面粉"
+      ],
+      "method": [
+        "油炸"
+      ],
+      "cuisine": [
+        "日式"
+      ],
+      "flavor": [
+        "酥脆",
+        "鲜美"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "豚骨拉面",
+    "description": "浓厚醇香的猪骨汤底。",
+    "category": "japanese",
+    "season": "winter",
+    "difficulty": "hard",
+    "cookTime": 240,
+    "servings": 4,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800",
+    "ingredients": [
+      {
+        "name": "猪筒骨",
+        "amount": 1,
+        "unit": "kg"
+      },
+      {
+        "name": "拉面",
+        "amount": 4,
+        "unit": "份"
+      },
+      {
+        "name": "叉烧肉",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "溏心蛋",
+        "amount": 4,
+        "unit": "个"
+      },
+      {
+        "name": "海苔",
+        "amount": 4,
+        "unit": "片"
+      },
+      {
+        "name": "葱花",
+        "amount": 20,
+        "unit": "g"
+      },
+      {
+        "name": "味噌",
+        "amount": 2,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "猪骨焯水洗净入大锅煮沸撇沫"
+      },
+      {
+        "stepNumber": 2,
+        "content": "加姜蒜大火滚煮30分钟乳化汤色"
+      },
+      {
+        "stepNumber": 3,
+        "content": "转中火熬煮3小时至奶白"
+      },
+      {
+        "stepNumber": 4,
+        "content": "味噌调开加入汤中调盐"
+      },
+      {
+        "stepNumber": 5,
+        "content": "另起锅煮面过冷水"
+      },
+      {
+        "stepNumber": 6,
+        "content": "碗中盛汤放面摆上叉烧溏心蛋海苔葱花"
+      }
+    ],
+    "nutrition": {
+      "calories": 520,
+      "protein": 28,
+      "fat": 22,
+      "carbs": 52,
+      "fiber": 1,
+      "sodium": 1100
+    },
+    "tips": "大火滚煮30分钟是汤变白的关键。",
+    "categoryTags": {
+      "ingredient": [
+        "猪肉",
+        "拉面"
+      ],
+      "method": [
+        "熬煮"
+      ],
+      "cuisine": [
+        "日式"
+      ],
+      "flavor": [
+        "醇厚",
+        "咸鲜"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "章鱼小丸子",
+    "description": "街头人气日式小吃。",
+    "category": "japanese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 25,
+    "servings": 4,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1559691441-2e1b08b4d7ad?w=800",
+    "ingredients": [
+      {
+        "name": "章鱼",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "低筋面粉",
+        "amount": 150,
+        "unit": "g"
+      },
+      {
+        "name": "鸡蛋",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "卷心菜",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "照烧酱",
+        "amount": 30,
+        "unit": "ml"
+      },
+      {
+        "name": "蛋黄酱",
+        "amount": 30,
+        "unit": "ml"
+      },
+      {
+        "name": "木鱼花",
+        "amount": 10,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "章鱼切小丁焯水30秒"
+      },
+      {
+        "stepNumber": 2,
+        "content": "面粉鸡蛋水调成流动面糊"
+      },
+      {
+        "stepNumber": 3,
+        "content": "卷心菜切碎"
+      },
+      {
+        "stepNumber": 4,
+        "content": "模具刷油倒入面糊至八分满"
+      },
+      {
+        "stepNumber": 5,
+        "content": "放入章鱼丁卷心菜用竹签翻成球形"
+      },
+      {
+        "stepNumber": 6,
+        "content": "煎至金黄挤酱撒木鱼花"
+      }
+    ],
+    "nutrition": {
+      "calories": 300,
+      "protein": 15,
+      "fat": 12,
+      "carbs": 34,
+      "fiber": 2,
+      "sodium": 650
+    },
+    "tips": "面糊有颗粒口感更好。",
+    "categoryTags": {
+      "ingredient": [
+        "章鱼",
+        "面粉"
+      ],
+      "method": [
+        "煎"
+      ],
+      "cuisine": [
+        "日式"
+      ],
+      "flavor": [
+        "咸鲜"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "冬阴功汤",
+    "description": "泰国国汤，酸辣鲜香。",
+    "category": "thai",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 30,
+    "servings": 4,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?w=800",
+    "ingredients": [
+      {
+        "name": "大虾",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "蘑菇",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "香茅",
+        "amount": 3,
+        "unit": "根"
+      },
+      {
+        "name": "南姜",
+        "amount": 3,
+        "unit": "片"
+      },
+      {
+        "name": "柠檬叶",
+        "amount": 4,
+        "unit": "片"
+      },
+      {
+        "name": "小米辣",
+        "amount": 4,
+        "unit": "个"
+      },
+      {
+        "name": "鱼露",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "椰奶",
+        "amount": 200,
+        "unit": "ml"
+      },
+      {
+        "name": "冬阴功酱",
+        "amount": 2,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "香茅拍扁切段南姜切片"
+      },
+      {
+        "stepNumber": 2,
+        "content": "加水煮开放香茅南姜柠檬叶煮5分钟"
+      },
+      {
+        "stepNumber": 3,
+        "content": "加入冬阴功酱搅匀"
+      },
+      {
+        "stepNumber": 4,
+        "content": "下蘑菇煮3分钟再下大虾煮至变红"
+      },
+      {
+        "stepNumber": 5,
+        "content": "倒入椰奶小火煮2分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "关火加鱼露和青柠汁调味"
+      }
+    ],
+    "nutrition": {
+      "calories": 240,
+      "protein": 22,
+      "fat": 14,
+      "carbs": 8,
+      "fiber": 1,
+      "sodium": 820
+    },
+    "tips": "青柠汁关火后再加，煮久了会苦。",
+    "categoryTags": {
+      "ingredient": [
+        "虾",
+        "椰奶",
+        "香茅"
+      ],
+      "method": [
+        "煮"
+      ],
+      "cuisine": [
+        "泰式"
+      ],
+      "flavor": [
+        "酸辣"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "泰式绿咖喱鸡",
+    "description": "椰香浓郁的泰式绿咖喱。",
+    "category": "thai",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 25,
+    "servings": 3,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800",
+    "ingredients": [
+      {
+        "name": "鸡胸肉",
+        "amount": 300,
+        "unit": "g"
+      },
+      {
+        "name": "绿咖喱酱",
+        "amount": 3,
+        "unit": "勺"
+      },
+      {
+        "name": "椰奶",
+        "amount": 400,
+        "unit": "ml"
+      },
+      {
+        "name": "茄子",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "青椒",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "罗勒叶",
+        "amount": 10,
+        "unit": "片"
+      },
+      {
+        "name": "鱼露",
+        "amount": 2,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "鸡胸肉切薄片茄子切块"
+      },
+      {
+        "stepNumber": 2,
+        "content": "倒入一半椰奶煮开加绿咖喱酱搅匀"
+      },
+      {
+        "stepNumber": 3,
+        "content": "下鸡肉翻炒至变色"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加剩余椰奶和少许水"
+      },
+      {
+        "stepNumber": 5,
+        "content": "下茄子青椒煮5分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "鱼露调味关火撒罗勒叶"
+      }
+    ],
+    "nutrition": {
+      "calories": 360,
+      "protein": 28,
+      "fat": 22,
+      "carbs": 10,
+      "fiber": 3,
+      "sodium": 720
+    },
+    "tips": "先煮椰奶浓稠部分再放咖喱酱更浓郁。",
+    "categoryTags": {
+      "ingredient": [
+        "鸡肉",
+        "椰奶"
+      ],
+      "method": [
+        "煮"
+      ],
+      "cuisine": [
+        "泰式"
+      ],
+      "flavor": [
+        "咖喱",
+        "微辣"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "芒果糯米饭",
+    "description": "泰式甜品之王，香甜软糯。",
+    "category": "thai",
+    "season": "summer",
+    "difficulty": "easy",
+    "cookTime": 40,
+    "servings": 3,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=800",
+    "ingredients": [
+      {
+        "name": "糯米",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "芒果",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "椰奶",
+        "amount": 200,
+        "unit": "ml"
+      },
+      {
+        "name": "糖",
+        "amount": 40,
+        "unit": "g"
+      },
+      {
+        "name": "盐",
+        "amount": 1,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "糯米提前浸泡4小时以上"
+      },
+      {
+        "stepNumber": 2,
+        "content": "糯米沥干蒸笼大火蒸25分钟"
+      },
+      {
+        "stepNumber": 3,
+        "content": "椰奶加糖和少许盐小火加热"
+      },
+      {
+        "stepNumber": 4,
+        "content": "蒸好的糯米倒入椰奶中拌匀焖15分钟"
+      },
+      {
+        "stepNumber": 5,
+        "content": "芒果削皮切大片"
+      },
+      {
+        "stepNumber": 6,
+        "content": "糯米饭盛盘摆上芒果淋椰奶"
+      }
+    ],
+    "nutrition": {
+      "calories": 380,
+      "protein": 6,
+      "fat": 12,
+      "carbs": 62,
+      "fiber": 3,
+      "sodium": 80
+    },
+    "tips": "糯米必须浸泡足够时间。加少许盐提升甜味层次。",
+    "categoryTags": {
+      "ingredient": [
+        "糯米",
+        "芒果",
+        "椰奶"
+      ],
+      "method": [
+        "蒸"
+      ],
+      "cuisine": [
+        "泰式"
+      ],
+      "flavor": [
+        "甜"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "韩式泡菜锅",
+    "description": "酸辣开胃的韩式泡菜锅。",
+    "category": "korean",
+    "season": "winter",
+    "difficulty": "easy",
+    "cookTime": 25,
+    "servings": 3,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=800",
+    "ingredients": [
+      {
+        "name": "老泡菜",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "五花肉",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "豆腐",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "金针菇",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "大葱",
+        "amount": 1,
+        "unit": "根"
+      },
+      {
+        "name": "辣椒粉",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "韩式辣酱",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "五花肉切薄片泡菜切段豆腐切块"
+      },
+      {
+        "stepNumber": 2,
+        "content": "锅中炒香五花肉至出油"
+      },
+      {
+        "stepNumber": 3,
+        "content": "加入泡菜翻炒2分钟"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加水烧开加辣椒粉辣酱"
+      },
+      {
+        "stepNumber": 5,
+        "content": "下豆腐金针菇煮5分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "撒葱花出锅"
+      }
+    ],
+    "nutrition": {
+      "calories": 280,
+      "protein": 18,
+      "fat": 16,
+      "carbs": 14,
+      "fiber": 3,
+      "sodium": 1100
+    },
+    "tips": "用发酵久的老泡菜味道更浓郁。",
+    "categoryTags": {
+      "ingredient": [
+        "泡菜",
+        "猪肉",
+        "豆腐"
+      ],
+      "method": [
+        "煮",
+        "炒"
+      ],
+      "cuisine": [
+        "韩式"
+      ],
+      "flavor": [
+        "酸辣"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "韩式拌饭",
+    "description": "色彩缤纷的韩式拌饭。",
+    "category": "korean",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 30,
+    "servings": 2,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=800",
+    "ingredients": [
+      {
+        "name": "米饭",
+        "amount": 2,
+        "unit": "碗"
+      },
+      {
+        "name": "牛肉",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "菠菜",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "胡萝卜",
+        "amount": 1,
+        "unit": "根"
+      },
+      {
+        "name": "豆芽",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "鸡蛋",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "韩式辣酱",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "香油",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "菠菜焯水胡萝卜切丝豆芽焯水"
+      },
+      {
+        "stepNumber": 2,
+        "content": "牛肉切丝炒熟"
+      },
+      {
+        "stepNumber": 3,
+        "content": "煎一个溏心蛋"
+      },
+      {
+        "stepNumber": 4,
+        "content": "碗底抹香油放入米饭"
+      },
+      {
+        "stepNumber": 5,
+        "content": "依次摆上蔬菜牛肉和煎蛋"
+      },
+      {
+        "stepNumber": 6,
+        "content": "加韩式辣酱拌匀食用"
+      }
+    ],
+    "nutrition": {
+      "calories": 420,
+      "protein": 20,
+      "fat": 14,
+      "carbs": 56,
+      "fiber": 4,
+      "sodium": 680
+    },
+    "tips": "拌饭碗底抹香油防粘增香。",
+    "categoryTags": {
+      "ingredient": [
+        "米饭",
+        "牛肉",
+        "鸡蛋",
+        "蔬菜"
+      ],
+      "method": [
+        "拌"
+      ],
+      "cuisine": [
+        "韩式"
+      ],
+      "flavor": [
+        "辣",
+        "鲜"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "提拉米苏",
+    "description": "经典意式甜点，咖啡与奶酪的完美交融。",
+    "category": "dessert",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 30,
+    "servings": 6,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800",
+    "ingredients": [
+      {
+        "name": "马斯卡彭芝士",
+        "amount": 250,
+        "unit": "g"
+      },
+      {
+        "name": "手指饼干",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "鸡蛋",
+        "amount": 3,
+        "unit": "个"
+      },
+      {
+        "name": "浓缩咖啡",
+        "amount": 200,
+        "unit": "ml"
+      },
+      {
+        "name": "朗姆酒",
+        "amount": 20,
+        "unit": "ml"
+      },
+      {
+        "name": "糖",
+        "amount": 80,
+        "unit": "g"
+      },
+      {
+        "name": "可可粉",
+        "amount": 15,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "蛋黄加糖打至浓稠发白"
+      },
+      {
+        "stepNumber": 2,
+        "content": "加入马斯卡彭芝士搅拌均匀"
+      },
+      {
+        "stepNumber": 3,
+        "content": "蛋白打至硬性发泡翻拌入芝士糊"
+      },
+      {
+        "stepNumber": 4,
+        "content": "浓缩咖啡加朗姆酒混合"
+      },
+      {
+        "stepNumber": 5,
+        "content": "手指饼干快速蘸咖啡液铺底"
+      },
+      {
+        "stepNumber": 6,
+        "content": "一层芝士糊一层饼干叠放冷藏4小时撒可可粉"
+      }
+    ],
+    "nutrition": {
+      "calories": 340,
+      "protein": 8,
+      "fat": 22,
+      "carbs": 28,
+      "fiber": 0,
+      "sodium": 120
+    },
+    "tips": "手指饼干蘸咖啡要快。冷藏过夜口感更好。",
+    "categoryTags": {
+      "ingredient": [
+        "芝士",
+        "鸡蛋",
+        "咖啡"
+      ],
+      "method": [
+        "冷藏",
+        "打发"
+      ],
+      "cuisine": [
+        "意式"
+      ],
+      "flavor": [
+        "甜",
+        "咖啡"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "班尼迪克蛋",
+    "description": "经典早午餐，水波蛋配荷兰酱。",
+    "category": "western",
+    "season": "all",
+    "difficulty": "hard",
+    "cookTime": 25,
+    "servings": 2,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1608039829572-d6b79737985a?w=800",
+    "ingredients": [
+      {
+        "name": "鸡蛋",
+        "amount": 4,
+        "unit": "个"
+      },
+      {
+        "name": "英式松饼",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "培根",
+        "amount": 4,
+        "unit": "片"
+      },
+      {
+        "name": "黄油",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "柠檬汁",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "蛋黄",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "白醋",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "黄油融化取澄清部分"
+      },
+      {
+        "stepNumber": 2,
+        "content": "蛋黄加柠檬汁隔水打至浓稠缓慢倒入黄油做成荷兰酱"
+      },
+      {
+        "stepNumber": 3,
+        "content": "水加白醋烧开搅出漩涡打入鸡蛋煮3分钟做水波蛋"
+      },
+      {
+        "stepNumber": 4,
+        "content": "英式松饼对半切开烤至微焦"
+      },
+      {
+        "stepNumber": 5,
+        "content": "松饼上放培根再放水波蛋"
+      },
+      {
+        "stepNumber": 6,
+        "content": "淋上荷兰酱撒黑胡椒和欧芹碎"
+      }
+    ],
+    "nutrition": {
+      "calories": 420,
+      "protein": 24,
+      "fat": 30,
+      "carbs": 16,
+      "fiber": 0,
+      "sodium": 820
+    },
+    "tips": "荷兰酱隔水加热温度不要超过60C否则蛋会结块。",
+    "categoryTags": {
+      "ingredient": [
+        "鸡蛋",
+        "培根",
+        "黄油"
+      ],
+      "method": [
+        "煮",
+        "隔水加热"
+      ],
+      "cuisine": [
+        "法餐"
+      ],
+      "flavor": [
+        "咸鲜",
+        "浓郁"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "蒜蓉粉丝蒸扇贝",
+    "description": "鲜甜扇贝搭配蒜蓉粉丝，宴客必备。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "easy",
+    "cookTime": 15,
+    "servings": 4,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1559742811-822f4580b12e?w=800",
+    "ingredients": [
+      {
+        "name": "扇贝",
+        "amount": 8,
+        "unit": "只"
+      },
+      {
+        "name": "粉丝",
+        "amount": 1,
+        "unit": "把"
+      },
+      {
+        "name": "蒜",
+        "amount": 1,
+        "unit": "整头"
+      },
+      {
+        "name": "小米辣",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "蒸鱼豉油",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "葱花",
+        "amount": 10,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "粉丝温水泡软蒜切成蒜末"
+      },
+      {
+        "stepNumber": 2,
+        "content": "热油浇蒜末做成金银蒜蓉"
+      },
+      {
+        "stepNumber": 3,
+        "content": "扇贝洗净摆盘放上粉丝"
+      },
+      {
+        "stepNumber": 4,
+        "content": "铺上蒜蓉和小米辣圈"
+      },
+      {
+        "stepNumber": 5,
+        "content": "水开后大火蒸6分钟"
+      },
+      {
+        "stepNumber": 6,
+        "content": "淋蒸鱼豉油撒葱花浇热油"
+      }
+    ],
+    "nutrition": {
+      "calories": 180,
+      "protein": 20,
+      "fat": 8,
+      "carbs": 12,
+      "fiber": 1,
+      "sodium": 480
+    },
+    "tips": "蒸不要太久否则扇贝老了。金银蒜是生熟蒜混合。",
+    "categoryTags": {
+      "ingredient": [
+        "扇贝",
+        "蒜",
+        "粉丝"
+      ],
+      "method": [
+        "蒸"
+      ],
+      "cuisine": [
+        "粤菜"
+      ],
+      "flavor": [
+        "蒜香",
+        "鲜甜"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  },
+  {
+    "title": "酸菜鱼",
+    "description": "酸爽开胃的经典川菜。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 30,
+    "servings": 4,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1582452932078-3cd87f4766c7?w=800",
+    "ingredients": [
+      {
+        "name": "草鱼",
+        "amount": 1,
+        "unit": "条"
+      },
+      {
+        "name": "四川泡酸菜",
+        "amount": 200,
+        "unit": "g"
+      },
+      {
+        "name": "泡椒",
+        "amount": 30,
+        "unit": "g"
+      },
+      {
+        "name": "姜",
+        "amount": 1,
+        "unit": "块"
+      },
+      {
+        "name": "蒜",
+        "amount": 5,
+        "unit": "瓣"
+      },
+      {
+        "name": "干花椒",
+        "amount": 10,
+        "unit": "粒"
+      },
+      {
+        "name": "蛋清",
+        "amount": 1,
+        "unit": "个"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "草鱼片出鱼片鱼骨斩块"
+      },
+      {
+        "stepNumber": 2,
+        "content": "鱼片加料酒蛋清淀粉腌制"
+      },
+      {
+        "stepNumber": 3,
+        "content": "酸菜切段泡椒切圈"
+      },
+      {
+        "stepNumber": 4,
+        "content": "油炒香姜蒜泡椒下酸菜炒香"
+      },
+      {
+        "stepNumber": 5,
+        "content": "加入鱼骨和水煮15分钟出白汤捞鱼骨"
+      },
+      {
+        "stepNumber": 6,
+        "content": "汤滚沸下鱼片煮至变色出锅浇热油"
+      }
+    ],
+    "nutrition": {
+      "calories": 320,
+      "protein": 30,
+      "fat": 16,
+      "carbs": 6,
+      "fiber": 2,
+      "sodium": 920
+    },
+    "tips": "鱼片不要一次全部下锅，一片片放不容易碎。",
+    "categoryTags": {
+      "ingredient": [
+        "鱼",
+        "酸菜"
+      ],
+      "method": [
+        "煮"
+      ],
+      "cuisine": [
+        "川菜"
+      ],
+      "flavor": [
+        "酸辣"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "卤肉饭",
+    "description": "台湾经典，浓郁的卤肉浇在米饭上。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 90,
+    "servings": 4,
+    "isFeatured": 1,
+    "coverImage": "https://images.unsplash.com/photo-1598866594230-a7c12756260f?w=800",
+    "ingredients": [
+      {
+        "name": "五花肉",
+        "amount": 500,
+        "unit": "g"
+      },
+      {
+        "name": "红葱头",
+        "amount": 100,
+        "unit": "g"
+      },
+      {
+        "name": "鸡蛋",
+        "amount": 4,
+        "unit": "个"
+      },
+      {
+        "name": "生抽",
+        "amount": 3,
+        "unit": "勺"
+      },
+      {
+        "name": "老抽",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "冰糖",
+        "amount": 20,
+        "unit": "g"
+      },
+      {
+        "name": "八角",
+        "amount": 2,
+        "unit": "个"
+      },
+      {
+        "name": "米饭",
+        "amount": 4,
+        "unit": "碗"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "五花肉切小丁红葱头切碎"
+      },
+      {
+        "stepNumber": 2,
+        "content": "锅中不放油直接炒五花肉丁至出油金黄"
+      },
+      {
+        "stepNumber": 3,
+        "content": "加入红葱碎炒至焦香"
+      },
+      {
+        "stepNumber": 4,
+        "content": "加入生抽老抽冰糖八角"
+      },
+      {
+        "stepNumber": 5,
+        "content": "加水没过肉大火烧开转小火炖1小时"
+      },
+      {
+        "stepNumber": 6,
+        "content": "煮好的溏心蛋放入锅中一起浸泡半小时配米饭"
+      }
+    ],
+    "nutrition": {
+      "calories": 480,
+      "protein": 22,
+      "fat": 32,
+      "carbs": 28,
+      "fiber": 1,
+      "sodium": 720
+    },
+    "tips": "红葱头是灵魂。炖的时间越长越入味。",
+    "categoryTags": {
+      "ingredient": [
+        "猪肉",
+        "红葱头",
+        "鸡蛋"
+      ],
+      "method": [
+        "炖"
+      ],
+      "cuisine": [
+        "中式"
+      ],
+      "flavor": [
+        "咸甜",
+        "浓郁"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "鱼香肉丝",
+    "description": "酸甜微辣，配米饭绝了。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "medium",
+    "cookTime": 20,
+    "servings": 3,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1593604340846-3156ad6e8b08?w=800",
+    "ingredients": [
+      {
+        "name": "猪里脊",
+        "amount": 250,
+        "unit": "g"
+      },
+      {
+        "name": "木耳",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "胡萝卜",
+        "amount": 1,
+        "unit": "根"
+      },
+      {
+        "name": "青椒",
+        "amount": 1,
+        "unit": "个"
+      },
+      {
+        "name": "郫县豆瓣酱",
+        "amount": 1,
+        "unit": "勺"
+      },
+      {
+        "name": "醋",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "糖",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "淀粉",
+        "amount": 1,
+        "unit": "勺"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "猪里脊切丝加料酒淀粉腌制"
+      },
+      {
+        "stepNumber": 2,
+        "content": "木耳泡发切丝胡萝卜青椒切丝"
+      },
+      {
+        "stepNumber": 3,
+        "content": "醋糖生抽淀粉调成鱼香汁"
+      },
+      {
+        "stepNumber": 4,
+        "content": "热锅凉油滑炒肉丝至变色盛出"
+      },
+      {
+        "stepNumber": 5,
+        "content": "爆香豆瓣酱后下蔬菜翻炒"
+      },
+      {
+        "stepNumber": 6,
+        "content": "肉丝回锅倒入鱼香汁大火翻炒出锅"
+      }
+    ],
+    "nutrition": {
+      "calories": 320,
+      "protein": 24,
+      "fat": 14,
+      "carbs": 18,
+      "fiber": 3,
+      "sodium": 680
+    },
+    "tips": "鱼香汁比例2糖2醋1生抽是关键。",
+    "categoryTags": {
+      "ingredient": [
+        "猪肉",
+        "木耳",
+        "胡萝卜"
+      ],
+      "method": [
+        "炒"
+      ],
+      "cuisine": [
+        "川菜"
+      ],
+      "flavor": [
+        "酸甜",
+        "微辣"
+      ],
+      "price": [
+        "经济"
+      ]
+    }
+  },
+  {
+    "title": "白切鸡",
+    "description": "粤式经典，皮爽肉滑的原味鸡。",
+    "category": "chinese",
+    "season": "all",
+    "difficulty": "hard",
+    "cookTime": 50,
+    "servings": 4,
+    "isFeatured": 0,
+    "coverImage": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=800",
+    "ingredients": [
+      {
+        "name": "三黄鸡",
+        "amount": 1,
+        "unit": "只"
+      },
+      {
+        "name": "姜",
+        "amount": 1,
+        "unit": "块"
+      },
+      {
+        "name": "葱",
+        "amount": 4,
+        "unit": "根"
+      },
+      {
+        "name": "料酒",
+        "amount": 2,
+        "unit": "勺"
+      },
+      {
+        "name": "冰块",
+        "amount": 500,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "content": "鸡处理干净沥干水分"
+      },
+      {
+        "stepNumber": 2,
+        "content": "大锅水烧开加姜葱料酒"
+      },
+      {
+        "stepNumber": 3,
+        "content": "手提鸡头把鸡身浸入开水10秒提起重复3次"
+      },
+      {
+        "stepNumber": 4,
+        "content": "整鸡入锅转小火保持微沸浸煮20分钟"
+      },
+      {
+        "stepNumber": 5,
+        "content": "取出立刻放入冰水浸泡至完全冷却"
+      },
+      {
+        "stepNumber": 6,
+        "content": "斩块摆盘配姜葱油碟上桌"
+      }
+    ],
+    "nutrition": {
+      "calories": 280,
+      "protein": 32,
+      "fat": 16,
+      "carbs": 2,
+      "fiber": 0,
+      "sodium": 360
+    },
+    "tips": "浸煮后迅速冰水冷却才能皮爽肉滑。",
+    "categoryTags": {
+      "ingredient": [
+        "鸡肉"
+      ],
+      "method": [
+        "浸煮",
+        "冰镇"
+      ],
+      "cuisine": [
+        "粤菜"
+      ],
+      "flavor": [
+        "原味",
+        "鲜美"
+      ],
+      "price": [
+        "中等"
+      ]
+    }
+  }
+]

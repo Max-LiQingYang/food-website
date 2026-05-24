@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Recipe } from '../api'
 import { highlightText } from '../utils/highlightText'
@@ -9,6 +10,8 @@ interface RecipeCardProps {
   recipe: Recipe
   /** Optional search query to highlight in the title */
   highlightQuery?: string
+  /** Animation delay for staggered entry (ms) */
+  animationDelay?: number
 }
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -59,16 +62,30 @@ function getCalories(recipe: Recipe): number | null {
   return null
 }
 
-export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) {
+export default function RecipeCard({ recipe, highlightQuery, animationDelay }: RecipeCardProps) {
   const navigate = useNavigate()
+  const [imgLoaded, setImgLoaded] = useState(false)
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     navigate(`/recipe/${recipe.id}`)
-  }
+  }, [navigate, recipe.id])
 
   const titleContent = highlightQuery ? highlightText(recipe.title, highlightQuery) : recipe.title
   const difficulty = recipe.difficulty?.toLowerCase() || ''
   const calories = getCalories(recipe)
+
+  // Quick preview helpers
+  const getPreviewInfo = () => {
+    const steps = Array.isArray((recipe as any).steps) ? (recipe as any).steps : []
+    const ings = Array.isArray((recipe as any).ingredients) ? (recipe as any).ingredients : []
+    return {
+      stepCount: steps.length,
+      ingCount: ings.length,
+      desc: recipe.description || '',
+    }
+  }
+
+  const preview = getPreviewInfo()
 
   return (
     <div
@@ -82,11 +99,30 @@ export default function RecipeCard({ recipe, highlightQuery }: RecipeCardProps) 
           navigate(`/recipe/${recipe.id}`)
         }
       }}
+      style={animationDelay != null ? { animationDelay: `${animationDelay}ms` } : undefined}
     >
       {/* 封面图 */}
       <div className="recipe-card__cover">
         {recipe.coverImage ? (
-          <ImagePlaceholder src={recipe.coverImage} alt={recipe.title} className="recipe-card__cover-img" />
+          <>
+            <ImagePlaceholder
+              src={recipe.coverImage}
+              alt={recipe.title}
+              className={`recipe-card__cover-img ${imgLoaded ? 'loaded' : ''}`}
+              onLoad={() => setImgLoaded(true)}
+            />
+            {/* 悬浮预览层 */}
+            <div className="recipe-card__hover-overlay">
+              <div className="recipe-card__hover-content">
+                {preview.desc && <p className="recipe-card__hover-desc">{preview.desc}</p>}
+                <div className="recipe-card__hover-stats">
+                  <span>📋 {preview.ingCount}种食材</span>
+                  <span>📝 {preview.stepCount}步</span>
+                </div>
+                <span className="recipe-card__hover-cta">查看详情 →</span>
+              </div>
+            </div>
+          </>
         ) : (
           <div className="recipe-card__cover-placeholder">🍽️</div>
         )}

@@ -7,6 +7,7 @@ import Breadcrumb from '../components/Breadcrumb'
 import ErrorBoundary from '../components/ErrorBoundary'
 import PWAInstallPrompt from '../components/PWAInstallPrompt'
 import SkipLink from '../components/SkipLink'
+import '../components/PageTransition.css'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))

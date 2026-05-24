@@ -905,6 +905,34 @@ export function getRecipeVersions(id: string): Promise<RecipeVersion[]> {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// 内容发现 API
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * 获取热门食谱
+ * GET /api/recipes/popular
+ */
+export function getPopularRecipes(params?: { page?: number; pageSize?: number }): Promise<{ list: Recipe[]; total: number }> {
+  return apiClient.get('/recipes/popular', { params }).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 新用户引导推荐
+ * GET /api/recipes/new-user-recommend
+ */
+export function getNewUserRecommend(params?: { difficulty?: string; season?: string }): Promise<{ list: Recipe[]; matched: { difficulty?: string; season?: string } }> {
+  return apiClient.get('/recipes/new-user-recommend', { params }).then(r => r.data?.data || r.data)
+}
+
+/**
+ * 质量检查列表
+ * GET /api/recipes/quality-check
+ */
+export function getQualityCheck(params?: { page?: number; pageSize?: number }): Promise<{ list: any[]; total: number; summary: { passedCount: number; failedCount: number; passRate: number } }> {
+  return apiClient.get('/recipes/quality-check', { params }).then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
 // 每周餐单计划 (Meal Plan)
 // ─────────────────────────────────────────────────────────────────
 
@@ -1099,6 +1127,9 @@ export default {
   getFollowStatus,
   getRankings,
   getRecipeVersions,
+  getPopularRecipes,
+  getNewUserRecommend,
+  getQualityCheck,
   compareRecipes,
   getPreferences,
   updatePreferences,
