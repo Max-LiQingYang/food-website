@@ -224,6 +224,21 @@ export default function ShoppingListPage() {
     })
   }
 
+  const handleCopyAsText = useCallback(() => {
+    if (!selectedList) return
+    const lines = selectedList.items.map((item: any) => {
+      const checked = item.checked ? '✅' : '⬜'
+      const amount = item.amount ? ` ×${item.amount}${item.unit || ''}` : ''
+      return `${checked} ${item.name}${amount}`
+    })
+    const text = `🛒 ${selectedList.name}\n${lines.join('\n')}`
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success('已复制到剪贴板')
+    }).catch(() => {
+      toast.error('复制失败')
+    })
+  }, [selectedList, toast])
+
   const handleExportAsHtml = () => {
     if (!selectedList) return
     const checked = selectedList.items.filter(i => i.checked)
@@ -428,6 +443,9 @@ export default function ShoppingListPage() {
               <button className="shop-detail__export-btn" onClick={handleExportAsHtml} title="导出 HTML">
                 📄
               </button>
+              <button className="shop-detail__export-btn" onClick={handleCopyAsText} title="复制文本">
+                📋
+              </button>
             </>
           )}
         </div>
@@ -510,6 +528,10 @@ export default function ShoppingListPage() {
                           {item.amount}{item.unit ? ` ${item.unit}` : ''}
                         </span>
                       )}
+      
+                      {(item as any).estimatedPrice != null && (
+                        <span className="shop-detail__item-price">¥{(item as any).estimatedPrice.toFixed(1)}</span>
+                      )}
                       <button
                         className="shop-detail__item-delete"
                         onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.name) }}
@@ -543,9 +565,14 @@ export default function ShoppingListPage() {
               </span>
               <span className="shop-detail__item-name">{item.name}</span>
               {item.amount != null && (
-                <span className="shop-detail__item-amount">
-                  {item.amount}{item.unit ? ` ${item.unit}` : ''}
-                </span>
+                <>
+                  <span className="shop-detail__item-amount">
+                    {item.amount}{item.unit ? ` ${item.unit}` : ''}
+                  </span>
+                  {(item as any).estimatedPrice != null && (
+                    <span className="shop-detail__item-price">¥{(item as any).estimatedPrice.toFixed(1)}</span>
+                  )}
+                </>
               )}
               <button
                 className="shop-detail__item-delete"

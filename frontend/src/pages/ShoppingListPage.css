@@ -281,6 +281,18 @@
   flex-shrink: 0;
 }
 
+.shop-detail__item-price {
+  font-size: 12px;
+  color: var(--color-text-muted, #999);
+  font-weight: 500;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+body.dark .shop-detail__item-price {
+  color: var(--color-text-muted-dark, #888);
+}
+
 /* ── btn utility ── */
 .btn {
   display: inline-flex;

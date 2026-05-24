@@ -14,6 +14,7 @@ import ShareModal from '../components/ShareModal'
 import AddToCollectionDropdown from '../components/AddToCollectionDropdown'
 import AddToShoppingListButton from '../components/AddToShoppingListButton'
 import RecipeVersionPanel from '../components/RecipeVersionPanel'
+import SubstitutionPanel from '../components/SubstitutionPanel'
 import VideoPlayer from '../components/VideoPlayer'
 import QualityScoreModal from '../components/QualityScoreModal'
 import ExportMenu from '../components/ExportMenu'
@@ -79,6 +80,7 @@ export default function RecipeDetailPage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [showShareModal, setShowShareModal] = useState(false)
   const [showQualityModal, setShowQualityModal] = useState(false)
+  const [showSubstitution, setShowSubstitution] = useState(false)
 
   // 收集所有可查看的图片（封面 + 步骤图片）
   const allImages = [
@@ -613,6 +615,22 @@ export default function RecipeDetailPage() {
                 </li>
               ))}
             </ul>
+            {/* 食材替换建议 */}
+            <button
+              className="substitution-toggle"
+              onClick={() => setShowSubstitution(s => !s)}
+            >
+              {showSubstitution ? '▲ 收起替换建议' : '🔄 食材替换建议'}
+            </button>
+            {showSubstitution && (
+              <SubstitutionPanel
+                recipeId={id}
+                ingredientNames={(recipe.ingredients || []).map(i =>
+                  typeof i === 'string' ? i : (i.name || '')
+                ).filter(Boolean)}
+                onClose={() => setShowSubstitution(false)}
+              />
+            )}
           </section>
         )}
 

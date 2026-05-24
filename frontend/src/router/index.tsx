@@ -98,6 +98,10 @@ const router = createBrowserRouter([
       { path: '/pantry', element: <PantryPage /> },
       // 迭代#37: 营养追踪
       { path: '/nutrition', element: <NutritionDashboard /> },
+      // 迭代#40: 食谱版本对比
+      { path: '/recipe/:id/versions', element: <RecipeDiffPage /> },
+      // 迭代#40: 烹饪数据分析
+      { path: '/cooking/analytics', element: <CookingAnalyticsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
@@ -105,6 +109,8 @@ const router = createBrowserRouter([
 
 const PantryPage = lazy(() => import('../pages/PantryPage'))
 const NutritionDashboard = lazy(() => import('../pages/NutritionDashboard'))
+const RecipeDiffPage = lazy(() => import('../pages/RecipeDiffPage'))
+const CookingAnalyticsPage = lazy(() => import('../pages/CookingAnalyticsPage'))
 
 export default function Router() {
   // @ts-expect-error TS2786 with TS 5.9 + @types/react 18.3 — harmless render types mismatch

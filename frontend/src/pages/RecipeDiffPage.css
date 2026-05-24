@@ -1,0 +1,374 @@
+.recipe-diff-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.recipe-diff-page__header {
+  margin-bottom: 24px;
+}
+
+.recipe-diff-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary, #E8663E);
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.recipe-diff-page__back:hover {
+  text-decoration: underline;
+}
+
+.recipe-diff-page__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0 0 4px;
+}
+
+.recipe-diff-page__subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted, #999);
+}
+
+/* ── 版本选择器 ── */
+.recipe-diff-page__selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.recipe-diff-page__select {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 8px;
+  background: var(--color-card, #fff);
+  color: var(--color-text, #333);
+  font-size: 14px;
+  min-width: 120px;
+}
+
+body.dark .recipe-diff-page__select {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #444);
+  color: var(--color-text-dark, #eee);
+}
+
+.recipe-diff-page__vs {
+  font-weight: 600;
+  color: var(--color-text-muted, #999);
+  font-size: 14px;
+}
+
+.recipe-diff-page__diff-btn {
+  padding: 8px 20px;
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.recipe-diff-page__diff-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recipe-diff-page__diff-btn:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+/* ── 版本信息栏 ── */
+.recipe-diff-page__meta {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--color-bg-secondary, #f9f6f3);
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+body.dark .recipe-diff-page__meta {
+  background: var(--color-bg-dark, #1e1e1e);
+}
+
+.recipe-diff-page__meta-old,
+.recipe-diff-page__meta-new {
+  flex: 1;
+}
+
+.recipe-diff-page__meta-label {
+  font-weight: 600;
+  color: var(--color-text-muted, #999);
+  margin-bottom: 4px;
+}
+
+.recipe-diff-page__meta-version {
+  color: var(--color-text, #333);
+}
+
+body.dark .recipe-diff-page__meta-version {
+  color: var(--color-text-dark, #eee);
+}
+
+.recipe-diff-page__meta-date {
+  color: var(--color-text-muted, #999);
+  font-size: 12px;
+}
+
+.recipe-diff-page__meta-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.recipe-diff-page__meta-badge--added {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.recipe-diff-page__meta-badge--removed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.recipe-diff-page__meta-badge--modified {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+/* ── 双栏对比 ── */
+.recipe-diff-page__panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.recipe-diff-page__panel {
+  background: var(--color-card, #fff);
+  border-radius: 12px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  overflow: hidden;
+}
+
+body.dark .recipe-diff-page__panel {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #444);
+}
+
+.recipe-diff-page__panel-header {
+  padding: 12px 16px;
+  background: var(--color-bg-secondary, #f9f6f3);
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid var(--color-border, #e8e0d8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.dark .recipe-diff-page__panel-header {
+  background: var(--color-bg-dark, #1e1e1e);
+  border-color: var(--color-border-dark, #444);
+}
+
+.recipe-diff-page__panel-body {
+  padding: 16px;
+}
+
+.recipe-diff-page__field {
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+}
+
+.recipe-diff-page__field--added {
+  background: #f0fdf4;
+  border-left-color: #22c55e;
+}
+
+.recipe-diff-page__field--removed {
+  background: #fef2f2;
+  border-left-color: #ef4444;
+}
+
+.recipe-diff-page__field--modified {
+  background: #fefce8;
+  border-left-color: #eab308;
+}
+
+body.dark .recipe-diff-page__field--added {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+body.dark .recipe-diff-page__field--removed {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+body.dark .recipe-diff-page__field--modified {
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.recipe-diff-page__field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.recipe-diff-page__field-content {
+  font-size: 14px;
+  color: var(--color-text, #333);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+body.dark .recipe-diff-page__field-content {
+  color: var(--color-text-dark, #eee);
+}
+
+/* ── 数组对比（食材/步骤） ── */
+.recipe-diff-page__array-item {
+  padding: 6px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.recipe-diff-page__array-item--added {
+  background: rgba(34, 197, 94, 0.12);
+  color: #166534;
+}
+
+.recipe-diff-page__array-item--removed {
+  background: rgba(239, 68, 68, 0.12);
+  color: #991b1b;
+  text-decoration: line-through;
+}
+
+.recipe-diff-page__array-item--unchanged {
+  color: var(--color-text-muted, #999);
+}
+
+.recipe-diff-page__diff-count {
+  font-size: 13px;
+  color: var(--color-text-muted, #999);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--color-bg-secondary, #f0ebe6);
+  border-radius: 8px;
+}
+
+body.dark .recipe-diff-page__diff-count {
+  background: var(--color-bg-dark, #1e1e1e);
+}
+
+/* ── 版本列表 ── */
+.recipe-diff-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recipe-diff-page__list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-card, #fff);
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.recipe-diff-page__list-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+body.dark .recipe-diff-page__list-item {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #444);
+}
+
+.recipe-diff-page__list-version {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.recipe-diff-page__list-info {
+  flex: 1;
+}
+
+.recipe-diff-page__list-summary {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text, #333);
+}
+
+body.dark .recipe-diff-page__list-summary {
+  color: var(--color-text-dark, #eee);
+}
+
+.recipe-diff-page__list-date {
+  font-size: 12px;
+  color: var(--color-text-muted, #999);
+}
+
+.recipe-diff-page__list-changes {
+  font-size: 12px;
+  color: var(--color-text-muted, #999);
+}
+
+.recipe-diff-page__list-viewer {
+  margin-top: 24px;
+}
+
+/* ── 加载/空/错误 ── */
+.recipe-diff-page__empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-muted, #999);
+}
+
+.recipe-diff-page__loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-muted, #999);
+}
+
+.recipe-diff-page__error {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-primary, #E8663E);
+}
+
+@media (max-width: 700px) {
+  .recipe-diff-page__panels {
+    grid-template-columns: 1fr;
+  }
+}

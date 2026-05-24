@@ -2048,6 +2048,53 @@ router.post('/:id/substitutions', async (req, res) => {
       return i.name || i.ingredient || ''
     }).filter(Boolean)
 
+    // 从 query 中提取过滤条件
+    const filters = {
+      avoidAllergens: req.query.avoidAllergens || req.body.avoidAllergens || '',
+      diet: req.query.diet || req.body.diet || '',
+    }
+
+    // 过敏原排除组
+    const ALLERGEN_EXCLUSIONS = {
+      '花生': ['花生', '花生酱', '花生碎'],
+      '坚果': ['花生', '核桃', '杏仁', '腰果', '松子'],
+      '乳制品': ['牛奶', '酸奶', '黄油', '奶油', '奶酪', '芝士', '炼乳', '淡奶油'],
+      '鸡蛋': ['鸡蛋', '鸭蛋', '蛋'],
+      '海鲜': ['鱼', '虾', '蟹', '鱿鱼', '蛤蜊', '虾仁', '三文鱼', '鲈鱼', '带鱼', '龙利鱼', '鳕鱼', '贝'],
+      '麸质': ['面粉', '面条', '面包', '馒头', '饺子皮', '馄饨皮', '意面', '饼干'],
+      '大豆': ['豆腐', '豆腐干', '千张', '腐竹', '豆浆', '毛豆', '黄豆', '豆豉', '酱油', '生抽', '老抽', '豆瓣酱'],
+    }
+
+    // 饮食排除组
+    const DIET_EXCLUSIONS = {
+      'vegan': ['猪肉', '牛肉', '羊肉', '鸡肉', '鸭肉', '五花肉', '里脊', '排骨', '鸡胸肉', '鸡腿', '牛腩', '牛腱', '肉末', '腊肉', '培根', '火腿', '鱼', '虾', '蟹', '鱿鱼', '蛤蜊', '虾仁', '三文鱼', '鲈鱼', '带鱼', '龙利鱼', '鳕鱼', '贝', '鸡蛋', '鸭蛋', '牛奶', '酸奶', '黄油', '奶油', '奶酪', '芝士', '炼乳', '淡奶油', '蜂蜜', '蚝油'],
+      'vegetarian': ['猪肉', '牛肉', '羊肉', '鸡肉', '鸭肉', '五花肉', '里脊', '排骨', '鸡胸肉', '鸡腿', '牛腩', '牛腱', '肉末', '腊肉', '培根', '火腿', '鱼', '虾', '蟹', '鱿鱼', '蛤蜊', '虾仁', '三文鱼', '鲈鱼', '带鱼', '龙利鱼', '鳕鱼', '贝'],
+      'low-carb': ['大米', '糯米', '面粉', '面条', '米粉', '意面', '面包', '馒头', '饺子皮', '馄饨皮', '年糕', '土豆', '红薯', '糖', '冰糖', '红糖', '白糖'],
+      'low-fat': ['五花肉', '猪油', '黄油', '奶油', '奶酪', '芝士', '肥肉'],
+    }
+
+    // 计算需要排除的食材
+    const excludedItems = new Set()
+
+    // 过敏原过滤
+    if (filters.avoidAllergens) {
+      const allergensList = filters.avoidAllergens.split(',').map(a => a.trim())
+      for (const allergen of allergensList) {
+        const exclusions = ALLERGEN_EXCLUSIONS[allergen]
+        if (exclusions) {
+          exclusions.forEach(e => excludedItems.add(e))
+        }
+      }
+    }
+
+    // 饮食限制过滤
+    if (filters.diet) {
+      const exclusions = DIET_EXCLUSIONS[filters.diet]
+      if (exclusions) {
+        exclusions.forEach(e => excludedItems.add(e))
+      }
+    }
+
     // 建类别索引
     const categorized = {}
     ingredientNames.forEach(name => {
@@ -2058,14 +2105,17 @@ router.post('/:id/substitutions', async (req, res) => {
       }
     })
 
-    // 为每个已分类的食材推荐同类别替代品
+    // 为每个已分类的食材推荐同类别替代品（排除已排除的食材）
     const substitutions = {}
     Object.entries(categorized).forEach(([cat, names]) => {
-      const available = INGREDIENT_CATEGORIES[cat] || []
-      const alternatives = available.filter(a => !names.some(n => n.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(n.toLowerCase())))
-      if (alternatives.length > 0) {
+      const available = (INGREDIENT_CATEGORIES[cat] || []).filter(
+        a => !excludedItems.has(a) && !names.some(n =>
+          n.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(n.toLowerCase())
+        )
+      )
+      if (available.length > 0) {
         names.forEach(n => {
-          substitutions[n] = alternatives.slice(0, 3)
+          substitutions[n] = available.slice(0, 3)
         })
       }
     })
@@ -2078,6 +2128,12 @@ router.post('/:id/substitutions', async (req, res) => {
       uncategorized,
       totalIngredients: ingredientNames.length,
       categorizedCount: Object.keys(categorized).length,
+      activeFilters: filters,
+      allergensExcluded: filters.avoidAllergens
+        ? filters.avoidAllergens.split(',').map(a => ({ name: a.trim(), excludedCount: [...excludedItems].filter(e =>
+          ALLERGEN_EXCLUSIONS[a.trim()]?.includes(e)
+        ).length }))
+        : [],
     }))
   } catch (err) {
     console.error('[POST /recipes/:id/substitutions] Error:', err)

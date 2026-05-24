@@ -365,4 +365,188 @@ router.delete('/:id/items/:itemName', auth, async (req, res) => {
   }
 })
 
+// ─────────────────────────────────────────────────────────────────
+// 食材类别分组映射
+// ─────────────────────────────────────────────────────────────────
+const INGREDIENT_GROUPS = {
+  '🥩 肉类': ['猪肉', '牛肉', '羊肉', '鸡肉', '鸭肉', '五花肉', '里脊', '排骨', '鸡胸肉', '鸡腿', '牛腩', '牛腱', '肉末', '腊肉', '培根', '火腿', '香肠'],
+  '🐟 水产': ['鱼', '虾', '蟹', '鱿鱼', '蛤蜊', '虾仁', '三文鱼', '鲈鱼', '带鱼', '龙利鱼', '鳕鱼', '贝'],
+  '🥚 蛋豆制品': ['鸡蛋', '鸭蛋', '豆腐', '豆腐干', '千张', '腐竹', '豆皮', '豆浆', '毛豆', '黄豆', '豆豉'],
+  '🥬 蔬菜': ['白菜', '菠菜', '生菜', '油菜', '空心菜', '苋菜', '韭菜', '卷心菜', '羽衣甘蓝', '土豆', '胡萝卜', '萝卜', '红薯', '山药', '芋头', '莲藕', '竹笋', '莴笋', '番茄', '茄子', '青椒', '甜椒', '黄瓜', '冬瓜', '南瓜', '丝瓜', '苦瓜', '西葫芦', '秋葵', '香菇', '蘑菇', '金针菇', '杏鲍菇', '木耳', '银耳', '平菇', '茶树菇', '豆芽', '蒜苗', '芹菜', '西兰花', '花菜', '洋葱', '玉米', '豌豆', '葱', '姜', '蒜'],
+  '🍎 水果': ['苹果', '香蕉', '橙子', '柠檬', '西瓜', '芒果', '草莓', '蓝莓', '葡萄', '桃子', '梨', '猕猴桃', '火龙果', '百香果', '菠萝', '椰子', '红枣', '枸杞', '桂圆', '葡萄干'],
+  '🌾 主食': ['大米', '糯米', '面粉', '面条', '米粉', '意面', '面包', '馒头', '饺子皮', '馄饨皮', '年糕', '燕麦', '小米', '玉米面'],
+  '🥛 奶制品': ['牛奶', '酸奶', '黄油', '奶油', '奶酪', '芝士', '炼乳', '淡奶油'],
+  '🧂 调味料': ['盐', '糖', '生抽', '老抽', '酱油', '醋', '料酒', '蚝油', '豆瓣酱', '番茄酱', '辣椒酱', '甜面酱', '芝麻酱', '腐乳', '蜂蜜', '花椒', '八角', '桂皮', '香叶', '干辣椒', '胡椒粉', '五香粉', '孜然', '淀粉', '泡打粉', '小苏打', '味精', '鸡精'],
+  '🥜 干货果仁': ['花生', '核桃', '杏仁', '腰果', '松子', '芝麻', '枸杞', '红枣', '桂圆', '葡萄干'],
+  '🫒 油脂': ['食用油', '花生油', '橄榄油', '芝麻油', '猪油', '黄油', '植物油'],
+  '📦 其他': [],
+}
+
+/**
+ * 根据食材名返回类别分组
+ */
+function getIngredientGroup(name) {
+  if (!name) return '📦 其他'
+  const lower = name.toLowerCase()
+  for (const [group, items] of Object.entries(INGREDIENT_GROUPS)) {
+    if (items.some(i => lower.includes(i.toLowerCase()) || i.toLowerCase().includes(lower))) {
+      return group
+    }
+  }
+  return '📦 其他'
+}
+
+/**
+ * 食材价格估算（每单位元）
+ */
+const PRICE_ESTIMATES = {
+  '猪肉': 30, '牛肉': 60, '羊肉': 70, '鸡肉': 25, '鸭肉': 28,
+  '排骨': 55, '鸡胸肉': 20, '鸡腿': 18, '五花肉': 35, '牛腩': 50,
+  '鸡蛋': 1.5, '豆腐': 3, '豆腐干': 5,
+  '白菜': 3, '菠菜': 5, '生菜': 4, '油菜': 4, '番茄': 6, '黄瓜': 4,
+  '土豆': 3, '胡萝卜': 4, '洋葱': 4, '青椒': 6, '茄子': 5,
+  '大米': 5, '面条': 4, '面粉': 4, '面包': 8,
+  '牛奶': 8, '酸奶': 6, '黄油': 25, '奶油': 20, '芝士': 30,
+  '生抽': 8, '老抽': 8, '醋': 6, '料酒': 5, '盐': 3, '糖': 5,
+  '食用油': 15, '橄榄油': 40, '芝麻油': 20,
+}
+
+/**
+ * 价格单位映射
+ */
+const PRICE_UNITS = {
+  '个': 1, '颗': 1, '枚': 1, '只': 1, '包': 5, '袋': 5, '盒': 10, '瓶': 15, '罐': 8,
+}
+
+function estimateItemPrice(name, amount = 0, unit = '') {
+  const basePrice = PRICE_ESTIMATES[name] || null
+  if (basePrice === null) return null
+
+  const unitMultiplier = PRICE_UNITS[unit] || 1
+  const perUnitPrice = unit === '克' || unit === 'g' || unit === 'ml' ? basePrice / 500 : basePrice
+  return Math.round(amount * perUnitPrice * unitMultiplier * 100) / 100
+}
+
+/**
+ * 为购物清单 items 添加分组和价格估算
+ */
+function enrichItems(items) {
+  const enriched = items.map(item => ({
+    ...item,
+    group: getIngredientGroup(item.name || ''),
+    estimatedPrice: estimateItemPrice(item.name, parseFloat(item.amount) || 0, item.unit || ''),
+  }))
+
+  // 按组别排序
+  const sorted = enriched.sort((a, b) => {
+    if (a.group < b.group) return -1
+    if (a.group > b.group) return 1
+    return a.name.localeCompare(b.name, 'zh')
+  })
+
+  return sorted
+}
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/enriched — 获取增强版购物清单（含分组 + 价格估算）
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/enriched', auth, async (req, res) => {
+  try {
+    const list = await ShoppingList.findOne({
+      where: { id: req.params.id, userId: req.userId }
+    })
+
+    if (!list) {
+      return res.status(404).json(resJSON(404, '购物清单不存在', null))
+    }
+
+    let items = []
+    try { items = JSON.parse(list.items || '[]') } catch { items = [] }
+
+    const enriched = enrichItems(items)
+    const totalEstimate = enriched.reduce((sum, i) => sum + (i.estimatedPrice || 0), 0)
+
+    // 按分组建结构
+    const byGroup = {}
+    for (const item of enriched) {
+      if (!byGroup[item.group]) byGroup[item.group] = []
+      byGroup[item.group].push(item)
+    }
+
+    const data = list.toJSON()
+    data.items = enriched
+    data.itemsByGroup = byGroup
+    data.totalEstimate = Math.round(totalEstimate * 100) / 100
+
+    return res.json(resJSON(0, 'ok', data))
+  } catch (err) {
+    console.error('[GET /shopping-list/:id/enriched] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/copy-text — 获取复制文本
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/copy-text', auth, async (req, res) => {
+  try {
+    const list = await ShoppingList.findOne({
+      where: { id: req.params.id, userId: req.userId }
+    })
+
+    if (!list) {
+      return res.status(404).json(resJSON(404, '购物清单不存在', null))
+    }
+
+    let items = []
+    try { items = JSON.parse(list.items || '[]') } catch { items = [] }
+
+    const enriched = enrichItems(items)
+    const totalEstimate = enriched.reduce((sum, i) => sum + (i.estimatedPrice || 0), 0)
+
+    // 按分组构建文本
+    const byGroup = {}
+    for (const item of enriched) {
+      if (!byGroup[item.group]) byGroup[item.group] = []
+      byGroup[item.group].push(item)
+    }
+
+    const lines = [
+      `🛒 购物清单: ${list.name}`,
+      `━━━━━━━━━━━━━━━━━━━━`,
+    ]
+
+    for (const [group, groupItems] of Object.entries(byGroup)) {
+      lines.push(`\n${group}:`)
+      for (const item of groupItems) {
+        const amount = item.amount || 0
+        const unit = item.unit || ''
+        const priceStr = item.estimatedPrice != null ? ` ¥${item.estimatedPrice.toFixed(1)}` : ''
+        const checked = item.checked ? '✅' : '⬜'
+        if (amount > 0 && unit) {
+          lines.push(`  ${checked} ${item.name} × ${amount}${unit}${priceStr}`)
+        } else if (amount > 0) {
+          lines.push(`  ${checked} ${item.name} × ${amount}${priceStr}`)
+        } else {
+          lines.push(`  ${checked} ${item.name}${priceStr}`)
+        }
+      }
+    }
+
+    if (totalEstimate > 0) {
+      lines.push(`\n━━━━━━━━━━━━━━━━━━━━`)
+      lines.push(`💰 预估总计: ¥${totalEstimate.toFixed(2)}`)
+    }
+
+    return res.json(resJSON(0, 'ok', {
+      text: lines.join('\n'),
+      name: list.name,
+      totalEstimate: Math.round(totalEstimate * 100) / 100,
+    }))
+  } catch (err) {
+    console.error('[GET /shopping-list/:id/copy-text] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router

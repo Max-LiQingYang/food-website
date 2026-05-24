@@ -80,6 +80,9 @@ router.use('/meal-plans', auth, mealPlanRoutes)
 // 烹饪日志（需认证）
 router.use('/cooking-logs', auth, cookingLogRoutes)
 
+// 食谱版本历史与对比
+router.use('/recipe-versions', require('./recipeversion'))
+
 // 举报系统
 router.use('/reports', require('./reports'))
 

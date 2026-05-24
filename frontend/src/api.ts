@@ -1793,4 +1793,49 @@ export default {
   getWeeklyNutritionStats,
   getMonthlyNutritionStats,
   getNutritionSuggestions,
+  // ═══ 迭代#40 ═══
+  getRecipeVersionDiff,
+  getRecipeVersionsList,
+  getEnrichedShoppingList,
+  getShoppingListCopyText,
+  getIngredientSubstitutions,
+}
+
+// ═══ 迭代#40: 食谱版本对比 ═══
+export interface VersionInfo {
+  version: number
+  createdAt: string
+  summary: string | null
+}
+
+export interface VersionDiffResponse {
+  recipeTitle: string
+  recipeId: string
+  oldVersion: VersionInfo
+  newVersion: VersionInfo
+  changedFields: string[]
+  fieldDiffs: Record<string, { old: any; new: any; status: 'added' | 'removed' | 'modified' }>
+  totalChanged: number
+}
+
+export function getRecipeVersionDiff(recipeId: string, v1: number, v2: number): Promise<VersionDiffResponse> {
+  return apiClient.get(`/recipe-versions/${recipeId}/diff`, { params: { v1, v2 } }).then(r => r.data?.data || r.data)
+}
+
+export function getRecipeVersionsList(recipeId: string): Promise<{ recipeTitle: string; recipeId: string; versions: any[]; total: number }> {
+  return apiClient.get(`/recipe-versions/${recipeId}`).then(r => r.data?.data || r.data)
+}
+
+// ═══ 迭代#40: 购物清单增强 ═══
+export function getEnrichedShoppingList(id: string): Promise<any> {
+  return apiClient.get(`/shopping-list/${id}/enriched`).then(r => r.data?.data || r.data)
+}
+
+export function getShoppingListCopyText(id: string): Promise<{ text: string; name: string; totalEstimate: number }> {
+  return apiClient.get(`/shopping-list/${id}/copy-text`).then(r => r.data?.data || r.data)
+}
+
+// ═══ 迭代#40: 食材替换 ═══
+export function getIngredientSubstitutions(recipeId: string, filters?: { avoidAllergens?: string; diet?: string }): Promise<any> {
+  return apiClient.post(`/recipes/${recipeId}/substitutions`, filters || {}).then(r => r.data?.data || r.data)
 }
