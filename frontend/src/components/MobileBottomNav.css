@@ -10,6 +10,8 @@
   z-index: 99;
   padding-bottom: env(safe-area-inset-bottom);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  transition: background var(--transition-normal, 0.3s);
+  touch-action: pan-y;
 }
 
 .mobile-bottom-nav__item {
@@ -24,11 +26,56 @@
   font-size: 11px;
   transition: color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
+  padding: 6px 0;
 }
 
 .mobile-bottom-nav__item:hover,
 .mobile-bottom-nav__item.is-active {
   color: var(--color-primary, #e8663e);
+}
+
+/* 活动指示器小圆点 */
+.mobile-bottom-nav__item.is-active::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-primary, #e8663e);
+}
+
+/* 创作按钮特殊样式 */
+.mobile-bottom-nav__item[href="/recipe/new"] {
+  position: relative;
+  margin-top: -8px;
+}
+
+.mobile-bottom-nav__item[href="/recipe/new"] .mobile-bottom-nav__icon {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  font-size: 22px;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 3px 12px rgba(232, 102, 62, 0.3);
+  transform: translateY(-4px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-bottom-nav__item[href="/recipe/new"]:hover .mobile-bottom-nav__icon,
+.mobile-bottom-nav__item[href="/recipe/new"].is-active .mobile-bottom-nav__icon {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 4px 16px rgba(232, 102, 62, 0.4);
+}
+
+.mobile-bottom-nav__item[href="/recipe/new"] .mobile-bottom-nav__label {
+  margin-top: -4px;
 }
 
 .mobile-bottom-nav__icon {
@@ -39,6 +86,12 @@
 .mobile-bottom-nav__label {
   font-size: 11px;
   line-height: 1;
+}
+
+/* ── 触摸反馈涟漪 ── */
+.mobile-bottom-nav__item:active {
+  background: var(--color-primary-bg, #fff3ed);
+  border-radius: 4px;
 }
 
 /* ── Show only on mobile ── */

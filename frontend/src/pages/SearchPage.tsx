@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { searchRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
@@ -35,6 +35,36 @@ const SORT_OPTIONS: Record<string, string> = {
   oldest: '最早发布',
   cookTime_asc: '烹饪时间 ↑',
   cookTime_desc: '烹饪时间 ↓',
+}
+
+/** 热门搜索词（带图标） */
+const HOT_SEARCH_WORDS = [
+  { text: '番茄炒蛋', icon: '🍅' },
+  { text: '红烧肉', icon: '🥩' },
+  { text: '蛋糕', icon: '🎂' },
+  { text: '鸡肉', icon: '🍗' },
+  { text: '汤', icon: '🥣' },
+  { text: '牛肉', icon: '🐂' },
+  { text: '素菜', icon: '🥬' },
+  { text: '面条', icon: '🍜' },
+]
+
+/** localStorage 搜索历史 */
+function getSearchHistory(): string[] {
+  try {
+    const raw = localStorage.getItem('search_history')
+    return raw ? JSON.parse(raw) : []
+  } catch { return [] }
+}
+
+function addToSearchHistory(query: string) {
+  const history = getSearchHistory().filter(h => h !== query)
+  history.unshift(query)
+  localStorage.setItem('search_history', JSON.stringify(history.slice(0, 10)))
+}
+
+function clearSearchHistory() {
+  localStorage.removeItem('search_history')
 }
 
 export default function SearchPage() {
@@ -98,6 +128,7 @@ export default function SearchPage() {
 
   const handleSearchSubmit = (query: string) => {
     if (!query.trim()) return
+    addToSearchHistory(query.trim())
     const params: Record<string, string> = { q: query.trim(), page: '1' }
     if (filterCategory) params.category = filterCategory
     if (filterDifficulty) params.difficulty = filterDifficulty
@@ -168,49 +199,79 @@ export default function SearchPage() {
         </p>
       )}
 
-      {/* 筛选栏 - 仅在搜索后有结果时展示 */}
+      {/* 标签式筛选栏 — 替代下拉框 */}
       {q && !loading && (
-        <div className="search-filter-bar">
-          {/* 分类筛选 */}
-          <select
-            className="search-filter-select"
-            value={filterCategory}
-            onChange={e => handleFilterChange('category', e.target.value)}
-          >
-            <option value="">全部分类</option>
-            {Object.entries(CATEGORIES).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
+        <div className="search-tag-filters">
+          {/* 分类标签 */}
+          <div className="search-tag-group">
+            <span className="search-tag-group__label">分类</span>
+            <div className="search-tag-group__tags">
+              <button
+                className={`search-filter-tag ${!filterCategory ? 'is-active' : ''}`}
+                onClick={() => handleFilterChange('category', '')}
+              >
+                全部
+              </button>
+              {Object.entries(CATEGORIES).map(([key, label]) => (
+                <button
+                  key={key}
+                  className={`search-filter-tag ${filterCategory === key ? 'is-active' : ''}`}
+                  onClick={() => handleFilterChange('category', key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* 难度筛选 */}
-          <select
-            className="search-filter-select"
-            value={filterDifficulty}
-            onChange={e => handleFilterChange('difficulty', e.target.value)}
-          >
-            <option value="">全部难度</option>
-            {Object.entries(DIFFICULTIES).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
+          {/* 难度标签 */}
+          <div className="search-tag-group">
+            <span className="search-tag-group__label">难度</span>
+            <div className="search-tag-group__tags">
+              <button
+                className={`search-filter-tag ${!filterDifficulty ? 'is-active' : ''}`}
+                onClick={() => handleFilterChange('difficulty', '')}
+              >
+                不限
+              </button>
+              {Object.entries(DIFFICULTIES).map(([key, label]) => (
+                <button
+                  key={key}
+                  className={`search-filter-tag ${filterDifficulty === key ? 'is-active' : ''}`}
+                  onClick={() => handleFilterChange('difficulty', key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* 排序 */}
-          <select
-            className="search-filter-select"
-            value={filterSortBy}
-            onChange={e => handleFilterChange('sortBy', e.target.value)}
-          >
-            <option value="">默认排序</option>
-            {Object.entries(SORT_OPTIONS).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
+          {/* 排序标签 */}
+          <div className="search-tag-group">
+            <span className="search-tag-group__label">排序</span>
+            <div className="search-tag-group__tags">
+              <button
+                className={`search-filter-tag ${!filterSortBy ? 'is-active' : ''}`}
+                onClick={() => handleFilterChange('sortBy', '')}
+              >
+                默认
+              </button>
+              {Object.entries(SORT_OPTIONS).map(([key, label]) => (
+                <button
+                  key={key}
+                  className={`search-filter-tag ${filterSortBy === key ? 'is-active' : ''}`}
+                  onClick={() => handleFilterChange('sortBy', key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* 清除筛选 */}
+          {/* 清除所有筛选 */}
           {hasActiveFilters && (
             <button
-              className="search-filter-clear"
+              className="search-filter-clear-all"
               onClick={() => {
                 setFilterCategory('')
                 setFilterDifficulty('')
@@ -225,23 +286,61 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* 热门搜索词 - 无搜索词时展示 */}
+      {/* 搜索历史和热门搜索 - 无搜索词时展示 */}
       {!q && !loading && (
-        <div className="search-hot-words">
-          <span className="search-hot-words__label">🔥 热门搜索：</span>
-          {['番茄', '鸡蛋', '鸡肉', '红烧肉', '蛋糕', '汤'].map(word => (
-            <button
-              key={word}
-              className="search-hot-word"
-              onClick={() => {
-                setInputValue(word)
-                handleSearchSubmit(word)
-              }}
-            >
-              {word}
-            </button>
-          ))}
-        </div>
+        <>
+          {/* 搜索历史 */}
+          {getSearchHistory().length > 0 && (
+            <div className="search-history">
+              <div className="search-history__header">
+                <span className="search-history__label">🕐 搜索历史</span>
+                <button
+                  className="search-history__clear"
+                  onClick={() => {
+                    clearSearchHistory()
+                    // Force re-render
+                    setInputValue('')
+                  }}
+                >
+                  清除
+                </button>
+              </div>
+              <div className="search-history__tags">
+                {getSearchHistory().map((word, i) => (
+                  <button
+                    key={i}
+                    className="search-history-tag"
+                    onClick={() => {
+                      setInputValue(word)
+                      setTimeout(() => handleSearchSubmit(word), 0)
+                    }}
+                  >
+                    {word}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 热门搜索词 */}
+          <div className="search-hot-words">
+            <span className="search-hot-words__label">🔥 热门搜索</span>
+            <div className="search-hot-words__tags">
+              {HOT_SEARCH_WORDS.map(({ text, icon }) => (
+                <button
+                  key={text}
+                  className="search-hot-word"
+                  onClick={() => {
+                    setInputValue(text)
+                    setTimeout(() => handleSearchSubmit(text), 0)
+                  }}
+                >
+                  {icon} {text}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
       )}
 
       {/* 加载态 - 骨架屏 */}
@@ -266,20 +365,38 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* 空状态 */}
+      {/* 空状态 — 增强版 */}
       {!loading && q && !hasResults && (
-        <div className="search-empty">
+        <div className="search-empty search-empty--no-results">
           <div className="search-empty__icon">🔍</div>
           <p className="search-empty__text">没有找到相关食谱</p>
           <p className="search-empty__hint">试试调整关键词或筛选条件</p>
+          <div className="search-empty__suggestions">
+            <p className="search-empty__suggestions-label">💡 试试这些热搜词：</p>
+            <div className="search-empty__suggestion-tags">
+              {HOT_SEARCH_WORDS.slice(0, 4).map(({ text, icon }) => (
+                <button
+                  key={text}
+                  className="search-hot-word"
+                  onClick={() => {
+                    setInputValue(text)
+                    setTimeout(() => handleSearchSubmit(text), 0)
+                  }}
+                >
+                  {icon} {text}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
-      {/* 无搜索词时默认提示 */}
+      {/* 无搜索词时默认提示 — AI 推荐搜索 */}
       {!q && !loading && (
         <div className="search-empty">
           <div className="search-empty__icon">🍳</div>
           <p className="search-empty__text">输入关键词搜索食谱</p>
+          <p className="search-empty__hint">试试搜「番茄炒蛋」「红烧肉」「蛋糕」...</p>
         </div>
       )}
 

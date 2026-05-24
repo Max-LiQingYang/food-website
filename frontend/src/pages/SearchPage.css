@@ -83,21 +83,25 @@
 
 /* ── 热门搜索词 ── */
 .search-hot-words {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
   margin-bottom: 28px;
 }
 
 .search-hot-words__label {
+  display: block;
   font-size: 14px;
-  color: var(--color-text-muted, #999);
-  white-space: nowrap;
+  font-weight: 600;
+  color: var(--color-text, #444);
+  margin-bottom: 12px;
+}
+
+.search-hot-words__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .search-hot-word {
-  padding: 6px 16px;
+  padding: 7px 18px;
   font-size: 13px;
   background: var(--color-bg, #f5f5f5);
   border: 1px solid var(--color-border, #e0ddd9);
@@ -105,12 +109,15 @@
   color: var(--color-text-secondary, #666);
   cursor: pointer;
   transition: all 0.2s;
+  touch-action: manipulation;
 }
 
 .search-hot-word:hover {
   background: var(--color-primary, #e8663e);
   color: white;
   border-color: var(--color-primary, #e8663e);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(232, 102, 62, 0.15);
 }
 
 [data-theme='dark'] .search-hot-word {
@@ -125,60 +132,159 @@
   border-color: #e8663e;
 }
 
-/* ── 筛选栏 ── */
-.search-filter-bar {
+/* ── 搜索历史 ── */
+.search-history {
+  margin-bottom: 24px;
+}
+
+.search-history__header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.search-filter-select {
-  padding: 8px 32px 8px 12px;
-  font-size: 13px;
-  border: 1px solid var(--color-border, #e0ddd9);
-  border-radius: 8px;
-  background: var(--color-card, #fff);
-  color: var(--color-text-primary, #333);
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  transition: border-color 0.2s;
-  min-width: 100px;
+.search-history__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #444);
 }
 
-.search-filter-select:hover,
-.search-filter-select:focus {
-  border-color: var(--color-primary, #e8663e);
-  outline: none;
-}
-
-.search-filter-clear {
-  padding: 8px 14px;
-  font-size: 13px;
+.search-history__clear {
+  padding: 3px 12px;
+  font-size: 12px;
   background: none;
-  border: 1px dashed var(--color-border, #e0ddd9);
-  border-radius: 8px;
+  border: 1px solid var(--color-border, #e0ddd9);
+  border-radius: 12px;
   color: var(--color-text-muted, #999);
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.search-filter-clear:hover {
+.search-history__clear:hover {
   border-color: var(--color-danger, #e74c3c);
   color: var(--color-danger, #e74c3c);
 }
 
-[data-theme='dark'] .search-filter-select {
-  background-color: #1e1812;
-  border-color: #3a3028;
-  color: #e0ddd9;
+.search-history__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-[data-theme='dark'] .search-filter-clear {
+.search-history-tag {
+  padding: 5px 14px;
+  font-size: 13px;
+  background: var(--color-primary-bg, #fff3ed);
+  border: none;
+  border-radius: 16px;
+  color: var(--color-primary-dark, #c94f2a);
+  cursor: pointer;
+  transition: all 0.2s;
+  touch-action: manipulation;
+}
+
+.search-history-tag:hover {
+  background: var(--color-primary, #e8663e);
+  color: white;
+  transform: translateY(-1px);
+}
+
+[data-theme='dark'] .search-history-tag {
+  background: #2a1a12;
+  color: #f0946e;
+}
+
+[data-theme='dark'] .search-history-tag:hover {
+  background: var(--color-primary, #e8663e);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   标签式筛选栏 (Tag-based Filters — 替代下拉框)
+   ═══════════════════════════════════════════════════════════════ */
+.search-tag-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-tag-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.search-tag-group__label {
+  font-size: 13px;
+  color: var(--color-text-muted, #999);
+  white-space: nowrap;
+  line-height: 32px;
+  min-width: 34px;
+  font-weight: 500;
+}
+
+.search-tag-group__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.search-filter-tag {
+  padding: 5px 14px;
+  font-size: 13px;
+  border: 1.5px solid var(--color-border, #e0ddd9);
+  border-radius: 18px;
+  background: var(--color-card, #fff);
+  color: var(--color-text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+
+.search-filter-tag:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.search-filter-tag.is-active {
+  background: var(--color-primary, #e8663e);
+  border-color: var(--color-primary, #e8663e);
+  color: #fff;
+}
+
+.search-filter-clear-all {
+  align-self: flex-start;
+  padding: 6px 16px;
+  font-size: 12px;
+  background: none;
+  border: 1px dashed var(--color-border, #e0ddd9);
+  border-radius: 16px;
+  color: var(--color-text-muted, #999);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-filter-clear-all:hover {
+  border-color: var(--color-danger, #e74c3c);
+  color: var(--color-danger, #e74c3c);
+}
+
+[data-theme='dark'] .search-filter-tag {
+  background: #1e1812;
+  border-color: #3a3028;
+  color: #b0a090;
+}
+
+[data-theme='dark'] .search-filter-tag.is-active {
+  background: var(--color-primary, #e8663e);
+  border-color: var(--color-primary, #e8663e);
+  color: #fff;
+}
+
+[data-theme='dark'] .search-filter-clear-all {
   border-color: #3a3028;
   color: #a09080;
 }
@@ -236,6 +342,29 @@
   font-size: 14px;
   color: var(--color-text-muted, #999);
   margin: 0;
+}
+
+/* 空结果建议搜索 */
+.search-empty--no-results {
+  gap: 16px;
+}
+
+.search-empty__suggestions {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.search-empty__suggestions-label {
+  font-size: 13px;
+  color: var(--color-text-muted, #999);
+  margin: 0 0 10px;
+}
+
+.search-empty__suggestion-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
 }
 
 /* ── 分页 ── */

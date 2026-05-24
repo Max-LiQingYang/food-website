@@ -391,14 +391,15 @@ export default function RecipeDetailPage() {
         <div className="detail-header">
           <h1 className="detail-title">{recipe.title}</h1>
 
-          {/* 分享按钮 */}
-          <button className="detail-share-btn" onClick={handleShare} title="分享食谱">
-            📤 分享
-          </button>
-          {/* 打印按钮 */}
-          <button className="detail__print-btn" onClick={() => window.print()} title="打印食谱">
-            🖨️ 打印
-          </button>
+          {/* 分享按钮 — 仅桌面端可见 */}
+          <div className="detail-header-actions">
+            <button className="detail-share-btn" onClick={handleShare} title="分享食谱">
+              📤 分享
+            </button>
+            <button className="detail-share-btn" onClick={() => window.print()} title="打印食谱">
+              🖨️ 打印
+            </button>
+          </div>
 
           <p className="detail-author">
             👨🍳{' '}
@@ -501,11 +502,11 @@ export default function RecipeDetailPage() {
           {recipe.description && <p className="detail-desc">{recipe.description}</p>}
         </div>
 
-        {/* 营养信息卡片 */}
+        {/* 营养信息卡片 — 增强展示 */}
         {nutrition && (
-          <div className="detail-container__section">
+          <div className="nutrition-enhanced">
             <div className="nutri-score-header">
-              <h2 className="nutrition-card__title">📊 营养信息</h2>
+              <h2 className="nutrition-card__title" style={{ margin: 0, fontSize: '18px' }}>📊 营养信息</h2>
               {recipe.nutriScore && (
                 <span
                   className="nutri-score-badge"
@@ -570,6 +571,7 @@ export default function RecipeDetailPage() {
                   <li
                     key={step.stepNumber}
                     className={`detail-step ${isActive ? 'is-active' : ''} ${completedSteps.has(step.stepNumber) ? 'is-completed' : ''}`}
+                    onClick={() => handleStepClick(step.stepNumber)}
                   >
                     <div className="step-checkbox" onClick={e => { e.stopPropagation(); toggleStep(step.stepNumber); }}>
                       <div className={`step-checkbox__box ${completedSteps.has(step.stepNumber) ? 'is-checked' : ''}`}>
@@ -636,6 +638,40 @@ export default function RecipeDetailPage() {
             <h2 className="detail-section__title">💬 评价与留言</h2>
             <CommentSection recipeId={id} />
           </section>
+        )}
+      </div>
+
+      {/* ═══ 浮动操作栏（移动端）═══ */}
+      <div className="floating-action-bar">
+        <button
+          className={`fab-btn ${isFavorited ? 'fab-btn--favorite' : ''}`}
+          onClick={handleFavoriteToggle}
+          disabled={favLoading}
+          title={isFavorited ? '取消收藏' : '收藏'}
+        >
+          <span className={`fab-btn__icon ${favLoading ? '' : isFavorited ? 'fab-btn__heart-active' : ''}`}>
+            {favLoading ? '⋯' : isFavorited ? '❤️' : '🤍'}
+          </span>
+          <span>{isFavorited ? '已收藏' : '收藏'}</span>
+        </button>
+
+        <AddToCollectionDropdown recipeId={id} label="📁" />
+
+        <button className="fab-btn" onClick={handleShare} title="分享食谱">
+          <span className="fab-btn__icon">📤</span>
+          <span>分享</span>
+        </button>
+
+        <button className="fab-btn" onClick={() => window.print()} title="打印食谱">
+          <span className="fab-btn__icon">🖨️</span>
+          <span>打印</span>
+        </button>
+
+        {recipe && (
+          <button className="fab-btn" onClick={handleCopyIngredients} title="复制食材">
+            <span className="fab-btn__icon">📋</span>
+            <span>食材</span>
+          </button>
         )}
       </div>
 

@@ -139,7 +139,9 @@ describe('RecipeDetailPage', () => {
     // Meta tags
     expect(screen.getByText('中餐')).toBeInTheDocument()
     expect(screen.getByText('中等')).toBeInTheDocument()
-    expect(screen.getByText(/3 人份/)).toBeInTheDocument()
+    // Serving text appears in both meta tag and scaler
+    const servings = screen.getAllByText(/3 人份/)
+    expect(servings.length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText(/25 分钟/)).toBeInTheDocument()
 
     // Cover image
@@ -224,13 +226,15 @@ describe('RecipeDetailPage', () => {
     const steps = document.querySelectorAll('.detail-step')
     expect(steps.length).toBe(6)
 
-    // Click step 3
-    fireEvent.click(steps[2])
+    // Click step content area to toggle active state
+    // The step is now clicked via step-body or step-number, not checkbox
+    const step3Content = steps[2].querySelector('.step-body') || steps[2]
+    fireEvent.click(step3Content)
     expect(steps[2].classList.contains('is-active')).toBe(true)
     expect(steps[0].classList.contains('is-active')).toBe(false)
 
     // Click step 3 again to toggle off
-    fireEvent.click(steps[2])
+    fireEvent.click(step3Content)
     expect(steps[2].classList.contains('is-active')).toBe(false)
   })
 
@@ -244,7 +248,9 @@ describe('RecipeDetailPage', () => {
     renderDetail()
 
     await waitFor(() => {
-      expect(screen.getByText('收藏')).toBeInTheDocument()
+      // "收藏" text appears in both cover button and floating bar
+      const favTexts = screen.getAllByText('收藏')
+      expect(favTexts.length).toBeGreaterThanOrEqual(1)
     })
   })
 
@@ -258,7 +264,8 @@ describe('RecipeDetailPage', () => {
     renderDetail()
 
     await waitFor(() => {
-      expect(screen.getByText('已收藏')).toBeInTheDocument()
+      const favTexts = screen.getAllByText('已收藏')
+      expect(favTexts.length).toBeGreaterThanOrEqual(1)
     })
   })
 

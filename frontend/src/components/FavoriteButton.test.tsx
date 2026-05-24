@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { vi } from 'vitest'
+import React from 'react'
 import FavoriteButton from './FavoriteButton'
 import * as api from '../api'
 
@@ -9,6 +10,17 @@ vi.mock('../api', () => ({
   addFavorite: vi.fn().mockResolvedValue({ data: {} }),
   removeFavorite: vi.fn().mockResolvedValue({ data: {} }),
   getFavoriteStatus: vi.fn().mockResolvedValue({ data: { isFavorited: false } }),
+}))
+
+// Mock Auth
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    token: 'fake-token',
+    isAuthenticated: true,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
 }))
 
 const renderButton = (props = {}) => {

@@ -6,6 +6,25 @@ import * as api from '../api'
 
 vi.mock('../api', () => ({
   getRecipes: vi.fn(),
+  getFeaturedRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
+  getSeasonalRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
+  searchRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
+  getPopularRecipes: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
+  getNewUserRecommend: vi.fn().mockResolvedValue({ data: { list: [], total: 0 } }),
+  addFavorite: vi.fn().mockResolvedValue({ data: {} }),
+  removeFavorite: vi.fn().mockResolvedValue({ data: {} }),
+  getFavoriteStatus: vi.fn().mockResolvedValue({ data: { isFavorited: false } }),
+}))
+
+// Mock Auth for FavoriteButton inside RecipeCard
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    token: null,
+    isAuthenticated: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
 }))
 
 describe('HomePage', () => {
