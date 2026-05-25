@@ -30,6 +30,13 @@
   display: flex;
   gap: 8px;
   flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__links li {
+  list-style: none;
 }
 
 .navbar__link {
@@ -220,5 +227,104 @@
   .navbar__logout-btn {
     padding: 5px 12px;
     font-size: 13px;
+  }
+}
+
+/* ── "更多"下拉菜单 ── */
+.navbar__more {
+  position: relative;
+}
+
+.navbar__more-btn {
+  padding: 6px 14px;
+  font-size: 15px;
+  color: var(--color-text, #333);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.navbar__more-btn:hover,
+.navbar__more-btn.is-open {
+  background: var(--color-primary-bg, #fff3ed);
+  color: var(--color-primary, #e8663e);
+}
+
+.navbar__more-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  background: var(--color-card, #fff);
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 200;
+  animation: navbar-dropdown-in 0.15s ease;
+}
+
+@keyframes navbar-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar__more-item {
+  display: block;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--color-text, #333);
+  text-decoration: none;
+  border-radius: var(--radius-sm, 6px);
+  transition: background 0.15s;
+}
+
+.navbar__more-item:hover {
+  background: var(--color-primary-bg, #fff3ed);
+  color: var(--color-primary, #e8663e);
+}
+
+body.dark .navbar__more-dropdown {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: #3a3a3a;
+}
+
+body.dark .navbar__more-item:hover {
+  background: #3a3028;
+}
+
+/* ── 移动端更多功能区域 ── */
+.navbar__mobile-secondary {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar__more-btn {
+    display: none;
+  }
+
+  .navbar__mobile-secondary {
+    display: block;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border, #e8e0d8);
+    margin-top: 4px;
+  }
+
+  .navbar__mobile-secondary-label {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--color-text-muted, #999);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
   }
 }

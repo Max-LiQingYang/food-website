@@ -656,7 +656,6 @@ export default function RecipeDetailPage() {
         {nutrition && (
           <div className="nutrition-enhanced">
             <div className="nutri-score-header">
-              <h2 className="nutrition-card__title" style={{ margin: 0, fontSize: '18px' }}>📊 营养信息</h2>
               {recipe.nutriScore && (
                 <span
                   className="nutri-score-badge"

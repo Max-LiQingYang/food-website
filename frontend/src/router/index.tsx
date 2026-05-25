@@ -9,6 +9,7 @@ import PWAInstallPrompt from '../components/PWAInstallPrompt'
 import SkipLink from '../components/SkipLink'
 import KeyboardShortcutsProvider from '../components/KeyboardShortcuts'
 import WelcomeTour from '../components/WelcomeTour'
+import Footer from '../components/Footer'
 import '../components/PageTransition.css'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
@@ -61,6 +62,7 @@ function Layout() {
             </ErrorBoundary>
           </Suspense>
         </main>
+        <Footer />
         <MobileBottomNav />
         <BackToTop />
         <PWAInstallPrompt />

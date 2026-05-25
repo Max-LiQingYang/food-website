@@ -41,7 +41,6 @@ export default function NutritionCard({ nutrition }: { nutrition: NutritionData 
 
   return (
     <section className="nutrition-card">
-      <h2 className="nutrition-card__title">📊 营养信息</h2>
       <div className="nutrition-card__grid">
         {RING_ITEMS.map(item => {
           const rawValue = nutrition[item.key] ?? 0
