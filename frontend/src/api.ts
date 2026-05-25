@@ -1721,7 +1721,6 @@ export default {
   updateShoppingList,
   deleteShoppingList,
   getShareInfo,
-  updateProfile,   // from user routes
   followUser,
   unfollowUser,
   getFollowers,

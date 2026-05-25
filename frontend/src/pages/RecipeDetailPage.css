@@ -441,6 +441,8 @@
 
 .detail-step.is-active::before {
   background: var(--color-primary, #e8663e);
+}
+
 /* ── 复制食材按钮 ── */
 .ingredient-copy-btn {
   margin-left: auto;
