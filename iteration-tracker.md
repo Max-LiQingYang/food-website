@@ -559,3 +559,28 @@
 ### 经验教训
 - 服务器 dist 存在 ≠ 容器 dist 同步（已记录到 iteration-lessons.md）
 - SPA 构建产物验证：必须检查容器内 assets/ 目录或直接 curl 资源文件
+
+---
+
+## 迭代 #56 — B/功能增强：热门食谱视频教程链接填充 ⏳
+**状态**: 进行中
+**方向**: B（功能增强）/ 🟢 现有功能完善
+**基线 Commit**: `356408a`
+
+### 背景
+网站巡检通过，无遗留错误，无未完成任务。通过API检查发现：
+- 迭代#34已实现 VideoEmbed 模型、前端 VideoPlayer 播放器、/api/recipes/:id/videos 端点
+- 但全部81道食谱的视频列表均为空（list: [], total: 0）
+- 热门食谱（冬阴功汤937views、鱼香肉丝935views等）缺少视频教程链接
+- 用户无法利用已上线的视频播放功能
+
+### 任务内容
+1. 查询热门食谱（Top 15-20，按 viewCount + favoriteCount 排序）
+2. 为每道热门食谱找到1-2个合适的公开视频教程链接（YouTube/Bilibili）
+3. 后端：通过脚本或API创建 VideoEmbed 记录（recipeId, videoUrl, platform, title, duration, sortOrder）
+4. 同步更新 seed.js 种子数据（如有视频数据）
+5. 前端验证：确保 VideoPlayer 组件正确展示视频列表和播放器
+6. 部署闭环：commit → build → deploy → 验证
+7. 更新 iteration-tracker.md 和 iteration-lessons.md
+
+**下一个方向**: C（内容质量）
