@@ -501,4 +501,61 @@
 - **示例**: 水煮鱼（重庆船工起源）、冬阴功（泰国四味平衡）、提拉米苏（意大利"带我走"）
 - **部署状态**: 数据库已更新 ✅，服务器代码待同步（无前端变更，不需 rebuild）
 
-**下一个方向**: A（UI/UX）
+---
+
+## 迭代 #54 — A/UI/UX：评分与评论展示体验优化 ✅
+**状态**: 已完成 (2026-05-26 00:15 CST)
+**方向**: A (UI/UX) / 🟡 ui-optimization
+**基线 Commit**: `3cbcac0`
+**完成 Commit**: `2012e9f`
+
+### 背景
+生产环境评论数据极少（仅1条），所有食谱 avgRating=0、ratingCount=0。详情页显示0.0分和0条评论给用户造成"评分系统坏了"的错觉。评论区空状态缺乏引导性文案。
+
+### 变更文件
+| 文件 | 变更 |
+|------|------|
+| `RecipeDetailPage.tsx` | +rating-prompt区, +unrated标签, +handleRatingUpdate回调, +onRatingUpdate传给CommentSection |
+| `RecipeDetailPage.css` | +.detail-tag--unrated, +.rating-prompt 全套样式含暗色模式 |
+| `CommentSection.tsx` | +onRatingUpdate prop, +乐观更新回调, +空状态改进(区分两类文案) |
+| `CommentSection.css` | +.comment-empty__icon/.__text/.__hint 新空状态样式含暗色模式 |
+
+### 部署验证
+- `npm run build`: 0 errors ✅
+- commit + git push: `2012e9f` ✅
+- scp dist → docker cp → nginx reload ✅
+- CSS: detail-tag--unrated(2), rating-prompt__stars(2), comment-empty__icon(1) ✅
+- JS: 暂无评分(2), onRatingUpdate(1) ✅
+
+### 注意事项
+- CommentSection.CSS 被 Vite 打包进 RecipeDetailPage CSS chunk，不在 index.css 中
+- 前端容器名为 food-frontend（非 docker-compose 默认名）
+- 容器名差异是已知问题，未来镜像重建可修正
+
+**下一个方向**: A（UI/UX 移动端体验深化）
+
+---
+
+## 迭代 #55 — 🔴 bugfix：生产环境 CSS 文件 404 修复 ✅
+**状态**: 已完成 (2026-05-25 16:30 CST)
+**方向**: 🔴 bugfix
+**基线 Commit**: `2012e9f`
+
+### 背景
+浏览器控制台报错 "Unable to preload CSS for /assets/AuthorLevelBadge-CjRVbMdv.css"。
+根因：服务器 dist 已包含该 CSS 文件，但前端容器内的 dist 未同步更新（部署闭环断裂）。
+
+### 修复方法
+1. **git pull 最新代码**: `3cbcac0…2012e9f` Fast-forward（iter#54 代码）
+2. **服务器完整重建前端**: `npm ci`（199 packages）→ `npm run build`（250 modules, 0 errors）
+3. **docker cp dist 到容器**: `docker cp dist/. food-frontend:/usr/share/nginx/html/`
+4. **nginx reload**: signal process started ✅
+
+### 验证结果
+- `curl http://39.103.68.205/assets/AuthorLevelBadge-CjRVbMdv.css` → **200** ✅
+- `curl http://39.103.68.205/assets/AuthorLevelBadge-DrGzRDLb.js` → **200** ✅
+- CSS 内容有效：包含 `.author-level-badge` 完整样式类 ✅
+
+### 经验教训
+- 服务器 dist 存在 ≠ 容器 dist 同步（已记录到 iteration-lessons.md）
+- SPA 构建产物验证：必须检查容器内 assets/ 目录或直接 curl 资源文件
