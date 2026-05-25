@@ -1,4 +1,38 @@
 
+# 迭代经验教训记录
+
+---
+
+## 2026-05-25 迭代#59 经验 — 通知触发系统 + challenges.js 预存 Bug 修复
+
+### 迭代方向
+- 🟢 feature（通知触发机制与互动提醒完善）
+
+### 出现的问题
+1. **challenges.js 全量路由在生产环境返回 500**: `POST /api/challenges` 等所有需要认证的操作都返回 `Cannot read properties of undefined (reading 'userId')`
+2. **通知表在部署前为全空**: Comment 回复、收藏、关注的路由中已存在 `createNotification` 调用，但生产 DB 的 Notification 表 COUNT = 0
+3. **docker cp 在 dist 覆盖后容器内文件时间戳不变**: 执行 `docker cp /root/food-website/frontend/dist/. food-frontend:/usr/share/nginx/html/` 后，容器内文件时间戳仍然显示旧版本
+
+### 根因
+1. **req.user 不存在**: auth 中间件设置 `req.userId`（`req.userId = decoded.userId`），但 challenges.js 全量 10 处使用 `req.user.userId`，而 `req.user` 从未被任何中间件赋值。这是**挑战系统创建以来的预存 Bug**，此前从未端到端测试过认证+挑战流程
+2. **数据填充未覆盖通知**: `fill_ratings.js --clear-first` 清空了 Comment 旧数据，但未重建 Notification 记录。已有通知创建代码需要用户互动（评论回复、收藏、关注）才能自然触发
+3. **容器时区差异**: 服务器宿主 `ls -la` 显示的是 CST 时间（`May 26 04:40`），而容器内 `stat` 显示 UTC（`May 25 20:40`），文件实际内容一致（MD5 匹配）
+
+### 修复方法
+1. **全局替换** `req.user.userId` → `req.userId`（sed 批量替换 10 处）：`sed -i '' 's/req\.user\.userId/req.userId/g' routes/challenges.js`
+2. **用户名查询改为 DB 查询**: `req.user.nickname || req.user.username` → `User.findByPk(req.userId, { attributes: ['nickname', 'username'] })` + 取值
+3. **容器文件验证前先清空**: `docker exec food-frontend sh -c 'rm -rf /usr/share/nginx/html/*'` 确保旧文件不会混淆
+4. **nginx reload 前验证内容哈希**: 使用 `md5sum` 比对宿主机 dist 和容器内文件，确认一致后再 reload
+
+### 遗留问题
+- [ ] VAPID 密钥未配置，Web Push 推送静默跳过
+
+### 自优化建议
+- **容器验证应使用 md5sum 而非时间戳**: 时间戳可能因时区差异误导（宿主 CST vs 容器 UTC），内容哈希才是可靠验证方式
+- **docker cp + rm clean 组合**: 每次前端部署前先 `rm -rf /usr/share/nginx/html/*` 再 `docker cp`，避免旧 chunk 残留和文件混淆
+- **auth 中间件的 req 注入一致性**: 所有路由模块应该统一使用 `req.userId`，不应存在 `req.user` 这种不被赋值的字段引用
+- **通知系统测试应在部署后主动触发一次**: 创建挑战→提交→验证通知写入，确保全链路可用
+
 ---
 
 ## 2026-05-25 迭代#55 经验 — 生产环境 CSS 404 修复
