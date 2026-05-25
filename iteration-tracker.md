@@ -562,10 +562,11 @@
 
 ---
 
-## 迭代 #56 — B/功能增强：热门食谱视频教程链接填充 ⏳
-**状态**: 进行中
-**方向**: B（功能增强）/ 🟢 现有功能完善
-**基线 Commit**: `356408a`
+## 迭代 #56 — 🟢 功能增强：热门食谱视频教程链接填充 ✅
+**状态**: 已完成 (2026-05-26 01:16 CST)
+**完成 Commit**: `97398ff`
+**方向**: 🟢 现有功能完善
+**基线 Commit**: `b36f2b5`
 
 ### 背景
 网站巡检通过，无遗留错误，无未完成任务。通过API检查发现：
@@ -582,5 +583,37 @@
 5. 前端验证：确保 VideoPlayer 组件正确展示视频列表和播放器
 6. 部署闭环：commit → build → deploy → 验证
 7. 更新 iteration-tracker.md 和 iteration-lessons.md
+
+### 完成详情
+#### 数据
+- 查询生产DB Top20热门食谱（按 viewCount×0.3 + favoriteCount×2 综合排序）
+- 为20道食谱找到23条视频链接（Bilibili 13条 + YouTube 10条）
+- 覆盖食谱：冬阴功汤(2条)、鱼香肉丝(2条)、回锅肉(2条) 及17道单视频食谱
+
+#### 脚本
+- `backend/scripts/fill_videos.js`：包含20道食谱的视频数据映射表，按 title 匹配 recipeId
+- 支持 `--dry-run` 模式预览插入计划
+- 运行时匹配 20/20 食谱 → 插入 23 条 VideoEmbed 记录
+
+#### 种子数据
+- `backend/seeds/seed.js`：追加 `videoEmbeds` 数组 + bulkCreate 逻辑
+- 新环境 seed 时自动创建 23 条 VideoEmbed 记录
+
+#### 验证结果
+- API `GET /api/recipes/:id/videos` 返回正确数据 ✅
+- 冬阴功汤：2条Bilibili视频（132万播放老饭骨版 + 14.6万真材实料版）✅
+- 班尼迪克蛋：YouTube Eggs Benedict教程 ✅
+- 数据库视频记录总数：23 ✅
+- 前端构建：0 errors ✅
+
+#### 部署
+- 生产 DB 已通过 docker exec 脚本直接更新，无需重建后端
+- 服务器 git pull 同步至 `97398ff`
+- 本地 commit `97398ff` 已推送至 GitHub
+
+### 注意事项
+- Bilibili BV 号码可能随平台调整失效，需定期验证
+- 视频数据不依赖前端构建变更，DB有数据即可展示
+- 更多食谱的视频可用 fill_videos.js 扩展 VIDEO_MAP 数组补充
 
 **下一个方向**: C（内容质量）
