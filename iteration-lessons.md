@@ -56,3 +56,31 @@
 - Bilibili BV 号应有周期性验证机制（例如每月检查链接有效性）
 - 视频填充脚本 fill_videos.js 设计为可扩展模式，未来新增食谱只需在 VIDEO_MAP 追加条目
 - 数据填充类任务（不涉及代码变更）的部署路径：脚本注入 DB + git 同步种子数据，无需前端 rebuild 或容器重启
+
+---
+
+## 2026-05-26 迭代#57 经验 — 食谱评分数据填充
+
+### 迭代方向
+- 🟢 feature（内容质量填充 — 评分数据）
+
+### 出现的问题
+1. **评论表实际数据与预期不符**: 背景提到 "约200条评论"，实际仅 1 条带评分的评论，其余旧数据不存在
+2. **容器内 docker cp 静默失败**: `docker cp backend/scripts/fill_ratings.js food-backend:/app/scripts/fill_ratings.js` 无错误输出但文件实际未复制到容器
+3. **scp 后的文件未更新服务器**: 本地修改 fill_ratings.js 后，应先 scp 到服务器 SSH 路径再用 `cat | docker exec` 注入容器，否则容器内仍是旧版本
+
+### 根因
+1. **db 结构调研不足**: 应更早直接查询生产 DB 确认评论数量，而非依赖 PRD/背景中的估算值
+2. **容器路径问题**: `docker cp` 要求源路径在容器所在主机（宿主机）上，scp 文件到服务器后用 `docker cp` 复制到容器 → 但只成功一次，第二次静默失败
+3. **文件传输链路不清晰**: 本地 → SSH → 宿主机 → 容器 三个环节，任一环节出问题都会导致容器内文件不是最新版
+
+### 修复方法
+1. **pipe 注入**: `cat local_file | docker exec -i food-backend sh -c 'cat > /app/scripts/file.js'` 绕过 docker cp，直接 pipestream 写入容器
+2. **容器内验证**: 注入后立即 `ls -la` 确认文件大小和时间戳正确
+3. **dry-run 先行**: 每次注入后先 --dry-run 确认是新版本，再执行真实插入
+
+### 自优化建议
+- **数据填充类脚本**: 始终用 `cat | docker exec -i sh -c 'cat > path'` 替代 docker cp，更可靠
+- **DB 调研第一**: 在写脚本前先查 DB 确认实际数据量级，避免基于假设设计
+- **seed.js 评分逻辑独立函数**: 当前 seed.js 内联了评分生成逻辑，未来可抽离为共享模块（fill_ratings.js 和 seed.js 共用）
+- **comment destroy 顺序**: seed 时需先 destroy Comment 再 destroy Recipe，否则 FK 问题
