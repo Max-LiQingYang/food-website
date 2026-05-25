@@ -1,0 +1,145 @@
+.drafts-page {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.drafts-container {
+  background: var(--color-card-bg, #fff);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.drafts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.drafts-header h1 { margin: 0; font-size: 24px; }
+.drafts-new-btn {
+  padding: 10px 20px;
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.drafts-new-btn:hover { opacity: 0.9; }
+.drafts-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.drafts-filter-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--color-text, #333);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.drafts-filter-btn.active {
+  background: var(--color-primary, #E8663E);
+  color: #fff;
+  border-color: var(--color-primary, #E8663E);
+}
+.drafts-filter-btn:hover:not(.active) { background: var(--color-hover-bg, #f5f5f5); }
+.drafts-list { display: flex; flex-direction: column; gap: 10px; }
+.draft-card {
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 12px;
+  padding: 16px;
+  transition: box-shadow 0.2s;
+}
+.draft-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.draft-card-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.draft-card-info { flex: 1; min-width: 0; }
+.draft-card-info h3 { margin: 0 0 6px; font-size: 16px; }
+.draft-card-meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--color-text-secondary, #888);
+  flex-wrap: wrap;
+}
+.draft-card-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary, #888);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.draft-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.draft-status-draft .draft-badge,
+.draft-badge.draft-status-draft { background: #FFF3E0; color: #E65100; }
+.draft-status-scheduled .draft-badge,
+.draft-badge.draft-status-scheduled { background: #E3F2FD; color: #1565C0; }
+.draft-status-published .draft-badge,
+.draft-badge.draft-status-published { background: #E8F5E9; color: #2E7D32; }
+.draft-card-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.draft-action-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.draft-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.draft-action-btn.publish-btn { background: #4CAF50; color: #fff; }
+.draft-action-btn.edit-btn { background: var(--color-primary, #E8663E); color: #fff; }
+.draft-action-btn.delete-btn { background: #ffebee; color: #c62828; }
+.drafts-loading { padding: 40px 0; }
+.drafts-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-secondary, #888);
+}
+.drafts-empty p { margin-bottom: 16px; font-size: 16px; }
+.drafts-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border, #e0e0e0);
+}
+.drafts-pagination button {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+}
+.drafts-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+.drafts-pagination span { font-size: 13px; color: var(--color-text-secondary, #888); }
+
+/* Dark mode */
+body.dark .drafts-container { background: var(--color-card-bg, #1e1e1e); }
+body.dark .draft-card { border-color: var(--color-border, #333); }
+body.dark .draft-action-btn.delete-btn { background: #3e2025; color: #ef9a9a; }
+body.dark .drafts-pagination button { border-color: #444; color: #ccc; }
+
+@media(max-width: 600px) {
+  .draft-card-main { flex-direction: column; }
+  .draft-card-actions { width: 100%; justify-content: flex-end; }
+}

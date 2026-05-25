@@ -1907,3 +1907,89 @@ export function getEnhancedCookingStats(): Promise<{ weeklyCount: number; dailyT
   return apiClient.get('/cooking-logs/stats/enhanced').then(r => r.data?.data || r.data)
 }
 
+// ═══ 迭代#43: 食谱草稿系统 ═══
+export interface Draft {
+  id: string
+  title: string
+  description?: string
+  category?: string
+  ingredients?: any[]
+  steps?: any[]
+  servings?: number
+  difficulty?: string
+  cookTime?: number
+  coverImage?: string
+  tips?: string
+  categoryTags?: string[]
+  season?: string
+  status: 'draft' | 'scheduled' | 'published'
+  scheduledPublishAt?: string
+  userId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export function getDrafts(params?: { page?: number; pageSize?: number; status?: string }): Promise<{ drafts: Draft[]; total: number; page: number; pageSize: number }> {
+  return apiClient.get('/drafts', { params }).then(r => r.data?.data || r.data)
+}
+
+export function getDraft(id: string): Promise<Draft> {
+  return apiClient.get('/drafts/' + id).then(r => r.data?.data || r.data)
+}
+
+export function saveDraft(data: Partial<Draft>): Promise<Draft> {
+  return apiClient.post('/drafts', data).then(r => r.data?.data || r.data)
+}
+
+export function updateDraft(id: string, data: Partial<Draft>): Promise<Draft> {
+  return apiClient.put('/drafts/' + id, data).then(r => r.data?.data || r.data)
+}
+
+export function deleteDraft(id: string): Promise<void> {
+  return apiClient.delete('/drafts/' + id).then(r => r.data?.data || r.data)
+}
+
+export function publishDraft(id: string): Promise<{ recipe: any; draft: Draft }> {
+  return apiClient.post('/drafts/' + id + '/publish').then(r => r.data?.data || r.data)
+}
+
+// ═══ 迭代#43: 作者统计仪表板 ═══
+export interface DashboardData {
+  basic: { totalRecipes: number; totalViews: number; totalFavorites: number; totalComments: number; totalPoints: number }
+  viewTrend: { date: string; views: number }[]
+  favTrend: { date: string; favorites: number }[]
+  ratingDistribution: { 1: number; 2: number; 3: number; 4: number; 5: number }
+  wordCloud: { text: string; value: number }[]
+  topRecipes: { id: string; title: string; views: number; favorites: number; qualityScore: number; points: number }[]
+}
+
+export function getDashboard(): Promise<DashboardData> {
+  return apiClient.get('/dashboard').then(r => r.data?.data || r.data)
+}
+
+// ═══ 迭代#43: 内容审核 ═══
+export interface ReviewQueueItem {
+  recipes: { items: any[]; total: number }
+  comments: { items: any[]; total: number }
+}
+
+export function getReviewQueue(params?: { type?: string; threshold?: number; page?: number; pageSize?: number }): Promise<ReviewQueueItem> {
+  return apiClient.get('/admin/review-queue', { params }).then(r => r.data?.data || r.data)
+}
+
+export function submitReviewBatch(items: { type: string; id: string; action: string; reason?: string }[]): Promise<{ results: any[] }> {
+  return apiClient.post('/admin/review-batch', { items }).then(r => r.data?.data || r.data)
+}
+
+export function getReviewHistory(params?: { page?: number; pageSize?: number }): Promise<{ items: any[]; total: number; page: number; pageSize: number }> {
+  return apiClient.get('/admin/review-history', { params }).then(r => r.data?.data || r.data)
+}
+
+export function markCommentFeatured(id: string | number, featured: boolean): Promise<void> {
+  return apiClient.post('/comments/' + id + '/feature', { featured }).then(r => r.data?.data || r.data)
+}
+
+export function getHotComments(recipeId: string, limit?: number): Promise<any[]> {
+  return apiClient.get('/comments/' + recipeId + '/hot', { params: { limit } }).then(r => r.data?.data || r.data)
+}
+

@@ -36,6 +36,9 @@ const IngredientSearchPage = lazy(() => import('../pages/IngredientSearchPage'))
 const KitchenToolsPage = lazy(() => import('../pages/KitchenToolsPage'))
 const MyToolsPage = lazy(() => import('../pages/MyToolsPage'))
 const TagsPage = lazy(() => import('../pages/TagsPage'))
+const DraftsPage = lazy(() => import('../pages/DraftsPage'))
+const DashboardPage = lazy(() => import('../pages/DashboardPage'))
+const AdminReviewPage = lazy(() => import('../pages/AdminReviewPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -95,6 +98,13 @@ const router = createBrowserRouter([
       { path: '/my-tools', element: <MyToolsPage /> },
       // 迭代#35: 标签探索
       { path: '/tags', element: <TagsPage /> },
+      // 迭代#43: 食谱草稿系统
+      { path: '/drafts', element: <DraftsPage /> },
+      // 迭代#43: 作者统计仪表板
+      { path: '/dashboard', element: <DashboardPage /> },
+      // 迭代#43: 内容审核面板（管理员）
+      { path: '/admin/review', element: <AdminReviewPage /> },
+      { path: '/admin/review-history', element: <AdminReviewPage /> },
       // 迭代#37: 食材库存管理
       { path: '/pantry', element: <PantryPage /> },
       { path: '/settings', element: <SettingsPage /> },

@@ -45,6 +45,25 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
         comment: '点赞数'
       },
+      imageUrls: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '图片URL列表(JSON数组,最多3张)',
+        get() {
+          const raw = this.getDataValue('imageUrls')
+          if (!raw) return []
+          try { return JSON.parse(raw) } catch { return [] }
+        },
+        set(val) {
+          const arr = Array.isArray(val) ? val.slice(0, 3) : []
+          this.setDataValue('imageUrls', JSON.stringify(arr))
+        }
+      },
+      isFeatured: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: '是否为精华评论'
+      },
       userId: {
         type: DataTypes.UUID,
         allowNull: false,

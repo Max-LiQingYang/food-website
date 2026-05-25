@@ -123,6 +123,15 @@ router.use('/', require('./recommendations'))
 // 个人设置
 router.use('/settings', require('./settings'))
 
+// 迭代#43: 草稿系统
+router.use('/', require('./drafts'))
+
+// 迭代#43: 审核队列
+router.use('/', require('./reviewQueue'))
+
+// 迭代#43: 作者统计仪表板
+router.use('/dashboard', require('./dashboard'))
+
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)
 router.get('/favorites', favoriteRoutes.getFavorites)
