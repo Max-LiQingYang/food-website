@@ -313,15 +313,66 @@
 
 ---
 
-## 迭代 #44 — A/UI/UX：⏳ 待派发
-**状态**: 等待QClaw派发
-**方向**: UI/UX体验增强
+## 迭代 #44 — A/UI/UX：微交互+组件增强 ✅
+**Commit**: `15e5ac9` + `2d2865d` (hotfix TDZ) (2026-05-25)
+**测试**: 前端9/9 UX测试全绿
 
-**候选方向**:
-- 微交互动效系统（按钮反馈、悬浮效果、加载动画）
-- 暗色模式细节打磨（更多组件覆盖、过渡动画）
-- 响应式布局优化（平板适配、横屏模式）
-- 空状态与错误状态视觉设计
-- 页面切换过渡动画增强
+### 功能
+- **Footer 组件** — 四栏响应式、暗色适配、社交链接
+- **EmptyState 组件** — 弹入动画、紧凑模式、CTA按钮
+- **全局微交互** — focus-visible 静默鼠标、btn 三变体 active scale(0.97)、输入框光晕、自定义滚动条、卡片 stagger 入场、Toast 堆叠
+- **HomePage 集成** — 卡片渐入 + EmptyState 替换内联空状态
+- **修复关键生产Bug** — api.ts `updateProfile` 重复声明导致 Rollup TDZ，主chunk从517KB→293KB，38 JS chunks 全部无TDZ
+
+---
+
+## 迭代 #45 — B/功能：通知系统 ✅
+**Commit**: `23ba483` (2026-05-25)
+**测试**: 后端 266/266 全绿
+**部署**: commit推送 + scp dist + docker cp frontend + nginx reload
+
+### 功能
+- **Notification 模型重写** — actorId/targetId/targetType, type ENUM扩展为9类
+- **PushSubscription 模型** — Web Push 端点到订阅映射
+- **通知Helper重构** — 兼容新旧调用方式 + 非阻塞 Web Push
+- **NotificationBell** — 铃铛+红色气泡(99+) + 下拉面板(5条+标记已读)
+- **NotificationsPage** — 分页列表+类型筛选+已读切换+删除
+- **Navbar集成** — 铃铛组件嵌入，路由注册/notifications
+
+### 修复
+- `favorites.js` line 200 位置参数→对象参数调用修复
+- 容器名 **food-frontend/food-backend**（非 docker-compose 默认名）
+
+---
+
+## 迭代 #46 — C/内容质量：故事+文化背景+作者等级 ✅
+**Commit**: `4ae5168` (2026-05-25)
+**测试**: 后端266/266 ✅, 前端252/260 ✅ (8项预存失败)
+
+### 功能
+- **AuthorLevelBadge 组件** — 5级制等级(5积分公式子项)，支持compact/标准模式
+- **RecipeDetailPage** — story/culturalBackground 可折叠区（accordion+键盘支持）
+- **CreateRecipePage** — story/culturalBackground 输入区 + 草稿保存/恢复
+- **RecipeCard** — 作者等级徽章(作者名旁)
+- **UserProfilePage** — 等级展示+进度条+得分/下一等级
+- **后端** — authorLevel.js 等级公式 + /api/users/:id/author-info 端点
+
+### 修复
+- AuthorLevelBadge props 解构修复（33项RecipeCard测试由FAIL→1项预存）
+
+---
+
+## 迭代 #47 — A/UI/UX：移动端体验增强 ✅
+**Commit**: `de1b794` (2026-05-25 16:55)
+**部署**: 生产双端200 ✅
+**测试**: 前端252/260 ✅ (8项预存)
+
+### 功能
+- **MobileBottomNav 滚动隐藏/显示** — 下滚>100px隐藏导航，上滚恢复，`translateY(100%)`动画
+- **手势导航修复** — `window.location.href`→`useNavigate()`，消除全页刷新
+- **步骤滑动+箭头导航** — 触摸左/右滑切换食谱步骤 + 底部←/→按钮 + 步骤计数 + 自动滚入视图
+- **搜索筛选移动端** — <480px水平滚动+sticky分类标签+32px触摸目标
+
+**下一个方向**: B（功能增强）
 
 ---
