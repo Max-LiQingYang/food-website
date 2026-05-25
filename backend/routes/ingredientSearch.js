@@ -123,7 +123,7 @@ router.post('/recipes/by-ingredients', async (req, res) => {
         const aiPrompt = `你是一个美食食谱推荐专家。用户提供了以下食材：${ingredientStr}。请推荐 3 道包含这些食材的菜谱，每道菜谱包含：菜名、简介、所需食材列表、烹饪时长（分钟）、难度（easy/medium/hard）、份数。以 JSON 数组格式返回，每个元素包含 title, description, ingredients(数组[{name, amount, unit}]), cookTime, difficulty, servings 字段。只返回 JSON，不要其他文字。`
 
         const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 15000)
+        const timeout = setTimeout(() => controller.abort(), 30000)
 
         const aiRes = await fetch(
           `${process.env.AI_API_BASE_URL || 'https://ark.cn-beijing.volces.com/api/coding/v3'}/chat/completions`,
@@ -146,15 +146,85 @@ router.post('/recipes/by-ingredients', async (req, res) => {
 
         if (aiRes.ok) {
           const aiData = await aiRes.json()
-          const content = aiData.choices?.[0]?.message?.content || ''
-          const jsonMatch = content.match(/\[\s*\{[\s\S]*?\}\s*\]/)
-          if (jsonMatch) {
-            aiRecipes = JSON.parse(jsonMatch[0])
-            aiGenerated = true
+          let content = aiData.choices?.[0]?.message?.content || ''
+
+          // 清理 markdown 代码块包裹
+          content = content.replace(/^```(?:json)?\s*/gm, '').replace(/```\s*$/gm, '').trim()
+
+          // ── 尝试解析 JSON ──
+          // 1. 优先直接解析完整内容（AI 严格按提示返回 JSON 时）
+          try {
+            const full = JSON.parse(content)
+            if (Array.isArray(full)) {
+              aiRecipes = full
+              aiGenerated = true
+            }
+          } catch (e) {
+            // 完整解析失败，继续尝试
           }
+
+          // 2. 用 bracket 计数精确提取 JSON 数组（避免 lazy regex 匹配到内层括号）
+          if (!aiGenerated) {
+            const startIdx = content.indexOf('[')
+            if (startIdx !== -1) {
+              let depth = 0
+              let endIdx = -1
+              for (let i = startIdx; i < content.length; i++) {
+                if (content[i] === '[') depth++
+                else if (content[i] === ']') {
+                  depth--
+                  if (depth === 0) { endIdx = i + 1; break }
+                }
+              }
+              if (endIdx !== -1) {
+                try {
+                  aiRecipes = JSON.parse(content.slice(startIdx, endIdx))
+                  aiGenerated = true
+                } catch (e2) {}
+              }
+            }
+          }
+
+          // 3. 备用：提取单个 JSON 对象
+          if (!aiGenerated) {
+            const objStart = content.indexOf('{')
+            if (objStart !== -1) {
+              let depth = 0
+              let endIdx = -1
+              for (let i = objStart; i < content.length; i++) {
+                if (content[i] === '{') depth++
+                else if (content[i] === '}') {
+                  depth--
+                  if (depth === 0) { endIdx = i + 1; break }
+                }
+              }
+              if (endIdx !== -1) {
+                try {
+                  const single = JSON.parse(content.slice(objStart, endIdx))
+                  if (single.title) {
+                    aiRecipes = [single]
+                    aiGenerated = true
+                  }
+                } catch (e3) {}
+              }
+            }
+          }
+
+          if (!aiGenerated) {
+            console.warn('[by-ingredients] AI response unparseable, first 400:', content.substring(0, 400))
+          } else {
+            console.log('[by-ingredients] AI fallback generated', aiRecipes.length, 'recipes')
+          }
+        } else {
+          const aiErrBody = await aiRes.text().catch(() => 'unreadable')
+          console.warn('[by-ingredients] AI API non-OK:', aiRes.status, aiErrBody.substring(0, 200))
         }
       } catch (aiErr) {
-        console.error('[by-ingredients] AI fallback failed:', aiErr.message)
+        if (aiErr.name === 'AbortError') {
+          console.error('[by-ingredients] AI fallback timed out after 30s')
+        } else {
+          console.error('[by-ingredients] AI fallback failed:', aiErr.message)
+        }
         // AI 失败不影响主流程
       }
     }
