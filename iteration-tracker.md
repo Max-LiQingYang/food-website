@@ -409,7 +409,42 @@
 
 ---
 
-## #50 — 搜索与发现体验增强 ✅
+## #51 — 食材别名映射 + AI fallback + 前端输入建议 ✅
+
+| 类型 | 状态 | 时间 |
+|------|------|------|
+| 后端 | ✅ | 05-25 21:35 |
+| 前端 | ✅ | 05-25 21:35 |
+| 测试 | ✅ 30/30 | 05-25 21:35 |
+| 部署 | ✅ | 05-25 21:35 |
+
+**后端改动**:
+- `backend/utils/ingredientAliases.js` — 82组别名、267条映射、别名展开 + 热门食材
+- `backend/routes/ingredientSearch.js` — 别名展开 + AI fallback + bracket-counting JSON parse
+- 修复: AI超时15s→30s, lazy regex匹配内层括号问题, markdown代码块剥离
+
+**前端改动**:
+- `IngredientSearchPage.tsx` — 自动补全 + 热门标签 + AI推荐 + 缺失食材提示
+- `api.ts` — AiRecipeRecommend接口类型
+
+**修复**: `0498d2f` → `294caa7` (admin.js col/fn修复)
+
+## #52 — 后端Docker镜像重建 + 全量端点修复 ✅
+
+| 类型 | 状态 | 时间 |
+|------|------|------|
+| 🔴 bugfix | ✅ 已修复 | 05-25 22:15 |
+
+**问题**: 后端容器运行过时的ghcr.io镜像（12 routes vs 38 routes），40+ API端点404
+
+**修复方法**:
+- `docker cp` 全量注入所有routes/models/middleware/utils/核心文件
+- `npm install cheerio pdfkit web-push` 补全容器缺少的3个依赖包
+- `admin.js` import修复: `col/fn/Op`从`require('sequelize')`导入
+
+**验证结果**: 27个关键端点全部非404 ✅
+- 容器routes: 12→38, models: 18→33, middleware: 2→3, utils: 2→5
+- 别名搜索: 番茄→6条 ✅
 
 | 类型 | 状态 | 时间 |
 |------|------|------|
