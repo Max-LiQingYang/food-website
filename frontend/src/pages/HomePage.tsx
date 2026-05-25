@@ -15,6 +15,7 @@ import HomeTagsSection from '../components/HomeTagsSection'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import EmptyState from '../components/EmptyState'
 import type { Recipe } from '../api'
 import './HomePage.css'
 
@@ -223,16 +224,20 @@ export default function HomePage() {
 
         {!loading && recipes.length > 0 && (
           <div className="home-grid">
-            {recipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
+            {recipes.map((recipe, i) => (
+              <div key={recipe.id} className="recipe-card-enter" style={{ animationDelay: `${(i % 12) * 0.04}s` }}>
+                <RecipeCard key={recipe.id} recipe={recipe} />
+              </div>
+            ))}
           </div>
         )}
 
         {!loading && recipes.length === 0 && (
-          <div className="home-empty">
-            <div className="home-empty__icon">🍳</div>
-            <p className="home-empty__text">暂无食谱</p>
-            <p className="home-empty__hint">试试其它筛选条件~</p>
-          </div>
+          <EmptyState
+            icon="🍳"
+            title="暂无食谱"
+            description="试试其它筛选条件~"
+          />
         )}
       </section>
 
