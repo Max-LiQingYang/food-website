@@ -549,4 +549,162 @@ router.get('/:id/copy-text', auth, async (req, res) => {
   }
 })
 
+
+// ─────────────────────────────────────────────────────────────────
+// POST /batch-add — 批量添加多个食谱的食材到购物清单
+// ─────────────────────────────────────────────────────────────────
+router.post('/batch-add', auth, async (req, res) => {
+  try {
+    const userId = req.userId
+    const { recipeIds } = req.body
+
+    if (!Array.isArray(recipeIds) || recipeIds.length === 0) {
+      return res.status(400).json(resJSON(400, '请提供食谱ID列表', null))
+    }
+
+    // 获取所有食谱的食材
+    const recipes = await Recipe.findAll({
+      where: { id: recipeIds },
+      attributes: ['id', 'title', 'ingredients']
+    })
+
+    const ingredientLists = recipes.map(parseIngredients)
+    const mergedItems = mergeIngredients(ingredientLists)
+
+    if (mergedItems.length === 0) {
+      return res.status(400).json(resJSON(400, '没有可添加的食材', null))
+    }
+
+    // 查找或创建今日购物清单
+    const today = new Date().toISOString().split('T')[0]
+    let list = await ShoppingList.findOne({
+      where: {
+        userId,
+        createdAt: {
+          [require('sequelize').Op.gte]: new Date(today)
+        }
+      },
+      order: [['createdAt', 'DESC']]
+    })
+
+    if (list) {
+      // 合并到已有清单
+      const existingItems = (() => {
+        try { return JSON.parse(list.items) || [] } catch { return [] }
+      })()
+      const merged = {}
+      for (const item of existingItems) {
+        const name = (item.name || '').trim()
+        if (name) merged[name] = { ...item }
+      }
+      for (const item of mergedItems) {
+        const name = (item.name || '').trim()
+        if (merged[name]) {
+          merged[name].amount += item.amount
+          if (!merged[name].unit && item.unit) merged[name].unit = item.unit
+        } else {
+          merged[name] = { ...item }
+        }
+      }
+      list.items = JSON.stringify(Object.values(merged))
+      await list.save()
+    } else {
+      const recipeTitles = recipes.map(r => r.title).join('、')
+      list = await ShoppingList.create({
+        userId,
+        name: recipeTitles.length > 30 ? recipeTitles.slice(0, 30) + '…' : recipeTitles,
+        items: JSON.stringify(mergedItems)
+      })
+    }
+
+    return res.status(200).json(resJSON(0, 'success', {
+      listId: list.id,
+      name: list.name,
+      items: mergedItems,
+      added: mergedItems.length
+    }))
+  } catch (err) {
+    console.error('[POST /shopping-list/batch-add] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+
+// ─────────────────────────────────────────────────────────────────
+// POST /batch — 批量将食谱食材添加到购物清单
+// ─────────────────────────────────────────────────────────────────
+router.post('/batch', auth, async (req, res) => {
+  try {
+    const userId = req.userId
+    const { recipeIds } = req.body
+
+    if (!Array.isArray(recipeIds) || recipeIds.length === 0) {
+      return res.status(400).json(resJSON(400, '请提供食谱IDs', null))
+    }
+
+    // Get recipes with ingredients
+    const recipes = await Recipe.findAll({
+      where: { id: { [Op.in]: recipeIds } },
+      attributes: ['id', 'title', 'ingredients']
+    })
+
+    // Merge all ingredients
+    const allItems = []
+    for (const recipe of recipes) {
+      const ings = typeof recipe.ingredients === 'string'
+        ? JSON.parse(recipe.ingredients)
+        : (recipe.ingredients || [])
+      ings.forEach(ing => {
+        allItems.push({
+          name: ing.name || ing,
+          amount: parseFloat(ing.amount) || 0,
+          unit: ing.unit || ''
+        })
+      })
+    }
+
+    // Find or create default shopping list
+    let list = await ShoppingList.findOne({
+      where: { userId, name: '批量添加' }
+    })
+
+    const mergedItems = mergeIngredients(allItems)
+
+    if (list) {
+      const existingItems = typeof list.items === 'string'
+        ? JSON.parse(list.items)
+        : (list.items || [])
+
+      // Merge existing items with new items
+      const allMerged = [...existingItems]
+      for (const item of mergedItems) {
+        const existing = allMerged.find(e => e.name === item.name)
+        if (existing) {
+          existing.amount = parseFloat(existing.amount || 0) + item.amount
+          if (!existing.unit && item.unit) existing.unit = item.unit
+        } else {
+          allMerged.push(item)
+        }
+      }
+      list.items = allMerged
+      await list.save()
+    } else {
+      list = await ShoppingList.create({
+        userId,
+        name: '批量添加',
+        items: mergedItems
+      })
+    }
+
+    return res.status(200).json(resJSON(0, 'success', {
+      added: mergedItems.length,
+      items: mergedItems,
+      listId: list.id
+    }))
+  } catch (err) {
+    console.error('[POST /shopping-list/batch] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router

@@ -2,7 +2,7 @@
 
 const { createActivity } = require('../utils/activity')
 const favoriteService = require('../services/favoriteService')
-const { Recipe, User } = require('../models')
+const { Recipe, User, Favorite, Op } = require('../models')
 const { createNotification } = require('../utils/notificationHelper')
 const { checkAllAchievements } = require('../utils/achievementChecker')
 
@@ -171,10 +171,130 @@ async function getFavoriteCount(req, res) {
   }
 }
 
+
+// ─────────────────────────────────────────────────────────────────
+// POST /api/favorites/batch — 批量收藏/取消收藏
+// ─────────────────────────────────────────────────────────────────
+async function batchFavorite(req, res) {
+  try {
+    const userId = req.userId
+    const { recipeIds, action } = req.body
+
+    if (!Array.isArray(recipeIds) || recipeIds.length === 0) {
+      return res.status(400).json(resJSON(400, '请提供食谱ID列表', null))
+    }
+    if (!['add', 'remove'].includes(action)) {
+      return res.status(400).json(resJSON(400, 'action 必须为 add 或 remove', null))
+    }
+
+    if (action === 'add') {
+      const result = await favoriteService.batchAddFavorites(userId, recipeIds)
+      const activity = Array.isArray(result) ? result : []
+      if (activity.length > 0) {
+        setImmediate(() => {
+          activity.forEach(a => {
+            const recipient = a.recipeUserId
+            if (recipient && String(recipient) !== String(userId)) {
+              createActivity('favorite', userId, a.recipeId, 'Recipe')
+              createNotification(recipient, 'favorite', userId, a.recipeId, 'Recipe')
+            }
+          })
+        })
+      }
+      return res.status(200).json(resJSON(0, 'success', { affected: activity.length }))
+    } else {
+      await favoriteService.batchRemoveFavorites(userId, recipeIds)
+      return res.status(200).json(resJSON(0, 'success', { affected: recipeIds.length }))
+    }
+  } catch (err) {
+    console.error('[POST /api/favorites/batch] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+}
+
+
+// ─────────────────────────────────────────────────────────────────
+// POST /api/favorites/batch — 批量收藏/取消收藏
+// ─────────────────────────────────────────────────────────────────
+async function batchFavorite(req, res) {
+  try {
+    const userId = req.userId
+    const { recipeIds, action } = req.body
+
+    if (!Array.isArray(recipeIds) || recipeIds.length === 0) {
+      return res.status(400).json(resJSON(400, '请提供食谱IDs', null))
+    }
+    if (!['add', 'remove'].includes(action)) {
+      return res.status(400).json(resJSON(400, 'action 必须为 add 或 remove', null))
+    }
+
+    // Verify recipes exist
+    const recipes = await Recipe.findAll({
+      where: { id: { [Op.in]: recipeIds } },
+      attributes: ['id']
+    })
+    const validIds = recipes.map(r => r.id)
+
+    let affected = 0
+    if (action === 'add') {
+      // Batch add favorites
+      const existing = await Favorite.findAll({
+        where: { userId, recipeId: { [Op.in]: validIds } },
+        paranoid: false
+      })
+      const existingMap = {}
+      existing.forEach(f => { existingMap[f.recipeId] = f })
+
+      for (const recipeId of validIds) {
+        const existingFav = existingMap[recipeId]
+        if (existingFav) {
+          if (existingFav.deletedAt) {
+            await existingFav.restore()
+            affected++
+          }
+        } else {
+          await Favorite.create({ userId, recipeId })
+          affected++
+        }
+      }
+
+      // Update favoriteCount for affected recipes — use raw query to avoid model issues
+      for (const recipeId of validIds) {
+        const count = await Favorite.count({ where: { recipeId, deletedAt: null } })
+        await Recipe.update({ favoriteCount: count }, { where: { id: recipeId } })
+      }
+    } else {
+      // Batch remove favorites
+      const deleted = await Favorite.destroy({
+        where: { userId, recipeId: { [Op.in]: validIds } }
+      })
+      affected = deleted
+
+      for (const recipeId of validIds) {
+        const count = await Favorite.count({ where: { recipeId, deletedAt: null } })
+        await Recipe.update({ favoriteCount: count }, { where: { id: recipeId } })
+      }
+    }
+
+    // Clear cache
+    const favoriteService = require('../services/favoriteService')
+    if (typeof favoriteService.clearCache === 'function') {
+      favoriteService.clearCache()
+    }
+
+    return res.status(200).json(resJSON(0, 'success', { affected }))
+  } catch (err) {
+    console.error('[POST /api/favorites/batch] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+}
+
 module.exports = {
   getFavorites,
+  batchFavorite,
   addFavorite,
   removeFavorite,
   getFavoriteStatus,
-  getFavoriteCount
+  getFavoriteCount,
+  batchFavorite
 }

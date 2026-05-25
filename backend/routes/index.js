@@ -60,6 +60,7 @@ router.use('/feed', auth, feedRoutes)
 
 // 需要 auth 的路由（shopping-list, import）
 router.use('/shopping-list', auth, shoppingListRoutes)
+// No separate batch route - batch is handled within shoppingListRoutes
 router.use('/recipes/import', importRoutes)
 
 // 收藏夹（auth 在内部按需处理，/public 无需认证）
@@ -116,6 +117,12 @@ router.use('/pantry', require('./pantry'))
 // 迭代#37: 营养追踪
 router.use('/nutrition', require('./nutrition'))
 
+// 个性化推荐
+router.use('/', require('./recommendations'))
+
+// 个人设置
+router.use('/settings', require('./settings'))
+
 // 需要 auth 的路由（favorites）
 router.use('/favorites', auth)
 router.get('/favorites', favoriteRoutes.getFavorites)
@@ -123,5 +130,6 @@ router.post('/favorites', favoriteRoutes.addFavorite)
 router.delete('/favorites/:recipeId', favoriteRoutes.removeFavorite)
 router.get('/favorites/:recipeId/status', favoriteRoutes.getFavoriteStatus)
 router.get('/favorites/:recipeId/count', favoriteRoutes.getFavoriteCount)
+router.post('/favorites/batch', favoriteRoutes.batchFavorite)
 
 module.exports = router

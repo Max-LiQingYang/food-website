@@ -330,4 +330,171 @@ router.get('/stats', auth, async (req, res) => {
   }
 })
 
+
+// ─────────────────────────────────────────────────────────────────
+// GET /detail/:id — 烹饪日志详情
+// ─────────────────────────────────────────────────────────────────
+router.get('/detail/:id', auth, async (req, res) => {
+  try {
+    const log = await CookingLog.findByPk(req.params.id, {
+      include: [{
+        model: Recipe,
+        attributes: ['id', 'title', 'coverImage', 'category', 'difficulty', 'cookTime', 'servings']
+      }]
+    })
+    if (!log) return res.status(404).json(resJSON(404, '日志不存在', null))
+
+    return res.status(200).json(resJSON(0, 'success', log))
+  } catch (err) {
+    console.error('[GET /cooking-logs/detail/:id] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /search — 搜索和筛选烹饪日志
+// ─────────────────────────────────────────────────────────────────
+router.get('/search', auth, async (req, res) => {
+  try {
+    const userId = req.userId
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1)
+    const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize, 10) || 20))
+    const { q, startDate, endDate, minRating, maxRating } = req.query
+
+    const where = { userId }
+
+    // Date range filter
+    if (startDate || endDate) {
+      where.cookedAt = {}
+      if (startDate) where.cookedAt[Op.gte] = new Date(startDate)
+      if (endDate) where.cookedAt[Op.lte] = new Date(endDate + 'T23:59:59')
+    }
+
+    // Rating filter
+    if (minRating || maxRating) {
+      where.rating = {}
+      if (minRating) where.rating[Op.gte] = parseFloat(minRating)
+      if (maxRating) where.rating[Op.lte] = parseFloat(maxRating)
+    }
+
+    const include = [{
+      model: Recipe,
+      attributes: ['id', 'title', 'coverImage', 'category'],
+      ...(q ? { where: { title: { [Op.like]: `%${q}%` } } } : {})
+    }]
+
+    const { rows, count } = await CookingLog.findAndCountAll({
+      where,
+      include,
+      order: [['cookedAt', 'DESC']],
+      offset: (page - 1) * pageSize,
+      limit: pageSize
+    })
+
+    return res.status(200).json(resJSON(0, 'success', {
+      logs: rows,
+      total: count,
+      page,
+      pageSize,
+      totalPages: Math.ceil(count / pageSize)
+    }))
+  } catch (err) {
+    console.error('[GET /cooking-logs/search] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /stats/enhanced — 增强烹饪统计
+// ─────────────────────────────────────────────────────────────────
+router.get('/stats/enhanced', auth, async (req, res) => {
+  try {
+    const userId = req.userId
+
+    // Weekly cooking count (last 7 days)
+    const weekStart = new Date()
+    weekStart.setDate(weekStart.getDate() - 7)
+    const weeklyCount = await CookingLog.count({
+      where: { userId, cookedAt: { [Op.gte]: weekStart } }
+    })
+
+    // Monthly trend (last 30 days, grouped by day)
+    const monthStart = new Date()
+    monthStart.setDate(monthStart.getDate() - 30)
+    const monthlyLogs = await CookingLog.findAll({
+      where: { userId, cookedAt: { [Op.gte]: monthStart } },
+      attributes: ['cookedAt', 'rating', 'recipeId'],
+      order: [['cookedAt', 'ASC']]
+    })
+
+    // Build daily trend
+    const dailyMap = {}
+    for (const log of monthlyLogs) {
+      const day = log.cookedAt ? new Date(log.cookedAt).toISOString().slice(0, 10) : 'unknown'
+      if (!dailyMap[day]) dailyMap[day] = { count: 0, totalRating: 0, ratingCount: 0 }
+      dailyMap[day].count++
+      if (log.rating) {
+        dailyMap[day].totalRating += log.rating
+        dailyMap[day].ratingCount++
+      }
+    }
+
+    const dailyTrend = Object.entries(dailyMap)
+      .map(([date, data]) => ({
+        date,
+        count: data.count,
+        avgRating: data.ratingCount > 0 ? Math.round(data.totalRating / data.ratingCount * 10) / 10 : 0
+      }))
+
+    // Most cooked recipes
+    const recipeCountMap = {}
+    for (const log of monthlyLogs) {
+      recipeCountMap[log.recipeId] = (recipeCountMap[log.recipeId] || 0) + 1
+    }
+    const recipeIds = Object.keys(recipeCountMap).map(Number).filter(Boolean)
+    const recipes = recipeIds.length > 0
+      ? await Recipe.findAll({
+          where: { id: { [Op.in]: recipeIds } },
+          attributes: ['id', 'title', 'coverImage']
+        })
+      : []
+    const recipeMap = {}
+    recipes.forEach(r => { recipeMap[r.id] = r })
+
+    const mostCooked = Object.entries(recipeCountMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([id, count]) => ({
+        recipeId: parseInt(id),
+        title: recipeMap[parseInt(id)]?.title || '',
+        coverImage: recipeMap[parseInt(id)]?.coverImage || '',
+        count
+      }))
+
+    // Achievement progress
+    const totalCooking = await CookingLog.count({ where: { userId } })
+    // Use raw query for distinct count
+    const [result] = await require('../models').sequelize.query(
+      'SELECT COUNT(DISTINCT recipeId) as cnt FROM cooking_logs WHERE userId = ?',
+      { replacements: [userId], type: require('sequelize').QueryTypes.SELECT }
+    )
+    const totalRecipesCooked = result?.cnt || 0
+
+    return res.status(200).json(resJSON(0, 'success', {
+      weeklyCount,
+      dailyTrend,
+      mostCooked,
+      achievement: {
+        totalCooking,
+        totalRecipesCooked: totalRecipesCooked.length,
+        currentStreak: weeklyCount, // Simple: last 7 days count
+        totalRatings: await CookingLog.count({ where: { userId, rating: { [Op.ne]: null } } })
+      }
+    }))
+  } catch (err) {
+    console.error('[GET /cooking-logs/stats/enhanced] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router
