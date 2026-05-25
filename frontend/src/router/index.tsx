@@ -40,6 +40,10 @@ const DraftsPage = lazy(() => import('../pages/DraftsPage'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const AdminReviewPage = lazy(() => import('../pages/AdminReviewPage'))
 const NotificationsPage = lazy(() => import('../pages/NotificationsPage'))
+const PantryPage = lazy(() => import('../pages/PantryPage'))
+const NutritionDashboard = lazy(() => import('../pages/NutritionDashboard'))
+const RecipeDiffPage = lazy(() => import('../pages/RecipeDiffPage'))
+const CookingAnalyticsPage = lazy(() => import('../pages/CookingAnalyticsPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -87,44 +91,28 @@ const router = createBrowserRouter([
       { path: '/compare', element: <ComparePage /> },
       { path: '/preferences', element: <PreferencesPage /> },
       { path: '/preferences/recommendations', element: <PreferenceRecommendations /> },
-          { path: '/meal-planner', element: <MealPlannerPage /> },
-  { path: '/cooking-journal', element: <CookingJournalPage /> },
-      // 迭代#34: 挑战赛系统
+      { path: '/meal-planner', element: <MealPlannerPage /> },
+      { path: '/cooking-journal', element: <CookingJournalPage /> },
       { path: '/challenges', element: <ChallengesPage /> },
       { path: '/challenges/:id', element: <ChallengeDetailPage /> },
-      // 迭代#34: 智能食材搜索
       { path: '/ingredient-search', element: <IngredientSearchPage /> },
-      // 迭代#34: 厨房工具管理
       { path: '/tools', element: <KitchenToolsPage /> },
       { path: '/my-tools', element: <MyToolsPage /> },
-      // 迭代#35: 标签探索
       { path: '/tags', element: <TagsPage /> },
-      // 迭代#43: 食谱草稿系统
       { path: '/drafts', element: <DraftsPage /> },
-      // 迭代#43: 作者统计仪表板
       { path: '/dashboard', element: <DashboardPage /> },
-      // 迭代#43: 内容审核面板（管理员）
       { path: '/admin/review', element: <AdminReviewPage /> },
       { path: '/admin/review-history', element: <AdminReviewPage /> },
       { path: '/notifications', element: <NotificationsPage /> },
-      // 迭代#37: 食材库存管理
       { path: '/pantry', element: <PantryPage /> },
       { path: '/settings', element: <SettingsPage /> },
-      // 迭代#37: 营养追踪
       { path: '/nutrition', element: <NutritionDashboard /> },
-      // 迭代#40: 食谱版本对比
       { path: '/recipe/:id/versions', element: <RecipeDiffPage /> },
-      // 迭代#40: 烹饪数据分析
       { path: '/cooking/analytics', element: <CookingAnalyticsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])
-
-const PantryPage = lazy(() => import('../pages/PantryPage'))
-const NutritionDashboard = lazy(() => import('../pages/NutritionDashboard'))
-const RecipeDiffPage = lazy(() => import('../pages/RecipeDiffPage'))
-const CookingAnalyticsPage = lazy(() => import('../pages/CookingAnalyticsPage'))
 
 export default function Router() {
   // @ts-expect-error TS2786 with TS 5.9 + @types/react 18.3 — harmless render types mismatch

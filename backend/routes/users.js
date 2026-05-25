@@ -302,4 +302,28 @@ router.get('/:id/activity-heatmap', async (req, res) => {
   }
 })
 
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/author-info — 作者等级信息
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/author-info', async (req, res) => {
+  try {
+    const { getAuthorLevel } = require('../utils/authorLevel')
+    const levelInfo = await getAuthorLevel(req.params.id)
+    const { User } = require('../models')
+    const user = await User.findByPk(req.params.id, {
+      attributes: ['id', 'username', 'nickname']
+    })
+    if (!user) {
+      return res.status(404).json(resJSON(404, '用户不存在', null))
+    }
+    return res.status(200).json(resJSON(0, 'ok', {
+      user: { id: user.id, username: user.username, nickname: user.nickname },
+      level: levelInfo
+    }))
+  } catch (err) {
+    console.error('[GET /users/:id/author-info] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router

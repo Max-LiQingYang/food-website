@@ -82,6 +82,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         comment: '烹饪小贴士（纯文本）'
       },
+      story: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '烹饪故事/食谱来源/缘起'
+      },
+      culturalBackground: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: '文化背景/地域特色/时节讲究'
+      },
       season: {
         type: DataTypes.STRING,
         allowNull: true,
