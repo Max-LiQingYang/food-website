@@ -49,6 +49,8 @@ export default function CreateRecipePage() {
   const [difficulty, setDifficulty] = useState('easy')
   const [cookTime, setCookTime] = useState(30)
   const [tips, setTips] = useState('')
+  const [story, setStory] = useState('')
+  const [culturalBackground, setCulturalBackground] = useState('')
   const [ingredients, setIngredients] = useState<Array<{ name: string; amount: number; unit: string }>>([{ ...EMPTY_INGREDIENT }])
   const [steps, setSteps] = useState<Array<{ stepNumber: number; content: string; image?: string }>>([{ ...EMPTY_STEP }])
   const [submitting, setSubmitting] = useState(false)
@@ -98,6 +100,8 @@ export default function CreateRecipePage() {
         if (draft.difficulty) setDifficulty(draft.difficulty)
         if (draft.cookTime) setCookTime(draft.cookTime)
         if (draft.tips != null) setTips(draft.tips)
+        if (draft.story != null) setStory(draft.story)
+        if (draft.culturalBackground != null) setCulturalBackground(draft.culturalBackground)
         if (draft.ingredients?.length) setIngredients(draft.ingredients)
         if (draft.steps?.length) setSteps(draft.steps)
       }
@@ -108,11 +112,11 @@ export default function CreateRecipePage() {
   useEffect(() => {
     if (isEdit || submitting) return
     const timer = setTimeout(() => {
-      const draft = { title, description, category, coverImage, servings, difficulty, cookTime, tips, ingredients, steps, savedAt: Date.now() }
+      const draft = { title, description, category, coverImage, servings, difficulty, cookTime, tips, story, culturalBackground, ingredients, steps, savedAt: Date.now() }
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
     }, 10000) // Save 10s after last change
     return () => clearTimeout(timer)
-  }, [title, description, category, coverImage, servings, difficulty, cookTime, tips, ingredients, steps, submitting])
+  }, [title, description, category, coverImage, servings, difficulty, cookTime, tips, story, culturalBackground, ingredients, steps, submitting])
 
   // ── Validation ──
   const validateStep = (step: number): boolean => {
@@ -151,6 +155,8 @@ export default function CreateRecipePage() {
         setDifficulty(data.difficulty || 'easy')
         setCookTime(data.cookTime || 30)
         setTips(data.tips || '')
+        setStory(data.story || '')
+        setCulturalBackground(data.culturalBackground || '')
         setIngredients(data.ingredients?.length ? data.ingredients : [{ ...EMPTY_INGREDIENT }])
         setSteps(data.steps?.length ? data.steps : [{ ...EMPTY_STEP }])
       })
@@ -301,6 +307,8 @@ export default function CreateRecipePage() {
         difficulty: difficulty || undefined,
         cookTime: cookTime || undefined,
         tips: tips.trim() || undefined,
+        story: story.trim() || undefined,
+        culturalBackground: culturalBackground.trim() || undefined,
         ingredients: ingredients.filter(i => i.name.trim()),
         steps: steps
           .filter(s => s.content.trim())
@@ -529,6 +537,18 @@ export default function CreateRecipePage() {
                 <label className="form-label">烹饪小贴士</label>
                 <textarea className="form-textarea" value={tips} onChange={e => setTips(e.target.value)} placeholder="分享一些烹饪技巧和注意事项..." rows={3} maxLength={500} />
                 <span className="form-hint">可选，填写烹饪技巧、注意事项等</span>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">📖 食谱故事</label>
+                <textarea className="form-textarea" value={story} onChange={e => setStory(e.target.value)} placeholder="介绍这道食谱的灵感来源或背后的故事..." rows={3} maxLength={1000} />
+                <span className="form-hint">可选，让读者了解这道菜的来历和灵感</span>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">🌍 文化背景</label>
+                <textarea className="form-textarea" value={culturalBackground} onChange={e => setCulturalBackground(e.target.value)} placeholder="介绍这道菜的文化背景、历史渊源或传统习俗..." rows={3} maxLength={1000} />
+                <span className="form-hint">可选，介绍食谱的文化背景和传统知识</span>
               </div>
             </div>
 

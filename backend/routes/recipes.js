@@ -220,6 +220,8 @@ const LIST_ATTRIBUTES = [
   'updatedAt',
   'nutrition',
   'tips',
+  'story',
+  'culturalBackground',
   'season',
   'favoriteCount',
   'commentCount',
@@ -1251,7 +1253,7 @@ router.get('/quality-check', async (req, res) => {
     const offset = (page - 1) * pageSize
 
     const { count, rows } = await Recipe.findAndCountAll({
-      attributes: ['id', 'title', 'description', 'coverImage', 'steps', 'nutrition', 'tips', 'cookTime', 'difficulty', 'servings', 'category', 'viewCount', 'favoriteCount', 'commentCount', 'createdAt', 'updatedAt', 'userId'],
+      attributes: ['id', 'title', 'description', 'coverImage', 'steps', 'nutrition', 'tips', 'story', 'culturalBackground', 'cookTime', 'difficulty', 'servings', 'category', 'viewCount', 'favoriteCount', 'commentCount', 'createdAt', 'updatedAt', 'userId'],
       offset,
       limit: pageSize,
       order: [['createdAt', 'DESC']],
@@ -1518,6 +1520,8 @@ router.post('/', auth, async (req, res) => {
       categoryTags,
       nutrition,
       tips,
+      story,
+      culturalBackground,
     } = req.body
 
     if (!title || title.trim().length === 0) {
@@ -1549,6 +1553,8 @@ router.post('/', auth, async (req, res) => {
           : JSON.stringify(nutrition)
         : null,
       tips: tips || null,
+      story: story || null,
+      culturalBackground: culturalBackground || null,
       author: user ? user.nickname || user.username : '未知用户',
       userId: req.userId,
     })
@@ -1599,6 +1605,8 @@ router.put('/:id', auth, async (req, res) => {
       categoryTags,
       nutrition,
       tips,
+      story,
+      culturalBackground,
     } = req.body
 
     const updateData = {}
@@ -1617,6 +1625,8 @@ router.put('/:id', auth, async (req, res) => {
     if (nutrition !== undefined)
       updateData.nutrition = typeof nutrition === 'string' ? nutrition : JSON.stringify(nutrition)
     if (tips !== undefined) updateData.tips = tips
+    if (story !== undefined) updateData.story = story
+    if (culturalBackground !== undefined) updateData.culturalBackground = culturalBackground
     updateData.updatedAt = new Date()
 
     await Recipe.update(updateData, { where: { id } })

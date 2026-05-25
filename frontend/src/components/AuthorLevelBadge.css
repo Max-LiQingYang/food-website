@@ -1,0 +1,35 @@
+/* AuthorLevelBadge */
+.author-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, var(--color-primary, #e8663e) 0%, #d4532e 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(232, 102, 62, 0.3);
+}
+
+.author-level-badge--compact {
+  padding: 1px 5px;
+  font-size: 10px;
+}
+
+.author-level-badge__icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.author-level-badge--compact .author-level-badge__icon {
+  font-size: 10px;
+}
+
+/* Dark mode */
+body.dark .author-level-badge {
+  background: linear-gradient(135deg, var(--color-primary-dark, #c75a3a) 0%, #a8472e 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}

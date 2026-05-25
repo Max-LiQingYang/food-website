@@ -8,10 +8,12 @@ import {
   getCollections,
   getUserAchievements,
   updateProfile,
+  getAuthorInfo,
   type Recipe,
   type UserStats,
   type Collection,
   type AchievementItem,
+  type AuthorLevelInfo,
 } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import BrowsingHistory from '../components/BrowsingHistory'
@@ -105,6 +107,7 @@ export default function UserProfilePage() {
   const [activeTab, setActiveTab] = useState<TabTypeWithHistory>('recipes')
   const [isOwnProfile, setIsOwnProfile] = useState(false)
   const [achievements, setAchievements] = useState<AchievementItem[]>([])
+  const [authorLevel, setAuthorLevel] = useState<AuthorLevelInfo | null>(null)
 
   // Recipes state
   const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -169,6 +172,11 @@ export default function UserProfilePage() {
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false))
+
+    // 异步加载作者等级
+    getAuthorInfo(id)
+      .then(res => setAuthorLevel(res.level))
+      .catch(() => {/* 静默 */})
   }, [id])
 
   // Load recipes tab
@@ -371,6 +379,33 @@ export default function UserProfilePage() {
             <span className="profile-stats__value"><AnimatedNumber value={stats.followingCount ?? 0} /></span>
             <span className="profile-stats__label">关注</span>
           </div>
+        </div>
+      )}
+
+      {/* 作者等级 */}
+      {authorLevel && (
+        <div className="profile-level">
+          <div className="profile-level__header">
+            <span className="profile-level__icon">{authorLevel.icon}</span>
+            <span className="profile-level__title">Lv.{authorLevel.level} {authorLevel.title}</span>
+            {!authorLevel.isMaxLevel && (
+              <span className="profile-level__next">→ Lv.{authorLevel.level + 1} {authorLevel.nextTitle}</span>
+            )}
+          </div>
+          <div className="profile-level__bar-container">
+            <div
+              className="profile-level__bar"
+              style={{ width: `${(authorLevel.progress * 100).toFixed(1)}%` }}
+            />
+          </div>
+          {!authorLevel.isMaxLevel && (
+            <div className="profile-level__score">
+              {authorLevel.score} / {authorLevel.nextLevelScore} 分
+            </div>
+          )}
+          {authorLevel.isMaxLevel && (
+            <div className="profile-level__score">🏆 已达满级！</div>
+          )}
         </div>
       )}
 

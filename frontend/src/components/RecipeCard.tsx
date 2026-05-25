@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Recipe } from '../api'
+import type { AuthorLevelInfo } from '../api'
 import { highlightText } from '../utils/highlightText'
 import FavoriteButton from './FavoriteButton'
 import ImagePlaceholder from './ImagePlaceholder'
+import AuthorLevelBadge from './AuthorLevelBadge'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -12,6 +14,8 @@ interface RecipeCardProps {
   highlightQuery?: string
   /** Animation delay for staggered entry (ms) */
   animationDelay?: number
+  /** Optional pre-loaded author level badge info (avoids per-card API calls) */
+  authorLevel?: AuthorLevelInfo | null
 }
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -62,7 +66,7 @@ function getCalories(recipe: Recipe): number | null {
   return null
 }
 
-export default function RecipeCard({ recipe, highlightQuery, animationDelay }: RecipeCardProps) {
+export default function RecipeCard({ recipe, highlightQuery, animationDelay, authorLevel }: RecipeCardProps) {
   const navigate = useNavigate()
   const [imgLoaded, setImgLoaded] = useState(false)
 
@@ -193,6 +197,14 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay }: R
           {recipe.author && (
             <span className="recipe-card__meta-item recipe-card__author">
               👨‍🍳 {recipe.author}
+              {authorLevel && (
+                <AuthorLevelBadge
+                  level={authorLevel.level}
+                  title={authorLevel.title}
+                  icon={authorLevel.icon}
+                  compact
+                />
+              )}
             </span>
           )}
 

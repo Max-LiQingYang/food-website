@@ -1219,3 +1219,56 @@ body.dark .serving-scaler__value {
     margin-top: 4px;
   }
 }
+
+/* ═══ 迭代#46: 折叠式内容区 ═══ */
+.detail-section__title--toggle {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+
+.detail-section__title--toggle:hover {
+  color: var(--color-primary, #e8663e);
+}
+
+.detail-section__title--toggle:focus-visible {
+  outline: 2px solid var(--color-primary, #e8663e);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.accordion-arrow {
+  font-size: 12px;
+  transition: transform 0.25s ease;
+  color: var(--color-text-secondary, #888);
+}
+
+.accordion-arrow--open {
+  transform: rotate(90deg);
+}
+
+/* 故事/文化背景内容样式 */
+.story-content,
+.cultural-content {
+  background: var(--color-bg-secondary, #f9f9f9);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 8px;
+  line-height: 1.7;
+  color: var(--color-text, #333);
+  font-size: 14px;
+}
+
+.story-content p,
+.cultural-content p {
+  margin: 0;
+}
+
+body.dark .story-content,
+body.dark .cultural-content {
+  background: var(--color-card-dark, #2a2a2a);
+  color: var(--color-text-dark, #ccc);
+}

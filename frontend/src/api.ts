@@ -87,6 +87,8 @@ export interface Recipe {
   commentCount?: number
   nutriScore?: string
   smartDifficulty?: string
+  story?: string
+  culturalBackground?: string
   nutrition?: {
     calories?: number
     protein?: number
@@ -1683,6 +1685,28 @@ export function getNutritionSuggestions(date?: string): Promise<any> {
   return apiClient.get('/nutrition/suggestions', { params: { date } }).then(r => r.data?.data)
 }
 
+// ═══ 迭代#46: 作者等级信息 ═══
+export interface AuthorLevelInfo {
+  level: number
+  title: string
+  icon: string
+  score: number
+  nextLevelScore: number
+  nextTitle: string | null
+  progress: number
+  isMaxLevel: boolean
+}
+
+export interface AuthorInfoResponse {
+  user: { id: string; username: string; nickname: string | null }
+  level: AuthorLevelInfo
+}
+
+/** 获取作者等级信息 */
+export function getAuthorInfo(userId: string): Promise<AuthorInfoResponse> {
+  return apiClient.get(`/users/${userId}/author-info`).then(r => r.data?.data || r.data)
+}
+
 export default {
   addFavorite,
   removeFavorite,
@@ -1816,6 +1840,8 @@ export default {
   getCookingLogDetail,
   searchCookingLogs,
   getEnhancedCookingStats,
+  // ═══ 迭代#46 ═══
+  getAuthorInfo,
 }
 
 // ═══ 迭代#40: 食谱版本对比 ═══

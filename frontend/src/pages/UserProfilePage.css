@@ -711,3 +711,62 @@ body.dark .achievement-badge__name {
   opacity: 0.6;
   font-size: 11px;
 }
+
+/* ═══ 迭代#46: 作者等级 ═══ */
+.profile-level {
+  margin: 20px 0;
+  padding: 16px 20px;
+  background: var(--color-card, #fff);
+  border-radius: 12px;
+  border: 1px solid var(--color-border, #eee);
+}
+
+.profile-level__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.profile-level__icon {
+  font-size: 22px;
+}
+
+.profile-level__next {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-secondary, #888);
+}
+
+.profile-level__bar-container {
+  height: 8px;
+  background: var(--color-bg-secondary, #f0f0f0);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.profile-level__bar {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--color-primary, #e8663e), #f0946e);
+  transition: width 0.8s ease;
+}
+
+.profile-level__score {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #888);
+  text-align: right;
+}
+
+body.dark .profile-level {
+  background: var(--color-card-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #333);
+}
+
+body.dark .profile-level__bar-container {
+  background: var(--color-bg-dark, #1a1a1a);
+}

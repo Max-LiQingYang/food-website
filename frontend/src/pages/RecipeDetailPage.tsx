@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getRecipeById, deleteRecipe } from '../api'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
+import { getAuthorInfo } from '../api'
+import type { AuthorLevelInfo } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
 import CommentSection from '../components/CommentSection'
@@ -18,6 +20,7 @@ import SubstitutionPanel from '../components/SubstitutionPanel'
 import VideoPlayer from '../components/VideoPlayer'
 import QualityScoreModal from '../components/QualityScoreModal'
 import ExportMenu from '../components/ExportMenu'
+import AuthorLevelBadge from '../components/AuthorLevelBadge'
 import { trackBehavior, trackBehaviorAnonymous } from '../api'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
@@ -81,6 +84,9 @@ export default function RecipeDetailPage() {
   const [showShareModal, setShowShareModal] = useState(false)
   const [showQualityModal, setShowQualityModal] = useState(false)
   const [showSubstitution, setShowSubstitution] = useState(false)
+  const [authorLevel, setAuthorLevel] = useState<AuthorLevelInfo | null>(null)
+  const [showStory, setShowStory] = useState(false)
+  const [showCulturalBg, setShowCulturalBg] = useState(false)
 
   // 收集所有可查看的图片（封面 + 步骤图片）
   const allImages = [
@@ -221,6 +227,18 @@ export default function RecipeDetailPage() {
       })
       .finally(() => setLoading(false))
   }, [id])
+
+  // ═══ 迭代#46: 加载作者等级信息 ═══
+  useEffect(() => {
+    if (!recipe || !recipe.userId) return
+    getAuthorInfo(String(recipe.userId))
+      .then(res => {
+        setAuthorLevel(res.level)
+      })
+      .catch(() => {
+        // 静默失败
+      })
+  }, [recipe?.userId])
 
   // 迭代#35: 记录浏览行为
   useEffect(() => {
@@ -468,6 +486,13 @@ export default function RecipeDetailPage() {
             ) : (
               recipe.author || '未知作者'
             )}
+            {authorLevel && (
+              <AuthorLevelBadge
+                level={authorLevel.level}
+                title={authorLevel.title}
+                icon={authorLevel.icon}
+              />
+            )}
           </p>
 
           {/* 分类/难度/份数/时间徽标 */}
@@ -682,6 +707,48 @@ export default function RecipeDetailPage() {
                 )
               })}
             </ol>
+          </section>
+        )}
+
+        {/* 食谱故事（折叠式） */}
+        {recipe.story && (
+          <section className="detail-section detail-section--story">
+            <h2
+              className="detail-section__title detail-section__title--toggle"
+              onClick={() => setShowStory(!showStory)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowStory(!showStory) } }}
+            >
+              📖 食谱故事
+              <span className={`accordion-arrow ${showStory ? 'accordion-arrow--open' : ''}`}>▸</span>
+            </h2>
+            {showStory && (
+              <div className="detail-section__content story-content">
+                <p>{recipe.story}</p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* 文化背景（折叠式） */}
+        {recipe.culturalBackground && (
+          <section className="detail-section detail-section--cultural">
+            <h2
+              className="detail-section__title detail-section__title--toggle"
+              onClick={() => setShowCulturalBg(!showCulturalBg)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowCulturalBg(!showCulturalBg) } }}
+            >
+              🌍 文化背景
+              <span className={`accordion-arrow ${showCulturalBg ? 'accordion-arrow--open' : ''}`}>▸</span>
+            </h2>
+            {showCulturalBg && (
+              <div className="detail-section__content cultural-content">
+                <p>{recipe.culturalBackground}</p>
+              </div>
+            )}
           </section>
         )}
 
