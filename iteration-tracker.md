@@ -406,3 +406,33 @@
 - **营养信息标题重复** — NutritionCard 自身 h2 与 RecipeDetailPage 外层 h2 重复，全部移除后仅 NutritionCard 内部渲染一次
 - **导航栏移动端拥挤** — 将 7 个二级菜单项（挑战赛/工具库/标签/餐单计划/烹饪日志/对比/偏好）合并到"更多"下拉菜单（桌面端），移动端汉堡菜单内"更多功能"分隔区显示
 - **RecipeCard 图片加载** — 添加 onError 回调，标记加载失败后显示 🍽️ 占位符
+
+---
+
+## #50 — 搜索与发现体验增强 ✅
+
+| 类型 | 状态 | 时间 |
+|------|------|------|
+| 后端 | ✅ | 05-25 11:05 |
+| 前端 | ✅ | 05-25 11:05 |
+| 测试 | ✅ 10/10 | 05-25 11:05 |
+| 部署 | ✅ | 05-25 11:10 |
+| 验证 | ✅ 双端200 | 05-25 11:10 |
+
+**后端改动**：
+- 搜索范围扩展：categoryTags / tips / story / culturalBackground 字段加入 `[Op.or]`
+- 搜索结果默认按相关性 CASE 权重排序（标题100 > 描述40 > 标签30 > 食材20 > tips/故事 > 背景10）
+- 新增 `GET /api/recipes/suggestions` 轻量端点（title+description 匹配，6条上限，favoriteCount 排序）
+
+**前端改动**：
+- `api.ts`：新增 `getSuggestions(q)` 函数
+- `SearchAutocomplete`：从 `searchRecipes` 改为 `getSuggestions`（更轻量，专用端点）
+- RecipeCard highlightText 渲染保持不动（已存在）
+
+**新测试**：`search_enhance.test.js`（10个用例，全绿）
+
+**部署**：commit `ec5c1d7` → git push → 服务器 git pull → docker cp + backend restart
+
+**注意事项**：
+- routes/recipes.js 中 `/suggestions` 在 `/:id` 之前注册（Express 路由顺序）
+- 服务器必须 git pull 到最新 commit 后 docker cp，否则容器文件未更新
