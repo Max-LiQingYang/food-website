@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { useState } from 'react'
+import NotificationBell from './NotificationBell'
 import './Navbar.css'
 
 export default function Navbar() {
@@ -81,6 +82,7 @@ export default function Navbar() {
         </div>
 
         <div className="navbar__actions">
+          <NotificationBell />
           <button
             className="navbar__theme-toggle"
             onClick={toggleTheme}

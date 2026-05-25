@@ -70,8 +70,11 @@ router.post('/:id/follow', auth, async (req, res) => {
         createNotification({
           userId: followingId,
           type: 'follow',
+          actorId: followerId,
           message: name + ' 关注了你',
-          link: '/user/' + followerId
+          link: '/user/' + followerId,
+          targetId: followerId,
+          targetType: 'user'
         }).catch(err => console.error('[follow notif err]', err))
       }).catch(err => console.error('[follow notif lookup err]', err))
 

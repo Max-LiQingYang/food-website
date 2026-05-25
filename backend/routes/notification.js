@@ -31,8 +31,18 @@ router.get('/', auth, async (req, res) => {
     const offset = (page - 1) * pageSize
     const userId = req.userId
 
+    const whereClause = { userId }
+    // 过滤通知类型
+    if (req.query.type) {
+      whereClause.type = req.query.type
+    }
+    // 只显示未读
+    if (req.query.unread === 'true' || req.query.unread === '1') {
+      whereClause.isRead = false
+    }
+
     const { rows, count } = await Notification.findAndCountAll({
-      where: { userId },
+      where: whereClause,
       order: [['createdAt', 'DESC']],
       offset,
       limit: pageSize

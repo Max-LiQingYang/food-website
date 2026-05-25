@@ -1,0 +1,271 @@
+/* NotificationsPage */
+
+.notif-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.notif-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.notif-page__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0;
+}
+
+.notif-page__mark-all {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.notif-page__mark-all:hover {
+  opacity: 0.85;
+}
+
+/* 筛选栏 */
+.notif-page__filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.notif-page__type-filter {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.notif-page__filter-btn {
+  background: none;
+  border: 1px solid var(--color-border, #e0e0e0);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--color-muted, #666);
+  transition: all 0.15s;
+}
+
+.notif-page__filter-btn.active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+.notif-page__filter-btn:hover:not(.active) {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.notif-page__unread-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text, #333);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.notif-page__unread-toggle input[type="checkbox"] {
+  accent-color: var(--color-primary, #e8663e);
+}
+
+/* 列表 */
+.notif-page__list {
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.notif-page__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border-light, #f0f0f0);
+  transition: background 0.15s;
+}
+
+.notif-page__item:last-child {
+  border-bottom: none;
+}
+
+.notif-page__item--unread {
+  background: rgba(232, 102, 62, 0.04);
+}
+
+.notif-page__item:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.notif-page__item-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-secondary, #f5f5f5);
+  border-radius: 50%;
+}
+
+.notif-page__item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-page__item-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.notif-page__item-message {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--color-text, #333);
+}
+
+.notif-page__item-time {
+  font-size: 0.75rem;
+  color: var(--color-muted, #999);
+}
+
+.notif-page__item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.notif-page__item-read,
+.notif-page__item-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.notif-page__item-read {
+  color: var(--color-primary, #e8663e);
+}
+
+.notif-page__item-delete {
+  color: var(--color-muted, #999);
+}
+
+.notif-page__item-read:hover,
+.notif-page__item-delete:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+/* 骨架屏 */
+.notif-page__skeleton {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border-light, #f0f0f0);
+}
+
+/* 空状态 */
+.notif-page__empty {
+  text-align: center;
+  padding: 64px 16px;
+  color: var(--color-muted, #999);
+}
+
+.notif-page__empty a {
+  color: var(--color-primary, #e8663e);
+  display: inline-block;
+  margin-top: 8px;
+}
+
+/* 分页 */
+.notif-page__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.notif-page__pagination button {
+  background: none;
+  border: 1px solid var(--color-border, #e0e0e0);
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--color-text, #333);
+  font-size: 0.85rem;
+}
+
+.notif-page__pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.notif-page__pagination button:hover:not(:disabled) {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.notif-page__page-info {
+  font-size: 0.85rem;
+  color: var(--color-muted, #999);
+}
+
+/* 暗色模式 */
+body.dark .notif-page__item--unread {
+  background: rgba(232, 102, 62, 0.08);
+}
+
+body.dark .notif-page__item:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+body.dark .notif-page__item-icon {
+  background: rgba(255,255,255,0.08);
+}
+
+body.dark .notif-page__pagination button {
+  border-color: rgba(255,255,255,0.15);
+}
+
+body.dark .notif-page__pagination button:hover:not(:disabled) {
+  border-color: var(--color-primary, #e8663e);
+}
+
+/* 加载态 */
+.notif-page__loading {
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .notif-page {
+    padding: 16px 12px 32px;
+  }
+}

@@ -1992,3 +1992,105 @@ export function getHotComments(recipeId: string, limit?: number): Promise<any[]>
   return apiClient.get('/comments/' + recipeId + '/hot', { params: { limit } }).then(r => r.data?.data || r.data)
 }
 
+// ═══ 迭代#45: 通知系统 ═══
+export interface NotificationItem {
+  id: string
+  userId: string
+  actorId: string | null
+  type: 'follow' | 'comment' | 'reply' | 'favorite' | 'collection_add' | 'meal_plan_reminder' | 'cooking_log_reminder' | 'achievement_unlock' | 'system'
+  message: string
+  link: string | null
+  targetId: string | null
+  targetType: string | null
+  isRead: boolean
+  createdAt: string
+}
+
+export interface NotificationListResponse {
+  list: NotificationItem[]
+  total: number
+  page: number
+  pageSize: number
+  unreadCount: number
+}
+
+export interface NotificationPreference {
+  inApp: boolean
+  push: boolean
+}
+
+export interface PushSubscriptionInfo {
+  id: string
+  userId: string
+  endpoint: string
+  p256dh: string
+  auth: string
+  userAgent: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+// 获取通知列表（支持分页、类型筛选、未读筛选）
+export function getNotifications(params?: {
+  page?: number
+  pageSize?: number
+  type?: string
+  unread?: boolean
+}): Promise<NotificationListResponse> {
+  const queryParams: Record<string, string> = {}
+  if (params?.page) queryParams.page = String(params.page)
+  if (params?.pageSize) queryParams.pageSize = String(params.pageSize)
+  if (params?.type) queryParams.type = params.type
+  if (params?.unread) queryParams.unread = 'true'
+  return apiClient.get('/notifications', { params: queryParams }).then(r => r.data?.data || r.data)
+}
+
+// 获取未读通知数量
+export function getUnreadNotificationCount(): Promise<{ count: number }> {
+  return apiClient.get('/notifications/unread-count').then(r => r.data?.data || r.data)
+}
+
+// 标记单条通知为已读
+export function markNotificationRead(id: string): Promise<void> {
+  return apiClient.put('/notifications/' + id + '/read').then(r => r.data?.data || r.data)
+}
+
+// 标记所有通知为已读
+export function markAllNotificationsRead(): Promise<void> {
+  return apiClient.put('/notifications/read-all').then(r => r.data?.data || r.data)
+}
+
+// 删除通知
+export function deleteNotification(id: string): Promise<void> {
+  return apiClient.delete('/notifications/' + id).then(r => r.data?.data || r.data)
+}
+
+// 获取推送订阅
+export function getPushSubscriptions(): Promise<PushSubscriptionInfo[]> {
+  return apiClient.get('/push/subscription/my').then(r => r.data?.data || r.data)
+}
+
+// 注册推送订阅
+export function registerPushSubscription(subscription: {
+  endpoint: string
+  keys: { p256dh: string; auth: string }
+  userAgent?: string
+}): Promise<PushSubscriptionInfo> {
+  return apiClient.post('/push/subscription', subscription).then(r => r.data?.data || r.data)
+}
+
+// 取消推送订阅
+export function unregisterPushSubscription(id: string): Promise<void> {
+  return apiClient.delete('/push/subscription/' + id).then(r => r.data?.data || r.data)
+}
+
+// 获取通知偏好
+export function getNotificationPreferences(): Promise<Record<string, NotificationPreference>> {
+  return apiClient.get('/notification-preferences').then(r => r.data?.data || r.data)
+}
+
+// 更新通知偏好
+export function updateNotificationPreferences(prefs: Record<string, NotificationPreference>): Promise<void> {
+  return apiClient.put('/notification-preferences', prefs).then(r => r.data?.data || r.data)
+}
+

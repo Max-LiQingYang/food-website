@@ -39,6 +39,7 @@ const TagsPage = lazy(() => import('../pages/TagsPage'))
 const DraftsPage = lazy(() => import('../pages/DraftsPage'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const AdminReviewPage = lazy(() => import('../pages/AdminReviewPage'))
+const NotificationsPage = lazy(() => import('../pages/NotificationsPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -105,6 +106,7 @@ const router = createBrowserRouter([
       // 迭代#43: 内容审核面板（管理员）
       { path: '/admin/review', element: <AdminReviewPage /> },
       { path: '/admin/review-history', element: <AdminReviewPage /> },
+      { path: '/notifications', element: <NotificationsPage /> },
       // 迭代#37: 食材库存管理
       { path: '/pantry', element: <PantryPage /> },
       { path: '/settings', element: <SettingsPage /> },

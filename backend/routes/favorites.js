@@ -68,8 +68,11 @@ async function addFavorite(req, res) {
             createNotification({
               userId: recipe.userId,
               type: 'favorite',
+              actorId: userId,
               message: '有人收藏了你的食谱「' + recipe.title + '」',
-              link: '/recipe/' + recipeId
+              link: '/recipe/' + recipeId,
+              targetId: recipeId,
+              targetType: 'recipe'
             }).catch(err => console.error('[fav notif err]', err))
           }
         }).catch(err => console.error('[fav notif lookup err]', err))
@@ -197,7 +200,13 @@ async function batchFavorite(req, res) {
             const recipient = a.recipeUserId
             if (recipient && String(recipient) !== String(userId)) {
               createActivity('favorite', userId, a.recipeId, 'Recipe')
-              createNotification(recipient, 'favorite', userId, a.recipeId, 'Recipe')
+              createNotification({
+                userId: recipient,
+                type: 'favorite',
+                actorId: userId,
+                targetId: a.recipeId,
+                targetType: 'recipe'
+              })
             }
           })
         })

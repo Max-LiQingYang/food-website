@@ -287,8 +287,11 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
         createNotification({
           userId: recipe.userId,
           type: 'comment',
+          actorId: req.userId,
           message: '有人评论了你的食谱「' + recipe.title + '」',
-          link: '/recipe/' + recipeId
+          link: '/recipe/' + recipeId,
+          targetId: recipeId,
+          targetType: 'recipe'
         }).catch(err => console.error('[comment notif err]', err))
       }
       checkAllAchievements(req.userId, ['first-comment']).catch(err => {
@@ -411,8 +414,11 @@ router.post('/comments/:id/reply', auth, async (req, res) => {
         createNotification({
           userId: parentComment.userId,
           type: 'reply',
+          actorId: req.userId,
           message: (user.nickname || user.username) + ' 回复了你的评论',
-          link: '/recipe/' + parentComment.recipeId
+          link: '/recipe/' + parentComment.recipeId,
+          targetId: parentComment.recipeId,
+          targetType: 'recipe'
         }).catch(err => console.error('[reply notif err]', err))
       }
     })
