@@ -1309,11 +1309,27 @@ export interface IngredientSearchResult {
   nutrition?: any
 }
 
+export interface AiRecipeRecommend {
+  title: string
+  description: string
+  ingredients: { name: string; amount: string; unit: string }[]
+  cookTime: number
+  difficulty: string
+  servings: number
+}
+
 /**
  * 手头食材搜索匹配食谱
  * POST /api/recipes/by-ingredients
  */
-export function searchByIngredients(ingredients: string[]): Promise<{ list: IngredientSearchResult[]; total: number; userIngredients: string[] }> {
+export function searchByIngredients(ingredients: string[]): Promise<{
+  list: IngredientSearchResult[]
+  total: number
+  userIngredients: string[]
+  aliasExpanded?: string[]
+  aiRecommends?: AiRecipeRecommend[]
+  aiGenerated?: boolean
+}> {
   return apiClient.post('/recipes/by-ingredients', { ingredients }).then(r => r.data?.data || { list: [], total: 0, userIngredients: [] })
 }
 

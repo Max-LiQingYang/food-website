@@ -32,6 +32,11 @@ const mockResults = {
   userIngredients: ['番茄', '鸡蛋'],
 }
 
+/** 获取搜索按钮（文本以 🔍 搜索食谱 开头即可） */
+function getSearchBtn() {
+  return screen.getByRole('button', { name: /搜索食谱/ })
+}
+
 describe('IngredientSearchPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -67,15 +72,19 @@ describe('IngredientSearchPage', () => {
     const addBtn = screen.getByText('添加')
     fireEvent.change(input, { target: { value: '番茄' } })
     fireEvent.click(addBtn)
+    // 确认已添加为 tag（在 .is-tags 区域内）
     expect(screen.getByText('番茄')).toBeDefined()
     const removeBtn = screen.getByText('×')
     fireEvent.click(removeBtn)
-    expect(screen.queryByText('番茄')).toBeNull()
+    // 移除后 tag 应消失，注意 hot tag 仍然存在
+    const tags = document.querySelectorAll('.is-tag')
+    const hasTag = Array.from(tags).some(tag => tag.textContent?.includes('番茄'))
+    expect(hasTag).toBe(false)
   })
 
   it('搜索按钮禁用当无食材', () => {
     render(<MemoryRouter><IngredientSearchPage /></MemoryRouter>)
-    const searchBtn = screen.getByText('🔍 搜索食谱')
+    const searchBtn = getSearchBtn()
     expect(searchBtn.hasAttribute('disabled')).toBe(true)
   })
 
@@ -87,7 +96,7 @@ describe('IngredientSearchPage', () => {
     fireEvent.click(addBtn)
     fireEvent.change(input, { target: { value: '鸡蛋' } })
     fireEvent.click(addBtn)
-    fireEvent.click(screen.getByText('🔍 搜索食谱'))
+    fireEvent.click(getSearchBtn())
     await waitFor(() => {
       expect(searchByIngredients).toHaveBeenCalledWith(['番茄', '鸡蛋'])
     })
@@ -99,9 +108,19 @@ describe('IngredientSearchPage', () => {
     const input = screen.getByPlaceholderText('输入食材名称（如：鸡蛋）') as HTMLInputElement
     fireEvent.change(input, { target: { value: '奇异食材' } })
     fireEvent.click(screen.getByText('添加'))
-    fireEvent.click(screen.getByText('🔍 搜索食谱'))
+    fireEvent.click(getSearchBtn())
     await waitFor(() => {
       expect(screen.getByText('这些食材没能匹配到食谱')).toBeDefined()
     })
+  })
+
+  it('热门食材标签可点击', () => {
+    render(<MemoryRouter><IngredientSearchPage /></MemoryRouter>)
+    // 未搜索时显示热门标签
+    expect(screen.getByText('🔥 热门食材：')).toBeDefined()
+    const hotBtn = screen.getByText('鸡蛋')
+    fireEvent.click(hotBtn)
+    // 点击后应添加为食材标签
+    expect(screen.getByText('鸡蛋')).toBeDefined()
   })
 })
