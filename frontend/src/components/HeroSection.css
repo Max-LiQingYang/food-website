@@ -178,3 +178,23 @@
     display: none;
   }
 }
+
+body.dark .hero-seasonal {
+  color: #e8d8c8;
+}
+
+body.dark .hero-arrow {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+body.dark .hero-arrow:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.dark .hero-dot {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+body.dark .hero-dot.active {
+  background: #fff;
+}

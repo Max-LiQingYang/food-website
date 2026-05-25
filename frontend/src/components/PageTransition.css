@@ -33,3 +33,12 @@ main#main-content {
     transform: translateY(0);
   }
 }
+
+.page-transition-enter {
+  opacity: 0;
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}

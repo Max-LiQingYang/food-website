@@ -35,3 +35,38 @@
 .rank-author { font-size: 0.8rem; color: var(--text-secondary); }
 .rank-votes { font-weight: 500; color: var(--text-secondary); }
 .not-found { text-align: center; padding: 60px; color: var(--text-secondary); }
+
+body.dark .challenge-detail {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .challenge-detail__section {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .challenge-detail__badge {
+  background: var(--color-primary-bg, #2e1a14);
+  color: var(--color-primary, #e8663e);
+}
+body.dark .challenge-detail__badge--easy {
+  background: #1a3a1a;
+  color: #66bb6a;
+}
+body.dark .challenge-detail__badge--medium {
+  background: #3a2a0a;
+  color: #ffa726;
+}
+body.dark .challenge-detail__badge--hard {
+  background: #3a1a1a;
+  color: #ef5350;
+}
+body.dark .challenge-detail__reward {
+  background: linear-gradient(135deg, #3a2a0a, #2a1a0a);
+  color: #ffcc02;
+  border-color: #ffcc02;
+}
+body.dark .challenge-detail__meta {
+  color: var(--color-text-secondary, #9898b0);
+}
+body.dark .challenge-detail__label {
+  color: var(--color-text-muted, #686880);
+}

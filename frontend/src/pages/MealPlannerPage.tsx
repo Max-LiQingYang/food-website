@@ -259,7 +259,15 @@ export default function MealPlannerPage() {
       </div>
 
       {loading ? (
-        <div className="meal-planner__loading">加载中...</div>
+        <div className="meal-planner">
+          <div className="skeleton-box" style={{ width: 200, height: 28, marginBottom: 20, borderRadius: 6 }} />
+          <div className="skeleton-box" style={{ width: '100%', height: 48, marginBottom: 20, borderRadius: 8 }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8 }}>
+            {[...Array(35)].map((_, i) => (
+              <div key={i} className="skeleton-box" style={{ aspectRatio: '1', width: '100%', borderRadius: 8, opacity: Math.max(0.3, 1 - (i % 7) * 0.08) }} />
+            ))}
+          </div>
+        </div>
       ) : (
         <div className="meal-planner__grid">
           <div className="meal-planner__grid-header">

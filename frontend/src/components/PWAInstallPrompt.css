@@ -99,3 +99,17 @@
     padding: 12px 16px;
   }
 }
+
+body.dark .install-prompt {
+  background: var(--color-card, #1e1e32);
+  border: 1px solid var(--color-border, #2e2e48);
+}
+body.dark .install-prompt__title {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .install-prompt__desc {
+  color: var(--color-text-secondary, #9898b0);
+}
+body.dark .install-prompt__dismiss {
+  color: var(--color-text-muted, #686880);
+}

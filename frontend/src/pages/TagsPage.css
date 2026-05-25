@@ -53,3 +53,17 @@
   background: var(--color-primary);
   color: #fff;
 }
+
+body.dark .tags-page {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .tag-card {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .tag-card:hover {
+  border-color: var(--color-primary, #e8663e);
+}
+body.dark .tag-card__name {
+  color: var(--color-text, #e0e0ee);
+}

@@ -178,7 +178,35 @@ export default function CookingAnalyticsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <div className="cooking-analytics"><div className="cooking-analytics__loading">加载分析数据...</div></div>
+  if (loading) return (
+    <div className="cooking-analytics">
+      <div className="cooking-analytics__header">
+        <div className="skeleton-box" style={{ width: 180, height: 28, marginBottom: 8, borderRadius: 6 }} />
+        <div className="skeleton-box" style={{ width: 120, height: 16, borderRadius: 4 }} />
+      </div>
+      <div className="cooking-analytics__overview" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, margin: '20px 0' }}>
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="cooking-analytics__card" style={{ opacity: 1 - (i - 1) * 0.1 }}>
+            <div className="skeleton-box" style={{ width: 28, height: 28, margin: '0 auto 8px', borderRadius: 8 }} />
+            <div className="skeleton-box" style={{ width: 40, height: 24, margin: '0 auto 4px', borderRadius: 4 }} />
+            <div className="skeleton-box" style={{ width: 60, height: 12, margin: '0 auto', borderRadius: 4 }} />
+          </div>
+        ))}
+      </div>
+      <div className="cooking-analytics__chart-section">
+        <div className="skeleton-box" style={{ width: 120, height: 20, marginBottom: 12, borderRadius: 4 }} />
+        <div className="skeleton-box" style={{ width: '100%', height: 160, borderRadius: 8 }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        {[1, 2].map(i => (
+          <div key={i} className="cooking-analytics__chart-section">
+            <div className="skeleton-box" style={{ width: 100, height: 20, marginBottom: 12, borderRadius: 4 }} />
+            <div className="skeleton-box" style={{ width: '100%', height: 140, borderRadius: 8 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
   if (error) return <div className="cooking-analytics"><div className="cooking-analytics__error">{error}</div></div>
   if (!stats || stats.totalCooked === 0) {
     return (

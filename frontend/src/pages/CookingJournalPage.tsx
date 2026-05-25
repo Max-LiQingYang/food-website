@@ -258,7 +258,22 @@ export default function CookingJournalPage() {
       {view === 'list' && (
         <>
           {loading ? (
-            <div className="cooking-journal__loading">加载中...</div>
+            <div className="cooking-journal">
+              <div className="cooking-journal__header">
+                <div className="skeleton-box" style={{ width: 200, height: 28, marginBottom: 8, borderRadius: 6 }} />
+                <div className="skeleton-box" style={{ width: 120, height: 16, marginBottom: 20, borderRadius: 6 }} />
+              </div>
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="cooking-journal__item" style={{ display: 'flex', gap: 12, padding: 16, marginBottom: 12, background: 'var(--color-card)', borderRadius: 12, boxShadow: 'var(--shadow-sm)' }}>
+                  <div className="skeleton-box" style={{ width: 60, height: 60, borderRadius: 8, flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div className="skeleton-box" style={{ width: '60%', height: 16, marginBottom: 8, borderRadius: 6 }} />
+                    <div className="skeleton-box" style={{ width: '40%', height: 14, marginBottom: 4, borderRadius: 6 }} />
+                    <div className="skeleton-box" style={{ width: '70%', height: 14, borderRadius: 6 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : logs.length === 0 ? (
             <div className="cooking-journal__empty">
               <p>还没有烹饪记录</p>

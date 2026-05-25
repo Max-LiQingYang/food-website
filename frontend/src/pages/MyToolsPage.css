@@ -15,3 +15,22 @@
 .remove-btn:disabled { opacity: 0.5; }
 .loading, .empty { text-align: center; padding: 40px; color: var(--text-secondary); }
 .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+
+body.dark .my-tools-page {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .my-tool-item {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .my-tool-item--owned {
+  border-left-color: #66bb6a;
+  background: #1a2a1a;
+}
+body.dark .my-tool-item--wish {
+  border-left-color: #ffa726;
+  background: #2a2a1a;
+}
+body.dark .my-tool-item__name {
+  color: var(--color-text, #e0e0ee);
+}

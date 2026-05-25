@@ -179,3 +179,18 @@
     height: 100px;
   }
 }
+
+body.dark .seasonal-rec__card {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .seasonal-rec__card:hover {
+  border-color: var(--color-primary, #e8663e);
+}
+body.dark .seasonal-rec__title {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .seasonal-rec__tag {
+  background: var(--color-input-bg, #282840);
+  color: var(--color-text-secondary, #9898b0);
+}

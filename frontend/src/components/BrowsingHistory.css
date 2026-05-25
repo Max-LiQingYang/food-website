@@ -141,3 +141,7 @@
     padding: 10px;
   }
 }
+
+body.dark .browsing-history-section {
+  background: var(--color-card, #1e1e32);
+}

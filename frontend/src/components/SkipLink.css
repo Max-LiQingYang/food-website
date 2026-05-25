@@ -19,3 +19,9 @@
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
+
+body.dark .skip-link {
+  background: var(--color-card, #1e1e32);
+  color: var(--color-text, #e0e0ee);
+  border-color: var(--color-primary, #e8663e);
+}

@@ -121,3 +121,30 @@
     font-size: 16px;
   }
 }
+
+body.dark .step-timer {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .step-timer--running {
+  border-color: var(--color-primary, #e8663e);
+  background: var(--color-primary-bg, #2e1a14);
+}
+body.dark .step-timer__time {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .step-timer__btn {
+  color: var(--color-text-secondary, #9898b0);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .step-timer__btn:hover {
+  background: var(--color-input-bg, #282840);
+}
+body.dark .step-timer__preset {
+  background: var(--color-input-bg, #282840);
+  color: var(--color-text-secondary, #9898b0);
+}
+body.dark .step-timer__preset:hover {
+  background: var(--color-primary-bg, #2e1a14);
+  color: var(--color-primary, #e8663e);
+}

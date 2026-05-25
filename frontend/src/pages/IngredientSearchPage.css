@@ -28,3 +28,23 @@
 .empty { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
 .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
 .empty-hint { font-size: 0.85rem; margin-top: 4px; }
+
+body.dark .ingredient-search-page {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .ingredient-search__result {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .ingredient-search__badge {
+  background: var(--color-primary-bg, #2e1a14);
+  color: var(--color-primary, #e8663e);
+}
+body.dark .ingredient-search__badge--found {
+  background: #1a3a1a;
+  color: #66bb6a;
+}
+body.dark .ingredient-search__badge--missing {
+  background: #3a1a1a;
+  color: #ef5350;
+}

@@ -42,3 +42,36 @@
 .loading, .empty { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
 .empty-icon { font-size: 3rem; display: block; margin-bottom: 12px; }
 .empty-hint { font-size: 0.85rem; margin-top: 8px; }
+
+body.dark .challenge-card {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .challenge-card__title {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .challenge-card__desc {
+  color: var(--color-text-secondary, #9898b0);
+}
+body.dark .challenge-card__badge {
+  background: var(--color-primary-bg, #2e1a14);
+  color: var(--color-primary, #e8663e);
+}
+body.dark .challenge-card__badge--easy {
+  background: #1a3a1a;
+  color: #66bb6a;
+}
+body.dark .challenge-card__badge--medium {
+  background: #3a2a0a;
+  color: #ffa726;
+}
+body.dark .challenge-card__badge--hard {
+  background: #3a1a1a;
+  color: #ef5350;
+}
+body.dark .challenge-card__progress-bg {
+  background: var(--color-input-bg, #282840);
+}
+body.dark .challenge-card__progress-fill {
+  background: var(--color-primary, #e8663e);
+}

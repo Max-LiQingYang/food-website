@@ -510,3 +510,88 @@ body.dark .back-to-top {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-muted);
 }
+
+/* ── Pull-to-refresh ── */
+.pull-to-refresh-container {
+  position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pull-to-refresh-indicator {
+  position: absolute;
+  top: -60px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pull-to-refresh-indicator__spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--color-border, #ddd);
+  border-top-color: var(--color-primary, #e8663e);
+  border-radius: 50%;
+  animation: ptr-spin 0.7s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes ptr-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 767px) {
+  .pull-to-refresh-container {
+    overscroll-behavior: contain;
+  }
+}
+
+/* ── Mobile search enhancements ── */
+.search-input {
+  min-height: 44px;
+}
+
+@media (max-width: 480px) {
+  .search-bar__icon {
+    display: none;
+  }
+  .search-input {
+    font-size: 15px;
+  }
+  .search-hot-word {
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 20px;
+  }
+}
+
+/* ── Mobile recipe steps ── */
+@media (max-width: 480px) {
+  .detail-step {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  .step-content {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+/* ── Mobile adjustments ── */
+@media (max-width: 480px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

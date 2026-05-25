@@ -17,3 +17,21 @@
 .add-btn:disabled { opacity: 0.5; }
 .loading, .empty { text-align: center; padding: 40px; color: var(--text-secondary); }
 .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+
+body.dark .kitchen-tool-card {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+body.dark .kitchen-tool-card:hover {
+  border-color: var(--color-primary, #e8663e);
+}
+body.dark .kitchen-tool-card__owned {
+  background: #1a3a1a;
+  color: #66bb6a;
+}
+body.dark .kitchen-tool-card__name {
+  color: var(--color-text, #e0e0ee);
+}
+body.dark .kitchen-tool-card__desc {
+  color: var(--color-text-secondary, #9898b0);
+}
