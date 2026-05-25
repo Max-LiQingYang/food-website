@@ -759,3 +759,39 @@
 10. 更新 iteration-tracker.md 和 iteration-lessons.md
 
 **下一个方向**: C（内容质量）
+
+---
+
+## #59 — 通知触发机制与互动提醒完善 ✅ 2026-05-25
+
+**类型**: feature  
+**状态**: ✅ 已部署 (commit b5b5adf)  
+**模型**: main agent (deepseek-v4-flash)
+
+### 变更清单
+
+| 文件 | 变更 |
+|------|------|
+| `backend/models/notification.js` | ENUM 补充 `challenge_update` |
+| `backend/utils/notificationHelper.js` | `challenge_update` 默认消息 |
+| `backend/routes/challenges.js` | 提交后通知创建者；新增 `PUT /challenges/:id/notify-participants` 管理员广播端点；修复 `req.user.userId`→`req.userId` 预存在 Bug |
+| `backend/tests/notification.test.js` | 新增 3 项挑战通知测试（create+submit、type enum、creator self-exclude） |
+| `frontend/src/api.ts` | `NotificationItem.type` 添加 `challenge_update` |
+| `frontend/src/components/NotificationBell.tsx` | `NOTIF_ICONS` 添加 `challenge_update: '🏅'` |
+| `frontend/src/pages/NotificationsPage.tsx` | 按类型分组视图（可折叠，未读自动展开） |
+| `frontend/src/pages/NotificationsPage.css` | 分组视图样式 |
+
+### 验证
+
+- 后端测试: 9/9 ✅ (通知测试套件全绿)
+- 全量测试: 302/302 ✅ (compare.test.js 预存 TS 语法失败)
+- 前端构建: 250 modules, 0 errors ✅
+- 挑战创建 API: 200 ✅
+- 挑战通知 API: 🏅 已通知 1/1 参与者 ✅
+- 通知列表: challenge_update 类型正常显示 ✅
+
+### 关键发现
+
+- `auth` 中间件设置 `req.userId`，但 challenges.js 全量使用 `req.user.userId`（`req.user` 从未存在）—— 这是自挑战系统创建以来的预存 Bug。本次修复 10 处引用
+- `req.user.nickname || req.user.username` 改为 `User.findByPk(req.userId)` DB 查询获取提交者昵称
+- notify-participants 端点按订阅者逐条创建通知，返回 notified/total/errors 计数
