@@ -790,6 +790,64 @@ const videoEmbeds = [
   { title: '法式洋葱汤', videos: [
     { url: 'https://www.youtube.com/embed/jdS7jptBOU8', platform: 'youtube', title: 'Classic French Onion Soup Recipe', duration: 600, sortOrder: 0 },
   ]},
+  // ── 第二轮（迭代 #60）：视频覆盖扩容 20→39 食谱 ───────────
+  { title: '酸菜鱼', videos: [
+    { url: 'https://www.bilibili.com/video/BV1mK411F7oM', platform: 'bilibili', title: '川菜"酸菜水煮鱼"的家常做法，鱼片滑嫩，麻辣鲜香', duration: 301, sortOrder: 0 },
+  ]},
+  { title: '红烧肉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1HA411v7iv', platform: 'bilibili', title: '"电饭锅红烧肉"的家常做法，满满的小技巧，收藏了', duration: 565, sortOrder: 0 },
+  ]},
+  { title: '宫保鸡丁', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Xt411Z7z8', platform: 'bilibili', title: '"宫保鸡丁"的川味正宗做法，一看就有食欲，收藏了', duration: 222, sortOrder: 0 },
+  ]},
+  { title: '麻婆豆腐', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Rs411V7i9', platform: 'bilibili', title: '"麻婆豆腐"的正宗做法，吃的停不下来', duration: 286, sortOrder: 0 },
+  ]},
+  { title: '糖醋排骨', videos: [
+    { url: 'https://www.bilibili.com/video/BV1dq4y1Q718', platform: 'bilibili', title: '"糖醋排骨"的最新做法，酸甜开胃，好吃不腻', duration: 196, sortOrder: 0 },
+  ]},
+  { title: '清蒸鲈鱼', videos: [
+    { url: 'https://www.bilibili.com/video/BV1QU4y1j7T4', platform: 'bilibili', title: '"清蒸鲈鱼"，鲜嫩美味，内附蒸鱼酱油专业调制方法', duration: 223, sortOrder: 0 },
+  ]},
+  { title: '可乐鸡翅', videos: [
+    { url: 'https://www.bilibili.com/video/BV1vE411h7VP', platform: 'bilibili', title: '"可乐鸡翅"的家常做法，味道鲜嫩可口，先收藏起来', duration: 240, sortOrder: 0 },
+  ]},
+  { title: '西红柿炒鸡蛋', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Py4y1S7EF', platform: 'bilibili', title: '"番茄炒蛋"的6种做法，多种版本适合各类人群', duration: 503, sortOrder: 0 },
+  ]},
+  { title: '葱油拌面', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Pm4y1X796', platform: 'bilibili', title: '"葱油拌面"，葱香酱香十足，吃起来根本停不下来', duration: 542, sortOrder: 0 },
+  ]},
+  { title: '剁椒鱼头', videos: [
+    { url: 'https://www.bilibili.com/video/BV1R34y1p7qG', platform: 'bilibili', title: '一道剁椒鱼头俘获四伯的胃，笑称你会做我会吃，天生一对', duration: 424, sortOrder: 0 },
+  ]},
+  { title: '东坡肉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1CebaznE19', platform: 'bilibili', title: '做一道稀溜耙的家常版"东坡肉"，肥而不腻，伯爷直接密干', duration: 1056, sortOrder: 0 },
+  ]},
+  { title: '酸辣土豆丝', videos: [
+    { url: 'https://www.bilibili.com/video/BV1TFo7BiEYe', platform: 'bilibili', title: '酸辣土豆丝像我这样做，酸辣爽口，超级入味', duration: 295, sortOrder: 0 },
+  ]},
+  { title: '地三鲜', videos: [
+    { url: 'https://www.bilibili.com/video/BV1iW411N7CY', platform: 'bilibili', title: '厨师长教你一道北方菜："地三鲜"的家常做法，味道很赞', duration: 191, sortOrder: 0 },
+  ]},
+  { title: '虾饺', videos: [
+    { url: 'https://www.bilibili.com/video/BV1xhLw69EGM', platform: 'bilibili', title: '皮薄爆汁的广东早茶水晶虾饺', duration: 216, sortOrder: 0 },
+  ]},
+  { title: '普罗旺斯炖菜', videos: [
+    { url: 'https://www.youtube.com/embed/nL1nM3Sr3bg', platform: 'youtube', title: '《料理鼠王》里普罗旺斯炖菜，法式杂菜煲 Ratatouille Recipe', duration: 520, sortOrder: 0 },
+  ]},
+  { title: '意大利肉酱面', videos: [
+    { url: 'https://www.youtube.com/embed/JBN-k3-noVo', platform: 'youtube', title: '番茄肉酱意面 Spaghetti with Meat Sauce', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '豚骨拉面', videos: [
+    { url: 'https://www.youtube.com/embed/wv5dylzXuBs', platform: 'youtube', title: '《豚骨拉面全套配方》| Tonkotsu Ramen [Eng Sub]', duration: 600, sortOrder: 0 },
+  ]},
+  { title: '芒果糯米饭', videos: [
+    { url: 'https://www.youtube.com/embed/WB___WEpfkw', platform: 'youtube', title: '椰汁芒果糯米饭 Mango Sticky Rice Recipe Thailand', duration: 450, sortOrder: 0 },
+  ]},
+  { title: '白灼基围虾', videos: [
+    { url: 'https://www.bilibili.com/video/BV1urFSzBEWv', platform: 'bilibili', title: '厨师长分享现场版"一虾两吃"，白灼虾汁水充沛，香辣虾酥脆够味', duration: 899, sortOrder: 0 },
+  ]},
 ]
 
 async function seed () {
