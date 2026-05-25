@@ -21,6 +21,8 @@ import VideoPlayer from '../components/VideoPlayer'
 import QualityScoreModal from '../components/QualityScoreModal'
 import ExportMenu from '../components/ExportMenu'
 import AuthorLevelBadge from '../components/AuthorLevelBadge'
+import CookingModeOverlay from '../components/CookingModeOverlay'
+import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import { trackBehavior, trackBehaviorAnonymous } from '../api'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
@@ -87,6 +89,10 @@ export default function RecipeDetailPage() {
   const [authorLevel, setAuthorLevel] = useState<AuthorLevelInfo | null>(null)
   const [showStory, setShowStory] = useState(false)
   const [showCulturalBg, setShowCulturalBg] = useState(false)
+  const [showCookingMode, setShowCookingMode] = useState(false)
+
+  // ── 语音播报 ──
+  const { speak, pause, resume, stop: stopSpeech, speaking, paused, supported: speechSupported } = useSpeechSynthesis()
 
   // 收集所有可查看的图片（封面 + 步骤图片）
   const allImages = [
@@ -794,6 +800,16 @@ export default function RecipeDetailPage() {
                 下一步 ▶
               </button>
             </div>
+            {/* 烹饪模式按钮 */}
+            <div className="step-nav cooking-mode-launch">
+              <button
+                className="cooking-mode-btn"
+                onClick={() => setShowCookingMode(true)}
+                aria-label="进入烹饪模式"
+              >
+                🍳 烹饪模式
+              </button>
+            </div>
           </section>
         )}
 
@@ -940,6 +956,19 @@ export default function RecipeDetailPage() {
         <QualityScoreModal
           recipeId={id!}
           onClose={() => setShowQualityModal(false)}
+        />
+      )}
+
+      {/* 烹饪模式 */}
+      {showCookingMode && recipe?.steps && (
+        <CookingModeOverlay
+          visible={showCookingMode}
+          steps={recipe.steps}
+          initialStepIndex={focusedStepIndex}
+          onClose={() => setShowCookingMode(false)}
+          speak={speak}
+          stopSpeech={stopSpeech}
+          speaking={speaking}
         />
       )}
     </div>

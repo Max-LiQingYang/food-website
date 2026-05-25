@@ -1319,3 +1319,42 @@ body.dark .cultural-content {
   background: var(--color-card-dark, #2a2a2a);
   color: var(--color-text-dark, #ccc);
 }
+
+/* ── 烹饪模式启动按钮 ── */
+.cooking-mode-launch {
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.cooking-mode-btn {
+  width: 100%;
+  max-width: 300px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-lg, 16px);
+  background: linear-gradient(135deg, var(--color-primary, #e8663e), var(--color-primary-dark, #d05530));
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 16px rgba(232, 102, 62, 0.3);
+}
+
+.cooking-mode-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(232, 102, 62, 0.4);
+}
+
+.cooking-mode-btn:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 480px) {
+  .cooking-mode-btn {
+    padding: 16px 20px;
+    font-size: 17px;
+  }
+}
