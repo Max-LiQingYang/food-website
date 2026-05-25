@@ -238,11 +238,60 @@ function clearCache() {
   inflightRequests.clear()
 }
 
+
+/**
+ * 批量收藏食谱
+ * @param {number} userId
+ * @param {number[]} recipeIds
+ * @returns {Promise<Array<{recipeId, recipeUserId}>>} 新增收藏信息
+ */
+async function batchAddFavorites(userId, recipeIds) {
+  const results = []
+  for (const recipeId of recipeIds) {
+    const recipe = await db.Recipe.findByPk(recipeId, { attributes: ['id', 'userId'] })
+    if (!recipe) continue
+
+    const [fav, created] = await db.Favorite.findOrCreate({
+      where: { userId, recipeId },
+      defaults: { userId, recipeId }
+    })
+
+    if (created || fav.deletedAt) {
+      if (fav.deletedAt) {
+        await fav.restore()
+      }
+      await db.Recipe.increment('favoriteCount', { by: 1, where: { id: recipeId } })
+      clearCache()
+      results.push({ recipeId, recipeUserId: recipe.userId })
+    }
+  }
+  return results
+}
+
+/**
+ * 批量取消收藏
+ * @param {number} userId
+ * @param {number[]} recipeIds
+ */
+async function batchRemoveFavorites(userId, recipeIds) {
+  for (const recipeId of recipeIds) {
+    const fav = await db.Favorite.findOne({ where: { userId, recipeId, deletedAt: null } })
+    if (fav) {
+      await fav.destroy()
+      await db.Recipe.increment('favoriteCount', { by: -1, where: { id: recipeId } })
+    }
+  }
+  clearCache()
+}
+
+
 module.exports = {
   addFavorite,
   removeFavorite,
   getFavoritesByUser,
   getFavoriteStatus,
   countFavorites,
-  clearCache
+  clearCache,
+  batchAddFavorites,
+  batchRemoveFavorites
 }

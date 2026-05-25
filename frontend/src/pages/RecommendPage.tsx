@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { recommendRecipes, addFavorite, removeFavorite, getFavoriteStatus } from '../api'
+import { recommendRecipes, addFavorite, removeFavorite, getFavoriteStatus, getPersonalizedRecommendations, getPopularRecommendations } from '../api'
 import type { RecommendRecipe } from '../api'
+import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import './RecommendPage.css'
 
@@ -50,6 +51,10 @@ export default function RecommendPage() {
   const [searched, setSearched] = useState(false)
   const [history, setHistory] = useState<string[]>(loadHistory)
   const [favorites, setFavorites] = useState<Record<string, boolean>>({})
+  const [personalized, setPersonalized] = useState<any[]>([])
+  const [popular, setPopular] = useState<any[]>([])
+  const [personalizedLoading, setPersonalizedLoading] = useState(false)
+  const [recommendTab, setRecommendTab] = useState<'personalized' | 'popular'>('popular')
   const navigate = useNavigate()
   const toast = useToast()
   const resultRef = useRef<HTMLDivElement>(null)
@@ -110,6 +115,27 @@ export default function RecommendPage() {
   }
 
   /* 收藏切换 */
+  /* 个性化推荐 */
+  const loadPersonalized = useCallback(async () => {
+    const token = localStorage.getItem('token')
+    setPersonalizedLoading(true)
+    try {
+      const personalizedRes: any = await getPersonalizedRecommendations(8)
+      setPersonalized(personalizedRes.recipes || [])
+      const popularRes: any = await getPopularRecommendations(8)
+      setPopular(popularRes.recipes || [])
+    } catch {
+      setPersonalized([])
+    } finally {
+      setPersonalizedLoading(false)
+    }
+  }, [])
+
+  // 页面加载时加载推荐
+  useEffect(() => {
+    loadPersonalized()
+  }, [loadPersonalized])
+
   const toggleFavorite = async (e: React.MouseEvent, recipeId: string, isFav: boolean) => {
     e.preventDefault()
     e.stopPropagation()
@@ -214,6 +240,125 @@ export default function RecommendPage() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* 个性化推荐 */}
+      <div className="recommend-personalized">
+        <div className="recommend-personalized__tabs">
+          <button
+            className={`recommend-personalized__tab ${recommendTab === 'popular' ? 'active' : ''}`}
+            onClick={() => setRecommendTab('popular')}
+          >
+            🔥 热门推荐
+          </button>
+          <button
+            className={`recommend-personalized__tab ${recommendTab === 'personalized' ? 'active' : ''}`}
+            onClick={() => setRecommendTab('personalized')}
+          >
+            🎯 个性化推荐
+          </button>
+        </div>
+
+        {personalizedLoading ? (
+          <div className="recommend-grid" style={{ marginBottom: 24 }}>
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="recommend-card recommend-card--skeleton">
+                <div className="recommend-card__cover skeleton-box" />
+                <div className="recommend-card__body">
+                  <div className="skeleton-box skeleton-box--title" style={{ width: '80%' }} />
+                  <div className="skeleton-box skeleton-box--desc" style={{ width: '60%' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Popular */}
+            {recommendTab === 'popular' && popular.length > 0 && (
+              <div className="recommend-personalized-section" style={{ marginBottom: 24 }}>
+                <h2 className="recommend-section-title">🔥 最受欢迎食谱</h2>
+                <div className="recommend-grid">
+                  {popular.map(recipe => (
+                    <Link key={recipe.id} to={`/recipe/${recipe.id}`} className="recommend-card-link">
+                      <div className="recommend-card">
+                        <div className="recommend-card__cover">
+                          {recipe.coverImage ? (
+                            <img src={recipe.coverImage} alt={recipe.title} />
+                          ) : (
+                            <div className="recommend-card__placeholder">🍽️</div>
+                          )}
+                        </div>
+                        <div className="recommend-card__body">
+                          <h3 className="recommend-card__title">{recipe.title}</h3>
+                          <p className="recommend-card__desc">{recipe.description}</p>
+                          <div className="recommend-card__meta">
+                            {recipe.cookTime && <span>⏱ {recipe.cookTime}分钟</span>}
+                            {recipe.favoriteCount > 0 && <span>❤️ {recipe.favoriteCount}</span>}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Personalized */}
+            {recommendTab === 'personalized' && (
+              <>
+                {!isAuthenticated ? (
+                  <div className="recommend-empty" style={{ marginBottom: 24 }}>
+                    <div className="recommend-empty__icon">🔑</div>
+                    <p className="recommend-empty__text">登录后查看个性化推荐</p>
+                    <button className="recommend-submit" onClick={() => navigate('/login')} style={{ marginTop: 12 }}>
+                      去登录
+                    </button>
+                  </div>
+                ) : personalized.length > 0 ? (
+                  <div className="recommend-personalized-section" style={{ marginBottom: 24 }}>
+                    <h2 className="recommend-section-title">🎯 为你推荐</h2>
+                    <p className="recommend-ai-hint">基于你的收藏历史和口味偏好</p>
+                    <div className="recommend-grid">
+                      {personalized.map(recipe => (
+                        <Link key={recipe.id} to={`/recipe/${recipe.id}`} className="recommend-card-link">
+                          <div className="recommend-card">
+                            <div className="recommend-card__cover">
+                              {recipe.coverImage ? (
+                                <img src={recipe.coverImage} alt={recipe.title} />
+                              ) : (
+                                <div className="recommend-card__placeholder">🍽️</div>
+                              )}
+                            </div>
+                            <div className="recommend-card__body">
+                              <h3 className="recommend-card__title">{recipe.title}</h3>
+                              <p className="recommend-card__desc">{recipe.description}</p>
+                              <div className="recommend-card__meta">
+                                {recipe.cookTime && <span>⏱ {recipe.cookTime}分钟</span>}
+                                {recipe.difficulty && <span>{recipe.difficulty === 'easy' ? '简单' : recipe.difficulty === 'medium' ? '中等' : '困难'}</span>}
+                              </div>
+                              {recipe.reason && (
+                                <div className="recommend-card__reason">
+                                  <span className="recommend-card__reason-icon">💡</span>
+                                  <span>{recipe.reason}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="recommend-empty" style={{ marginBottom: 24 }}>
+                    <div className="recommend-empty__icon">📖</div>
+                    <p className="recommend-empty__text">收藏一些食谱后，我们会为你推荐</p>
+                    <p className="recommend-empty__hint">先去探索食谱吧！</p>
+                  </div>
+                )}
+              </>
+            )}
+          </>
+        )}
       </div>
 
       {/* ─── 结果区 ─── */}

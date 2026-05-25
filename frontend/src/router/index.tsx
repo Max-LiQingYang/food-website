@@ -25,6 +25,7 @@ const ShoppingListPage = lazy(() => import('../pages/ShoppingListPage'))
 const RankingsPage = lazy(() => import('../pages/RankingsPage'))
 const MealPlannerPage = lazy(() => import('../pages/MealPlannerPage'))
 const CookingJournalPage = lazy(() => import('../pages/CookingJournalPage'))
+const SettingsPage = lazy(() => import('../pages/SettingsPage'))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
 const ComparePage = lazy(() => import('../pages/ComparePage'))
 const PreferencesPage = lazy(() => import('../pages/PreferencesPage'))
@@ -96,6 +97,7 @@ const router = createBrowserRouter([
       { path: '/tags', element: <TagsPage /> },
       // 迭代#37: 食材库存管理
       { path: '/pantry', element: <PantryPage /> },
+      { path: '/settings', element: <SettingsPage /> },
       // 迭代#37: 营养追踪
       { path: '/nutrition', element: <NutritionDashboard /> },
       // 迭代#40: 食谱版本对比

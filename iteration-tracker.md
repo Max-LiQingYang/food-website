@@ -217,3 +217,65 @@
 | `frontend/src/api.ts` | 修改（+45 行 API 函数） |
 
 **下一个方向**: A (UI/UX)
+
+---
+
+## 迭代 #41 — A/UI/UX 全面体验优化 ✅
+**Commit**: `0b28dc2` (2026-05-25)
+**测试**: 前端构建成功
+**部署**: http://39.103.68.205/
+
+### 功能
+- **暗色模式全面覆盖** — 16个CSS文件添加body.dark覆盖，涵盖HeroSection/ImageLightbox/StepTimer/ChallengesPage/ChallengeDetailPage/IngredientSearchPage/KitchenToolsPage/MyToolsPage/TagsPage/BrowsingHistory/ExportMenu/PWAInstallPrompt/SeasonalRecommendations/SimilarRecipes/SkipLink/VideoPlayer
+- **骨架屏增强** — CookingAnalyticsPage/ChallengesPage/MealPlannerPage/CookingJournalPage 添加匹配页面结构的骨架加载状态
+- **多步向导表单** — CreateRecipePage重构为4步向导（基本信息→食材清单→制作步骤→更多设置），实时验证+内联错误提示+草稿自动保存(localStorage,10s防抖)
+- **移动端交互优化** — usePullToRefresh下拉刷新hook、搜索/步骤移动端CSS优化
+
+### 文件操作（26文件，+1147/-202）
+| 文件 | 操作 |
+|------|------|
+| `frontend/src/components/HeroSection.css` | 修改（暗色模式）|
+| `frontend/src/components/ImageLightbox.css` | 重写（暗色模式+完整样式）|
+| `frontend/src/components/PageTransition.css` | 修改 |
+| `frontend/src/components/MobileBottomNav.css` | 修改 |
+| `frontend/src/components/BrowsingHistory.css` | 修改 |
+| `frontend/src/components/ExportMenu.css` | 修改 |
+| `frontend/src/components/PWAInstallPrompt.css` | 修改 |
+| `frontend/src/components/SeasonalRecommendations.css` | 修改 |
+| `frontend/src/components/SimilarRecipes.css` | 修改 |
+| `frontend/src/components/SkipLink.css` | 修改 |
+| `frontend/src/components/StepTimer.css` | 修改 |
+| `frontend/src/components/VideoPlayer.css` | 修改 |
+| `frontend/src/pages/ChallengesPage.css` | 修改 |
+| `frontend/src/pages/ChallengeDetailPage.css` | 修改 |
+| `frontend/src/pages/IngredientSearchPage.css` | 修改 |
+| `frontend/src/pages/KitchenToolsPage.css` | 修改 |
+| `frontend/src/pages/MyToolsPage.css` | 修改 |
+| `frontend/src/pages/TagsPage.css` | 修改 |
+| `frontend/src/pages/ChallengesPage.tsx` | 修改（骨架屏）|
+| `frontend/src/pages/CookingAnalyticsPage.tsx` | 修改（骨架屏）|
+| `frontend/src/pages/MealPlannerPage.tsx` | 修改（骨架屏）|
+| `frontend/src/pages/CookingJournalPage.tsx` | 修改（骨架屏）|
+| `frontend/src/pages/CreateRecipePage.tsx` | 重构（多步向导+验证+草稿）|
+| `frontend/src/pages/CreateRecipePage.css` | 修改（向导样式）|
+| `frontend/src/hooks/usePullToRefresh.ts` | 新建 |
+| `frontend/src/global.css` | 修改（移动端CSS）|
+
+**下一个方向**: B（功能增强）
+
+---
+
+## 迭代 #42 — B/功能增强：批量操作+设置页+智能推荐+日志增强
+**状态**: ⏳ QClaw 后台执行中 (Task ID: V7HRC2)
+**派发时间**: 2026-05-25 10:07
+
+### 功能
+- **食谱批量操作增强** — 批量收藏/取消收藏 + 批量添加购物清单 + 批量导出
+- **用户个人设置页面** — 分组卡片式布局（个人信息/饮食偏好/通知/隐私/安全）+ 数据导出
+- **食谱收藏智能推荐** — 基于收藏历史个性化推荐 + 推荐理由 + 个性化 tab
+- **烹饪日志增强** — 详情页时间线 + 搜索筛选 + 统计可视化增强
+
+### 前置任务
+- 部署闭环：推送 #41（0b28dc2）到服务器（当前停在 65bdc19）
+
+**下一个方向**: C（内容质量）

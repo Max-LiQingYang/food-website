@@ -1721,7 +1721,7 @@ export default {
   updateShoppingList,
   deleteShoppingList,
   getShareInfo,
-  updateProfile,
+  updateProfile,   // from user routes
   followUser,
   unfollowUser,
   getFollowers,
@@ -1799,6 +1799,24 @@ export default {
   getEnrichedShoppingList,
   getShoppingListCopyText,
   getIngredientSubstitutions,
+  // ═══ 迭代#42: 批量收藏 ═══
+  batchFavorite,
+  // ═══ 迭代#42: 批量添加购物清单 ═══
+  batchShoppingAdd,
+  // ═══ 迭代#42: 个人设置 ═══
+  getSettings,
+  updateProfile,   // from user routes
+  updateNotificationPrefs,
+  updatePrivacySettings,
+  exportUserData,
+  exportCsvFavorites,
+  // ═══ 迭代#42: 个性化学推荐 ═══
+  getPersonalizedRecommendations,
+  getPopularRecommendations,
+  // ═══ 迭代#42: 烹饪日志增强 ═══
+  getCookingLogDetail,
+  searchCookingLogs,
+  getEnhancedCookingStats,
 }
 
 // ═══ 迭代#40: 食谱版本对比 ═══
@@ -1839,3 +1857,53 @@ export function getShoppingListCopyText(id: string): Promise<{ text: string; nam
 export function getIngredientSubstitutions(recipeId: string, filters?: { avoidAllergens?: string; diet?: string }): Promise<any> {
   return apiClient.post(`/recipes/${recipeId}/substitutions`, filters || {}).then(r => r.data?.data || r.data)
 }
+
+// ═══ 迭代#42: 批量收藏 ═══
+export function batchFavorite(recipeIds: number[], action: 'add' | 'remove'): Promise<{ affected: number }> {
+  return apiClient.post('/favorites/batch', { recipeIds, action }).then(r => r.data?.data || r.data)
+}
+
+// ═══ 迭代#42: 批量添加到购物清单 ═══
+export function batchShoppingAdd(recipeIds: number[]): Promise<{ added: number; items: any[]; listId: string }> {
+  return apiClient.post('/shopping-list/batch', { recipeIds }).then(r => r.data?.data || r.data)
+}
+
+// ═══ 迭代#42: 个人设置 ═══
+export function getSettings(): Promise<{ profile: any; notifications: any; privacy: any; diet: string; cuisine: string; difficulty: string; maxCookTime: string; allergies: string[] }> {
+  return apiClient.get('/settings').then(r => r.data?.data || r.data)
+}
+export function updateSettingsProfile(data: { nickname?: string }): Promise<{ nickname: string }> {
+  return apiClient.put('/settings/profile', data).then(r => r.data?.data || r.data)
+}
+export function updateNotificationPrefs(data: { commentReply?: boolean; followUpdate?: boolean; challenge?: boolean; system?: boolean }): Promise<any> {
+  return apiClient.put('/settings/notifications', data).then(r => r.data?.data || r.data)
+}
+export function updatePrivacySettings(data: { collectionVisibility?: string; cookingLogVisibility?: string }): Promise<any> {
+  return apiClient.put('/settings/privacy', data).then(r => r.data?.data || r.data)
+}
+export function exportUserData(): Promise<any> {
+  return apiClient.get('/settings/export').then(r => r.data?.data || r.data)
+}
+export function exportCsvFavorites(): Promise<any> {
+  return apiClient.get('/settings/export/csv', { responseType: 'blob' }).then(r => r.data)
+}
+
+// ═══ 迭代#42: 个性化推荐 ═══
+export function getPersonalizedRecommendations(limit?: number): Promise<{ recipes: any[] }> {
+  return apiClient.get('/recommendations/personalized', { params: { limit } }).then(r => r.data?.data || r.data)
+}
+export function getPopularRecommendations(limit?: number): Promise<{ recipes: any[] }> {
+  return apiClient.get('/recommendations/popular', { params: { limit } }).then(r => r.data?.data || r.data)
+}
+
+// ═══ 迭代#42: 烹饪日志增强 ═══
+export function getCookingLogDetail(id: string): Promise<any> {
+  return apiClient.get('/cooking-logs/detail/' + id).then(r => r.data?.data || r.data)
+}
+export function searchCookingLogs(params: { q?: string; startDate?: string; endDate?: string; minRating?: number; maxRating?: number; page?: number; pageSize?: number }): Promise<{ logs: any[]; total: number; page: number; pageSize: number; totalPages: number }> {
+  return apiClient.get('/cooking-logs/search', { params }).then(r => r.data?.data || r.data)
+}
+export function getEnhancedCookingStats(): Promise<{ weeklyCount: number; dailyTrend: any[]; mostCooked: any[]; achievement: any }> {
+  return apiClient.get('/cooking-logs/stats/enhanced').then(r => r.data?.data || r.data)
+}
+
