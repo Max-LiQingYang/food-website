@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { searchRecipes } from '../api'
+import { getSuggestions } from '../api'
 import { highlightText } from '../utils/highlightText'
 import './SearchAutocomplete.css'
 
@@ -71,7 +71,7 @@ export default function SearchAutocomplete({
     debounceTimerRef.current = setTimeout(async () => {
       setIsApiLoading(true)
       try {
-        const res: any = await searchRecipes({ q: trimmed, pageSize: 5 })
+        const res: any = await getSuggestions(trimmed)
         const data = res.data || res
         const list = data.list || []
         const titles = list.map((r: any) => r.title).filter(Boolean)

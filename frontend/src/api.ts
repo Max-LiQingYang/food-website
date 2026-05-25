@@ -240,6 +240,14 @@ export function searchRecipes(params: { q: string; page?: number; pageSize?: num
 }
 
 /**
+ * 搜索建议（轻量级，返回标题+ID）
+ * GET /api/recipes/suggestions?q=xxx
+ */
+export function getSuggestions(q: string) {
+  return apiClient.get('/recipes/suggestions', { params: { q } })
+}
+
+/**
  * 获取季节性推荐食谱
  * GET /api/recipes/seasonal?season=spring
  */
@@ -1718,6 +1726,7 @@ export default {
   getRecipes,
   getRecipeById,
   searchRecipes,
+  getSuggestions,
   recommendRecipes,
   getUserProfile,
   getUserRecipes,

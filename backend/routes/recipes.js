@@ -14,7 +14,7 @@
 
 const express = require('express')
 const { Recipe } = require('../models')
-const { Op, fn, col } = require('sequelize')
+const { Op, fn, col, literal } = require('sequelize')
 const auth = require('../middleware/auth')
 
 const { createActivity } = require('../utils/activity')
@@ -317,12 +317,16 @@ router.get('/search', async (req, res) => {
     const keyword = `%${query}%`
 
     // ── 带权重的搜索条件 ──
-    // 标题匹配权重最高，描述次之，食材最低
+    // 标题匹配权重最高，描述/标签次之，食材/贴士/故事最低
     const where = {
       [Op.or]: [
         { title: { [Op.like]: keyword } },
         { description: { [Op.like]: keyword } },
         { ingredients: { [Op.like]: keyword } },
+        { categoryTags: { [Op.like]: keyword } },
+        { tips: { [Op.like]: keyword } },
+        { story: { [Op.like]: keyword } },
+        { culturalBackground: { [Op.like]: keyword } },
       ],
     }
 
@@ -351,14 +355,17 @@ router.get('/search', async (req, res) => {
       where[Op.and] = andConds
     }
 
-    // 排序方式
-    let order = [['createdAt', 'DESC']]
+    // 排序方式：默认按相关性降序（标题 > 描述/标签 > 食材/贴士/故事）
+    let order
     if (sortBy === 'cookTime_asc') {
       order = [['cookTime', 'ASC'], ['createdAt', 'DESC']]
     } else if (sortBy === 'cookTime_desc') {
       order = [['cookTime', 'DESC'], ['createdAt', 'DESC']]
     } else if (sortBy === 'oldest') {
       order = [['createdAt', 'ASC']]
+    } else {
+      const relevanceField = literal(`\n        CASE\n          WHEN title LIKE '%${query}%' THEN 100\n          WHEN description LIKE '%${query}%' THEN 40\n          WHEN categoryTags LIKE '%${query}%' THEN 30\n          WHEN ingredients LIKE '%${query}%' THEN 20\n          WHEN tips LIKE '%${query}%' THEN 10\n          WHEN story LIKE '%${query}%' THEN 10\n          WHEN culturalBackground LIKE '%${query}%' THEN 10\n          ELSE 0\n        END\n      `)
+      order = [[relevanceField, 'DESC'], ['favoriteCount', 'DESC'], ['createdAt', 'DESC']]
     }
 
     const { count, rows } = await Recipe.findAndCountAll({
@@ -466,6 +473,41 @@ router.get('/search', async (req, res) => {
     )
   } catch (err) {
     console.error('[GET /recipes/search] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /suggestions — 搜索建议（轻量级，返回标题+ID）
+// ─────────────────────────────────────────────────────────────────
+router.get('/suggestions', async (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=15, s-maxage=60',
+    Vary: 'Accept-Encoding',
+  })
+  try {
+    const q = (req.query.q || '').trim()
+    if (!q || q.length < 1) {
+      return res.status(200).json(resJSON(0, 'ok', { list: [], total: 0 }))
+    }
+
+    const keyword = `%${q}%`
+    const rows = await Recipe.findAll({
+      where: {
+        [Op.or]: [
+          { title: { [Op.like]: keyword } },
+          { description: { [Op.like]: keyword } },
+        ],
+      },
+      attributes: ['id', 'title', 'category'],
+      limit: 6,
+      order: [['favoriteCount', 'DESC'], ['createdAt', 'DESC']],
+      raw: true,
+    })
+
+    return res.status(200).json(resJSON(0, 'ok', { list: rows, total: rows.length }))
+  } catch (err) {
+    console.error('[GET /recipes/suggestions] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })
