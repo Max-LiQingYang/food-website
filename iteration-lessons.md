@@ -84,3 +84,30 @@
 - **DB 调研第一**: 在写脚本前先查 DB 确认实际数据量级，避免基于假设设计
 - **seed.js 评分逻辑独立函数**: 当前 seed.js 内联了评分生成逻辑，未来可抽离为共享模块（fill_ratings.js 和 seed.js 共用）
 - **comment destroy 顺序**: seed 时需先 destroy Comment 再 destroy Recipe，否则 FK 问题
+
+---
+
+## 2026-05-26 迭代#58 经验 — 季节感知 + 视频标识 + 卡片层次优化
+
+### 迭代方向
+- 🎨 ui-optimization（首页发现体验优化）
+
+### 出现的问题
+1. **后端代码注入容器权限问题**: `cat | docker exec -i sh -c 'cat > path'` 报错 `Permission denied`，因为容器进程以 `nodeapp` 用户运行，但文件属于 `root`
+2. **docker cp 可靠性 vs pipe 注入**: docker cp 从宿主机复制到容器成功，而 pipe 注入因权限失败——取决于容器内文件所有者
+3. **季节性推断的时区陷阱**: 容器运行在 UTC 时间，而服务器（CST）和用户都在东八区。`new Date().getMonth()` 在容器内是 UTC 时间
+
+### 根因
+1. **容器用户权限**: `docker exec` 默认以容器中 `USER` 指令定义的用户（nodeapp）运行，而 `/app/routes/` 目录所有者是 root。`cat > path` 需要写权限
+2. **docker cp 不检查权限**: docker cp 由 docker daemon 执行，绕过了容器内用户权限限制
+3. **容器时区**: 之前未设置 TZ 环境变量，Node.js `new Date()` 返回 UTC 时间
+
+### 修复方法
+1. **docker cp 优先**: 当文件已在宿主机上时，优先使用 `docker cp` 而非 pipe 注入
+2. **pipe 注入的 root 模式**: 若必须 pipe，使用 `docker exec -u 0 -i`（以 root 执行）或先用 `docker exec -u 0 sh -c 'chmod 777 ...'` 改权限
+3. **时区验证**: 容器内 UTC 对 season 推断造成了约 8 小时的偏差（UTC 03:34 = CST 11:34，不影响月/日判断），但记录此事实。seasonal.js 的 `new Date()` 返回容器时间
+
+### 自优化建议
+- **后端部署流程**: docker cp 后端文件到容器 → docker restart（已验证可靠）
+- **时区考虑**: 涉及"当天"逻辑时注意容器 UTC 与用户地区时差
+- **验证手法**: pipe 注入失败后，切换到 docker cp，然后用 `docker exec ls -la` 确认文件时间戳

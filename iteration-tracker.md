@@ -675,18 +675,50 @@
 
 ---
 
-## 迭代 #58 — 🟡 UI/UX：首页发现体验优化 ⏳
-**状态**: 进行中
+## 迭代 #58 — 🟢 UI/UX：首页发现体验优化 ✅
+**状态**: 已完成
 **方向**: A（UI/UX）/ 🟡 体验优化
-**基线 Commit**: `4f30d92`
+**基线 Commit**: `4f30d92` → `b39ea8a`
 
-### 背景
-网站巡检通过，无遗留错误，无未完成任务。方向评估发现以下体验优化空间：
+### 变更内容
 
-1. **季节感知不一致**：5月26日季节性推荐API返回"🌺 春季"，但用户实际体验已进入初夏；前后端季节推断逻辑可更贴近节气
-2. **食谱季节标签缺失**：81道食谱中仅少量有具体季节标签，大部分为"all"，导致季节性推荐结果泛化
-3. **视频内容无标识**：23条视频已上线，但RecipeCard上无视频标识，用户无法一眼识别有视频教程的食谱
-4. **卡片信息层次**：评分、评论、视频等多维信息在卡片上的展示可进一步优化
+#### 1. 季节推断优化
+- **后端 seasonal.js**: `guessSeason()` 在5月20日后自动切换到夏季（初夏）
+- **前端 SeasonalRecommendations.tsx**: 同步后端月份推断逻辑
+- **季节标签**: 5月时季节API显示 ☀️ 初夏（seasonLabel 根据月份动态适配）
+- 验证: `season: summer (☀️ 初夏)` ✅
+
+#### 2. 视频内容标识
+- **后端 recipes.js**: 新增 `fetchVideoCounts()` + `attachVideoInfo()` 批量查询视频数量
+- **attachRatingInfo**: 内部集成 videoCount（9处调用点自动受益）
+- **RecipeCard.tsx**: 封面右下角新增半透明播放按钮徽章 + 信息区视频统计行
+- **导出 attachVideoInfo** 供 seasonal.js 使用
+- 验证: 首页5道食谱均正确显示 videoCount ✅
+
+#### 3. 卡片评分信息层次优化
+- 评分从散落 `<span>` 整合为统一的 `recipe-card__stats` 容器
+- 无评分时显示"暂无评分"灰色占位
+- 评分星级 + 视频在同行并排展示
+
+### 文件变更
+| 文件 | 类型 |
+|------|------|
+| `backend/routes/seasonal.js` | 修改（季节推断+标签） |
+| `backend/routes/recipes.js` | 修改（+videoCount） |
+| `frontend/src/components/RecipeCard.tsx` | 修改（视频徽章+统计行） |
+| `frontend/src/components/RecipeCard.css` | 修改（视频徽章+统计行样式） |
+| `frontend/src/components/SeasonalRecommendations.tsx` | 修改（同步推断） |
+
+### 验证
+- 前端 build 250 modules 0 errors
+- 无新增测试失败（预存1项不变）
+- Seasonal API: `summer (☀️ 初夏)`
+- 食谱列表: videoCount 正确
+- 评分数据: 无回归
+
+### 待处理
+- 季节标签 DB 数据优化（当前 season=summer 标签食谱有限）
+- 部分食谱 season 标签可补充为具体季节而非 all
 
 ### 任务内容
 1. 后端：优化季节推断逻辑（考虑节气/下旬过渡），补充更多食谱季节标签
