@@ -797,6 +797,7 @@ async function seed () {
     await db.sequelize.sync()
 
     // 清空旧数据
+    await db.Comment.destroy({ where: {} })
     await db.Favorite.destroy({ where: {} })
     await db.Recipe.destroy({ where: {} })
     await db.User.destroy({ where: {} })
@@ -853,6 +854,88 @@ async function seed () {
 
     console.log(`✅ 成功插入 ${recipes.length} 条示范食谱`)
     console.log(`   分类分布: ${[...new Set(recipes.map(r => r.category))].join(', ')}`)
+
+    // ── 生成评分数据 ──────────────────────────────────────────
+    console.log('🔄 正在生成评分数据...')
+    const adminUser = await db.User.findOne({ where: { username: 'admin' } })
+    const secondUser = await db.User.findOne({ where: { username: { [db.Sequelize.Op.ne]: 'admin' } } })
+    const userIds = [adminUser.id]
+    if (secondUser) userIds.push(secondUser.id)
+
+    const allRecipesWithCounts = await db.Recipe.findAll()
+    // 按 favoriteCount + viewCount 权重排序划分热度
+    const sortedByPop = allRecipesWithCounts.slice().sort((a, b) => {
+      const scoreA = (a.favoriteCount || 0) * 2 + (a.viewCount || 0) * 0.3
+      const scoreB = (b.favoriteCount || 0) * 2 + (b.viewCount || 0) * 0.3
+      return scoreB - scoreA
+    })
+    const seedHotCount = Math.ceil(sortedByPop.length * 0.3)
+    const seedNormalCount = Math.ceil(sortedByPop.length * 0.4)
+
+    const ratingComments = {
+      5: ['非常棒！','太好吃了','五星好评','完美教程','超级美味','味道绝了','好吃到哭','必须收藏','太赞了','零失败！'],
+      4: ['不错','挺好吃的','味道很好','简单易学','全家都喜欢','还会再做','色香味俱全','推荐','一次成功','口感不错'],
+      3: ['还行吧','一般般','中规中矩','还可以','味道普通','不难吃但一般','步骤清楚但味道一般','做法简单口味一般'],
+      2: ['不太满意','做出来跟图片差好多','味道偏淡了','不太推荐','口感不好'],
+      1: ['完全失败了','不推荐','差评','味道真不行','教程有误'],
+    }
+
+    const allComments = []
+    for (let i = 0; i < sortedByPop.length; i++) {
+      const r = sortedByPop[i]
+      let count, avgTarget
+      if (i < seedHotCount) { count = 10 + Math.floor(Math.random() * 9); avgTarget = 4.2 + Math.random() * 0.6 }
+      else if (i < seedHotCount + seedNormalCount) { count = 3 + Math.floor(Math.random() * 8); avgTarget = 3.5 + Math.random() * 0.8 }
+      else { count = 1 + Math.floor(Math.random() * 3); avgTarget = 2.5 + Math.random() * 1.0 }
+
+      let ratings = []
+      for (let j = 0; j < count; j++) {
+        let score = Math.round(avgTarget + (Math.random() - 0.5) * 2)
+        score = Math.max(1, Math.min(5, score))
+        ratings.push(score)
+      }
+      // 保证至少一条高分
+      if (!ratings.some(s => s === 5)) ratings[0] = 5
+      // 保证至少一条中低分
+      if (!ratings.some(s => s <= 3)) ratings[ratings.length - 1] = 2 + Math.floor(Math.random() * 2)
+
+      ratings = ratings.slice(0, count)
+      for (let j = ratings.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1)); [ratings[j], ratings[k]] = [ratings[k], ratings[j]]
+      }
+
+      for (const rating of ratings) {
+        const opts = ratingComments[rating] || ratingComments[3]
+        const comment = opts[Math.floor(Math.random() * opts.length)]
+        const userId = userIds[Math.floor(Math.random() * userIds.length)]
+        const daysAgo = Math.floor(Math.random() * 30)
+        const date = new Date(Date.now() - daysAgo * 86400000 - Math.floor(Math.random() * 86400000))
+        allComments.push({
+          content: comment,
+          rating,
+          userId,
+          recipeId: r.id,
+          likesCount: Math.floor(Math.random() * 20),
+          createdAt: date,
+        })
+      }
+    }
+
+    if (allComments.length > 0) {
+      await db.Comment.bulkCreate(allComments)
+      // 更新 avgRating / ratingCount
+      for (const r of allRecipesWithCounts) {
+        const recipeComments = allComments.filter(c => c.recipeId === r.id)
+        if (recipeComments.length > 0) {
+          const sum = recipeComments.reduce((s, c) => s + c.rating, 0)
+          await db.Recipe.update(
+            { avgRating: (sum / recipeComments.length).toFixed(2), ratingCount: recipeComments.length },
+            { where: { id: r.id } }
+          )
+        }
+      }
+      console.log(`✅ 成功插入 ${allComments.length} 条评分记录`)
+    }
 
     process.exit(0)
   } catch (err) {
