@@ -11,7 +11,8 @@
 
 const express = require('express')
 const router = express.Router()
-const { Recipe, User, Comment, Op, fn, col, literal, sequelize } = require('../models')
+const { Recipe, User, Comment, sequelize } = require('../models')
+const { Op, fn, col, literal } = require('sequelize')
 
 // 质量评分阈值
 const QUALITY_THRESHOLDS = {
