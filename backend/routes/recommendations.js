@@ -34,15 +34,15 @@ router.get('/recommendations/personalized', auth, async (req, res) => {
 
     // 1. Get user's favorite recipes
     const favorites = await Favorite.findAll({
-      where: { userId, deletedAt: null },
-      include: [{ model: Recipe, attributes: ['id', 'category', 'categoryTags', 'title'] }],
+      where: { userId },
+      include: [{ model: Recipe, as: 'recipe', attributes: ['id', 'category', 'categoryTags', 'title'] }],
       order: [['createdAt', 'DESC']],
       limit: 30
     })
 
     const favoritedIds = favorites.map(f => f.recipeId)
     const favCategories = favorites
-      .map(f => f.Recipe ? f.Recipe.category : null)
+      .map(f => f.recipe ? f.recipe.category : null)
       .filter(Boolean)
 
     const categoryCounts = {}
@@ -89,12 +89,12 @@ router.get('/recommendations/personalized', auth, async (req, res) => {
     const result = recipes.map(function(r) {
       const reasons = []
       const favsWithCategory = favorites.filter(function(f) {
-        return f.Recipe && f.Recipe.category === r.category
+        return f.recipe && f.recipe.category === r.category
       }).slice(0, 2)
 
       favsWithCategory.forEach(function(f) {
-        if (f.Recipe && f.Recipe.title) {
-          reasons.push('因为你收藏了「' + f.Recipe.title + '」')
+        if (f.recipe && f.recipe.title) {
+          reasons.push('因为你收藏了「' + f.recipe.title + '」')
         }
       })
 

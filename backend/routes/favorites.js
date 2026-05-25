@@ -2,7 +2,8 @@
 
 const { createActivity } = require('../utils/activity')
 const favoriteService = require('../services/favoriteService')
-const { Recipe, User, Favorite, Op } = require('../models')
+const { Recipe, User, Favorite, Sequelize } = require('../models')
+const Op = Sequelize.Op
 const { createNotification } = require('../utils/notificationHelper')
 const { checkAllAchievements } = require('../utils/achievementChecker')
 
@@ -237,30 +238,22 @@ async function batchFavorite(req, res) {
 
     let affected = 0
     if (action === 'add') {
-      // Batch add favorites
+      // Batch add favorites (non-paranoid model — no soft delete)
       const existing = await Favorite.findAll({
-        where: { userId, recipeId: { [Op.in]: validIds } },
-        paranoid: false
+        where: { userId, recipeId: { [Op.in]: validIds } }
       })
-      const existingMap = {}
-      existing.forEach(f => { existingMap[f.recipeId] = f })
+      const existingIds = new Set(existing.map(f => f.recipeId))
 
-      for (const recipeId of validIds) {
-        const existingFav = existingMap[recipeId]
-        if (existingFav) {
-          if (existingFav.deletedAt) {
-            await existingFav.restore()
-            affected++
-          }
-        } else {
-          await Favorite.create({ userId, recipeId })
-          affected++
-        }
+      const newIds = validIds.filter(id => !existingIds.has(id))
+      if (newIds.length > 0) {
+        const records = newIds.map(recipeId => ({ userId, recipeId }))
+        await Favorite.bulkCreate(records)
+        affected = newIds.length
       }
 
-      // Update favoriteCount for affected recipes — use raw query to avoid model issues
+      // Update favoriteCount for affected recipes
       for (const recipeId of validIds) {
-        const count = await Favorite.count({ where: { recipeId, deletedAt: null } })
+        const count = await Favorite.count({ where: { recipeId } })
         await Recipe.update({ favoriteCount: count }, { where: { id: recipeId } })
       }
     } else {
@@ -271,13 +264,12 @@ async function batchFavorite(req, res) {
       affected = deleted
 
       for (const recipeId of validIds) {
-        const count = await Favorite.count({ where: { recipeId, deletedAt: null } })
+        const count = await Favorite.count({ where: { recipeId } })
         await Recipe.update({ favoriteCount: count }, { where: { id: recipeId } })
       }
     }
 
     // Clear cache
-    const favoriteService = require('../services/favoriteService')
     if (typeof favoriteService.clearCache === 'function') {
       favoriteService.clearCache()
     }
