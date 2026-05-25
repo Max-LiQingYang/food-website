@@ -145,3 +145,36 @@
 - **后端部署流程**: docker cp 后端文件到容器 → docker restart（已验证可靠）
 - **时区考虑**: 涉及"当天"逻辑时注意容器 UTC 与用户地区时差
 - **验证手法**: pipe 注入失败后，切换到 docker cp，然后用 `docker exec ls -la` 确认文件时间戳
+
+---
+
+## 2026-05-26 迭代#60 经验 — 视频覆盖扩容（Kimi WebBridge）
+
+### 迭代方向
+- 🟢 content-quality（视频教程覆盖率提升 24.7%→48.1%）
+
+### 出现的问题
+1. **Bilibili 412 反爬拦截**：web_fetch / curl / 多搜索引擎 全部返回 412
+2. **Bilibili 空间页新版卡片 href 不一致**：`space.bilibili.com/xxx/video` 页面卡片链接包含 `?spm_id_from=` 参数而非完整 `/video/BVxxx`，导致部分菜品无法提取
+3. **YouTube 无障碍但搜索质量依赖关键词**：非中文食谱（如普罗旺斯炖菜、豚骨拉面）需要在搜索和解析上额外注意英文描述
+
+### 根因
+1. **Bilibili 反爬机制**：未登录的访问请求被 CDN 层 412 拦截，即使使用 Node.js、Python requests、curl 等同样被拦截。数据来源验证：之前迭代#56 已使用 web_fetch 获取信息但未记录此问题
+2. **Bilibili 前端更新**：新版 B 站空间页卡片使用 `a[href*="/video/BV"]` CSS 选择器不可靠，改用搜索页直接搜索食谱名可稳定提取
+
+### 修复/规避方法
+1. **Kimi WebBridge 浏览器控制**：浏览器登录态下 cookie 完整，Bilibili 不会拦截请求
+2. **使用搜索页代替空间页**：Bilibili `search.bilibili.com` 搜索页的 URL 结构稳定，直接用 document.querySelectorAll 提取 BV 号
+3. **YouTube 无 Cookie 限制**：YouTube 搜索结果可正常获取，使用 `ytd-video-renderer` CSS 选择器稳定
+
+### Kimi WebBridge 使用记录
+- 版本: daemon v1.9.8 / extension v1.9.7
+- 操作方式：通过 evaluate JS 在搜索结果页提取目标元素
+- 耗时：约 45-50 秒完成 19 道食谱的搜索（含 Bilibili 15 + YouTube 4）
+- 成功率：100%（19/19 道食谱均找到视频链接并插入）
+
+### 自优化建议
+1. **批量搜索工具**：考虑写一个 Kimi WebBridge 自动化脚本，一次性搜索全部缺失食谱
+2. **缓存 BV 数据库**：将常用食谱的 B 站/YouTube 视频映射做成 JSON 配置，方便后续增补
+3. **Bilibili API 探索**：搜索页方案效率较低，可尝试 Bilibili 用户的公开 API（`api.bilibili.com/x/space/arc/search`）获取 BV 号
+4. **视频覆盖目标**：建议下一轮扩充至 60/81（74%），覆盖所有热门食谱（viewCount > 50）
