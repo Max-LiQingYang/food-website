@@ -170,16 +170,58 @@ async function fetchAvgRatings(recipeIds) {
 }
 
 /**
+ * 批量获取食谱视频数量
+ */
+async function fetchVideoCounts(recipeIds) {
+  if (!recipeIds || recipeIds.length === 0) return {}
+  const { VideoEmbed } = require('../models')
+  const { fn: fn3, col: col3 } = require('sequelize')
+
+  const results = await VideoEmbed.findAll({
+    attributes: [
+      'recipeId',
+      [fn3('COUNT', col3('id')), 'videoCount'],
+    ],
+    where: {
+      recipeId: { [Op.in]: recipeIds },
+    },
+    group: ['recipeId'],
+    raw: true,
+  })
+
+  const map = {}
+  results.forEach(r => {
+    map[r.recipeId] = parseInt(r.videoCount || '0', 10)
+  })
+  return map
+}
+
+/**
+ * 为食谱列表批量附加 videoCount
+ */
+async function attachVideoInfo(items) {
+  if (!items || items.length === 0) return
+  const ids = items.map(i => i.id)
+  const videoMap = await fetchVideoCounts(ids)
+  for (const item of items) {
+    item.videoCount = videoMap[item.id] || 0
+  }
+}
+
+/**
  * 为食谱列表批量附加 avgRating、ratingCount 并重新计算 qualityScore
  */
 async function attachRatingInfo(items) {
   if (!items || items.length === 0) return
   const ids = items.map(i => i.id)
   const ratingMap = await fetchAvgRatings(ids)
+  // 批量附带视频数量信息
+  const videoMap = await fetchVideoCounts(ids)
   for (const item of items) {
     const info = ratingMap[item.id] || { avgRating: 0, ratingCount: 0 }
     item.avgRating = info.avgRating
     item.ratingCount = info.ratingCount
+    item.videoCount = videoMap[item.id] || 0
     Object.assign(item, computeQuality(item))
   }
 }
@@ -2345,3 +2387,4 @@ module.exports = router
 module.exports.auth = auth
 module.exports.attachRatingInfo = attachRatingInfo
 module.exports.attachContentScore = attachContentScore
+module.exports.attachVideoInfo = attachVideoInfo

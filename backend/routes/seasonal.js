@@ -50,8 +50,14 @@ const LIST_ATTRIBUTES = [
  * 根据月份推断季节
  */
 function guessSeason() {
-  const month = new Date().getMonth() + 1
-  if (month >= 3 && month <= 5) return 'spring'
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  // 5月20日之后切换为夏季（初夏）
+  if (month >= 3 && month <= 5) {
+    if (month === 5 && day >= 20) return 'summer'
+    return 'spring'
+  }
   if (month >= 6 && month <= 8) return 'summer'
   if (month >= 9 && month <= 11) return 'autumn'
   return 'winter'
@@ -60,10 +66,11 @@ function guessSeason() {
 /**
  * 获取季节中文标签
  */
-function seasonLabel(season) {
+function seasonLabel(season, now) {
+  const month = (now || new Date()).getMonth() + 1
   const labels = {
     spring: '🌺 春季',
-    summer: '☀️ 夏季',
+    summer: month === 5 ? '☀️ 初夏' : '☀️ 夏季',
     autumn: '🍂 秋季',
     winter: '❄️ 冬季',
   }
@@ -96,16 +103,19 @@ router.get('/', async (req, res) => {
     const list = recipes.map(r => r.toJSON())
 
     // 附加质量评分
-    const { attachRatingInfo } = require('./recipes')
+    const { attachRatingInfo, attachVideoInfo } = require('./recipes')
     if (typeof attachRatingInfo === 'function') {
       await attachRatingInfo(list)
+    }
+    if (typeof attachVideoInfo === 'function') {
+      await attachVideoInfo(list)
     }
 
     return res.status(200).json(
       resJSON(0, 'ok', {
         list,
         season,
-        seasonLabel: seasonLabel(season),
+        seasonLabel: seasonLabel(season, new Date()),
         total: list.length,
       })
     )

@@ -154,7 +154,15 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
           </span>
         )}
 
-        {/* 烹饪时间标签 (移除了，现在在tags行展示) */}
+        {/* 视频指示器 */}
+        {(recipe as any).videoCount > 0 && (
+          <span className="recipe-card__video-indicator">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            {(recipe as any).videoCount}
+          </span>
+        )}
       </div>
 
       {/* 信息区 */}
@@ -217,16 +225,29 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
           )}
         </div>
 
-        {/* 评分星星 */}
-        {recipe.avgRating != null && recipe.avgRating > 0 && (
-          <span className="recipe-card__meta-item recipe-card__rating">
-            {'★'.repeat(Math.round(recipe.avgRating))}{'☆'.repeat(5 - Math.round(recipe.avgRating))} {' '}
-            {recipe.avgRating.toFixed(1)}
-            {recipe.ratingCount != null && recipe.ratingCount > 0 && (
-              <span className="recipe-card__rating-count">({recipe.ratingCount})</span>
-            )}
-          </span>
-        )}
+        {/* 评分星星 + 视频/评论计数 */}
+        <div className="recipe-card__stats">
+          {recipe.avgRating != null && recipe.avgRating > 0 ? (
+            <span className="recipe-card__stat recipe-card__stat--rating">
+              {'★'.repeat(Math.round(recipe.avgRating))}{'☆'.repeat(5 - Math.round(recipe.avgRating))}
+              <span className="recipe-card__stat-number">{recipe.avgRating.toFixed(1)}</span>
+              {recipe.ratingCount != null && recipe.ratingCount > 0 && (
+                <span className="recipe-card__stat-count">({recipe.ratingCount})</span>
+              )}
+            </span>
+          ) : (
+            <span className="recipe-card__stat recipe-card__stat--norating">暂无评分</span>
+          )}
+
+          {(recipe as any).videoCount > 0 && (
+            <span className="recipe-card__stat recipe-card__stat--video">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              {(recipe as any).videoCount}个视频
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )

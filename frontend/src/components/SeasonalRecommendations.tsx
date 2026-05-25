@@ -6,14 +6,20 @@ import './SeasonalRecommendations.css'
 
 const SEASON_OPTIONS = [
   { value: 'spring', label: '🌺 春季' },
-  { value: 'summer', label: '☀️ 夏季' },
+  { value: 'summer', label: '☀️ 夏' },
   { value: 'autumn', label: '🍂 秋季' },
   { value: 'winter', label: '❄️ 冬季' },
 ]
 
 function guessSeason(): string {
-  const month = new Date().getMonth() + 1
-  if (month >= 3 && month <= 5) return 'spring'
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  // 5月20日之后切换为夏季（初夏）
+  if (month >= 3 && month <= 5) {
+    if (month === 5 && day >= 20) return 'summer'
+    return 'spring'
+  }
   if (month >= 6 && month <= 8) return 'summer'
   if (month >= 9 && month <= 11) return 'autumn'
   return 'winter'
