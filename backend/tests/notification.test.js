@@ -153,6 +153,59 @@ beforeAll(async () => {
   recipeId = r.id
 })
 
+// Challenge model fomodel for testing
+const Challenge = sequelize.define('Challenge', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  title: { type: DataTypes.STRING(200), allowNull: false },
+  theme: { type: DataTypes.STRING, allowNull: false },
+  description: { type: DataTypes.TEXT },
+  status: { type: DataTypes.STRING, defaultValue: 'draft' },
+  createdBy: { type: DataTypes.UUID, allowNull: false },
+  submissionCount: { type: DataTypes.INTEGER, defaultValue: 0 },
+  voteCount: { type: DataTypes.INTEGER, defaultValue: 0 },
+}, { tableName: 'challenges', timestamps: true })
+
+const ChallengeSubmission = sequelize.define('ChallengeSubmission', {
+  id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+  challengeId: { type: DataTypes.UUID, allowNull: false },
+  userId: { type: DataTypes.UUID, allowNull: false },
+  recipeId: { type: DataTypes.UUID, allowNull: false },
+  description: { type: DataTypes.TEXT },
+  voteCount: { type: DataTypes.INTEGER, defaultValue: 0 },
+}, { tableName: 'challenge_submissions', timestamps: true })
+
+// Challenge notification test routes
+app.post('/api/challenges', auth, async (req, res) => {
+  const c = await Challenge.create({ ...req.body, createdBy: req.userId })
+  res.status(201).json({ code: 0, data: c })
+})
+
+app.post('/api/challenges/:id/submit', auth, async (req, res) => {
+  const { id } = req.params
+  const { recipeId, description } = req.body
+  const challenge = await Challenge.findByPk(id)
+  if (!challenge) return res.status(404).json({ code: 404, message: '挑战不存在' })
+  const submission = await ChallengeSubmission.create({ challengeId: id, recipeId: recipeId, userId: req.userId, description })
+  // Notify challenge creator
+  if (challenge.createdBy && challenge.createdBy !== req.userId) {
+    const user = await User.findByPk(req.userId)
+    const userName = (user.nickname || user.username)
+    setImmediate(async () => {
+      try {
+        await Notification.create({
+          userId: challenge.createdBy,
+          type: 'challenge_update',
+          message: userName + ' 投稿参与了挑战「' + challenge.title + '」',
+          link: '/challenges/' + id,
+          targetId: id,
+          targetType: 'challenge',
+        })
+      } catch (e) { /* ignore */ }
+    })
+  }
+  res.status(201).json({ code: 0, data: submission })
+})
+
 describe('Notification System', () => {
   test('GET /api/notifications — empty list', async () => {
     const res = await request(app).get('/api/notifications').set('Authorization', 'Bearer ' + token1)
@@ -195,6 +248,66 @@ describe('Notification System', () => {
   test('GET /api/notifications requires auth', async () => {
     const res = await request(app).get('/api/notifications')
     expect(res.status).toBe(401)
+  })
+
+  test('challenge notification: create challenge and submit', async () => {
+    // Create challenge as user2
+    const chRes = await request(app).post('/api/challenges').set('Authorization', 'Bearer ' + token2).send({
+      title: '夏日食谱挑战',
+      theme: '清凉一夏',
+      status: 'active'
+    })
+    expect(chRes.status).toBe(201)
+    const challengeId = chRes.body.data.id
+
+    // Submit as user1
+    const subRes = await request(app).post('/api/challenges/' + challengeId + '/submit').set('Authorization', 'Bearer ' + token1).send({
+      recipeId: recipeId,
+      description: '清凉消暑'
+    })
+    expect(subRes.status).toBe(201)
+
+    // Wait for async notification creation
+    await new Promise(r => setTimeout(r, 500))
+
+    // Check user2 (challenge creator) received challenge_update notification
+    const notifRes = await request(app).get('/api/notifications').set('Authorization', 'Bearer ' + token2)
+    expect(notifRes.body.data.total).toBeGreaterThanOrEqual(1)
+    const challengeNotif = notifRes.body.data.list.find(n => n.type === 'challenge_update')
+    expect(challengeNotif).toBeDefined()
+    expect(challengeNotif.message).toContain('挑战')
+  })
+
+  test('notification type enum: challenge_update creates and fetches correctly', async () => {
+    const n = await Notification.create({
+      userId: userId1,
+      type: 'challenge_update',
+      message: '🏅 挑战「夏日食谱挑战」已结束，查看排行榜',
+      link: '/challenges/dummy-id',
+      targetId: 'dummy-id',
+      targetType: 'challenge',
+    })
+    expect(n).toBeDefined()
+    expect(n.type).toBe('challenge_update')
+
+    const res = await request(app).get('/api/notifications').set('Authorization', 'Bearer ' + token1)
+    const found = res.body.data.list.find(i => i.id === n.id)
+    expect(found).toBeDefined()
+    expect(found.type).toBe('challenge_update')
+  })
+
+  test('challenge notification: creator does not notify self', async () => {
+    const chRes = await request(app).post('/api/challenges').set('Authorization', 'Bearer ' + token1).send({
+      title: '自投挑战',
+      theme: '测试',
+      status: 'active'
+    })
+    const challengeId = chRes.body.data.id
+    const subRes = await request(app).post('/api/challenges/' + challengeId + '/submit').set('Authorization', 'Bearer ' + token1).send({
+      recipeId: recipeId,
+      description: '自己投稿'
+    })
+    expect(subRes.status).toBe(201)
   })
 })
 

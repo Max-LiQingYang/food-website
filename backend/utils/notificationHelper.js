@@ -55,6 +55,7 @@ async function createNotification(...args) {
       favorite: '有人收藏了你的食谱',
       collection_add: '你的食谱被加入收藏集',
       achievement_unlock: '🏆 解锁了新成就！',
+      challenge_update: '🏅 挑战赛有新的进展',
       system: '系统通知',
       meal_plan_reminder: '⏰ 餐单提醒',
       cooking_log_reminder: '📝 烹饪日志提醒'

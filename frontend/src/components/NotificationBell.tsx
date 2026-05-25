@@ -19,6 +19,7 @@ const NOTIF_ICONS: Record<string, string> = {
   meal_plan_reminder: '⏰',
   cooking_log_reminder: '📝',
   achievement_unlock: '🏆',
+  challenge_update: '🏅',
   system: '🔔'
 }
 

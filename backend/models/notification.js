@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM(
           'follow', 'comment', 'reply', 'favorite',
           'collection_add', 'meal_plan_reminder',
-          'cooking_log_reminder', 'achievement_unlock', 'system'
+          'cooking_log_reminder', 'achievement_unlock', 'challenge_update',
+          'system'
         ),
         allowNull: false
       },

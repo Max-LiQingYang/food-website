@@ -118,11 +118,24 @@ router.post('/challenges/:id/submit', auth, async (req, res) => {
       description,
     })
 
-    // 异步更新投稿计数
+    // 异步更新投稿计数 + 通知挑战创建者
     setImmediate(async () => {
       try {
         await Challenge.increment('submissionCount', { by: 1, where: { id } })
-      } catch (e) { console.error('[submit] increment error:', e.message) }
+        // 通知挑战创建者有新投稿
+        if (challenge.createdBy && challenge.createdBy !== req.user.userId) {
+          const userName = req.user.nickname || req.user.username || '某用户'
+          createNotification({
+            userId: challenge.createdBy,
+            type: 'challenge_update',
+            actorId: req.user.userId,
+            message: userName + ' 投稿参与了挑战「' + challenge.title + '」',
+            link: '/challenges/' + id,
+            targetId: id,
+            targetType: 'challenge',
+          }).catch(() => {})
+        }
+      } catch (e) { console.error('[submit] notification error:', e.message) }
     })
 
     res.status(201).json({ code: 0, data: submission, message: '投稿成功' })
@@ -272,6 +285,76 @@ router.delete('/submissions/:id', auth, async (req, res) => {
   } catch (err) {
     console.error('[DELETE /submissions] error:', err.message)
     res.status(500).json({ code: 500, message: '删除投稿失败' })
+  }
+})
+
+// ── 通知相关 ──────────────────────────────────────────────────────────────
+
+// 获取挑战的所有参与者ID（内部辅助）
+async function getChallengeParticipantIds(challengeId) {
+  const subs = await ChallengeSubmission.findAll({
+    where: { challengeId },
+    attributes: ['userId'],
+    raw: true,
+  })
+  const ids = subs.map(s => s.userId)
+  return [...new Set(ids)]
+}
+
+/**
+ * 通知挑战所有参与者（挑战状态变更时由管理员触发）
+ * POST /challenges/:id/notify-participants
+ * Body: { message, status? }
+ */
+router.post('/challenges/:id/notify-participants', auth, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { message, status } = req.body
+
+    const challenge = await Challenge.findByPk(id)
+    if (!challenge) return res.status(404).json({ code: 404, message: '挑战不存在' })
+
+    const participantIds = await getChallengeParticipantIds(id)
+    // 添加创建者也纳入通知
+    if (challenge.createdBy && !participantIds.includes(challenge.createdBy)) {
+      participantIds.push(challenge.createdBy)
+    }
+
+    if (participantIds.length === 0) {
+      return res.json({ code: 0, data: { notified: 0 }, message: '暂无参与者需要通知' })
+    }
+
+    const notifMessage = message || (status
+      ? '挑战「' + challenge.title + '」状态已更新为：' + status
+      : '挑战「' + challenge.title + '」有新的更新')
+
+    let notified = 0
+    const errors = []
+
+    for (const userId of participantIds) {
+      try {
+        await createNotification({
+          userId,
+          type: 'challenge_update',
+          message: notifMessage,
+          link: '/challenges/' + id,
+          targetId: id,
+          targetType: 'challenge',
+        })
+        notified++
+      } catch (e) {
+        errors.push(userId)
+      }
+    }
+
+    res.json({
+      code: 0,
+      data: { notified, total: participantIds.length, errors: errors.length },
+      message: `已通知 ${notified}/${participantIds.length} 位参与者`,
+    })
+  } catch (err) {
+    console.error('[POST /notify-participants] error:', err.message)
+    res.status(500).json({ code: 500, message: '通知发送失败' })
   }
 })
 

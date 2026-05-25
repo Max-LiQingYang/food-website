@@ -19,6 +19,7 @@ const NOTIF_ICONS: Record<string, string> = {
   meal_plan_reminder: '⏰',
   cooking_log_reminder: '📝',
   achievement_unlock: '🏆',
+  challenge_update: '🏅',
   system: '🔔'
 }
 
@@ -28,6 +29,7 @@ const NOTIF_TYPES = [
   { value: 'comment', label: '评论' },
   { value: 'reply', label: '回复' },
   { value: 'favorite', label: '收藏' },
+  { value: 'challenge_update', label: '挑战' },
   { value: 'achievement_unlock', label: '成就' },
   { value: 'system', label: '系统' }
 ]
@@ -52,6 +54,8 @@ export default function NotificationsPage() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [filterType, setFilterType] = useState('')
   const [filterUnread, setFilterUnread] = useState(false)
+  const [groupByType, setGroupByType] = useState(false)
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -72,6 +76,41 @@ export default function NotificationsPage() {
     }
     setLoading(false)
   }, [isAuthenticated, page, pageSize, filterType, filterUnread])
+
+  // 按类型分组
+  const groupedItems = useCallback(() => {
+    const groups: Record<string, NotificationItem[]> = {}
+    for (const item of items) {
+      const key = item.type
+      if (!groups[key]) groups[key] = []
+      groups[key].push(item)
+    }
+    // 排序：未读优先，按最新时间
+    for (const key of Object.keys(groups)) {
+      groups[key].sort((a, b) => {
+        if (a.isRead !== b.isRead) return a.isRead ? 1 : -1
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      })
+    }
+    return groups
+  }, [items])
+
+  const toggleGroup = (type: string) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(type)) next.delete(type)
+      else next.add(type)
+      return next
+    })
+  }
+
+  // 默认展开有未读的组
+  useEffect(() => {
+    if (groupByType && items.length > 0) {
+      const unreadGroups = [...new Set(items.filter(i => !i.isRead).map(i => i.type))]
+      setExpandedGroups(new Set(unreadGroups))
+    }
+  }, [groupByType, items])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -136,14 +175,23 @@ export default function NotificationsPage() {
             </button>
           ))}
         </div>
-        <label className="notif-page__unread-toggle">
-          <input
-            type="checkbox"
-            checked={filterUnread}
-            onChange={() => { setFilterUnread(!filterUnread); setPage(1) }}
-          />
-          仅未读
-        </label>
+        <div className="notif-page__filter-options">
+          <label className="notif-page__unread-toggle">
+            <input
+              type="checkbox"
+              checked={filterUnread}
+              onChange={() => { setFilterUnread(!filterUnread); setPage(1) }}
+            />
+            仅未读
+          </label>
+          <button
+            className={`notif-page__group-toggle ${groupByType ? 'active' : ''}`}
+            onClick={() => setGroupByType(!groupByType)}
+            title="按类型分组"
+          >
+            📂 分组
+          </button>
+        </div>
       </div>
 
       {/* 列表 */}
@@ -163,7 +211,75 @@ export default function NotificationsPage() {
         <div className="notif-page__empty">
           <p>暂无通知</p>
         </div>
+      ) : groupByType ? (
+        /* ── 分组视图 ── */
+        <div className="notif-page__groups">
+          {Object.entries(groupedItems()).map(([type, typeItems]) => {
+            const typeUnread = typeItems.filter(i => !i.isRead).length
+            const isExpanded = expandedGroups.has(type)
+            const typeLabel = NOTIF_TYPES.find(t => t.value === type)?.label || type
+            return (
+              <div key={type} className="notif-page__group">
+                <button
+                  className="notif-page__group-header"
+                  onClick={() => toggleGroup(type)}
+                >
+                  <span className="notif-page__group-header-left">
+                    <span className="notif-page__group-icon">{NOTIF_ICONS[type] || '🔔'}</span>
+                    <span className="notif-page__group-label">{typeLabel}</span>
+                    {typeUnread > 0 && (
+                      <span className="notif-page__group-badge">{typeUnread}</span>
+                    )}
+                  </span>
+                  <span className="notif-page__group-count">{typeItems.length}条</span>
+                  <span className={`notif-page__group-arrow ${isExpanded ? 'expanded' : ''}`}>▸</span>
+                </button>
+                {isExpanded && (
+                  <div className="notif-page__group-items">
+                    {typeItems.map(item => (
+                      <div
+                        key={item.id}
+                        className={`notif-page__item ${item.isRead ? '' : 'notif-page__item--unread'}`}
+                      >
+                        <div className="notif-page__item-icon">{NOTIF_ICONS[item.type] || '🔔'}</div>
+                        <div className="notif-page__item-body">
+                          <Link
+                            to={item.link || '/notifications'}
+                            className="notif-page__item-link"
+                            onClick={() => { if (!item.isRead) handleMarkRead(item.id) }}
+                          >
+                            <p className="notif-page__item-message">{item.message}</p>
+                          </Link>
+                          <span className="notif-page__item-time">{formatTime(item.createdAt)}</span>
+                        </div>
+                        <div className="notif-page__item-actions">
+                          {!item.isRead && (
+                            <button
+                              className="notif-page__item-read"
+                              onClick={() => handleMarkRead(item.id)}
+                              title="标记已读"
+                            >
+                              ○
+                            </button>
+                          )}
+                          <button
+                            className="notif-page__item-delete"
+                            onClick={() => handleDelete(item.id)}
+                            title="删除"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       ) : (
+        /* ── 平铺列表视图 ── */
         <div className="notif-page__list">
           {items.map(item => (
             <div

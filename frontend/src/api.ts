@@ -2048,7 +2048,7 @@ export interface NotificationItem {
   id: string
   userId: string
   actorId: string | null
-  type: 'follow' | 'comment' | 'reply' | 'favorite' | 'collection_add' | 'meal_plan_reminder' | 'cooking_log_reminder' | 'achievement_unlock' | 'system'
+  type: 'follow' | 'comment' | 'reply' | 'favorite' | 'collection_add' | 'meal_plan_reminder' | 'cooking_log_reminder' | 'achievement_unlock' | 'challenge_update' | 'system'
   message: string
   link: string | null
   targetId: string | null
