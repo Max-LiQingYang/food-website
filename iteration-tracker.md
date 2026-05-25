@@ -795,3 +795,35 @@
 - `auth` 中间件设置 `req.userId`，但 challenges.js 全量使用 `req.user.userId`（`req.user` 从未存在）—— 这是自挑战系统创建以来的预存 Bug。本次修复 10 处引用
 - `req.user.nickname || req.user.username` 改为 `User.findByPk(req.userId)` DB 查询获取提交者昵称
 - notify-participants 端点按订阅者逐条创建通知，返回 notified/total/errors 计数
+
+---
+
+## 迭代 #60 — C/内容质量：食谱视频覆盖率提升 ⏳
+**派发时间**: 2026-05-26
+**方向**: C（内容质量）/ 🟢 现有功能完善
+**基线 Commit**: `871c0ca`
+
+### 背景
+网站巡检通过，无遗留错误，无未完成任务。方向评估：
+- 功能完整性：核心流程通畅 ✅
+- 视觉一致性：无样式错乱 ✅
+- 交互体验：加载快、搜索正常 ✅
+- 代码质量：构建通过 ✅
+- 内容缺口：81 道食谱中仅 20 道有视频教程（24.7%），61 道无视频
+
+### 巡检数据
+- 有视频：20/81（24.7%）
+- 无视频热门候选：酸菜鱼(303views/15favs)、虾饺(221/10)、豚骨拉面(154/33)、芒果糯米饭(105/28)、剁椒鱼头(103/11)
+- 视频基础设施：VideoEmbed 模型、VideoPlayer 组件、/api/recipes/:id/videos 端点 全部就绪 ✅
+- 迭代#56 已成功填充 20 道食谱的 23 条视频
+
+### 任务内容
+1. **后端**：查询生产 DB，按 popularity（viewCount + favoriteCount×2）排序，找出 Top 20 无视频食谱
+2. **内容**：为每道食谱寻找 1 条合适的公开视频教程链接（Bilibili/YouTube）
+3. **后端**：扩展 `backend/scripts/fill_videos.js` 或新建脚本，插入 VideoEmbed 记录
+4. **种子数据**：同步更新 `backend/seeds/seed.js`
+5. **前端验证**：确保 VideoPlayer 正确展示新视频
+6. **部署闭环**：commit → build → deploy → 验证
+7. **更新**：iteration-tracker.md 和 iteration-lessons.md
+
+**下一个方向**: A（UI/UX）
