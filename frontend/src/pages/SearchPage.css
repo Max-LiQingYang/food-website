@@ -428,6 +428,38 @@
     font-size: 15px;
   }
 
+  /* 标签筛选移动端水平滚动 */
+  .search-tag-filters {
+    gap: 8px;
+  }
+
+  .search-tag-group {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .search-tag-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  .search-tag-group__label {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-bg, #faf8f5);
+    padding-right: 4px;
+  }
+
+  .search-filter-tag {
+    padding: 6px 14px;
+    min-height: 32px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+}
+
   .search-grid {
     grid-template-columns: 1fr;
     gap: 14px;

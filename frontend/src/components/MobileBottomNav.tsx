@@ -1,5 +1,5 @@
-import { NavLink, useLocation } from 'react-router-dom'
-import { useState, useRef, useCallback } from 'react'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import './MobileBottomNav.css'
 
 const NAV_ITEMS = [
@@ -12,10 +12,32 @@ const NAV_ITEMS = [
 
 export default function MobileBottomNav() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [visible, setVisible] = useState(true)
   const navRef = useRef<HTMLElement>(null)
+  const lastScrollY = useRef(0)
 
-  // ── 手势导航：手指左右滑动切换 Tab ──
+  // ── 滚动隐藏/显示 ──
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        // 向下滚动 → 隐藏
+        setVisible(false)
+      } else if (currentScrollY < lastScrollY.current) {
+        // 向上滚动 → 显示
+        setVisible(true)
+      }
+      lastScrollY.current = currentScrollY
+    }
+
+    // Use passive listener for performance
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // ── 手势导航：手指左右滑动切换 Tab（useNavigate 修复全页刷新） ──
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setTouchStart(e.touches[0].clientX)
   }, [])
@@ -44,11 +66,11 @@ export default function MobileBottomNav() {
 
       if (targetIndex !== currentIndex) {
         const targetPath = NAV_ITEMS[targetIndex].path
-        // Use window.location for full navigation
-        window.location.href = targetPath
+        // ✅ 修复：React Router navigate 替代 window.location.href（避免全页刷新）
+        navigate(targetPath)
       }
     },
-    [touchStart, location.pathname]
+    [touchStart, location.pathname, navigate]
   )
 
   const isActivePath = (path: string) => {
@@ -59,7 +81,7 @@ export default function MobileBottomNav() {
 
   return (
     <nav
-      className="mobile-bottom-nav"
+      className={`mobile-bottom-nav ${visible ? '' : 'mobile-bottom-nav--hidden'}`}
       aria-label="页脚导航"
       ref={navRef}
       onTouchStart={handleTouchStart}
@@ -78,6 +100,8 @@ export default function MobileBottomNav() {
           >
             <span className="mobile-bottom-nav__icon" aria-hidden="true">{item.icon}</span>
             <span className="mobile-bottom-nav__label">{item.label}</span>
+            {/* 活动指示器底部条 */}
+            {isActive && <span className="mobile-bottom-nav__indicator" />}
           </NavLink>
         )
       })}

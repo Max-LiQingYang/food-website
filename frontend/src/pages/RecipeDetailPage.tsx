@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getRecipeById, deleteRecipe } from '../api'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
@@ -309,6 +309,67 @@ export default function RecipeDetailPage() {
   const handleStepClick = (stepNum: number) => {
     setActiveStep(activeStep === stepNum ? null : stepNum)
   }
+
+  // ── 步骤滑动导航 ──
+  const stepList = recipe?.steps || []
+  const [stepSwipeStart, setStepSwipeStart] = useState<number | null>(null)
+  const [focusedStepIndex, setFocusedStepIndex] = useState(0)
+
+  // 滚动到第几步（自动定位）
+  useEffect(() => {
+    if (stepList.length === 0) return
+    // 找到第一个未完成的步骤
+    const firstIncomplete = stepList.findIndex(s => !completedSteps.has(s.stepNumber))
+    setFocusedStepIndex(firstIncomplete >= 0 ? firstIncomplete : 0)
+  }, [stepList.length, completedSteps])
+
+  const handleStepSwipeStart = useCallback((e: React.TouchEvent) => {
+    setStepSwipeStart(e.touches[0].clientX)
+  }, [])
+
+  const handleStepSwipeEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (stepSwipeStart === null || stepList.length === 0) return
+      const diff = e.changedTouches[0].clientX - stepSwipeStart
+      setStepSwipeStart(null)
+
+      if (Math.abs(diff) < 50) return
+
+      // 左滑 → 上一步，右滑 → 下一步
+      if (diff > 0 && focusedStepIndex > 0) {
+        const newIdx = focusedStepIndex - 1
+        setFocusedStepIndex(newIdx)
+        setActiveStep(stepList[newIdx].stepNumber)
+        document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      } else if (diff < 0 && focusedStepIndex < stepList.length - 1) {
+        const newIdx = focusedStepIndex + 1
+        setFocusedStepIndex(newIdx)
+        setActiveStep(stepList[newIdx].stepNumber)
+        document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    },
+    [stepSwipeStart, stepList, focusedStepIndex]
+  )
+
+  const goPrevStep = useCallback(() => {
+    if (focusedStepIndex > 0) {
+      const newIdx = focusedStepIndex - 1
+      setFocusedStepIndex(newIdx)
+      setActiveStep(stepList[newIdx].stepNumber)
+      const el = document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [focusedStepIndex, stepList])
+
+  const goNextStep = useCallback(() => {
+    if (focusedStepIndex < stepList.length - 1) {
+      const newIdx = focusedStepIndex + 1
+      setFocusedStepIndex(newIdx)
+      setActiveStep(stepList[newIdx].stepNumber)
+      const el = document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [focusedStepIndex, stepList])
 
   // ── 加载态（骨架屏） ─────────────────────────────────────
 
@@ -661,7 +722,11 @@ export default function RecipeDetailPage() {
 
         {/* 制作步骤 */}
         {recipe.steps && recipe.steps.length > 0 && (
-          <section className="detail-section">
+          <section
+            className="detail-section"
+            onTouchStart={handleStepSwipeStart}
+            onTouchEnd={handleStepSwipeEnd}
+          >
             <h2 className="detail-section__title">
               📝 制作步骤
               <span className="section-count">{recipe.steps.length} 步</span>
@@ -707,6 +772,28 @@ export default function RecipeDetailPage() {
                 )
               })}
             </ol>
+            {/* 步骤导航箭头 */}
+            <div className="step-nav">
+              <button
+                className="step-nav__btn step-nav__btn--prev"
+                onClick={goPrevStep}
+                disabled={focusedStepIndex <= 0}
+                aria-label="上一步"
+              >
+                ◀ 上一步
+              </button>
+              <span className="step-nav__info">
+                {focusedStepIndex + 1} / {recipe.steps.length}
+              </span>
+              <button
+                className="step-nav__btn step-nav__btn--next"
+                onClick={goNextStep}
+                disabled={focusedStepIndex >= recipe.steps.length - 1}
+                aria-label="下一步"
+              >
+                下一步 ▶
+              </button>
+            </div>
           </section>
         )}
 

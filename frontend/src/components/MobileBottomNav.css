@@ -10,8 +10,26 @@
   z-index: 99;
   padding-bottom: env(safe-area-inset-bottom);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
-  transition: background var(--transition-normal, 0.3s);
+  transition: background var(--transition-normal, 0.3s), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   touch-action: pan-y;
+}
+
+/* ── 滚动隐藏动画 ── */
+.mobile-bottom-nav--hidden {
+  transform: translateY(100%);
+}
+
+/* ── iPad/平板增大高度 ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mobile-bottom-nav {
+    height: 64px;
+  }
+  .mobile-bottom-nav__label {
+    font-size: 12px;
+  }
+  .mobile-bottom-nav__icon {
+    font-size: 22px;
+  }
 }
 
 .mobile-bottom-nav__item {
@@ -24,7 +42,7 @@
   text-decoration: none;
   color: var(--color-text-muted, #999);
   font-size: 11px;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.15s ease;
   -webkit-tap-highlight-color: transparent;
   position: relative;
   padding: 6px 0;
@@ -35,17 +53,25 @@
   color: var(--color-primary, #e8663e);
 }
 
-/* 活动指示器小圆点 */
-.mobile-bottom-nav__item.is-active::after {
-  content: '';
+.mobile-bottom-nav__item:active {
+  transform: scale(0.92);
+}
+
+/* ── 活动指示器底部条（替代顶部小圆点） ── */
+.mobile-bottom-nav__indicator {
   position: absolute;
-  top: 3px;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
   background: var(--color-primary, #e8663e);
+  transition: width 0.25s ease;
+}
+
+.is-active .mobile-bottom-nav__indicator {
+  width: 20px;
 }
 
 /* 创作按钮特殊样式 */

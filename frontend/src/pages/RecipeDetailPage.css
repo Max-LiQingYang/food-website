@@ -638,6 +638,53 @@ body.dark .substitution-toggle:hover {
   opacity: 0.85;
 }
 
+/* ── 步骤导航箭头 ── */
+.step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: var(--color-card, #fff);
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: var(--radius-md, 12px);
+  gap: 12px;
+}
+
+.step-nav__btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  border: 1.5px solid var(--color-primary, #e8663e);
+  border-radius: 20px;
+  background: var(--color-card, #fff);
+  color: var(--color-primary, #e8663e);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+.step-nav__btn:hover:not(:disabled) {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+}
+
+.step-nav__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--color-border, #e8e0d8);
+  color: var(--color-text-muted, #999);
+}
+
+.step-nav__info {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #666);
+  min-width: 48px;
+  text-align: center;
+}
+
 /* ── 空状态 / 404 ── */
 .detail-notfound {
   display: flex;
