@@ -8,6 +8,8 @@ import './CommentSection.css'
 
 interface Props {
   recipeId: string
+  /** Callback when a rating-based comment is submitted (for optimistic UI update) */
+  onRatingUpdate?: (newAvg: number, newCount: number) => void
 }
 
 type SortMode = 'latest' | 'hot'
@@ -74,7 +76,7 @@ function RatingBar({ count, total }: { count: number; total: number }) {
   )
 }
 
-export default function CommentSection({ recipeId }: Props) {
+export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
   const navigate = useNavigate()
   const toast = useToast()
   const { isAuthenticated, user } = useAuth()
@@ -142,6 +144,16 @@ export default function CommentSection({ recipeId }: Props) {
       toast.success('评论发表成功')
       setPage(1)
       await fetchData()
+
+      // Optimistic rating update: estimate new avg/ratingCount
+      if (rating > 0 && onRatingUpdate) {
+        const prev = stats
+        const prevCount = prev?.ratedCount || 0
+        const prevAvg = prev?.averageRating || 0
+        const newCount = prevCount + 1
+        const newAvg = ((prevAvg * prevCount) + rating) / newCount
+        onRatingUpdate(parseFloat(newAvg.toFixed(2)), newCount)
+      }
     } catch (err: any) {
       toast.error(err?.message || '评论发表失败')
     } finally {
@@ -303,7 +315,15 @@ export default function CommentSection({ recipeId }: Props) {
       {/* 评论列表 */}
       {comments.length === 0 ? (
         <div className="comment-empty">
-          <p>🍽️ 暂无评论，快来抢沙发吧！</p>
+          <div className="comment-empty__icon">{stats && stats.ratedCount > 0 ? '💬' : '🌟'}</div>
+          <p className="comment-empty__text">
+            {stats && stats.ratedCount > 0
+              ? '还没有人留下文字评论' : '还没有评分和评论'}
+          </p>
+          <p className="comment-empty__hint">
+            {stats && stats.ratedCount > 0
+              ? '分享你的烹饪体验吧！' : '来做第一个品尝并评分的人吧！'}
+          </p>
         </div>
       ) : (
         <div className="comment-list">

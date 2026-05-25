@@ -347,9 +347,37 @@
 
 .comment-empty {
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 2.5rem 1.5rem;
+  border: 1px dashed var(--border-color, #e8e0d8);
+  border-radius: 12px;
+  background: var(--bg-secondary, #faf6f1);
+}
+
+.comment-empty__icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.comment-empty__text {
+  color: var(--text-primary, #2d2013);
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 0.4rem;
+}
+
+.comment-empty__hint {
   color: var(--text-secondary, #8b7355);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+[data-theme='dark'] .comment-empty {
+  border-color: #333;
+  background: var(--bg-secondary-dark, #252525);
+}
+
+[data-theme='dark'] .comment-empty__text {
+  color: var(--text-primary-dark, #e0e0e0);
 }
 
 /* ── 评论列表 ──────────────────────────────────────────────── */

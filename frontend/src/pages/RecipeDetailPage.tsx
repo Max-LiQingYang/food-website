@@ -91,6 +91,11 @@ export default function RecipeDetailPage() {
   const [showCulturalBg, setShowCulturalBg] = useState(false)
   const [showCookingMode, setShowCookingMode] = useState(false)
 
+  // ═══ #54: 乐观更新评分 ──
+  const handleRatingUpdate = useCallback((newAvg: number, newCount: number) => {
+    setRecipe(prev => prev ? { ...prev, avgRating: newAvg, ratingCount: newCount } : prev)
+  }, [])
+
   // ── 语音播报 ──
   const { speak, pause, resume, stop: stopSpeech, speaking, paused, supported: speechSupported } = useSpeechSynthesis()
 
@@ -614,7 +619,7 @@ export default function RecipeDetailPage() {
               </span>
             )}
             {/* 评分标签 */}
-            {recipe.avgRating != null && recipe.avgRating > 0 && (
+            {recipe.avgRating != null && recipe.avgRating > 0 ? (
               <span className="detail-tag detail-tag--rating">
                 {"★".repeat(Math.round(recipe.avgRating))}{"☆".repeat(5 - Math.round(recipe.avgRating))}
                 {" "}{recipe.avgRating.toFixed(1)}
@@ -622,7 +627,11 @@ export default function RecipeDetailPage() {
                   <span> ({recipe.ratingCount}人评分)</span>
                 )}
               </span>
-            )}
+            ) : recipe.avgRating != null ? (
+              <span className="detail-tag detail-tag--unrated">
+                ⭐ 暂无评分
+              </span>
+            ) : null}
             {/* 浏览量标签 */}
             {recipe.viewCount != null && recipe.viewCount > 0 && (
               <span className="detail-tag detail-tag--views">
@@ -908,7 +917,17 @@ export default function RecipeDetailPage() {
         {id && (
           <section className="detail-section detail-section--comments">
             <h2 className="detail-section__title">💬 评价与留言</h2>
-            <CommentSection recipeId={id} />
+            {/* 评分空状态引导 */}
+            {recipe.avgRating != null && recipe.ratingCount === 0 && (
+              <section className="detail-section detail-section--rating-prompt">
+                <div className="rating-prompt">
+                  <div className="rating-prompt__stars">☆ ☆ ☆ ☆ ☆</div>
+                  <p className="rating-prompt__text">暂无评分，来做第一个评分的人吧！</p>
+                  <p className="rating-prompt__hint">评分后可以帮助其他用户发现更好吃的菜谱 🍽️</p>
+                </div>
+              </section>
+            )}
+            <CommentSection recipeId={id} onRatingUpdate={handleRatingUpdate} />
           </section>
         )}
       </div>

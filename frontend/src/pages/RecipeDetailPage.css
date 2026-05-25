@@ -220,6 +220,18 @@
   color: #2e7d32;
 }
 
+.detail-tag--unrated {
+  background: var(--bg-secondary, #f5f0ea);
+  color: var(--color-text-secondary, #8b7355);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+[data-theme='dark'] .detail-tag--unrated {
+  background: var(--bg-secondary-dark, #2a2a2a);
+  color: var(--color-text-muted-dark, #999);
+}
+
 .detail-tag--rating {
   background: #fef3c7;
   color: #92400e;
@@ -1243,6 +1255,54 @@ body.dark .substitution-toggle:hover {
 
 .ingredient-amount {
   font-variant-numeric: tabular-nums;
+}
+
+/* ═══ #54 评分空状态引导 ═══ */
+
+.detail-section--rating-prompt {
+  margin-bottom: 0;
+}
+
+.rating-prompt {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border: 1px dashed var(--border-color, #e8e0d8);
+  border-radius: 12px;
+  background: var(--bg-secondary, #faf6f1);
+}
+
+.rating-prompt__stars {
+  font-size: 2rem;
+  color: #eab308;
+  letter-spacing: 6px;
+  margin-bottom: 0.75rem;
+  filter: grayscale(0.5);
+}
+
+.rating-prompt__text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary, #2d2013);
+  margin: 0 0 0.4rem;
+}
+
+.rating-prompt__hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #8b7355);
+  margin: 0;
+}
+
+[data-theme='dark'] .rating-prompt {
+  border-color: #333;
+  background: var(--bg-secondary-dark, #252525);
+}
+
+[data-theme='dark'] .rating-prompt__text {
+  color: var(--text-primary-dark, #e0e0e0);
+}
+
+[data-theme='dark'] .rating-prompt__stars {
+  filter: grayscale(0.4) brightness(0.8);
 }
 
 body.dark .serving-scaler {
