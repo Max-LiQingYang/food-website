@@ -62,6 +62,8 @@ router.post('/recipes/by-ingredients', async (req, res) => {
         }
       })
 
+    }
+
     const offsetVal = (parseInt(page) - 1) * parseInt(pageSize)
     const limitVal = parseInt(pageSize)
     const { count, rows } = await Recipe.findAndCountAll({
@@ -77,7 +79,7 @@ router.post('/recipes/by-ingredients', async (req, res) => {
       try {
         const parsed = typeof recipe.ingredients === 'string' ? JSON.parse(recipe.ingredients) : recipe.ingredients
         recipeIngredients = Array.isArray(parsed) ? parsed.map((i) => typeof i === 'string' ? i : (i.name || '')).filter(Boolean) : []
-      } catch { recipeIngredients = [] }
+      } catch (e) { recipeIngredients = [] }
 
       // 使用别名扩展匹配
       const userLowerExpanded = expandedIngredients
