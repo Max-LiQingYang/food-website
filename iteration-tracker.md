@@ -471,3 +471,26 @@
 **注意事项**：
 - routes/recipes.js 中 `/suggestions` 在 `/:id` 之前注册（Express 路由顺序）
 - 服务器必须 git pull 到最新 commit 后 docker cp，否则容器文件未更新
+
+---
+
+## 迭代 #53 — C/内容质量：食谱故事与文化背景内容填充 ⏳
+**状态**: 已派发 (2026-05-25 22:45 CST)
+**方向**: C（内容质量）/ 🟢 现有内容完善
+**基线 Commit**: `38fca63`
+
+### 背景
+网站巡检通过，无遗留错误，无未完成任务。通过API检查发现：
+- 81道食谱的 `story` 和 `culturalBackground` 字段全部为 `null`
+- 迭代#46已新增这两个字段并开发了前端展示组件（RecipeDetailPage 条件渲染折叠区）
+- 但由于内容缺失，用户在食谱详情页看不到故事和文化背景内容
+
+### 任务内容
+1. 后端/内容：为81道食谱生成/填充 `story`（起源、趣闻、个人记忆）和 `culturalBackground`（地域特色、节日关联、历史渊源）
+2. 内容要求：贴合食谱标题和分类，避免模板化，每篇100-200字
+3. 数据更新：编写批量UPDATE脚本，同步更新 seed.js 种子数据
+4. 前端验证：确保内容正确展示在 RecipeDetailPage 的折叠区
+5. 部署闭环：commit → build → deploy → 验证
+6. 更新 iteration-tracker.md 和 iteration-lessons.md
+
+**下一个方向**: A（UI/UX）
