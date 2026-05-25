@@ -755,6 +755,32 @@ export default function RecipeDetailPage() {
                     <div className="step-body">
                       <p className="step-content">{step.content}</p>
                       <StepTimer stepNumber={step.stepNumber} stepContent={step.content} />
+                      {/* 语音播报按钮 */}
+                      {speechSupported && (
+                        <div className="step-voice-controls">
+                          {!speaking && (
+                            <button
+                              className="step-voice-btn"
+                              onClick={(e) => { e.stopPropagation(); speak(step.content) }}
+                              title="朗读此步骤"
+                            >
+                              🔊 朗读
+                            </button>
+                          )}
+                          {speaking && (
+                            <>
+                              <span className="step-voice-indicator">🔊 朗读中...</span>
+                              <button
+                                className="step-voice-btn step-voice-btn--small"
+                                onClick={(e) => { e.stopPropagation(); stopSpeech() }}
+                                title="停止朗读"
+                              >
+                                ⏹ 停止
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
                       {step.image && (
                         <img
                           src={step.image}

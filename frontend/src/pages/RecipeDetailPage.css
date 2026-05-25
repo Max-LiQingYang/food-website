@@ -1358,3 +1358,54 @@ body.dark .cultural-content {
     font-size: 17px;
   }
 }
+
+/* ── 步骤语音播报按钮 ── */
+.step-voice-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.step-voice-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 14px;
+  background: var(--color-card, #fff);
+  color: var(--color-text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.step-voice-btn:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+  background: var(--color-primary-bg, #fff3ed);
+}
+
+.step-voice-btn:active {
+  transform: scale(0.95);
+}
+
+.step-voice-btn--small {
+  font-size: 11px;
+  padding: 3px 10px;
+}
+
+.step-voice-indicator {
+  font-size: 12px;
+  color: var(--color-primary, #e8663e);
+  animation: step-voice-pulse 1s ease-in-out infinite;
+}
+
+@keyframes step-voice-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
