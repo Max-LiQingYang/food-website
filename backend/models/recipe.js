@@ -88,14 +88,13 @@ module.exports = (sequelize, DataTypes) => {
         comment: '季节标签: spring, summer, autumn, winter, all（四季皆宜）'
       },
       nutriScore: {
-        type: DataTypes.CHAR(1),
-        allowNull: true,
-        comment: '营养价值评分: A/B/C/D/E'
+        type: DataTypes.VIRTUAL(DataTypes.CHAR(1)),
+        comment: '营养价值评分: A/B/C/D/E (运行时计算)'
       },
       smartDifficulty: {
-        type: DataTypes.STRING,
+        type: DataTypes.VIRTUAL(DataTypes.STRING),
         allowNull: true,
-        comment: '智能难度评估: beginner/intermediate/advanced'
+        comment: '智能难度评估: beginner/intermediate/advanced (运行时计算)'
       },
       favoriteCount: {
         type: DataTypes.INTEGER,
