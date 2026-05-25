@@ -85,7 +85,7 @@ router.post('/challenges', auth, async (req, res) => {
     const challenge = await Challenge.create({
       title, description, theme, coverImage, startDate, endDate,
       status: status || 'draft', rules, prize,
-      createdBy: req.user.userId,
+      createdBy: req.userId,
     })
     res.status(201).json({ code: 0, data: challenge, message: '挑战创建成功' })
   } catch (err) {
@@ -108,13 +108,13 @@ router.post('/challenges/:id/submit', auth, async (req, res) => {
     if (!recipe) return res.status(404).json({ code: 404, message: '食谱不存在' })
 
     // 检查是否已投稿
-    const existing = await ChallengeSubmission.findOne({ where: { challengeId: id, userId: req.user.userId } })
+    const existing = await ChallengeSubmission.findOne({ where: { challengeId: id, userId: req.userId } })
     if (existing) return res.status(400).json({ code: 400, message: '您已投稿，不可重复投递' })
 
     const submission = await ChallengeSubmission.create({
       challengeId: id,
       recipeId,
-      userId: req.user.userId,
+      userId: req.userId,
       description,
     })
 
@@ -123,12 +123,13 @@ router.post('/challenges/:id/submit', auth, async (req, res) => {
       try {
         await Challenge.increment('submissionCount', { by: 1, where: { id } })
         // 通知挑战创建者有新投稿
-        if (challenge.createdBy && challenge.createdBy !== req.user.userId) {
-          const userName = req.user.nickname || req.user.username || '某用户'
+        if (challenge.createdBy && challenge.createdBy !== req.userId) {
+          const submitterUser = await User.findByPk(req.userId, { attributes: ['nickname', 'username'] })
+          const userName = (submitterUser && (submitterUser.nickname || submitterUser.username)) || '某用户'
           createNotification({
             userId: challenge.createdBy,
             type: 'challenge_update',
-            actorId: req.user.userId,
+            actorId: req.userId,
             message: userName + ' 投稿参与了挑战「' + challenge.title + '」',
             link: '/challenges/' + id,
             targetId: id,
@@ -150,7 +151,7 @@ router.post('/challenges/:id/vote', auth, async (req, res) => {
   try {
     const challengeId = req.params.id
     const { submissionId } = req.body
-    const userId = req.user.userId
+    const userId = req.userId
 
     const challenge = await Challenge.findByPk(challengeId)
     if (!challenge) return res.status(404).json({ code: 404, message: '挑战不存在' })
@@ -210,7 +211,7 @@ router.get('/challenges/:id/my-vote', auth, async (req, res) => {
       include: [{
         model: ChallengeSubmission, as: 'submission', where: { challengeId: id },
       }],
-      where: { userId: req.user.userId },
+      where: { userId: req.userId },
     })
     res.json({ code: 0, data: vote ? { submissionId: vote.submissionId, voted: true } : { voted: false } })
   } catch (err) {
@@ -252,7 +253,7 @@ router.get('/challenges/:id/ranking', async (req, res) => {
 router.get('/my-submissions', auth, async (req, res) => {
   try {
     const submissions = await ChallengeSubmission.findAll({
-      where: { userId: req.user.userId },
+      where: { userId: req.userId },
       order: [['createdAt', 'DESC']],
       include: [
         { model: Challenge, as: 'challenge', attributes: ['id', 'title', 'theme', 'status'] },
@@ -271,7 +272,7 @@ router.delete('/submissions/:id', auth, async (req, res) => {
   try {
     const submission = await ChallengeSubmission.findByPk(req.params.id)
     if (!submission) return res.status(404).json({ code: 404, message: '投稿不存在' })
-    if (submission.userId !== req.user.userId) {
+    if (submission.userId !== req.userId) {
       return res.status(403).json({ code: 403, message: '无权操作' })
     }
     const challengeId = submission.challengeId
