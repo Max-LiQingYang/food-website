@@ -1186,3 +1186,33 @@
 - 完成打卡无缝衔接烹饪日志，记录成就
 
 **下一个方向**: C（内容质量）
+
+---
+
+## 迭代 #68 — A/UI/UX：构建警告修复与图片加载体验优化 ⏳
+**派发时间**: 2026-05-26
+**方向**: A（UI/UX）/ 🟡 体验优化
+**基线 Commit**: `306c7be`
+**交付 Commit**: `待填充`
+**部署**: http://39.103.68.205/
+
+### 背景
+网站巡检通过，功能完整无遗留错误，迭代#67已完成。方向评估中发现以下体验瑕疵：
+- 前端构建产生 2 个 CSS syntax warnings（Unexpected "/" 和 Unexpected "}"）
+- 抽样检查 10 道食谱中 4 道 Unsplash 封面图片返回 404（水煮鱼/班尼迪克蛋/鱼香肉丝等）
+- 图片加载失败虽有 onError fallback，但降级体验可进一步优化
+
+### 任务内容
+1. **定位并修复 CSS syntax warnings** — 找出产生 warnings 的 CSS 文件，修复语法错误，确保构建 0 warnings
+2. **修复失效封面图片** — 检查并替换返回 404 的 Unsplash 图片 URL，恢复视觉完整性
+3. **图片加载体验优化** — 增强 RecipeCard 图片降级展示，优化 ProgressiveImage 过渡效果
+4. **构建验证** — 本地 `npm run build` 0 errors 0 warnings
+5. **部署闭环** — commit → build → deploy → 验证
+6. **更新 iteration-tracker.md 和 iteration-lessons.md**
+
+### 用户价值
+- 消除构建警告，提升代码质量和维护性
+- 修复失效图片，提升首页和详情页视觉体验
+- 更优雅的图片加载失败降级，减少用户感知到的"破损感"
+
+**下一个方向**: B（功能增强）
