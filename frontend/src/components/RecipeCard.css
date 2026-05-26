@@ -130,7 +130,13 @@ body.dark .recipe-card {
   align-items: center;
   justify-content: center;
   font-size: 48px;
-  background: var(--color-bg-secondary, #f5f0eb);
+  background: linear-gradient(135deg, #f5f0eb 0%, #e8ddd5 40%, #f0d5c0 100%);
+  color: rgba(0,0,0,0.12);
+}
+
+body.dark .recipe-card__cover-placeholder {
+  background: linear-gradient(135deg, #2a2520 0%, #3a3028 50%, #2e2520 100%);
+  color: rgba(255,255,255,0.12);
 }
 
 /* ── 浮动标签 ── */

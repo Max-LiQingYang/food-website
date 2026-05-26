@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import MobileBottomNav from '../components/MobileBottomNav'
 import BackToTop from '../components/BackToTop'
@@ -48,11 +49,21 @@ const CookingAnalyticsPage = lazy(() => import('../pages/CookingAnalyticsPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
+/** 路由切换时自动滚动到顶部 */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+  }, [pathname])
+  return null
+}
+
 function Layout() {
   return (
     <KeyboardShortcutsProvider>
       <ErrorBoundary>
         <SkipLink />
+        <ScrollToTop />
         <Navbar />
         <Breadcrumb />
         <main id="main-content">

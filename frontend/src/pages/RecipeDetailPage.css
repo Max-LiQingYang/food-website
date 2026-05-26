@@ -1158,6 +1158,11 @@ body.dark .substitution-toggle:hover {
     font-size: 13px;
   }
 
+  /* 移动端：浮动操作栏 (floating-action-bar) 已包含收藏+收藏到分组功能 */
+  .detail-cover-actions {
+    display: none;
+  }
+
   .fav-text {
     display: none;
   }
