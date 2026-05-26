@@ -22,6 +22,7 @@ const recipes = [
     description: '经典川菜，鸡肉嫩滑，花生酥脆，麻辣鲜香，是一道老少皆宜的家常菜。',
     category: 'chinese',
     difficulty: 'medium',
+    season: 'all',
     servings: 3,
     ingredients: JSON.stringify([
       { name: '鸡胸肉', amount: 300, unit: 'g' },
@@ -52,6 +53,7 @@ const recipes = [
     description: '肥而不腻、入口即化的经典红烧肉，浓油赤酱，是下饭的绝佳选择。',
     category: 'chinese',
     difficulty: 'medium',
+    season: 'autumn',
     servings: 4,
     ingredients: JSON.stringify([
       { name: '五花肉', amount: 500, unit: 'g' },
@@ -82,6 +84,7 @@ const recipes = [
     description: '经典的意大利面做法，酸甜可口的番茄酱汁搭配弹牙的意面，简单又美味。',
     category: 'western',
     difficulty: 'easy',
+    season: 'summer',
     servings: 2,
     ingredients: JSON.stringify([
       { name: '意大利面', amount: 200, unit: 'g' },
@@ -139,6 +142,7 @@ const recipes = [
     description: '来自意大利的经典甜点，马斯卡彭芝士与浓缩咖啡的完美结合，入口即化。',
     category: 'dessert',
     difficulty: 'medium',
+    season: 'all',
     servings: 6,
     ingredients: JSON.stringify([
       { name: '马斯卡彭芝士', amount: 250, unit: 'g' },
@@ -169,6 +173,7 @@ const recipes = [
     description: '细腻的抹茶可丽饼层层叠加，搭配丝滑奶油，日式甜点的经典之作。',
     category: 'japanese',
     difficulty: 'hard',
+    season: 'spring',
     servings: 8,
     ingredients: JSON.stringify([
       { name: '低筋面粉', amount: 100, unit: 'g' },
@@ -200,6 +205,7 @@ const recipes = [
     description: '色彩缤纷的韩式经典料理，多种蔬菜搭配米饭和辣酱，营养均衡又美味。',
     category: 'korean',
     difficulty: 'medium',
+    season: 'all',
     servings: 2,
     ingredients: JSON.stringify([
       { name: '米饭', amount: 300, unit: 'g' },
@@ -230,6 +236,7 @@ const recipes = [
     description: '麻辣鲜香的经典川菜，嫩豆腐搭配肉末和花椒，简单快手却味道十足。',
     category: 'chinese',
     difficulty: 'easy',
+    season: 'winter',
     servings: 2,
     ingredients: JSON.stringify([
       { name: '嫩豆腐', amount: 1, unit: '盒' },
@@ -258,6 +265,7 @@ const recipes = [
     description: '浓郁味噌汤底搭配弹牙拉面，配上溏心蛋和叉烧，冬日暖身首选。',
     category: 'japanese',
     difficulty: 'medium',
+    season: 'winter',
     servings: 2,
     ingredients: JSON.stringify([
       { name: '拉面', amount: 200, unit: 'g' },
@@ -287,6 +295,7 @@ const recipes = [
     description: '经典法式甜点，焦糖的微苦与蛋奶的香甜交织，口感丝滑细腻。',
     category: 'dessert',
     difficulty: 'medium',
+    season: 'all',
     servings: 4,
     ingredients: JSON.stringify([
       { name: '鸡蛋', amount: 3, unit: '个' },
@@ -319,6 +328,7 @@ const recipes = [
     description: '酸甜微辣的经典川菜，肉丝嫩滑，配菜爽脆，鱼香汁浓郁下饭。',
     category: 'chinese',
     difficulty: 'medium',
+    season: 'all',
     servings: 3,
     ingredients: JSON.stringify([
       { name: '猪里脊肉', amount: 250, unit: 'g' },
@@ -350,6 +360,7 @@ const recipes = [
     description: '色泽红亮、酸甜适口的经典家常菜，外酥里嫩，大人小孩都爱吃。',
     category: 'chinese',
     difficulty: 'medium',
+    season: 'autumn',
     servings: 3,
     ingredients: JSON.stringify([
       { name: '小排', amount: 500, unit: 'g' },
@@ -378,6 +389,7 @@ const recipes = [
     description: '麻辣鲜香的川菜经典，牛肉嫩滑入味，汤底红亮，辣而不燥。',
     category: 'chinese',
     difficulty: 'hard',
+    season: 'winter',
     servings: 3,
     ingredients: JSON.stringify([
       { name: '牛里脊', amount: 300, unit: 'g' },
@@ -408,6 +420,7 @@ const recipes = [
     description: '原汁原味的粤式经典，鱼肉鲜嫩，豉油提味，清淡而不寡淡。',
     category: 'chinese',
     difficulty: 'easy',
+    season: 'spring',
     servings: 2,
     ingredients: JSON.stringify([
       { name: '鲈鱼', amount: 1, unit: '条' },
@@ -437,6 +450,7 @@ const recipes = [
     description: '经典西式沙拉，生菜爽脆，面包丁酥香，凯撒酱浓郁丝滑。',
     category: 'western',
     difficulty: 'easy',
+    season: 'summer',
     servings: 2,
     ingredients: JSON.stringify([
       { name: '罗马生菜', amount: 1, unit: '颗' },
@@ -465,6 +479,7 @@ const recipes = [
     description: '法式经典浓汤，蘑菇鲜香与奶油丝滑完美融合，温暖治愈。',
     category: 'western',
     difficulty: 'easy',
+    season: 'winter',
     servings: 4,
     ingredients: JSON.stringify([
       { name: '白蘑菇', amount: 300, unit: 'g' },
@@ -556,6 +571,7 @@ const recipes = [
     description: '酸辣鲜香的泰国国汤，椰奶的醇厚与柠檬草的清新完美平衡。',
     category: 'thai',
     difficulty: 'medium',
+    season: 'summer',
     servings: 3,
     ingredients: JSON.stringify([
       { name: '大虾', amount: 200, unit: 'g' },
