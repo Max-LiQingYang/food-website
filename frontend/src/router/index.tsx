@@ -17,6 +17,7 @@ const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const RecipeDetailPage = lazy(() => import('../pages/RecipeDetailPage'))
+const CookingModePage = lazy(() => import('../pages/CookingModePage'))
 const SearchPage = lazy(() => import('../pages/SearchPage'))
 const UserProfilePage = lazy(() => import('../pages/UserProfilePage'))
 const CreateRecipePage = lazy(() => import('../pages/CreateRecipePage'))
@@ -125,6 +126,7 @@ const router = createBrowserRouter([
       { path: '*', element: <NotFoundPage /> },
     ],
   },
+  { path: '/recipe/:id/cook', element: <CookingModePage /> },
 ])
 
 export default function Router() {

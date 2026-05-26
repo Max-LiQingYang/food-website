@@ -23,7 +23,6 @@ import VideoPlayer from '../components/VideoPlayer'
 import QualityScoreModal from '../components/QualityScoreModal'
 import ExportMenu from '../components/ExportMenu'
 import AuthorLevelBadge from '../components/AuthorLevelBadge'
-import CookingModeOverlay from '../components/CookingModeOverlay'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import { trackBehavior, trackBehaviorAnonymous } from '../api'
 import type { RecipeDetail } from '../api'
@@ -91,7 +90,6 @@ export default function RecipeDetailPage() {
   const [authorLevel, setAuthorLevel] = useState<AuthorLevelInfo | null>(null)
   const [showStory, setShowStory] = useState(false)
   const [showCulturalBg, setShowCulturalBg] = useState(false)
-  const [showCookingMode, setShowCookingMode] = useState(false)
 
   // ═══ #63: 食谱改编 ──
   const [forks, setForks] = useState<ForkInfo[]>([])
@@ -894,13 +892,13 @@ export default function RecipeDetailPage() {
             </div>
             {/* 烹饪模式按钮 */}
             <div className="step-nav cooking-mode-launch">
-              <button
+              <Link
+                to={`/recipe/${id}/cook`}
                 className="cooking-mode-btn"
-                onClick={() => setShowCookingMode(true)}
                 aria-label="进入烹饪模式"
               >
                 🍳 烹饪模式
-              </button>
+              </Link>
             </div>
           </section>
         )}
@@ -1093,18 +1091,7 @@ export default function RecipeDetailPage() {
         />
       )}
 
-      {/* 烹饪模式 */}
-      {showCookingMode && recipe?.steps && (
-        <CookingModeOverlay
-          visible={showCookingMode}
-          steps={recipe.steps}
-          initialStepIndex={focusedStepIndex}
-          onClose={() => setShowCookingMode(false)}
-          speak={speak}
-          stopSpeech={stopSpeech}
-          speaking={speaking}
-        />
-      )}
+
     </div>
   )
 }
