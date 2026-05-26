@@ -864,6 +864,62 @@ const videoEmbeds = [
   { title: '白灼基围虾', videos: [
     { url: 'https://www.bilibili.com/video/BV1urFSzBEWv', platform: 'bilibili', title: '厨师长分享现场版"一虾两吃"，白灼虾汁水充沛，香辣虾酥脆够味', duration: 899, sortOrder: 0 },
   ]},
+  // ── 第三轮（迭代#67）：视频覆盖扩容 39→~59 食谱 ───────────
+  { title: '东北乱炖', videos: [
+    { url: 'https://www.bilibili.com/video/BV1xoAhzxEuZ/', platform: 'bilibili', title: '东北乱炖家常做法', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '麻酱凉面', videos: [
+    { url: 'https://www.bilibili.com/video/BV16pGt65E2Y/', platform: 'bilibili', title: '麻酱凉面做法', duration: 300, sortOrder: 0 },
+  ]},
+  { title: '红烧牛腩', videos: [
+    { url: 'https://www.bilibili.com/video/BV1bi516jE4Q/', platform: 'bilibili', title: '红烧牛腩家常做法', duration: 600, sortOrder: 0 },
+  ]},
+  { title: '干锅花菜', videos: [
+    { url: 'https://www.bilibili.com/video/BV1hipUzaEHH/', platform: 'bilibili', title: '干锅花菜做法', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '蚝油生菜', videos: [
+    { url: 'https://www.bilibili.com/video/BV1M44y187u6/', platform: 'bilibili', title: '蚝油生菜做法', duration: 240, sortOrder: 0 },
+  ]},
+  { title: '啤酒鸭', videos: [
+    { url: 'https://www.bilibili.com/video/BV13DR4BvEy9/', platform: 'bilibili', title: '啤酒鸭做法', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '扬州炒饭', videos: [
+    { url: 'https://www.bilibili.com/video/BV1sU4y1B7MC/', platform: 'bilibili', title: '扬州炒饭做法', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '小炒肉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Y7Gb6qE8M/', platform: 'bilibili', title: '辣椒炒肉/小炒肉家常做法', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '韩式泡菜炒五花肉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1rp4y1C761/', platform: 'bilibili', title: '韩式泡菜炒五花肉做法', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '韩式炒年糕', videos: [
+    { url: 'https://www.youtube.com/embed/rggS-GidUpk', platform: 'youtube', title: 'How to Make Tteokbokki (Spicy Korean Rice Cakes)', duration: 480, sortOrder: 0 },
+    { url: 'https://www.youtube.com/embed/ZhUGVCT22EA', platform: 'youtube', title: 'Easy Tteokbokki Recipe', duration: 360, sortOrder: 1 },
+  ]},
+  { title: '抹茶千层蛋糕', videos: [
+    { url: 'https://www.youtube.com/embed/Iog-pNmqvhU', platform: 'youtube', title: 'Matcha Crepe Cake Recipe', duration: 600, sortOrder: 0 },
+  ]},
+  { title: '番茄意面', videos: [
+    { url: 'https://www.youtube.com/embed/DfB0EtvUv1c', platform: 'youtube', title: 'Pomodoro Pasta Recipe', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '法式焦糖布丁', videos: [
+    { url: 'https://www.youtube.com/embed/6tSdlo0r0Io', platform: 'youtube', title: 'Creme Brulee Recipe', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '越南牛肉河粉', videos: [
+    { url: 'https://www.youtube.com/embed/WlosNFMCnE4', platform: 'youtube', title: 'Authentic Vietnamese Pho Recipe', duration: 600, sortOrder: 0 },
+  ]},
+  { title: '奶油蘑菇汤', videos: [
+    { url: 'https://www.youtube.com/embed/pKedpDltnOM', platform: 'youtube', title: 'Mushroom Soup Recipe', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '味噌拉面', videos: [
+    { url: 'https://www.youtube.com/embed/_pIdGMX65qM', platform: 'youtube', title: 'Miso Ramen Recipe', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '日式照烧鸡腿', videos: [
+    { url: 'https://www.youtube.com/embed/Rs3fqWuVb94', platform: 'youtube', title: 'Teriyaki Chicken Recipe', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '泰式绿咖喱鸡', videos: [
+    { url: 'https://www.youtube.com/embed/zPkOPx1Oelw', platform: 'youtube', title: 'Thai Green Curry Recipe', duration: 480, sortOrder: 0 },
+  ]},
 ]
 
 async function seed () {

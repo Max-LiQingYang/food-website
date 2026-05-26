@@ -306,3 +306,28 @@
 ### 前端验证
 - curl 验证 SPA 页面不能仅看 HTML（JS 渲染内容），但 `<footer>` 中的静态文字可在 HTML 中通过构建产物查找
 - `docker build` 在服务器（1.8GB RAM）可能 OOM；`npm ci && npm run build` 在服务器端可行（~4s）
+
+## iter#67 — 视频覆盖率 48%→68.3% 经验 (2026-05-26)
+
+### 搜索策略
+- **Bilibili**：使用 Kimi WebBridge `evaluate` API（querySelectorAll `a[href*="/video/BV"]`）提取 BV 号，无需处理 412 反爬
+- **YouTube**：直接 `urlopen` 搜索页提取 `/watch?v=` 模式，无抗爬限制，速度更快
+- **搜索顺序**：select top 25 by popularity → pick 20 → batch search（10 Bilibili + 10 YouTube）
+
+### video_embeds 表结构
+- 表 `timestamps: false`，`createdAt` 列存在但 `updatedAt` 列不存在
+- INSERT 时必须省略 `updatedAt`，否则报 `Unknown column 'updatedAt' in 'field list'`
+- `createdAt` 虽有默认值，批量 INSERT 仍需显式传入
+
+### 管道注入确认
+- `cat | docker exec -i sh -c 'cat > path'` 比 `docker cp` 更可靠——已验证第三次
+- 修复 SQL 错误后只需重新 pipe 新版本脚本，容器内文件自动覆盖
+
+### seed.js 维护
+- 新视频记录追加到 `seed.js` 的 `videoEmbeds` 数组，分组注释标明轮次
+- 部分食谱在 seed 中有相关条目但 DB 查询为空——根因为 seed 的 video_embeds 阶段可能未完整执行
+- seed.js 追加后需 `node -c seed.js` 验证语法
+
+### 覆盖率
+- 48% → 68.3%（56/82 道食谱有视频，63 条记录）
+- 剩余 26 道无视频食谱多为低 popularity（view=0, fav=0），视频价值较低
