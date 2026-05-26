@@ -1,4 +1,34 @@
 
+## 迭代 #66 — 沉浸式烹饪模式（CookingModePage）✅
+**Commit**: `046999c` (2026-05-26 13:55)
+**构建**: 250 modules, 0 errors (server build 3.45s)
+**部署**: http://39.103.68.205/recipe/:id/cook
+
+### 功能清单
+1. **全屏沉浸式烹饪页** — 独立路由 `/recipe/:id/cook`，无 Navbar/Footer
+2. **大字体步骤展示** — 24px min，高对比度，72px 步骤序号圆环
+3. **步骤导航** — 步骤缩略图条 + 键盘←/→ + 触摸滑动
+4. **进度条** — X/总步数实时展示
+5. **StepTimer 集成** — 每步骤自动解析时长，支持倒计时
+6. **TTS 语音播报** — Web Speech API (zh-CN)，默认关闭可切换
+7. **食材侧边面板** — 份量缩放 + 已准备勾选状态
+8. **完成打卡** — 最后一步「🏁 完成烹饪」→ POST cooking-logs → toast + 跳转
+9. **暗色模式** — CSS 变量全适配
+10. **响应式** — 桌面/平板/移动横竖屏兼容
+11. **打印友好** — 仅保留步骤正文
+12. **ARIA 无障碍** — role=dialog, progressbar, checkbox, aria-label
+
+### 修改文件
+- `frontend/src/pages/CookingModePage.tsx` (created, 14500B) — 全屏烹饪组件
+- `frontend/src/pages/CookingModePage.css` (created, 14950B) — 样式主题
+- `frontend/src/router/index.tsx` — 新增 root-level 路由
+- `frontend/src/pages/RecipeDetailPage.tsx` — Link 替换 Overlay + 清理死代码
+
+### 数据
+- CookingModePage chunk: 7.81 kB JS + 11.86 kB CSS (server)
+- RecipeDetailPage chunk: 112.6→52.8 kB (移除 overlay 后 Rollup 优化)
+- 部署服务器: 250 modules, 0 errors, 3.45s build
+
 ## 迭代 #24 — UI/UX 健壮性与导航体验增强 ✅
 **Commit**: `c696757` (2026-05-24 05:08)
 **测试**: 30/30 新增 + 已有 273 = 303 总计（全绿前端）
