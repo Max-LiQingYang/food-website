@@ -30,7 +30,6 @@ export default function Footer() {
         <div className="footer__section">
           <h4 className="footer__heading">浏览</h4>
           <ul className="footer__links">
-            <li><Link to="/">分类浏览</Link></li>
             <li><Link to="/search">搜索食谱</Link></li>
             <li><Link to="/tags">标签云</Link></li>
             <li><Link to="/ingredient-search">食材搜索</Link></li>
