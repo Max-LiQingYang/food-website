@@ -954,3 +954,13 @@
 - 首页 HTTP 200 ✅
 - 详情页 HTTP 200 ✅
 - 容器 md5 校验通过 ✅
+
+## #61 已完成：内容发现浏览体验增强
+- 排行榜增强（周/月/总榜维度、4 种排序、TOP 3 金色徽章、增强骨架屏）✅
+- RecipeCard 无视频降级"📖 图文教程"徽章 ✅
+- VideoPlayer 无视频降级展示（虚线边框+查看更多食谱链接）✅
+- TagsPage 全链路骨架屏（标题块 + shimmer 标签云 + 分类网格）✅
+- 后端排行榜参数规范化（weekly/monthly/alltime）、新增 favorites 排序、返回 season 字段 ✅
+- 9 文件 485 行变更, commit 2192369 ✅
+- 容器 food-backend routes/recipes.js 注入 + restart 成功 ✅
+- 全链路验证：首页/排行/详情/Tags 全部 200 ✅
