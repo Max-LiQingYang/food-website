@@ -964,3 +964,35 @@
 - 9 文件 485 行变更, commit 2192369 ✅
 - 容器 food-backend routes/recipes.js 注入 + restart 成功 ✅
 - 全链路验证：首页/排行/详情/Tags 全部 200 ✅
+
+---
+
+## 迭代 #63 — B/功能增强：食谱克隆与改编系统 ⏳
+**派发时间**: 2026-05-26
+**方向**: B（功能增强）/ 🟢 现有功能扩展
+**基线 Commit**: `eb06c07`
+
+### 背景
+网站巡检通过，无遗留错误，无未完成任务。方向评估：
+- 功能完整性：核心流程通畅 ✅
+- 视觉一致性：无样式错乱 ✅
+- 交互体验：加载快、搜索正常 ✅
+- 代码质量：构建通过 ✅
+- 功能缺口：用户可以看到他人食谱但无法在此基础上创建自己的版本 → 🟢 功能增强
+
+### 任务内容
+1. **RecipeFork 模型** — originalRecipeId, forkedRecipeId, forkedByUserId, changesNote, createdAt
+2. **后端 API** — POST /api/recipes/:id/fork（创建改编版本），GET /api/recipes/:id/forks（查看改编列表），GET /api/recipes/:id/fork-lineage（改编谱系）
+3. **前端** — RecipeDetailPage "改编此食谱"按钮；CreateRecipePage 支持 fork 模式（预填充原食谱数据）；详情页展示改编来源信息
+4. **用户主页** — 新增 "我的改编"标签页
+5. **测试** — 后端 fork API 测试 + 前端组件测试
+6. 本地构建验证，0 warnings
+7. 部署闭环：commit → build → deploy → 验证
+8. 更新 iteration-tracker.md 和 iteration-lessons.md
+
+### 用户价值
+- 鼓励用户生成内容（UGC），在现有食谱基础上创新
+- 形成食谱改编谱系，展示社区创造力
+- 降低创作门槛：用户无需从零开始写食谱
+
+**下一个方向**: C（内容质量）
