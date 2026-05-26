@@ -922,3 +922,35 @@
 7. 更新 iteration-tracker.md 和 iteration-lessons.md
 
 **下一个方向**: B（功能增强）
+
+---
+
+## 迭代 #62 — 🐛 bugfix：用户反馈3个体检问题修复 ✅ 2026-05-26
+
+**类型**: bugfix
+**状态**: ✅ 已部署 (commit b867437)
+**方向**: A（UI/UX）/ 🔴 影响面广（首页、详情页）
+**模型**: main agent (deepseek-v4-flash)
+
+### 问题清单
+
+| # | 问题 | 根因 | 修复 |
+|---|------|------|------|
+| 1 | 食谱卡片无图片时占位视觉差 | `.recipe-card__cover-placeholder` 背景色单一、无暗色模式适配 | 改为暖色渐变背景 + 暗色模式深暖色渐变 |
+| 2 | 路由切换不自动滚动到顶部 | 缺少 ScrollToTop 组件 | 在 Layout 内嵌入 ScrollToTop，监听 `pathname` 变化执行 `scrollTo(0,0)` |
+| 3 | 详情页有两个收藏按钮 | 封面区 `detail-fav-btn` + 浮动操作栏 `fab-btn` 在移动端同时显示 | 移动端 `max-width:768px` 隐藏 `.detail-cover-actions`（浮动栏已提供完整收藏+分组功能） |
+
+### 变更清单
+
+| 文件 | 变更 |
+|------|------|
+| `frontend/src/router/index.tsx` | 新增 ScrollToTop 组件（`useLocation().pathname` 变化时 `scrollTo(0,0)`） |
+| `frontend/src/components/RecipeCard.css` | `.recipe-card__cover-placeholder` 暖色渐变 + 暗色模式 |
+| `frontend/src/pages/RecipeDetailPage.css` | `@media(max-width:768px)` 隐藏 `.detail-cover-actions` |
+
+### 验证
+
+- 前端构建: 250 modules, 0 errors ✅
+- 首页 HTTP 200 ✅
+- 详情页 HTTP 200 ✅
+- 容器 md5 校验通过 ✅
