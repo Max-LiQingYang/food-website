@@ -458,7 +458,6 @@
     font-size: 13px;
     flex-shrink: 0;
   }
-}
 
   .search-grid {
     grid-template-columns: 1fr;

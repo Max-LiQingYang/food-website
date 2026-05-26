@@ -236,6 +236,25 @@ body {
   border-radius: var(--radius-sm);
 }
 
+/* Image placeholder shimmer overlay (pulses over the gradient) */
+.image-placeholder-shimmer {
+  overflow: hidden;
+}
+
+.image-placeholder-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
 @keyframes shimmer {
   0% {
     background-position: 100% 50%;

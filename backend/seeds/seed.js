@@ -47,7 +47,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '红烧肉',
-    coverImage: 'https://images.unsplash.com/photo-1623689046286-01cd25b32d79?w=400&h=300&fit=crop',
+    coverImage: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop',
     author: '家常菜师傅',
     cookTime: 90,
     description: '肥而不腻、入口即化的经典红烧肉，浓油赤酱，是下饭的绝佳选择。',
@@ -230,7 +230,7 @@ const recipes = [
   {
     id: uuidv4(),
     title: '麻婆豆腐',
-    coverImage: 'https://images.unsplash.com/photo-1582452919408-aca4cd4cff2e?w=400&h=300&fit=crop',
+    coverImage: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&h=300&fit=crop',
     author: '川菜小馆',
     cookTime: 15,
     description: '麻辣鲜香的经典川菜，嫩豆腐搭配肉末和花椒，简单快手却味道十足。',

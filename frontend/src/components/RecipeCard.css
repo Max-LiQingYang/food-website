@@ -289,7 +289,7 @@ body.dark .recipe-card__cover-placeholder {
   pointer-events: none;
 }
 
-/* ── 底部统计行 ── */ */
+/* ── 底部统计行 ── */
 .recipe-card__stats {
   display: flex;
   flex-wrap: wrap;

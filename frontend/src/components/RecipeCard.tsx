@@ -115,6 +115,7 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
               className={`recipe-card__cover-img ${imgLoaded ? 'loaded' : ''}`}
               onLoad={() => setImgLoaded(true)}
               onError={() => setImgLoaded(false)}
+              fallbackText={recipe.title}
             />
             {/* 悬浮预览层 */}
             <div className="recipe-card__hover-overlay">

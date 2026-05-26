@@ -7,6 +7,8 @@ interface ImagePlaceholderProps {
   className?: string
   style?: React.CSSProperties
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void
+  /** Text to display when image fails to load (e.g. recipe name) */
+  fallbackText?: string
 }
 
 /**
@@ -19,6 +21,7 @@ export default function ImagePlaceholder({
   className = '',
   style,
   onError,
+  fallbackText,
 }: ImagePlaceholderProps) {
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState(false)
@@ -47,13 +50,20 @@ export default function ImagePlaceholder({
           ...style,
           background: 'linear-gradient(135deg, var(--color-primary-bg, #fff3ed) 0%, #f8e8e0 100%)',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '56px',
+          gap: '6px',
+          fontSize: '48px',
           color: 'rgba(0,0,0,0.15)',
         }}
       >
-        🍽️
+        <span style={{ fontSize: '48px', lineHeight: 1 }}>🍽️</span>
+        {fallbackText && (
+          <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.25)', maxWidth: '90%', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {fallbackText}
+          </span>
+        )}
       </div>
     )
   }
@@ -69,14 +79,15 @@ export default function ImagePlaceholder({
         style={{
           ...style,
           opacity: loaded ? 1 : 0,
-          transition: 'opacity 0.3s ease',
+          filter: loaded ? 'blur(0)' : 'blur(10px)',
+          transition: 'opacity 0.4s ease, filter 0.4s ease',
         }}
         onLoad={handleLoad}
         onError={handleError}
       />
       {!loaded && (
         <div
-          className={className}
+          className={`${className} image-placeholder-shimmer`}
           style={{
             ...style,
             position: 'absolute',
