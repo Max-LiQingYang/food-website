@@ -84,11 +84,57 @@
   border-color: #6366f1;
 }
 
-/* 加载骨架 */
+/* 加载骨架 — 增强版匹配新卡片结构 */
 .rankings-page__loading {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.rank-card-skeleton--enhanced {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  align-items: center;
+}
+
+.skeleton-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-bar {
+  width: 6px;
+  height: 60px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-main {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.skeleton-stats {
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  padding-left: 8px;
+  border-left: 1px solid var(--color-border, #e8e0d8);
 }
 
 .rank-card-skeleton {
@@ -99,33 +145,17 @@
   border-radius: var(--radius-lg, 16px);
 }
 
-.skeleton-img {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+body.dark .skeleton-badge,
+body.dark .skeleton-bar,
+body.dark .skeleton-main .skeleton-line,
+body.dark .skeleton-img {
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
 }
 
-.skeleton-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  justify-content: center;
+body.dark .skeleton-stats {
+  border-color: var(--color-border-dark, #333);
 }
-
-.skeleton-line {
-  height: 14px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-.skeleton-line.w-60 { width: 60%; }
-.skeleton-line.w-40 { width: 40%; }
 
 @keyframes shimmer {
   0% { background-position: 200% 0; }
@@ -210,7 +240,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   min-width: 64px;
   padding-left: 8px;
   border-left: 1px solid var(--color-border, #e8e0d8);
@@ -234,6 +264,33 @@
   color: var(--color-text-muted, #999);
 }
 
+.rank-card__primary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.rank-card__stat-value--primary {
+  font-size: 20px;
+  background: linear-gradient(135deg, #e8663e, #f5a623);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.rank-card__season-tag {
+  font-size: 16px;
+  cursor: default;
+  opacity: 0.8;
+  transition: transform 0.2s;
+}
+
+.rank-card__season-tag:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
 .rank-card__quality-tag {
   font-size: 11px;
   padding: 2px 6px;
@@ -241,6 +298,48 @@
   background: #fff3e0;
   color: #e8663e;
   white-space: nowrap;
+}
+
+/* 排名徽章增强 */
+.rank-card__rank-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+  transition: transform 0.2s;
+}
+
+.rank-card:hover .rank-card__rank-num {
+  transform: scale(1.15);
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, #ffd700, #ffc107);
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+  box-shadow: 0 2px 8px rgba(189, 189, 189, 0.3);
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #cd7f32, #b8860b);
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+  color: #fff;
+}
+
+.rank-card--top {
+  background: linear-gradient(to right, var(--color-card, #fff), rgba(255, 215, 0, 0.03));
+  border: 1px solid rgba(255, 193, 7, 0.1);
+}
+
+body.dark .rank-card--top {
+  background: linear-gradient(to right, var(--color-card-dark, #222), rgba(255, 215, 0, 0.05));
 }
 
 /* 暗色模式 */

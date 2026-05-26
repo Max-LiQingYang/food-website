@@ -7,19 +7,34 @@ import RecipeCard from '../components/RecipeCard'
 import './RankingsPage.css'
 
 const PERIODS = [
-  { key: 'all', label: '全部' },
-  { key: 'month', label: '本月' },
-  { key: 'week', label: '本周' },
+  { key: 'weekly', label: '📅 周榜' },
+  { key: 'monthly', label: '📆 月榜' },
+  { key: 'alltime', label: '🏆 总榜' },
 ]
 
 const SORT_OPTIONS = [
-  { key: 'composite', label: '综合评分' },
-  { key: 'rating', label: '最高评分' },
-  { key: 'views', label: '最多浏览' },
+  { key: 'composite', label: '🔥 综合' },
+  { key: 'views', label: '👁️ 浏览' },
+  { key: 'favorites', label: '❤️ 收藏' },
+  { key: 'rating', label: '⭐ 评分' },
 ]
 
+const SEASON_ICONS: Record<string, string> = {
+  'spring': '🌸',
+  'summer': '☀️',
+  'autumn': '🍂',
+  'winter': '❄️',
+}
+
+const SEASON_LABELS: Record<string, string> = {
+  'spring': '春',
+  'summer': '夏',
+  'autumn': '秋',
+  'winter': '冬',
+}
+
 export default function RankingsPage() {
-  const [period, setPeriod] = useState('all')
+  const [period, setPeriod] = useState('alltime')
   const [sortBy, setSortBy] = useState('composite')
   const [list, setList] = useState<RankedRecipe[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,12 +55,21 @@ export default function RankingsPage() {
     return `#${rank}`
   }
 
+  const getPrimaryStat = (item: RankedRecipe) => {
+    switch (sortBy) {
+      case 'views': return { value: item.viewCount ?? 0, label: '浏览' }
+      case 'favorites': return { value: item.favoriteCount, label: '收藏' }
+      case 'rating': return { value: item.avgRating ? item.avgRating.toFixed(1) : '-', label: '评分' }
+      default: return { value: item.compositeScore, label: '综合分' }
+    }
+  }
+
   return (
     <div className="rankings-page">
       <div className="rankings-page__header">
         <h1>🏆 食谱排行榜</h1>
         <p className="rankings-page__subtitle">
-          综合收藏数、评论数多维度评分，发现最受欢迎的食谱
+          按综合、浏览、收藏、评分多维度发现最受欢迎的食谱
         </p>
       </div>
 
@@ -75,14 +99,23 @@ export default function RankingsPage() {
         ))}
       </div>
 
-      {/* 加载状态 */}
+      {/* 加载骨架屏 */}
       {loading && (
         <div className="rankings-page__loading">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="rank-card-skeleton">
-              <div className="skeleton-img" />
-              <div className="skeleton-info">
-                <div className="skeleton-line w-60" />
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="rank-card-skeleton rank-card-skeleton--enhanced">
+              <div className="skeleton-badge" />
+              <div className="skeleton-bar" />
+              <div className="skeleton-main">
+                <div className="skeleton-img" />
+                <div className="skeleton-info">
+                  <div className="skeleton-line w-70" />
+                  <div className="skeleton-line w-50" />
+                  <div className="skeleton-line w-30" />
+                </div>
+              </div>
+              <div className="skeleton-stats">
+                <div className="skeleton-line w-40" />
                 <div className="skeleton-line w-40" />
               </div>
             </div>
@@ -93,63 +126,68 @@ export default function RankingsPage() {
       {/* 排名列表 */}
       {!loading && list.length === 0 && (
         <div className="rankings-page__empty">
-          <p>暂无数据</p>
+          <div className="rankings-page__empty-icon">📭</div>
+          <p className="rankings-page__empty-text">
+            {period === 'weekly'
+              ? '本周暂无热门食谱数据' 
+              : period === 'monthly'
+                ? '本月暂无热门食谱数据'
+                : '暂无食谱数据'}
+          </p>
+          <p className="rankings-page__empty-hint">食材少的时候别着急，试试换个时间范围或排序方式</p>
           <Link to="/" className="rankings-page__back-link">去首页逛逛 →</Link>
         </div>
       )}
 
       {!loading && list.length > 0 && (
         <div className="rankings-page__list">
-          {list.map(item => (
-            <div key={item.id} className="rank-card">
-              {/* 排名徽章 */}
-              <div className="rank-card__badge">{rankEmoji(item.rank)}</div>
-
-              {/* 分数柱 */}
-              <div className="rank-card__score-bar">
-                <div
-                  className="rank-card__score-fill"
-                  style={{ height: `${Math.min((item.compositeScore / 100) * 100, 100)}%` }}
-                />
-              </div>
-
-              {/* 卡片信息 */}
-              <div className="rank-card__content">
-                <RecipeCard recipe={item} />
-              </div>
-
-                            {/* 综合评分 */}
-              <div className="rank-card__stats">
-                <div className="rank-card__stat">
-                  <span className="rank-card__stat-value">{item.compositeScore}</span>
-                  <span className="rank-card__stat-label">综合分</span>
+          {list.map((item, idx) => {
+            const primaryStat = getPrimaryStat(item)
+            return (
+              <div key={item.id} className={`rank-card rank-card--${item.rank <= 3 ? 'top' : 'normal'}`}>
+                {/* 排名徽章 */}
+                <div className="rank-card__badge">
+                  <span className={`rank-card__rank-num rank-${item.rank}`}>{rankEmoji(item.rank)}</span>
                 </div>
-                {item.avgRating != null && item.avgRating > 0 && (
-                  <div className="rank-card__stat">
-                    <span className="rank-card__stat-value">{item.avgRating.toFixed(1)}</span>
-                    <span className="rank-card__stat-label">评分</span>
+
+                {/* 分数柱 */}
+                <div className="rank-card__score-bar">
+                  <div
+                    className="rank-card__score-fill"
+                    style={{ height: `${Math.min(((item.rank <= 3 ? 100 - (item.rank - 1) * 25 : Math.max(100 - item.rank * 4, 10)) / 100) * 100, 100)}%` }}
+                  />
+                </div>
+
+                {/* 卡片信息 */}
+                <div className="rank-card__content">
+                  <RecipeCard recipe={item} />
+                </div>
+
+                {/* 统计区 */}
+                <div className="rank-card__stats">
+                  <div className="rank-card__primary-stat">
+                    <span className="rank-card__stat-value rank-card__stat-value--primary">
+                      {typeof primaryStat.value === 'number' && primaryStat.value >= 1000
+                        ? (primaryStat.value / 1000).toFixed(1) + 'k'
+                        : primaryStat.value}
+                    </span>
+                    <span className="rank-card__stat-label">{primaryStat.label}</span>
                   </div>
-                )}
-                <div className="rank-card__stat">
-                  <span className="rank-card__stat-value">{item.favoriteCount}</span>
-                  <span className="rank-card__stat-label">收藏</span>
+                  {(sortBy !== 'rating' && item.avgRating != null && item.avgRating > 0) && (
+                    <div className="rank-card__stat">
+                      <span className="rank-card__stat-value">{item.avgRating.toFixed(1)}</span>
+                      <span className="rank-card__stat-label">⭐</span>
+                    </div>
+                  )}
+                  {item.season && item.season !== 'all' && (
+                    <div className="rank-card__season-tag" title={`${SEASON_LABELS[item.season] || item.season}季推荐`}>
+                      {SEASON_ICONS[item.season] || '📅'}
+                    </div>
+                  )}
                 </div>
-                <div className="rank-card__stat">
-                  <span className="rank-card__stat-value">{item.commentCount}</span>
-                  <span className="rank-card__stat-label">评论</span>
-                </div>
-                {item.viewCount != null && item.viewCount > 0 && (
-                  <div className="rank-card__stat">
-                    <span className="rank-card__stat-value">{item.viewCount >= 1000 ? (item.viewCount / 1000).toFixed(1) + "k" : item.viewCount}</span>
-                    <span className="rank-card__stat-label">浏览</span>
-                  </div>
-                )}
-                {item.qualityLabel && (
-                  <span className="rank-card__quality-tag">{item.qualityLabel}</span>
-                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

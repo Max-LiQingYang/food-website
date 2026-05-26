@@ -75,3 +75,82 @@ body.dark .video-player__title {
 body.dark .video-player__info {
   color: var(--color-text-secondary, #9898b0);
 }
+
+/* ── 无视频友好降级 ── */
+.video-player-section--empty {
+  position: relative;
+}
+
+.video-player__fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  background: var(--color-bg-secondary, #f5f0eb);
+  border: 2px dashed var(--color-border, #e8e0d8);
+  border-radius: var(--radius-lg, 16px);
+  text-align: center;
+}
+
+body.dark .video-player__fallback {
+  background: rgba(255,255,255,0.03);
+  border-color: var(--color-border-dark, #333);
+}
+
+.video-player__fallback-icon {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.video-player__fallback-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0 0 6px;
+}
+
+.video-player__fallback-desc {
+  font-size: 14px;
+  color: var(--color-text-muted, #999);
+  margin: 0 0 20px;
+  max-width: 360px;
+}
+
+.video-player__fallback-link {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 8px 20px;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.video-player__fallback-link:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.video-player__related {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.video-player__related-title {
+  font-size: 13px;
+  color: var(--color-text-muted, #999);
+  margin: 0 0 12px;
+  text-align: left;
+}
+
+.video-player__related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}

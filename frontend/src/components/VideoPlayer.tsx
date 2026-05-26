@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getRecipeVideos } from '../api'
 import type { VideoEmbed } from '../api'
 import './VideoPlayer.css'
@@ -20,7 +21,21 @@ export default function VideoPlayer({ recipeId }: Props) {
   }, [recipeId])
 
   if (loading) return null
-  if (!videos.length) return null
+
+  // 无视频 → 友善降级展示
+  if (!videos.length) {
+    return (
+      <div className="video-player-section video-player-section--empty">
+        <h3 className="video-section-title">🎬 视频教程</h3>
+        <div className="video-player__fallback">
+          <div className="video-player__fallback-icon">📖</div>
+          <p className="video-player__fallback-title">本食谱暂无视频教程</p>
+          <p className="video-player__fallback-desc">请跟随详细的图文步骤一步步操作，同样简单易懂</p>
+          <Link to="/search" className="video-player__fallback-link">🏆 查看更多食谱</Link>
+        </div>
+      </div>
+    )
+  }
 
   const current = videos[currentIndex]
 

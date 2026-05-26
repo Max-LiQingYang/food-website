@@ -964,7 +964,7 @@ router.get('/featured', async (req, res) => {
 
 // ─────────────────────────────────────────────────────────────────
 // GET /rankings — 食谱排行榜（Top 20）
-// 参数: ?period=week|month|all（默认 all）, ?sortBy=composite|views|rating（默认 composite）
+// 参数: ?period=weekly|monthly|alltime（默认 alltime）, ?sortBy=composite|views|rating|favorites（默认 composite）
 // ─────────────────────────────────────────────────────────────────
 router.get('/rankings', async (req, res) => {
   res.set({
@@ -972,47 +972,59 @@ router.get('/rankings', async (req, res) => {
   })
 
   try {
-    const { period = 'all', sortBy = 'composite' } = req.query
+    const { period = 'alltime', sortBy = 'composite' } = req.query
 
-    // 计算时间范围
+    // 计算时间范围（同时兼容新旧参数名）
     let dateWhere = {}
-    if (period === 'week') {
+    const effectivePeriod = {
+      'weekly': 'week',
+      'monthly': 'month',
+      'alltime': 'all',
+      'week': 'week',
+      'month': 'month',
+      'all': 'all'
+    }[period] || 'all'
+
+    if (effectivePeriod === 'week') {
       const weekAgo = new Date()
       weekAgo.setDate(weekAgo.getDate() - 7)
       dateWhere = { createdAt: { [Op.gte]: weekAgo } }
-    } else if (period === 'month') {
+    } else if (effectivePeriod === 'month') {
       const monthAgo = new Date()
       monthAgo.setMonth(monthAgo.getMonth() - 1)
       dateWhere = { createdAt: { [Op.gte]: monthAgo } }
     }
 
     // 根据排序方式确定 SQL order
-    let order
-    if (sortBy === 'views') {
-      order = [['viewCount', 'DESC'], ['createdAt', 'DESC']]
-    } else if (sortBy === 'rating') {
-      // 评分需要查 Comment 表，先按 favoriteCount 取候选集，后面用 JS 重排
-      order = [['favoriteCount', 'DESC'], ['commentCount', 'DESC'], ['createdAt', 'DESC']]
-    } else {
-      order = [['favoriteCount', 'DESC'], ['commentCount', 'DESC'], ['createdAt', 'DESC']]
-    }
+    const sortField = {
+      'composite': 'favoriteCount',
+      'views': 'viewCount',
+      'rating': 'favoriteCount',
+      'favorites': 'favoriteCount',
+      'favoriteCount': 'favoriteCount'
+    }[sortBy] || 'favoriteCount'
+
+    const order = [[sortField, 'DESC'], ['commentCount', 'DESC'], ['createdAt', 'DESC']]
 
     const recipes = await Recipe.findAll({
       where: dateWhere,
-      attributes: LIST_ATTRIBUTES,
+      attributes: [...LIST_ATTRIBUTES, 'season'],
       order,
       limit: 50,
     })
 
     let ranked = recipes.map(r => r.toJSON())
 
-    // 获取平均评分
+    // 获取平均评分 + 视频信息
     await attachRatingInfo(ranked)
+    await attachVideoInfo(ranked)
 
-    if (sortBy === 'rating') {
+    if (sortBy === 'rating' || sortBy === 'avgRating') {
       ranked.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0))
-    } else if (sortBy === 'views') {
+    } else if (sortBy === 'views' || sortBy === 'viewCount') {
       ranked.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
+    } else if (sortBy === 'favorites' || sortBy === 'favoriteCount') {
+      ranked.sort((a, b) => (b.favoriteCount || 0) - (a.favoriteCount || 0))
     } else {
       // composite: 使用 qualityScore
       ranked.sort((a, b) => (b.qualityScore || 0) - (a.qualityScore || 0))
@@ -1025,7 +1037,7 @@ router.get('/rankings', async (req, res) => {
       rank: i + 1,
     }))
 
-    return res.json(resJSON(0, 'ok', { period, sortBy, list: ranked }))
+    return res.json(resJSON(0, 'ok', { period: effectivePeriod, sortBy, list: ranked }))
   } catch (err) {
     console.error('[GET /recipes/rankings] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))

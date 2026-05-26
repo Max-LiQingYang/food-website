@@ -155,13 +155,15 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
         )}
 
         {/* 视频指示器 */}
-        {(recipe as any).videoCount > 0 && (
+        {(recipe as any).videoCount > 0 ? (
           <span className="recipe-card__video-indicator">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z"/>
             </svg>
             {(recipe as any).videoCount}
           </span>
+        ) : (
+          <span className="recipe-card__text-indicator">📖 图文教程</span>
         )}
       </div>
 

@@ -16,9 +16,55 @@ const categoryGroups = [
 
 const TagsPage: React.FC = () => {
   const navigate = useNavigate()
+  const [loaded, setLoaded] = React.useState(false)
+
+  React.useEffect(() => {
+    // 短暂延迟，确保骨架屏可见
+    const t = setTimeout(() => setLoaded(true), 100)
+    return () => clearTimeout(t)
+  }, [])
 
   const handleTagClick = (tag: string) => {
     navigate(`/search?tag=${encodeURIComponent(tag)}`)
+  }
+
+  if (!loaded) {
+    return (
+      <div className="tags-page">
+        <div className="tags-page-skeleton">
+          <div className="skeleton-title-block">
+            <div className="skeleton-line w-40 skeleton-line--lg" />
+            <div className="skeleton-line w-60" />
+          </div>
+          <div className="skeleton-section">
+            <div className="skeleton-line w-25" />
+            <div className="skeleton-tag-cloud">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="skeleton-tag" style={{ width: `${50 + Math.random() * 60}px` }} />
+              ))}
+            </div>
+          </div>
+          <div className="skeleton-section">
+            <div className="skeleton-line w-25" />
+            <div className="skeleton-category-grid">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="skeleton-category-item" />
+              ))}
+            </div>
+          </div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="skeleton-section">
+              <div className="skeleton-line w-30" />
+              <div className="skeleton-tag-cloud">
+                {Array.from({ length: 6 }).map((_, j) => (
+                  <div key={j} className="skeleton-tag" style={{ width: `${40 + Math.random() * 50}px` }} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
