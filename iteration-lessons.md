@@ -287,3 +287,22 @@
 - **季节标签的"设计模式"**：给食材/category/菜系分配季节不是精确科学，但要遵循"让推荐有用"的原则。夏季推荐 白切鸡比推荐 毛血旺 合理。
 - **seed.js 维护**：当 DB 数据通过脚本修改后，务必第一时间同步 seed.js，否则新部署会丢失变更。
 - **映射分离**：季节映射表放在独立文件（seed-enhance-season.js）而非内嵌在 seed.js 中，使新的 seed run 能复用已有映射。
+
+## iter#65 — 样式检查报告修复经验 (2026-05-26)
+
+### TagSuggestion 表填充
+- 表由 Sequelize 管理，列名为 `createdAt`/`updatedAt`（camelCase）而非 `created_at`
+- id 列是 UUID 无默认值，需在 INSERT 中用 `UUID()` 生成
+- 容器内执行脚本需用 `cat|docker exec -i` 管道方式注入，`docker cp` 后直接执行可能静默失败
+
+### 检查报告中的"假阳性"
+- "排行榜空白"—实际后端 API 正常返回数据，根因为前端构建产物过旧（stale build），fresh build 后正常
+- "食谱详情图未加载"—ImagePlaceholder 已有 onError 处理，build 后才生效
+
+### 关于 SSH Python 命令的引号陷阱
+- 多级嵌套引号（SSH + Python f-string + JSON key）容易断裂
+- 生产环境建议在容器内写 JS 脚本来执行复杂查询，而非 inline Python
+
+### 前端验证
+- curl 验证 SPA 页面不能仅看 HTML（JS 渲染内容），但 `<footer>` 中的静态文字可在 HTML 中通过构建产物查找
+- `docker build` 在服务器（1.8GB RAM）可能 OOM；`npm ci && npm run build` 在服务器端可行（~4s）

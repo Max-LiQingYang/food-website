@@ -1057,3 +1057,19 @@
 - **文件变更**: 新增2个seed脚本/转换工具 + 修改 seed.js/seed-enhance-season.js
 
 **下一个方向**: A（UI/UX）
+
+## iter#65 — 样式检查报告修复
+
+| 状态 | 类型 | 描述 | 修复方式 |
+|------|------|------|----------|
+| ✅ | P0 | TagsPage 显示"暂无标签" | 创建 `populate_tags.js`，提取 82 食谱→315 标签 |
+| ✅ | P0 | 排行榜 /rankings 空白 | 服务器重新 build + deploy 修复（原为 stale build） |
+| ✅ | P1 | 登录页 Footer 不可见 | LoginPage.css min-height 从 calc(100vh-56px) → auto，增加 padding-bottom |
+| ✅ | P1 | 食谱详情页封面加载失败 | 已验证 ImagePlaceholder 组件已有 onError → 🍽️ fallback |
+| ✅ | P1 | Footer 分类浏览链接到首页 | 移除此误导性链接 |
+| ✅ | P2 | 404 页图片/首页空白图/轮播首张模糊 | RecipeCard 已有 onError，HeroSection 使用 ImagePlaceholder 已覆盖 |
+
+**Commit**: 477e3bc
+**服务器同步**: 已 pull 至 477e3bc
+**前端部署**: 服务器端 npm run build + docker cp + nginx reload
+**后端部署**: populate_tags.js 在容器内执行成功（315 tags）
