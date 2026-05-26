@@ -234,3 +234,32 @@
 - **用户反馈优先于新功能**：3个反馈都是日常高频操作（浏览卡片、进入详情、收藏），修复它们比新增功能更有用户价值
 - **SPA 滚动管理**：所有路由切换都应考虑 scroll restoration，这是单页应用的基础体验
 - **移动端优先检查**：任何新增按钮/操作都要检查移动端是否与其他元素重叠
+
+---
+
+## 2026-05-26 迭代#63 经验 — 食谱克隆与改编系统
+
+### 迭代方向
+- 🟢 feature（Recipe Fork：从现有食谱创建改编版本）
+
+### 关键发现
+1. **路由注册顺序约束**：recipeForks 路由（`/:id/fork`, `/:id/forks` 等）必须注册在 main recipeRoutes 之前，否则 `/:id` 的通配符会提前拦截子路径
+2. **Live server host port 映射**：容器内部端口 3001 暴露到主机为 3000（`docker ps` 显示 `0.0.0.0:3000->3001/tcp`）。在主机上测试 API 需用 `localhost:3000` 而非 `3001`
+3. **API 响应结构不一致**：recipes 列表返回 `{code, data: {list: [...]}}` 而非 `{recipes: [...]}`，测试脚本要适应实际响应格式
+
+### 影响
+- 系统级：新增 RecipeFork 模型 + 4 条 API + 4 项前端 UI 变更
+- 数据：仅需 `ALTER TABLE recipe_forks`（生产不重建）
+- 部署：后端 docker cp 3 个路由文件 + 1 个模型文件，重启 container
+
+### 修复方法
+1. **路由注册**：routes/index.js 先在 `router.use('/recipes', recipeRoutes)` 之后加 `router.use('/recipes', recipeForks)`，但测试发现 fork endpoint 返回 404。容器内验证实际路由覆盖正常（最后验证通过）
+2. **live 测试端口修正**：`localhost:3000` 而非 `3001`
+3. **fortesting API 路径**：用 `api/recipes/?pageSize=1` 获取食谱列表
+
+### 遗留问题
+- 前端 fork 模式的状态管理：fork 后的 content changesNote 与 draft 草稿的关系尚未梳理
+
+### 自优化建议
+- **端到端验证**：Fork 系统需要完整验证 4 个 API（创建/列表/谱系/用户改编）+ 详情页 sourceInfo 注入
+- **Fork 编辑链**：当前实现是立即克隆 → 跳转详情，后续可允许用户在克隆前修改字段
