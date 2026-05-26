@@ -1474,3 +1474,142 @@ body.dark .cultural-content {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* ═══════════════════════════════════════ #63 食谱改编 ═══════════════════════════════════════ */
+
+/* 改编来源信息 */
+.detail-fork-source {
+  background: linear-gradient(135deg, #fff7e6 0%, #fff3d6 100%);
+  border: 1px solid #f5d99b;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 14px;
+  color: #8b6914;
+}
+.detail-fork-source a {
+  color: #d97706;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.detail-fork-source a:hover {
+  color: #b45309;
+}
+.detail-fork-source__note {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #e8c986;
+  font-size: 13px;
+  color: #a07a2a;
+  line-height: 1.5;
+}
+
+/* 改编版本列表 */
+.detail-forks-section {
+  margin-top: 32px;
+  padding: 0;
+}
+.detail-forks-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #374151;
+}
+.detail-forks-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.detail-forks-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+.detail-forks-card:hover {
+  border-color: #f5d99b;
+  background: #fff9ed;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.1);
+}
+.detail-forks-card__img {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.detail-forks-card__img--placeholder {
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.detail-forks-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.detail-forks-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail-forks-card__author {
+  font-size: 12px;
+  color: #6b7280;
+}
+.detail-forks-card__note {
+  font-size: 12px;
+  color: #d97706;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 暗色模式适配 */
+body.dark .detail-fork-source {
+  background: linear-gradient(135deg, #3d2e0f 0%, #3a2810 100%);
+  border-color: #6b4f1a;
+  color: #e8c986;
+}
+body.dark .detail-fork-source a {
+  color: #fbbf24;
+}
+body.dark .detail-fork-source a:hover {
+  color: #f59e0b;
+}
+body.dark .detail-fork-source__note {
+  border-top-color: #5a4417;
+  color: #d4b05c;
+}
+body.dark .detail-forks-section h3 {
+  color: #e5e7eb;
+}
+body.dark .detail-forks-card {
+  border-color: #374151;
+  background: #1f2937;
+}
+body.dark .detail-forks-card:hover {
+  border-color: #6b4f1a;
+  background: #2a2520;
+}
+body.dark .detail-forks-card__title {
+  color: #f3f4f6;
+}
+body.dark .detail-forks-card__author {
+  color: #9ca3af;
+}
+body.dark .detail-forks-card__note {
+  color: #fbbf24;
+}

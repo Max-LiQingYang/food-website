@@ -326,4 +326,54 @@ router.get('/:id/author-info', async (req, res) => {
   }
 })
 
+// ── 获取用户的所有改编食谱 ──────────────────────────────────────────────
+// GET /api/users/:id/forks（公开）
+router.get('/:id/forks', async (req, res) => {
+  try {
+    const { RecipeFork, Recipe } = require('../models')
+    const userId = req.params.id
+    const { page = '1', pageSize = '20' } = req.query
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize)
+
+    const { count, rows } = await RecipeFork.findAndCountAll({
+      where: { forkedByUserId: userId },
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(pageSize),
+      offset,
+      include: [
+        {
+          model: Recipe,
+          as: 'forkedRecipe',
+          attributes: ['id', 'title', 'coverImage', 'description', 'category', 'cookTime', 'servings', 'difficulty', 'createdAt']
+        },
+        {
+          model: Recipe,
+          as: 'originalRecipe',
+          attributes: ['id', 'title']
+        }
+      ]
+    })
+
+    const forks = rows.map(f => ({
+      id: f.forkedRecipe.id,
+      title: f.forkedRecipe.title,
+      coverImage: f.forkedRecipe.coverImage,
+      description: f.forkedRecipe.description,
+      category: f.forkedRecipe.category,
+      cookTime: f.forkedRecipe.cookTime,
+      servings: f.forkedRecipe.servings,
+      difficulty: f.forkedRecipe.difficulty,
+      createdAt: f.forkedRecipe.createdAt,
+      originalTitle: f.originalRecipe ? f.originalRecipe.title : null,
+      changesNote: f.changesNote
+    }))
+
+    return res.status(200).json(resJSON(0, 'ok', { count, forks, page: parseInt(page), pageSize: parseInt(pageSize) }))
+  } catch (err) {
+    console.error('[GET /users/:id/forks] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router

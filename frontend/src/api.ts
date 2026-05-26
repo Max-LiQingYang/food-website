@@ -89,6 +89,12 @@ export interface Recipe {
   smartDifficulty?: string
   story?: string
   culturalBackground?: string
+  sourceInfo?: {
+    forkedFrom: { id: string; title: string }
+    forkedBy?: { id: string; nickname: string; username: string } | null
+    changesNote?: string | null
+  }
+  forkCount?: number
   nutrition?: {
     calories?: number
     protein?: number
@@ -2143,5 +2149,70 @@ export function getNotificationPreferences(): Promise<Record<string, Notificatio
 // 更新通知偏好
 export function updateNotificationPreferences(prefs: Record<string, NotificationPreference>): Promise<void> {
   return apiClient.put('/notification-preferences', prefs).then(r => r.data?.data || r.data)
+}
+
+// ── 食谱克隆与改编 API ───────────────────────────────────────────────────
+
+export interface ForkResult {
+  success: boolean
+  recipeId: string
+  title: string
+}
+
+export interface ForkInfo {
+  id: string
+  title: string
+  coverImage?: string
+  description?: string
+  category?: string
+  cookTime?: number
+  servings?: number
+  difficulty?: string
+  createdAt?: string
+  forkedBy?: { id: string; nickname: string; username: string } | null
+  changesNote?: string | null
+  forkedAt?: string
+  originalTitle?: string | null
+}
+
+export interface ForkLineageItem {
+  id: string
+  title: string
+  isOriginal: boolean
+}
+
+export interface ForkListResponse {
+  success: boolean
+  count: number
+  forks: ForkInfo[]
+  page: number
+  pageSize: number
+}
+
+export interface ForkLineageResponse {
+  success: boolean
+  lineage: ForkLineageItem[]
+  isFork: boolean
+  forkDepth: number
+}
+
+// 创建改编食谱
+export function forkRecipe(recipeId: string, changesNote?: string): Promise<ForkResult> {
+  return apiClient.post(`/recipes/${recipeId}/fork`, { changesNote }).then(r => r.data)
+}
+
+// 获取食谱的改编版本列表
+export function getRecipeForks(recipeId: string, params?: { page?: number; pageSize?: number }): Promise<ForkListResponse> {
+  return apiClient.get(`/recipes/${recipeId}/forks`, { params }).then(r => r.data)
+}
+
+// 获取改编谱系
+export function getRecipeForkLineage(recipeId: string): Promise<ForkLineageResponse> {
+  return apiClient.get(`/recipes/${recipeId}/fork-lineage`).then(r => r.data)
+}
+
+// 获取用户的所有改编食谱
+export function getUserForks(userId: string, params?: { page?: number; pageSize?: number }): Promise<ForkListResponse> {
+  return apiClient.get(`/users/${userId}/forks`, { params }).then(r => r.data)
 }
 

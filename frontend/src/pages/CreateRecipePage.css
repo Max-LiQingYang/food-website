@@ -721,3 +721,56 @@ body.dark .wizard-step.done .wizard-step-icon {
   background: var(--color-success, #52c41a);
   color: #fff;
 }
+
+/* ═══ #63: 食谱改编模式提示条 ═══ */
+.fork-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+body.dark .fork-banner {
+  background: linear-gradient(135deg, #3d2e0f 0%, #3a2810 100%);
+  border-color: #6b4f1a;
+}
+body.dark .fork-banner strong,
+body.dark .fork-banner__content {
+  color: #fde68a;
+}
+.fork-banner__icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.fork-banner__content {
+  font-size: 14px;
+  color: #92400e;
+  line-height: 1.6;
+}
+.fork-banner__hint {
+  font-size: 13px;
+  color: #a16207;
+  margin: 4px 0 0;
+}
+
+/* 改编说明输入框 */
+.changes-note-input {
+  border-color: #f5d99b !important;
+}
+.changes-note-input:focus {
+  border-color: #d97706 !important;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15) !important;
+}
+body.dark .changes-note-input {
+  border-color: #6b4f1a !important;
+  background: #374151;
+  color: #fde68a;
+}
+body.dark .changes-note-input:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) !important;
+}

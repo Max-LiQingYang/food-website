@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { createRecipe, updateRecipe, getRecipeById } from '../api'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { createRecipe, updateRecipe, getRecipeById, forkRecipe } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
 import ImportFromUrl from '../components/ImportFromUrl'
@@ -55,6 +55,42 @@ export default function CreateRecipePage() {
   const [steps, setSteps] = useState<Array<{ stepNumber: number; content: string; image?: string }>>([{ ...EMPTY_STEP }])
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(isEdit)
+
+  // ═══ #63: 食谱改编模式 ──
+  const [searchParams] = useSearchParams()
+  const forkFrom = searchParams.get('forkFrom')
+  const [forkFromTitle, setForkFromTitle] = useState('')
+  const [changesNote, setChangesNote] = useState('')
+  const [forkLoading, setForkLoading] = useState(!!forkFrom)
+
+  // 改编模式：加载原食谱数据预填充表单
+  useEffect(() => {
+    if (!forkFrom) return
+    setForkLoading(true)
+    getRecipeById(forkFrom)
+      .then(res => {
+        const data = (res as any).data ?? res
+        setTitle(data.title.replace(/（改编）$/, '') + '（改进版）')
+        setDescription(data.description || '')
+        setCategory(data.category || '')
+        setCoverImage(data.coverImage || '')
+        setServings(data.servings || 2)
+        setDifficulty(data.difficulty || 'easy')
+        setCookTime(data.cookTime || 30)
+        if (data.ingredients) {
+          setIngredients(Array.isArray(data.ingredients) ? data.ingredients : [{ ...EMPTY_INGREDIENT }])
+        }
+        if (data.steps) {
+          setSteps(Array.isArray(data.steps) ? data.steps : [{ ...EMPTY_STEP }])
+        }
+        setTips(data.tips || '')
+        setForkFromTitle(data.title)
+      })
+      .catch(() => {
+        toast.error('加载原食谱数据失败')
+      })
+      .finally(() => setForkLoading(false))
+  }, [forkFrom])
 
   // Drag state
   const [dragIngIndex, setDragIngIndex] = useState<number | null>(null)
@@ -324,6 +360,11 @@ export default function CreateRecipePage() {
         await updateRecipe(id, data)
         toast.success('食谱已更新')
         navigate(`/recipe/${id}`)
+      } else if (forkFrom) {
+        // ═══ #63: 改编模式 ── 使用 fork API
+        const result = await forkRecipe(forkFrom, changesNote.trim() || undefined)
+        toast.success('改编成功！正在跳转到新食谱...')
+        navigate(`/recipe/${result.recipeId}`)
       } else {
         const result: any = await createRecipe(data)
         toast.success('食谱创建成功')
@@ -391,6 +432,17 @@ export default function CreateRecipePage() {
           </div>
 
           <form ref={formRef} className="create-form" onSubmit={handleSubmit}>
+            {/* ═══ #63: 改编模式提示 ═══ */}
+            {forkFrom && (
+              <div className="fork-banner">
+                <span className="fork-banner__icon">🍴</span>
+                <div className="fork-banner__content">
+                  <strong>改编自</strong>「{forkFromTitle || '加载中...'}」
+                  <p className="fork-banner__hint">你可以自由修改所有字段，完成后将创建一份新的食谱</p>
+                </div>
+              </div>
+            )}
+
             {/* Step 0: Basic Info */}
             <div className={`create-step ${currentStep !== 0 ? 'create-step--hidden' : ''}`}>
               <h2 className="create-step-title">📝 {isEdit ? '编辑食谱' : '基本信息'}</h2>
@@ -539,6 +591,15 @@ export default function CreateRecipePage() {
                 <span className="form-hint">可选，填写烹饪技巧、注意事项等</span>
               </div>
 
+              {/* ═══ #63: 改编说明 ═══ */}
+              {forkFrom && (
+                <div className="form-group">
+                  <label className="form-label">📝 改编说明</label>
+                  <textarea className="form-textarea changes-note-input" value={changesNote} onChange={e => setChangesNote(e.target.value)} placeholder="说明你做了什么改动，比如：减少了糖量、增加了辣度、替换了某种食材..." rows={3} maxLength={500} />
+                  <span className="form-hint">可选，向读者说明你的改编思路</span>
+                </div>
+              )}
+
               <div className="form-group">
                 <label className="form-label">📖 食谱故事</label>
                 <textarea className="form-textarea" value={story} onChange={e => setStory(e.target.value)} placeholder="介绍这道食谱的灵感来源或背后的故事..." rows={3} maxLength={1000} />
@@ -565,7 +626,7 @@ export default function CreateRecipePage() {
                 </button>
               ) : (
                 <button type="submit" className="btn btn--primary" disabled={submitting}>
-                  {submitting ? '提交中…' : isEdit ? '保存修改' : '✨ 发布食谱'}
+                  {submitting ? '提交中…' : isEdit ? '保存修改' : forkFrom ? '🍴 发布改编' : '✨ 发布食谱'}
                 </button>
               )}
               {currentStep === 0 && (

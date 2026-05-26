@@ -6,6 +6,8 @@ import { getAuthorInfo } from '../api'
 import type { AuthorLevelInfo } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
+import { forkRecipe, getRecipeForks, getRecipeForkLineage } from '../api'
+import type { ForkInfo, ForkLineageItem } from '../api'
 import CommentSection from '../components/CommentSection'
 import NutritionCard from '../components/NutritionCard'
 import SimilarRecipes from '../components/SimilarRecipes'
@@ -90,6 +92,11 @@ export default function RecipeDetailPage() {
   const [showStory, setShowStory] = useState(false)
   const [showCulturalBg, setShowCulturalBg] = useState(false)
   const [showCookingMode, setShowCookingMode] = useState(false)
+
+  // ═══ #63: 食谱改编 ──
+  const [forks, setForks] = useState<ForkInfo[]>([])
+  const [forkCount, setForkCount] = useState(0)
+  const [forking, setForking] = useState(false)
 
   // ═══ #54: 乐观更新评分 ──
   const handleRatingUpdate = useCallback((newAvg: number, newCount: number) => {
@@ -232,6 +239,19 @@ export default function RecipeDetailPage() {
         const recipeData = (res as any).data ?? res
         setRecipe(recipeData as RecipeDetail)
         setIsFavorited(favStatus.isFavorited)
+        // 获取改编版本列表
+        if (recipeData && recipeData.forkCount > 0) {
+          getRecipeForks(id).then(forkRes => {
+            if (forkRes.success && forkRes.forks) {
+              setForks(forkRes.forks)
+              setForkCount(forkRes.count)
+            }
+          }).catch(() => {})
+        }
+        // 如果当前食谱是改编版本，也尝试获取其祖先谱系
+        if (recipeData && recipeData.sourceInfo?.forkedFrom) {
+          getRecipeForkLineage(id).catch(() => {})
+        }
       })
       .catch(() => {
         setNotFound(true)
@@ -299,6 +319,28 @@ export default function RecipeDetailPage() {
   const handleShare = async () => {
     if (!recipe) return
     setShowShareModal(true)
+  }
+
+  // ═══ #63: 食谱改编 ──
+  const handleFork = async () => {
+    if (!id) return
+    if (!isAuthenticated) {
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname))
+      return
+    }
+    setForking(true)
+    try {
+      const changesNote = prompt('请输入你的改编说明（可留空）：')
+      const result = await forkRecipe(id, changesNote || undefined)
+      if (result.success) {
+        toast.success('改编成功！正在跳转到新食谱...')
+        navigate(`/recipe/${result.recipeId}`)
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || '创建改编失败')
+    } finally {
+      setForking(false)
+    }
   }
 
   const handleDelete = async () => {
@@ -566,6 +608,22 @@ export default function RecipeDetailPage() {
               />
             )}
           </p>
+
+          {/* ═══ #63: 食谱改编来源信息 ═══ */}
+          {recipe.sourceInfo?.forkedFrom && (
+            <div className="detail-fork-source">
+              🍴 改编自{' '}
+              <Link to={`/recipe/${recipe.sourceInfo.forkedFrom.id}`}>
+                {recipe.sourceInfo.forkedFrom.title}
+              </Link>
+              {recipe.sourceInfo.forkedBy?.nickname && (
+                <> · 改编者：{recipe.sourceInfo.forkedBy.nickname}</>
+              )}
+              {recipe.sourceInfo.changesNote && (
+                <div className="detail-fork-source__note">{recipe.sourceInfo.changesNote}</div>
+              )}
+            </div>
+          )}
 
           {/* 分类/难度/份数/时间徽标 */}
           <div className="detail-meta">
@@ -928,6 +986,33 @@ export default function RecipeDetailPage() {
               </section>
             )}
             <CommentSection recipeId={id} onRatingUpdate={handleRatingUpdate} />
+
+            {/* ═══ #63: 改编版本列表 ═══ */}
+            {(recipe as any)?.forkCount > 0 && forks.length > 0 && (
+              <section className="detail-forks-section">
+                <h3>🍴 改编版本（{forks.length}）</h3>
+                <div className="detail-forks-list">
+                  {forks.map(f => (
+                    <Link key={f.id} to={`/recipe/${f.id}`} className="detail-forks-card">
+                      {f.coverImage ? (
+                        <img src={f.coverImage} alt={f.title} className="detail-forks-card__img" />
+                      ) : (
+                        <div className="detail-forks-card__img detail-forks-card__img--placeholder">🍽️</div>
+                      )}
+                      <div className="detail-forks-card__info">
+                        <span className="detail-forks-card__title">{f.title}</span>
+                        {f.forkedBy && (
+                          <span className="detail-forks-card__author">{f.forkedBy.nickname || f.forkedBy.username}</span>
+                        )}
+                        {f.changesNote && (
+                          <span className="detail-forks-card__note">{f.changesNote}</span>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </section>
         )}
       </div>
@@ -944,6 +1029,11 @@ export default function RecipeDetailPage() {
             {favLoading ? '⋯' : isFavorited ? '❤️' : '🤍'}
           </span>
           <span>{isFavorited ? '已收藏' : '收藏'}</span>
+        </button>
+
+        <button className="fab-btn" onClick={handleFork} disabled={forking} title="改编食谱">
+          <span className="fab-btn__icon">{forking ? '⋯' : '🍴'}</span>
+          <span>{forking ? '改编中...' : '改编'}</span>
         </button>
 
         <AddToCollectionDropdown recipeId={id} label="📁" />

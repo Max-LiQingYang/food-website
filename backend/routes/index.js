@@ -142,4 +142,7 @@ router.get('/favorites/:recipeId/status', favoriteRoutes.getFavoriteStatus)
 router.get('/favorites/:recipeId/count', favoriteRoutes.getFavoriteCount)
 router.post('/favorites/batch', favoriteRoutes.batchFavorite)
 
+// 食谱克隆与改编系统
+router.use('/recipes', require('./recipeForks'))
+
 module.exports = router

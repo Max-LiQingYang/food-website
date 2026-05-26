@@ -1591,6 +1591,35 @@ router.get('/:id', async (req, res) => {
       }
     })
 
+    // 附加改编来源信息
+    try {
+      const { RecipeFork } = require('../models')
+      const User = require('../models')['User'] || require('../models/user')(null, null)
+      // 查询改编来源（判断当前食谱是否为其他食谱的 fork）
+      const forkRecord = await RecipeFork.findOne({
+        where: { forkedRecipeId: id },
+        include: [
+          { model: Recipe, as: 'originalRecipe', attributes: ['id', 'title'] },
+          { model: require('../models').User, as: 'forkedBy', attributes: ['id', 'nickname', 'username'] }
+        ]
+      })
+      if (forkRecord && forkRecord.originalRecipe) {
+        data.sourceInfo = {
+          forkedFrom: { id: forkRecord.originalRecipe.id, title: forkRecord.originalRecipe.title },
+          forkedBy: forkRecord.forkedBy
+            ? { id: forkRecord.forkedBy.id, nickname: forkRecord.forkedBy.nickname, username: forkRecord.forkedBy.username }
+            : null,
+          changesNote: forkRecord.changesNote
+        }
+      }
+      // 查询这个食谱被多少人 fork
+      const forkCount = await RecipeFork.count({ where: { originalRecipeId: id } })
+      data.forkCount = forkCount
+    } catch (fErr) {
+      // fork 信息附加失败不阻塞主响应
+      console.warn('[FORK INFO] attach failed:', fErr.message)
+    }
+
     return res.status(200).json(resJSON(0, 'ok', data))
   } catch (err) {
     console.error('[GET /recipes/:id] Error:', err)

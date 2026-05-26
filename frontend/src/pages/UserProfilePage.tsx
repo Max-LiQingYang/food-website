@@ -9,11 +9,13 @@ import {
   getUserAchievements,
   updateProfile,
   getAuthorInfo,
+  getUserForks,
   type Recipe,
   type UserStats,
   type Collection,
   type AchievementItem,
   type AuthorLevelInfo,
+  type ForkInfo,
 } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import BrowsingHistory from '../components/BrowsingHistory'
@@ -21,7 +23,7 @@ import ActivityHeatmap from '../components/ActivityHeatmap'
 import './UserProfilePage.css'
 
 type TabType = 'recipes' | 'favorites' | 'collections'
-type TabTypeWithHistory = TabType | 'history'
+type TabTypeWithHistory = TabType | 'history' | 'forks'
 
 // ─── CountUp 组件 ───
 function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: number }) {
@@ -97,6 +99,89 @@ function AchievementBadge({ achievement }: { achievement: AchievementItem }) {
         </div>
       </div>
     </div>
+  )
+}
+
+// ═══ #63: 改编食谱组件 ═══
+function ForksTab({ userId }: { userId: string }) {
+  const [forks, setForks] = useState<ForkInfo[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const pageSize = 20
+
+  useEffect(() => {
+    if (!userId) return
+    setLoading(true)
+    getUserForks(userId, { page, pageSize })
+      .then(res => {
+        if (res.success) {
+          setForks(res.forks)
+          setTotal(res.count)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [userId, page])
+
+  if (loading) {
+    return (
+      <div className="profile-grid">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="profile-card-skeleton">
+            <div className="skeleton-box skeleton-cover" style={{ height: 160 }} />
+            <div className="skeleton-box skeleton-line" style={{ margin: '12px 14px' }} />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (forks.length === 0) {
+    return (
+      <div className="profile-empty">
+        <div className="profile-empty__icon" style={{ fontSize: 48 }}>🍴</div>
+        <p className="profile-empty__text">还没有改编过食谱</p>
+        <p style={{ color: '#888', fontSize: 14 }}>浏览食谱，点击「改编」按钮创建自己的版本</p>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="profile-grid">
+        {forks.map(f => (
+          <Link key={f.id} to={`/recipe/${f.id}`}>
+            <RecipeCard
+              recipe={{
+                id: f.id,
+                title: f.title,
+                coverImage: f.coverImage,
+                description: f.description,
+                category: f.category,
+                cookTime: f.cookTime,
+                servings: f.servings,
+                difficulty: f.difficulty as any,
+                createdAt: f.createdAt,
+              }}
+            />
+          </Link>
+        ))}
+      </div>
+      {total > pageSize && (
+        <div className="profile-pagination">
+          {Array.from({ length: Math.ceil(total / pageSize) }, (_, i) => (
+            <button
+              key={i}
+              className={`btn btn--sm ${page === i + 1 ? 'btn--primary' : 'btn--outline'}`}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
   )
 }
 
@@ -455,6 +540,14 @@ export default function UserProfilePage() {
             👣 足迹
           </button>
         )}
+        {isOwnProfile && (
+          <button
+            className={`profile-tab ${activeTab === 'forks' ? 'profile-tab--active' : ''}`}
+            onClick={() => setActiveTab('forks')}
+          >
+            🍴 我的改编
+          </button>
+        )}
       </div>
 
       {/* Content */}
@@ -503,6 +596,8 @@ export default function UserProfilePage() {
               </>
             )}
           </>
+        ) : activeTab === 'forks' ? (
+          <ForksTab userId={id!} />
         ) : (
           <>
             {cur.loading ? (
