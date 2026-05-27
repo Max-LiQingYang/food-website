@@ -1277,3 +1277,64 @@
 - 1 小时过期 + 100 条上限，定期清理低频条目防止内存泄漏
 - 静态 fallback 热搜词要在 API 不可用时提供降级体验（当前已实现）
 - `docker cp` 对后端文件复制优于 pipe（避免容器内 sh 写入权限问题）
+
+---
+
+## 迭代 #71 — 首页 UI 优化 ✅
+**派发时间**: 2026-05-27
+**完成时间**: 2026-05-27
+**方向**: 🎨 ui-opt（首页展示效率和视觉高级感）
+**Commit**: `6df29f0`
+**构建**: 250 modules, 0 warnings, 715ms
+**部署**: http://39.103.68.205/
+
+### 修复问题
+1. ✅ **Hero 轮播图片裁切** — 高度 260→400px，`object-position: center 25%`（食物主体在中上区域）+ Unsplash 大图 URL（w=1200）
+2. ✅ **轮播指示器胶囊形** — `global.css` 中 `button {min-height:44px}` + flex `align-items:stretch` 导致 8×44 竖向胶囊 → `.hero-dots` 加 `align-items:center`，dot 加 `min-height:0`
+3. ✅ **导航栏视觉偏上** — logo 加 `display:inline-flex; align-items:center`，微调 padding
+4. ✅ **整体视觉高级感** — Hero seasonal bar absolute 悬浮/骨架屏加载过渡/分类卡片 hover 增强/标题装饰性下划线/页面间距节奏优化/最大宽度 960→1040px
+
+### 具体改动
+
+#### HeroSection.css（大幅重写）
+- 高度 260→400px（desktop），200→280px（mobile）
+- `.hero-seasonal`：`position: absolute` 悬浮在顶部，加 backdrop-filter blur，不占用图片空间
+- `object-position: center 25%`：食物摄影主体在画面中上
+- `.hero-dots`：加 `align-items: center`，`gap: 6→8px`
+- `.hero-dot`：加 `min-height: 0; line-height: 1; flex-shrink: 0` 覆盖全局 button 样式
+- `.hero-dot--active`：8px → 24px 圆角条 (`border-radius: 4px`)
+- 暗色模式全套适配
+- 新增骨架屏（hero-skeleton shimmer）
+
+#### HeroSection.tsx
+- FALLBACK_RECIPES 图片 URL：`w=800` → `w=1200&h=900&fit=crop&crop=center`
+- 新增图片预加载状态 `imagesLoaded`，未加载时显示骨架屏淡入
+- overlay 渐变优化
+
+#### Navbar.css
+- `.navbar__logo`：加 `display: inline-flex; align-items: center; line-height: 1; padding: 2px 0`
+
+#### CategoryCards.css
+- 分类卡片：初始 `box-shadow: var(--shadow-sm)` + 透明 border（1.5px）— hover 显示主题色
+- hover 加 `background: color-mix(... 4%)` 与主题色协调的背景
+- 图标 hover `scale(1.15)` 动画
+- label hover 变色 + 加粗到 600
+- 暗色模式全套
+
+#### HomePage.css
+- `max-width: 960→1040px`，`padding: 24px 16px→20px 20px`
+- 标题 `home-section__title` 加 `::after` 装饰下划线（48px 暖橙色指示条）
+- 调整间距节奏：`margin-bottom: 36→32px`，`gap: 10→8px` 等
+- ．home-grid `gap 20→16px`
+- rankings-entry 优化：加 `border`，更柔和渐变
+
+### 部署验证
+- 前端 `/` → 200 ✅
+- `/health` → 200 ✅
+- 后端 `api/recipes` → 200 ✅
+- new HomePage chunks: 20.3kB JS + 23.3kB CSS ✅
+
+### 关键经验
+- `global.css` 中 `button {min-height:44px}` 会影响所有按钮组件，组件级 CSS 必须显式覆写 `min-height: 0` 或 `min-height: auto`
+- Hero 图建议用 `w=1200&h=900` 的大图格式 + `object-position: center 25%` 优化食物展示区
+- Apple Double 文件（`._*`）会在 macOS scp 时自动创建，部署后需清理 `/usr/share/nginx/html/assets/._*`
