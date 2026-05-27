@@ -1462,3 +1462,38 @@
 - ingredientSearch 模块抽离后，recipes.js 和 ingredientSearch.js 路由均可复用同一逻辑
 
 **下一个方向**: C（内容质量）
+
+---
+
+## 迭代 #76 — 🔴 问题修复：视频端点返回空列表 ⏳
+**派发时间**: 2026-05-27
+**方向**: 🔴 问题修复 / bugfix
+**基线 Commit**: `0d86c6e`
+**交付 Commit**: `待填充`
+**部署**: http://39.103.68.205/
+
+### 背景
+网站巡检发现功能异常：
+- GET /api/recipes/:id/videos 返回 `{"list":[],"total":0}`（所有食谱测试均空）
+- 但 GET /api/recipes 列表页 videoCount 聚合正常：68/82 食谱 videoCount>0
+- 说明 VideoEmbed 表数据存在，但 videos 路由的 findAll 查询不到记录
+
+### 排查线索
+- `videos.js`: `VideoEmbed.findAll({ where: { recipeId }, order: [['sortOrder', 'ASC']] })` 返回空
+- `recipes.js`: `VideoEmbed.findAll({ attributes: [...], group: ['recipeId'], raw: true })` 聚合正常
+- 模型定义 `tableName: 'video_embeds'`, `timestamps: false`
+- 生产环境使用 MariaDB（172.17.0.1:3306）
+- 可能原因：表名大小写、列名映射、Sequelize 实例差异、where 条件格式等
+
+### 任务内容
+1. **根因定位** — 对比 COUNT 聚合和 findAll 查询的差异，找出返回空的根本原因
+2. **修复实施** — 修复 videos.js 或模型定义，确保视频记录能被正确查询
+3. **本地验证** — 复现问题并确认修复有效
+4. **部署验证** — 生产环境 curl 验证视频端点返回正确数据
+5. 更新 iteration-tracker.md 和 iteration-lessons.md
+
+### 用户价值
+- 用户点击食谱详情页的「视频教程」Tab 时能看到实际的视频内容
+- 视频覆盖率 82.9% 的数据价值被正确呈现
+
+**下一个方向**: C（内容质量）
