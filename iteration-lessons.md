@@ -161,6 +161,20 @@
 
 ---
 
+## iter#72 — 视频覆盖率提升 (2026-05-27)
+
+### 关键陷阱
+- **video_embeds 列名**: recipeId（驼峰）而非 recipe_id（蛇形），INSERT 时字段名必须匹配模型定义
+- **Bilibili 搜索**: web_fetch / curl 均 412 拦截，需用 Kimi WebBridge 浏览器登录态绕过反爬
+- **Bilibili 新版空间页**: 卡片 href 含 `?spm_id_from=` 而非完整 BV 链接，改用搜索页更稳定
+
+### 修复方法
+- 西餐视频空缺可用中文美食博主覆盖（奶油培根意面、凯撒沙拉均有B站中文版本）
+- 管道注入（`docker cp`）优于 `cat|docker exec` 写入，避免权限问题
+- 搜视频优先级: B站 > 中文美食博主 > YouTube
+
+---
+
 ## 遗留问题
 
 - [ ] VAPID 密钥未配置，Web Push 推送静默跳过
