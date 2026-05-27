@@ -1634,3 +1634,19 @@
 - 季节性内容发现更直观，提升时令食材利用率
 
 **下一个方向**: A（UI/UX）
+
+## Iter #80 — 推荐系统优化（05-27 21:00 ~ 21:55）
+- **目标**: 多样性控制 + 新鲜度加权 + 编辑精选提升 + 相似食谱增强 + 前端推荐理由标签 + 季节食材标签云 + 过渡动画
+- **后端**:
+  - `recipes.js`: 新增 `enhancedRecommendSort()` 工具函数（多样性 max 3/category + 新鲜度 30天加分 + isFeatured 加分）
+  - 应用到 `/recommend` 的季节模式 + 热门默认模式
+  - `/:id/similar`: 候选池 50→80，增加五维覆盖度评分（0.3权重），同 category 上限 2，返回 `dimensionScores`/`coveredDimensions`
+  - 推荐理由标签: 编辑精选/当季推荐/热门食谱/新上线/高度匹配/口味相近/相关推荐
+- **前端**:
+  - `api.ts` Recipe interface 新增 `recommendReason`
+  - `RecipeCard.tsx`: 封面图右上角推荐理由彩色标签 + `getReasonBadgeClass()` 映射函数
+  - `RecipeCard.css`: 6 色标签 + fadeIn 动画
+  - `SeasonalRecommendations.tsx`: 当季食材标签云 + 季节切换过渡动画（cardSlideIn + scrollReveal）
+  - `SeasonalRecommendations.css`: 标签云 + 过渡动画关键帧
+- **验证**: 构建 0 warnings (1.06s)，后端语法 OK，推荐端点 recommendReason 字段正常返回
+- **部署**: git commit `8c7821c` → push → frontend docker cp → backend pipe inject + restart
