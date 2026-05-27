@@ -920,6 +920,53 @@ const videoEmbeds = [
   { title: '泰式绿咖喱鸡', videos: [
     { url: 'https://www.youtube.com/embed/zPkOPx1Oelw', platform: 'youtube', title: 'Thai Green Curry Recipe', duration: 480, sortOrder: 0 },
   ]},
+  // ── 第四轮（迭代#72）：视频覆盖 62.2%→82.9% ───────────
+  { title: '兰州牛肉面', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Ay4y1i7S1', platform: 'bilibili', title: '兰州人家庭版正宗兰州牛肉面的做法(不是兰州拉面啦)详尽菜谱步骤在视频最后', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '大盘鸡', videos: [
+    { url: 'https://www.bilibili.com/video/BV1XNyTYZEWh', platform: 'bilibili', title: '比饭店做的还好吃的大盘鸡只要一分钟就能学会，味道超赞', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '水煮牛肉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Qu411G7ae', platform: 'bilibili', title: '原来这才是水煮牛肉的正宗做法!', duration: 420, sortOrder: 0 },
+  ]},
+  { title: '鱼头豆腐汤', videos: [
+    { url: 'https://www.bilibili.com/video/BV1AX4y1N77u', platform: 'bilibili', title: '老太教你做鱼头豆腐汤如何味道鲜美汤白如牛奶', duration: 300, sortOrder: 0 },
+  ]},
+  { title: '日式牛丼', videos: [
+    { url: 'https://www.bilibili.com/video/BV1cJ411D7do', platform: 'bilibili', title: '【Mingsze】超简单日式牛丼 六个步骤 10分钟', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '韩式烤五花肉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1mT4y1u7nS', platform: 'bilibili', title: '来自韩剧请回答1988里的烤肉，韩式猪五花，保证看着视频流口水', duration: 420, sortOrder: 0 },
+  ]},
+  { title: '干煸四季豆', videos: [
+    { url: 'https://www.bilibili.com/video/BV1os411e7Hf', platform: 'bilibili', title: '【美食台】干煸四季豆，美味的关键在于炸!', duration: 240, sortOrder: 0 },
+  ]},
+  { title: '罗宋汤', videos: [
+    { url: 'https://www.bilibili.com/video/BV1oT41197mk', platform: 'bilibili', title: '俄罗斯姐姐教你怎么做罗宋汤，第一次做就能成功!', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '凯撒沙拉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1pp411R7Bo', platform: 'bilibili', title: '【迷迭香】一招教你学做经典凯撒沙拉!', duration: 240, sortOrder: 0 },
+  ]},
+  { title: '日式咖喱饭', videos: [
+    { url: 'https://www.bilibili.com/video/BV18d4y1Z7Uo', platform: 'bilibili', title: '【日本家常菜】学做正宗日式咖喱饭 好吃的秘诀 和风无水番茄奇玛咖哩肉饭', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '醋溜白菜', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Wh4y1R7cn', platform: 'bilibili', title: '现在网上这个醋溜白菜真的太火了，居然还有人不会做，今天就教您正确的做法', duration: 300, sortOrder: 0 },
+  ]},
+  { title: '奶油培根意面', videos: [
+    { url: 'https://www.bilibili.com/video/BV1So4y137Ns', platform: 'bilibili', title: '奶油培根意面浓郁奶香一人食小锅', duration: 300, sortOrder: 0 },
+  ]},
+  // 以下已有视频(#67)，本轮增至多视频源
+  { title: '小炒肉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1Hy4y1b7Lw', platform: 'bilibili', title: '在家自己做小炒肉', duration: 300, sortOrder: 1 },
+  ]},
+  { title: '扬州炒饭', videos: [
+    { url: 'https://www.bilibili.com/video/BV1j541187ad', platform: 'bilibili', title: '要做正宗的扬州炒饭，蛋丝是灵魂。否则一不小心就变成蛋炒饭了', duration: 360, sortOrder: 1 },
+  ]},
+  { title: '东北乱炖', videos: [
+    { url: 'https://www.bilibili.com/video/BV1ct411f7ZW', platform: 'bilibili', title: '东北乱炖最正宗家常做法:食材选料最重要，先后顺序不能乱!', duration: 420, sortOrder: 1 },
+  ]},
 ]
 
 async function seed () {
