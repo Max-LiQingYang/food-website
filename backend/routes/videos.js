@@ -18,6 +18,13 @@ router.get('/recipes/:recipeId/videos', async (req, res) => {
       where: { recipeId },
       order: [['sortOrder', 'ASC']],
     })
+    if (!videos.length) {
+      // Debug: 检查 recipeId 是否在 video_embeds 表中有记录
+      const count = await VideoEmbed.count({ where: { recipeId } })
+      if (count > 0) {
+        console.warn(`[videos] findAll returned 0 but count=${count} for recipeId=${recipeId} — possible findAll vs count mismatch`)
+      }
+    }
     res.json({ code: 0, data: { list: videos, total: videos.length } })
   } catch (err) {
     console.error('[GET /videos] error:', err.message)

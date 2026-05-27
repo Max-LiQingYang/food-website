@@ -11,16 +11,47 @@ interface Props {
 export default function VideoPlayer({ recipeId }: Props) {
   const [videos, setVideos] = useState<VideoEmbed[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setError(null)
     getRecipeVideos(recipeId)
-      .then(r => setVideos(r.list))
-      .catch(() => {})
-      .finally(() => setLoading(false))
+      .then(r => {
+        if (!cancelled) {
+          setVideos(r.list)
+          setError(null)
+        }
+      })
+      .catch((err: any) => {
+        if (!cancelled) {
+          console.warn('[VideoPlayer] 获取视频失败:', err?.response?.data?.message || err?.message || err)
+          setError(err?.response?.data?.message || '获取视频失败，请稍后重试')
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
   }, [recipeId])
 
   if (loading) return null
+
+  // API 错误 → 友善提示
+  if (error) {
+    return (
+      <div className="video-player-section video-player-section--empty">
+        <h3 className="video-section-title">🎬 视频教程</h3>
+        <div className="video-player__fallback">
+          <div className="video-player__fallback-icon">⚠️</div>
+          <p className="video-player__fallback-title">视频加载失败</p>
+          <p className="video-player__fallback-desc">{error}</p>
+        </div>
+      </div>
+    )
+  }
 
   // 无视频 → 友善降级展示
   if (!videos.length) {
