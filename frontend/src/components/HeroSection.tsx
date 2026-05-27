@@ -15,7 +15,7 @@ interface HeroSectionProps {
 
 /** Seasonal configuration based on current month */
 function getSeasonConfig(): { season: string; tagline: string; gradient: string; emoji: string; overlayColor: string } {
-  const month = new Date().getMonth() // 0=Jan
+  const month = new Date().getMonth()
   if (month >= 2 && month <= 4) {
     return {
       season: 'spring',
@@ -52,24 +52,18 @@ function getSeasonConfig(): { season: string; tagline: string; gradient: string;
   }
 }
 
-const SEASONAL_TAGLINES: Record<string, string> = {
-  spring: '春暖花开，用美食迎接新季节',
-  summer: '炎炎夏日，清爽食谱帮你降温',
-  autumn: '秋高气爽，来一锅温暖炖菜吧',
-  winter: '寒冷冬日，暖心食谱陪你过冬',
-}
-
 const FALLBACK_RECIPES: HeroRecipe[] = [
-  { id: '', title: '宫保鸡丁', image: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=800&h=500&fit=crop', category: '中餐' },
-  { id: '', title: '红烧肉', image: 'https://images.unsplash.com/photo-1623689046286-01cd25b32d79?w=800&h=500&fit=crop', category: '中餐' },
-  { id: '', title: '提拉米苏', image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800&h=500&fit=crop', category: '甜点' },
-  { id: '', title: '清蒸鲈鱼', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=800&h=500&fit=crop', category: '中餐' },
-  { id: '', title: '凯撒沙拉', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=500&fit=crop', category: '西餐' },
+  { id: '', title: '宫保鸡丁', image: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=1200&h=900&fit=crop&crop=center', category: '中餐' },
+  { id: '', title: '红烧肉', image: 'https://images.unsplash.com/photo-1623689046286-01cd25b32d79?w=1200&h=900&fit=crop&crop=center', category: '中餐' },
+  { id: '', title: '提拉米苏', image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=1200&h=900&fit=crop&crop=center', category: '甜点' },
+  { id: '', title: '清蒸鲈鱼', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=1200&h=900&fit=crop&crop=center', category: '中餐' },
+  { id: '', title: '凯撒沙拉', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200&h=900&fit=crop&crop=center', category: '西餐' },
 ]
 
 export default function HeroSection({ recipes }: HeroSectionProps) {
   const items = recipes && recipes.length >= 3 ? recipes : FALLBACK_RECIPES
   const [current, setCurrent] = useState(0)
+  const [imagesLoaded, setImagesLoaded] = useState(false)
   const navigate = useNavigate()
 
   const seasonCfg = useMemo(() => getSeasonConfig(), [])
@@ -82,11 +76,26 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
     setCurrent(prev => (prev + 1) % items.length)
   }, [items.length])
 
-  // Auto rotate every 5s
   useEffect(() => {
     const timer = setInterval(goNext, 5000)
     return () => clearInterval(timer)
   }, [goNext])
+
+  // Preload images to detect loaded state
+  useEffect(() => {
+    const imgs = items.map(item => {
+      const img = new Image()
+      img.onload = () => { /* individual load */ }
+      img.src = item.image
+      return img
+    })
+    let loaded = 0
+    const onLoad = () => {
+      loaded++
+      if (loaded >= items.length) setImagesLoaded(true)
+    }
+    imgs.forEach(img => { img.onload = onLoad; img.onerror = onLoad })
+  }, [items])
 
   const handleRecipeClick = (recipe: HeroRecipe) => {
     if (recipe.id) {
@@ -98,21 +107,40 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
 
   return (
     <div className="hero-section">
-      {/* 季节性标语 + 动态渐变背景 */}
+      {/* 季节性标语 — 半透明悬浮在顶部 */}
       <div className="hero-seasonal" style={{ background: seasonCfg.gradient }}>
         <span className="hero-seasonal__emoji">{seasonCfg.emoji}</span>
         <span className="hero-seasonal__text">{seasonCfg.tagline}</span>
       </div>
 
-      <div className="hero-track" style={{ transform: `translateX(-${current * 100}%)` }}>
+      {!imagesLoaded && (
+        <div className="hero-skeleton">
+          <div className="hero-skeleton__title" />
+          <div className="hero-skeleton__tag" />
+        </div>
+      )}
+
+      <div
+        className="hero-track"
+        style={{
+          transform: `translateX(-${current * 100}%)`,
+          opacity: imagesLoaded ? 1 : 0,
+          transition: imagesLoaded ? 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.4s ease' : 'none',
+        }}
+      >
         {items.map((recipe, idx) => (
           <div
             key={idx}
             className="hero-slide"
             onClick={() => handleRecipeClick(recipe)}
           >
-            <img src={recipe.image} alt={recipe.title} className="hero-slide__img" />
-            <div className="hero-slide__overlay" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, ${seasonCfg.overlayColor} 100%)` }} />
+            <img
+              src={recipe.image}
+              alt={recipe.title}
+              className="hero-slide__img"
+              loading={idx === 0 ? 'eager' : 'lazy'}
+            />
+            <div className="hero-slide__overlay" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 35%, ${seasonCfg.overlayColor} 100%)` }} />
             <div className="hero-slide__content">
               <h2 className="hero-slide__title">{recipe.title}</h2>
               {recipe.category && <span className="hero-slide__tag">{recipe.category}</span>}

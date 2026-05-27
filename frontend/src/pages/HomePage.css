@@ -1,13 +1,13 @@
 .home-page {
-  max-width: 960px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 24px 16px 48px;
+  padding: 20px 20px 48px;
   min-height: calc(100vh - 56px);
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.35s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -39,8 +39,8 @@
 /* ── 搜索栏 ── */
 .home-search {
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .home-search__input {
@@ -84,8 +84,8 @@
 /* ── 分类标签 ── */
 .home-categories {
   display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 20px;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -123,43 +123,57 @@
 
 /* ── 内容区块 ── */
 .home-section {
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
 .home-section__title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 20px;
   font-weight: 700;
   color: var(--color-text, #333);
   margin: 0 0 16px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 2px solid var(--color-border, #e8e0d8);
+  position: relative;
+}
+
+/* 标题装饰下划线 — 较短的暖色指示条 */
+.home-section__title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 48px;
+  height: 2px;
+  background: var(--color-primary, #e8663e);
+  border-radius: 1px;
 }
 
 .home-section__icon {
   font-size: 22px;
+  line-height: 1;
 }
 
 /* ── 食谱网格 ── */
 .home-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 
 @media (max-width: 560px) {
   .home-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
 }
 
 @media (max-width: 380px) {
   .home-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 12px;
   }
 }
 
@@ -250,17 +264,23 @@
 .dark .home-section__title {
   border-bottom-color: var(--color-border, #3a3530);
 }
+
+.dark .home-section__title::after {
+  background: var(--color-primary-light, #f0946e);
+}
+
 /* 排行榜入口 */
 .rankings-entry {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
-  border-radius: var(--radius-lg, 16px);
+  background: linear-gradient(135deg, #fff5ee 0%, #ffede0 100%);
+  border-radius: var(--radius-md, 12px);
   text-decoration: none;
   transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid rgba(232, 102, 62, 0.1);
 }
 
 .rankings-entry:hover {
