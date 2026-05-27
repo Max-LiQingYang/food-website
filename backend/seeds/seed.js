@@ -968,6 +968,85 @@ const videoEmbeds = [
     { url: 'https://www.bilibili.com/video/BV1ct411f7ZW', platform: 'bilibili', title: '东北乱炖最正宗家常做法:食材选料最重要，先后顺序不能乱!', duration: 420, sortOrder: 1 },
   ]},
 ]
+// ── 挑战赛数据 ──────────────────────────────────────────────────
+const challenges = [
+  {
+    id: uuidv4(),
+    title: '夏日清爽料理大赛',
+    description: '炎炎夏日，来一道清爽开胃的料理吧！凉拌沙拉、冰镇甜品、清蒸时蔬……只要够清爽够夏天，就来投稿展示你的夏日厨艺！',
+    theme: '夏日凉菜',
+    status: 'active',
+    startDate: new Date('2026-06-01T00:00:00Z'),
+    endDate: new Date('2026-07-15T23:59:59Z'),
+    rules: '1. 食谱需为夏日清爽主题（凉拌/冰镇/清蒸/冷食等）\n2. 附上成品照片和完整步骤说明\n3. 鼓励附上清凉故事或夏日灵感来源',
+    prize: '🥇 第一名：厨具套装 + 首页推荐\n🥈 第二名：精美餐盘套装\n🥉 第三名：食谱手账本',
+    submissionCount: 0,
+    voteCount: 0,
+    createdBy: null,
+    createdAt: new Date(),
+  },
+  {
+    id: uuidv4(),
+    title: '一周快手菜挑战',
+    description: '忙碌的生活中，你有哪些30分钟内搞定的快手菜秘诀？分享你的高效烹饪魔法，让更多打工人学会快速吃好！',
+    theme: '快手菜',
+    status: 'active',
+    startDate: new Date('2026-05-28T00:00:00Z'),
+    endDate: new Date('2026-06-20T23:59:59Z'),
+    rules: '1. 烹饪总时长不超过30分钟\n2. 食材需简单易得（超市常见食材即可）\n3. 请注明总用时和食材获取难度',
+    prize: '🏆 最快速手奖：保温饭盒 + 厨房计时器\n🥇 最佳人气奖：品牌厨具套装',
+    submissionCount: 0,
+    voteCount: 0,
+    createdBy: null,
+    createdAt: new Date(),
+  },
+  {
+    id: uuidv4(),
+    title: '家乡味道征集赛',
+    description: '走遍天涯海角，最难忘的还是家乡的那一口。分享你记忆中那道最温暖的家乡菜，让美味承载的故事继续传递！',
+    theme: '地方特色',
+    status: 'active',
+    startDate: new Date('2026-06-15T00:00:00Z'),
+    endDate: new Date('2026-07-31T23:59:59Z'),
+    rules: '1. 食谱需带有地方特色（注明菜系或地区）\n2. 附上这道菜背后的故事或记忆\n3. 鼓励还原正宗做法，也可创意改良',
+    prize: '🥇 最佳故事奖：定制围裙 + 美食书\n🥈 最佳还原奖：厨具礼包\n🥉 人气奖：品牌调味品套装',
+    submissionCount: 0,
+    voteCount: 0,
+    createdBy: null,
+    createdAt: new Date(),
+  },
+  {
+    id: uuidv4(),
+    title: '创意早餐挑战',
+    description: '一日之计在于晨！分享你的创意早餐灵感——松饼艺术、卡通便当、营养碗、快手三明治……让早餐成为一天中最美好的开始！',
+    theme: '早餐',
+    status: 'active',
+    startDate: new Date('2026-06-10T00:00:00Z'),
+    endDate: new Date('2026-07-20T23:59:59Z'),
+    rules: '1. 作品需为早餐类食品\n2. 鼓励创意摆盘和营养搭配\n3. 附上准备时间和营养说明',
+    prize: '🎨 最佳创意奖：早餐神器三件套\n🥇 最受欢迎奖：品牌咖啡杯套装\n📖 参与奖：电子食谱合集',
+    submissionCount: 0,
+    voteCount: 0,
+    createdBy: null,
+    createdAt: new Date(),
+  },
+  {
+    id: uuidv4(),
+    title: '深夜食堂故事征集',
+    description: '夜深人静时的美食总是别有风味。分享你的深夜美食故事和食谱，在月光下品味人间烟火！',
+    theme: '夜宵',
+    status: 'active',
+    startDate: new Date('2026-07-01T00:00:00Z'),
+    endDate: new Date('2026-08-15T23:59:59Z'),
+    rules: '1. 食谱适合深夜制作（简单快捷为佳）\n2. 附上深夜美食故事或场景\n3. 鼓励分享配酒/饮品推荐',
+    prize: '🌙 最佳故事奖：夜空主题餐垫\n🍜 最佳食谱奖：特色面碗套装\n🏅 参与奖：社区荣誉徽章',
+    submissionCount: 0,
+    voteCount: 0,
+    createdBy: null,
+    createdAt: new Date(),
+  },
+]
+
 
 async function seed () {
   try {
@@ -1027,6 +1106,12 @@ async function seed () {
     if (videoRecords.length > 0) {
       await db.VideoEmbed.bulkCreate(videoRecords)
       console.log(`✅ 成功插入 ${videoRecords.length} 条视频记录`)
+    }
+
+    // ── 插入挑战赛数据 ────────────
+    if (challenges.length > 0) {
+      await db.Challenge.bulkCreate(challenges)
+      console.log(`✅ 成功插入 ${challenges.length} 条挑战赛记录`)
     }
 
     console.log(`✅ 成功插入 ${recipes.length} 条示范食谱`)

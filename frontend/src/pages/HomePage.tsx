@@ -7,6 +7,7 @@ import SearchAutocomplete from '../components/SearchAutocomplete'
 import FilterPanel from '../components/FilterPanel'
 import HeroSection from '../components/HeroSection'
 import CategoryCards from '../components/CategoryCards'
+import ChallengeHomeCards from '../components/ChallengeHomeCards'
 import FeaturedSection from '../components/FeaturedSection'
 import SeasonalRecommendations from '../components/SeasonalRecommendations'
 import SeasonalIngredients from '../components/SeasonalIngredients'
@@ -164,6 +165,9 @@ export default function HomePage() {
       )}
 
       {showFullLayout && <CategoryCards />}
+
+      {/* ── 挑战赛入口 ── */}
+      {showFullLayout && <ChallengeHomeCards />}
 
       {/* ── 搜索栏 ── */}
       <form className="home-search" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>
