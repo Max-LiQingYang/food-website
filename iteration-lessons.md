@@ -202,3 +202,21 @@
 - **内容缺口优先自动化填充**：视频/图片/故事等缺失内容可用 WebBridge + 脚本批量补充
 - **fork 食谱可继承原食谱视频**：克隆版本的 videoCount 可通过谱系查询关联原始食谱视频
 
+---
+
+## iter#78 — 搜索编码修复与测试数据清理 (2026-05-28)
+
+### 关键陷阱
+- **mojibake 不是传输层问题，是存储层问题**：前端 URL 编码 → Express 正常解码为 UTF-8，但 `trackSearch()` 在某种路径下（可能是重复 URL 编码或中间件处理）将 UTF-8 字节误解码为 Latin-1，导致存入内存 Map 的键为乱码
+- **测试数据清理必须用 SQL**：Sequelize `destroy({ truncate: true })` 不会重置自增 ID，且可能有外键约束；直接 `DELETE FROM challenges WHERE title LIKE '%测试%'` 更干净
+
+### 修复方法
+- `fixMojibake(str)`：检测 Latin-1 特征字节序列，用 `Buffer.from(str, 'latin1').toString('utf8')` 重新解码
+- `trackSearch()`：归一化输入后检查是否存在 mojibake 版本，合并计数后删除损坏条目
+- `getHotSearches()`：定期扫描内存 Map，自动修复并合并历史 mojibake 记录
+
+### 自优化建议
+- **URL 编码参数统一在入口层处理**：所有搜索相关路由在 `req.query.q` 读取后立即 `decodeURIComponent` 并验证，避免各路由自行处理导致不一致
+- **内存缓存数据定期清理**：hot-searches Map 设置 1h TTL + 上限 100 条，防止历史脏数据长期滞留
+- **测试数据隔离**：开发/测试环境插入的挑战赛数据应带 `isTest: true` 标记，生产环境查询自动过滤
+
