@@ -1424,3 +1424,14 @@
 - 搜索结果直观展示已有食材和还需购买的食材
 
 **下一个方向**: C（内容质量）
+
+## Iter #75 — 智能食材搜索优化 ✅ (2026-05-27 15:32~)
+**Files:** ingredientAliases.js, utils/ingredientSearch.js (new), routes/ingredientSearch.js, routes/recipes.js, IngredientSearchPage.tsx/.css, api.ts
+**Changes:**
+- 别名库扩展：新增鱼/羊肉/鸭/豆腐等30+组别名
+- 部分匹配模式：非严格模式下输入N种食材匹配M种即可召回（阈值: 3→2, 4→3, 其余≈60%）
+- 新增 `matchIngredient()` / `expandSearchTerms()` 函数
+- recommend 路由委托给 ingredientSearch 模块，消除重复代码
+- 前端：三色渐变进度条 (high绿色/mid黄色/low红色)、输入防抖(200ms)、双指标展示
+- 后端 JSON bracket-counting 解析（原有），无结果时触发 AI fallback（原有）
+- Commit: `4b791ca`，已推送 ✅
