@@ -4,11 +4,14 @@
 #
 # 流程：代码检查 → 单元测试 → 构建 Docker 镜像 → 推送镜像仓库 → 部署
 #
-# 所需 Secrets（在 GitHub repo Settings → Secrets 中配置）：
+# 所需 Secrets（在 GitHub repo Settings → Secrets → Actions 中配置）：
 #   GITHUB_TOKEN            GitHub 自动提供，用于 ghcr.io 镜像仓库登录
 #   SSH_PRIVATE_KEY          服务器 SSH 私钥（用于部署阶段）
 #   SSH_HOST                 服务器 IP 或域名
 #   SSH_USER                 SSH 用户名
+#
+# 可选 Secrets：
+#   CODECOV_TOKEN           codecov 上传 token（未配置则跳过覆盖率上传）
 # ─────────────────────────────────────────────────────────────
 
 name: CI/CD Pipeline
@@ -23,7 +26,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME_BACKEND: max-liqingyang/food-website-backend
   IMAGE_NAME_FRONTEND: max-liqingyang/food-website-frontend
-  NODE_VERSION: 18
+  NODE_VERSION: 22
 
 permissions:
   contents: read
@@ -32,10 +35,31 @@ permissions:
 jobs:
 
   # ───────────────────────────────────────────────────────────
-  # Job 1: 代码检查（lint）
+  # Job 0: Secrets 可用性预检查（仅部署阶段需要的）
+  # ───────────────────────────────────────────────────────────
+  check-secrets:
+    name: Check Required Secrets
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Verify deployment secrets
+        run: |
+          MISSING=""
+          if [ -z "${{ secrets.SSH_HOST }}" ]; then MISSING="$MISSING SSH_HOST"; fi
+          if [ -z "${{ secrets.SSH_USER }}" ]; then MISSING="$MISSING SSH_USER"; fi
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then MISSING="$MISSING SSH_PRIVATE_KEY"; fi
+          if [ -n "$MISSING" ]; then
+            echo "::error::缺少以下 Secrets，部署阶段将跳过：$MISSING"
+            echo "请在 GitHub repo Settings → Secrets → Actions 中配置"
+            exit 1
+          fi
+          echo "✅ 所有部署所需 Secrets 已配置"
+
+  # ───────────────────────────────────────────────────────────
+  # Job 1: 代码检查（lint + 类型检查）
   # ───────────────────────────────────────────────────────────
   lint:
-    name: Lint Code
+    name: Lint & Type Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,20 +73,25 @@ jobs:
           cache-dependency-path: |
             **/package-lock.json
 
-      # 安装根目录 devDependencies（concurrently 等）
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      # 后端 lint
-      - name: Backend ESLint
-        run: npm run lint --workspace=backend || true
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
 
-      # 前端 lint（如果有）
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+
       - name: Frontend ESLint
-        run: npm run lint --workspace=frontend || true
+        run: cd frontend && npm run lint
+        continue-on-error: true
+
+      - name: Backend ESLint
+        run: cd backend && npm run lint
+        continue-on-error: true
 
   # ───────────────────────────────────────────────────────────
-  # Job 2: 单元测试
+  # Job 2: 单元测试（后端 Jest + 前端 Vitest）
   # ───────────────────────────────────────────────────────────
   test:
     name: Unit Tests
@@ -80,28 +109,39 @@ jobs:
           cache-dependency-path: |
             **/package-lock.json
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      # ── 后端测试（独立环境：SQLite 内存数据库）──────────
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+
+      - name: Install test dependencies
+        run: cd tests && npm ci
+
+      # ── 后端测试（SQLite 内存数据库，--runInBand 防并行冲突）──
       - name: Backend tests
-        run: npm run test:backend
+        run: cd tests && npx jest --config ./jest.config.js --runInBand
         env:
           NODE_ENV: test
           DB_DIALECT: sqlite
           DB_STORAGE: ':memory:'
 
-      # ── 前端测试（Vitest + React Testing Library）─────────────────
+      # ── 前端测试（Vitest CI 模式）─────────────────
       - name: Frontend tests
-        run: npm run --workspace=frontend test -- --run
+        run: cd frontend && npx vitest run
         env:
           NODE_ENV: test
           VITE_API_BASE_URL: http://localhost:3001
 
-      # ── 上传测试覆盖率报告 ─────────────────────────────
+      # ── 上传测试覆盖率报告（可选）─────────────────────
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
-        if: always()
+        uses: codecov/codecov-action@v5
+        if: env.CODECOV_TOKEN != ''
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: ./tests/coverage/lcov.info
           fail_ci_if_error: false
@@ -209,7 +249,7 @@ jobs:
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
-    needs: [build-frontend, build-backend]
+    needs: [check-secrets, build-frontend, build-backend]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
     steps:
@@ -231,7 +271,8 @@ jobs:
             FRONTEND_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest"
 
             echo "=== 登录 ghcr.io ==="
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # 使用 GITHUB_TOKEN 登录 ghcr.io（不需要额外配置 GHCR_TOKEN）
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo "=== 拉取最新镜像 ==="
             docker pull $BACKEND_IMAGE
@@ -247,8 +288,22 @@ jobs:
 
             echo "=== 健康检查 ==="
             sleep 20
-            curl -sf http://127.0.0.1:3000/health || { echo "后端健康检查失败"; exit 1; }
-            curl -sf http://127.0.0.1:8081/health || { echo "前端健康检查失败"; exit 1; }
+            BACKEND_HEALTH=$(curl -sf http://127.0.0.1:3000/health && echo "OK" || echo "FAIL")
+            FRONTEND_HEALTH=$(curl -sf http://127.0.0.1:8081/health && echo "OK" || echo "FAIL")
+
+            if [ "$BACKEND_HEALTH" != "OK" ]; then
+              echo "::error::后端健康检查失败"
+              docker logs food-backend --tail 50
+              exit 1
+            fi
+
+            if [ "$FRONTEND_HEALTH" != "OK" ]; then
+              echo "::error::前端健康检查失败"
+              docker logs food-frontend --tail 50
+              exit 1
+            fi
+
+            echo "✅ 健康检查通过"
 
             echo "=== 清理旧镜像 ==="
             docker image prune -f
