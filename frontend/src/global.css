@@ -1,8 +1,16 @@
 /* 全局基础样式（从 App.vue 迁移） */
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+body {
+  overscroll-behavior: none;
 }
 
 :root {
@@ -469,6 +477,41 @@ a.btn--small, .btn--small, .profile-avatar-edit, .form-btn-remove {
 img, button, a {
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* ── 触摸反馈 :active ── */
+.btn:not(.btn--small):active,
+input[type="submit"]:active,
+button:not(.btn--small):not(.nav-link__btn):active {
+  transform: scale(0.97);
+  filter: brightness(0.95);
+}
+
+.recipe-card:active {
+  transform: scale(0.98);
+}
+
+/* ── iOS 输入框 focus 防缩放 ── */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* ── 统一 focus 样式 ── */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--color-primary, #e8663e);
+  box-shadow: 0 0 0 2px var(--color-primary-bg, #fff3ed);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark input:focus-visible,
+body.dark textarea:focus-visible,
+body.dark select:focus-visible {
+  box-shadow: 0 0 0 2px rgba(232, 102, 62, 0.35);
 }
 
 textarea, input[type="text"], input[type="email"], input[type="password"] {

@@ -1,7 +1,14 @@
 .progressive-image {
   position: relative;
   overflow: hidden;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.5s ease;
+  /* 防止 layout shift：未加载时保持宽高比 */
+  aspect-ratio: 1 / 1;
+}
+
+/* 图片容器覆盖 aspect-ratio 场景（非方形） */
+.progressive-image[style*="aspect-ratio"] {
+  aspect-ratio: auto;
 }
 
 .progressive-image--loading {
@@ -36,11 +43,13 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  filter: blur(8px);
+  transition: opacity 0.6s ease, filter 0.6s ease;
 }
 
 .progressive-image__img--visible {
   opacity: 1;
+  filter: blur(0);
 }
 
 .progressive-image__error {
