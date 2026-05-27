@@ -254,6 +254,14 @@ export function getSuggestions(q: string) {
 }
 
 /**
+ * 获取热门搜索词 TOP 8
+ * GET /api/recipes/hot-searches
+ */
+export function getHotSearches(): Promise<{ data: { list: Array<{ text: string; count: number }> } }> {
+  return apiClient.get('/recipes/hot-searches')
+}
+
+/**
  * 获取季节性推荐食谱
  * GET /api/recipes/seasonal?season=spring
  */

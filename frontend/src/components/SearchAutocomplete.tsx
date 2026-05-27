@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getSuggestions } from '../api'
 import { highlightText } from '../utils/highlightText'
 import './SearchAutocomplete.css'
@@ -26,6 +27,17 @@ function clearHistory() {
   localStorage.removeItem(HISTORY_KEY)
 }
 
+function removeFromHistory(word: string) {
+  const history = loadHistory()
+  const filtered = history.filter(h => h !== word)
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered))
+}
+
+/** 单条删除搜索历史（暴露给外部组件） */
+export function removeHistoryItem(word: string) {
+  removeFromHistory(word)
+}
+
 interface SearchAutocompleteProps {
   value: string
   onChange: (value: string) => void
@@ -34,6 +46,8 @@ interface SearchAutocompleteProps {
   inputClassName?: string
   /** Show hot searches even when input is empty */
   showHotSearches?: boolean
+  /** When true, clicking an API suggestion navigates to recipe detail */
+  enableNavigate?: boolean
 }
 
 export default function SearchAutocomplete({
@@ -43,11 +57,13 @@ export default function SearchAutocomplete({
   placeholder = '搜索食谱...',
   inputClassName = '',
   showHotSearches = true,
+  enableNavigate = true,
 }: SearchAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
-  const [apiSuggestions, setApiSuggestions] = useState<string[]>([])
+  const [apiSuggestions, setApiSuggestions] = useState<Array<{ id: string; title: string }>>([])
   const [isApiLoading, setIsApiLoading] = useState(false)
+  const navigate = useNavigate()
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -74,8 +90,8 @@ export default function SearchAutocomplete({
         const res: any = await getSuggestions(trimmed)
         const data = res.data || res
         const list = data.list || []
-        const titles = list.map((r: any) => r.title).filter(Boolean)
-        setApiSuggestions(titles)
+        const items = list.map((r: any) => ({ id: String(r.id), title: r.title })).filter(item => item.title)
+        setApiSuggestions(items)
       } catch {
         setApiSuggestions([])
       } finally {
@@ -89,14 +105,18 @@ export default function SearchAutocomplete({
   }, [value])
 
   // Merge suggestions: local first (history+hot), then API for fresh results
-  const suggestions = useMemo(() => {
-    const s = new Set(localSuggestions)
-    const merged = [...localSuggestions]
-    for (const api of apiSuggestions) {
-      if (!s.has(api)) merged.push(api)
-    }
+  const allItems = useMemo(() => {
+    const apiTitles = new Set(apiSuggestions.map(a => a.title))
+    const local = localSuggestions.filter(s => !apiTitles.has(s))
+    const merged: Array<{ id: string | null; title: string; source: 'local' | 'api' }> = [
+      ...local.map(s => ({ id: null, title: s, source: 'local' as const })),
+      ...apiSuggestions.map(a => ({ id: a.id, title: a.title, source: 'api' as const })),
+    ]
     return merged
   }, [localSuggestions, apiSuggestions])
+
+  // API title set for icon check
+  const apiTitlesSet = useMemo(() => new Set(apiSuggestions.map(a => a.title)), [apiSuggestions])
 
   // Close on outside click
   useEffect(() => {
@@ -112,7 +132,7 @@ export default function SearchAutocomplete({
   // Reset active index when value or suggestions change
   useEffect(() => {
     setActiveIndex(-1)
-  }, [value, suggestions.length])
+  }, [value, allItems.length])
 
   const handleSubmit = useCallback(
     (query: string) => {
@@ -124,8 +144,22 @@ export default function SearchAutocomplete({
     [onSubmit]
   )
 
+  const handleNavigate = useCallback(
+    (id: string, title: string) => {
+      if (!id || !enableNavigate) {
+        handleSubmit(title)
+        return
+      }
+      saveToHistory(title.trim())
+      setIsOpen(false)
+      navigate(`/recipe/${id}`)
+    },
+    [navigate, onSubmit, enableNavigate]
+  )
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    const visibleLength = suggestions.length + (value.trim().length >= 2 && apiSuggestions.length === 0 && !isApiLoading ? 1 : 0) + (!value.trim() && loadHistory().length > 0 ? 1 : 0)
+    const history = loadHistory()
+    const visibleLength = allItems.length + (value.trim().length >= 2 && apiSuggestions.length === 0 && !isApiLoading ? 1 : 0) + (!value.trim() && history.length > 0 ? 1 : 0)
     if (!isOpen || visibleLength === 0) {
       if (e.key === 'Enter') {
         handleSubmit(value)
@@ -144,11 +178,15 @@ export default function SearchAutocomplete({
         break
       case 'Enter':
         e.preventDefault()
-        if (activeIndex >= 0 && activeIndex < suggestions.length) {
-          const selected = suggestions[activeIndex]
-          onChange(selected)
-          handleSubmit(selected)
-        } else if (activeIndex === suggestions.length && value.trim().length >= 2) {
+        if (activeIndex >= 0 && activeIndex < allItems.length) {
+          const selected = allItems[activeIndex]
+          if (selected.source === 'api' && selected.id && enableNavigate) {
+            handleNavigate(selected.id, selected.title)
+          } else {
+            onChange(selected.title)
+            handleSubmit(selected.title)
+          }
+        } else if (activeIndex === allItems.length && value.trim().length >= 2) {
           handleSubmit(value)
         } else {
           handleSubmit(value)
@@ -178,23 +216,32 @@ export default function SearchAutocomplete({
         autoComplete="off"
       />
 
-      {isOpen && suggestions.length > 0 && (
+      {isOpen && allItems.length > 0 && (
         <ul className="search-autocomplete__dropdown">
-          {suggestions.map((suggestion, index) => (
+          {allItems.map((item, index) => (
             <li
-              key={suggestion}
+              key={item.source === 'api' ? `api-${item.id}` : `local-${item.title}`}
               className={`search-autocomplete__item ${index === activeIndex ? 'is-active' : ''}`}
               onMouseDown={e => {
                 e.preventDefault()
-                onChange(suggestion)
-                handleSubmit(suggestion)
+                if (item.source === 'api' && item.id && enableNavigate) {
+                  handleNavigate(item.id, item.title)
+                } else {
+                  onChange(item.title)
+                  handleSubmit(item.title)
+                }
               }}
               onMouseEnter={() => setActiveIndex(index)}
             >
               <span className="search-autocomplete__icon">
-                {apiSuggestions.includes(suggestion) ? '🔍' : value && suggestion.toLowerCase().includes(value.toLowerCase()) ? '🔍' : '🕐'}
+                {item.source === 'api' && enableNavigate ? '🔗' : '🕐'}
               </span>
-              {highlightText(suggestion, value)}
+              <span className="search-autocomplete__title">
+                {highlightText(item.title, value)}
+              </span>
+              {item.source === 'api' && enableNavigate && (
+                <span className="search-autocomplete__goto">详情 ›</span>
+              )}
             </li>
           ))}
           {isApiLoading && (

@@ -32,6 +32,44 @@ function resJSON(code, message, data) {
   return { code, message, data }
 }
 
+// ── 热门搜索：内存频率追踪 ──
+const searchFrequency = new Map()
+const SEARCH_CACHE_TTL = 3600_000 // 1 小时
+
+function trackSearch(term) {
+  if (!term || !term.trim()) return
+  const q = term.trim().toLowerCase()
+  const now = Date.now()
+  const entry = searchFrequency.get(q)
+  if (entry) {
+    entry.count++
+    entry.updatedAt = now
+  } else {
+    searchFrequency.set(q, { text: term.trim(), count: 1, updatedAt: now })
+  }
+  // 定期清理低频条目（超过 1 小时未更新的 < 2 次搜索）
+  if (searchFrequency.size > 100) {
+    const threshold = now - SEARCH_CACHE_TTL
+    for (const [key, val] of searchFrequency) {
+      if (val.count < 2 && val.updatedAt < threshold) searchFrequency.delete(key)
+    }
+  }
+}
+
+/** 获取热门搜索 Top N */
+function getHotSearches(limit = 8) {
+  // 清理过期条目
+  const threshold = Date.now() - SEARCH_CACHE_TTL
+  for (const [key, val] of searchFrequency) {
+    if (val.updatedAt < threshold) searchFrequency.delete(key)
+  }
+  const sorted = [...searchFrequency.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, limit)
+    .map(([key, val]) => ({ text: val.text, count: val.count }))
+  return sorted
+}
+
 /**
  * NutriScore 计算（基于营养数据的综合评分）
  * A ≥ 4, B ≥ 2.5, C ≥ 1, D ≥ 0, E < 0
@@ -345,6 +383,9 @@ router.get('/search', async (req, res) => {
     let pageSize = parseInt(req.query.pageSize, 10) || 20
     const { q, exclude, category, difficulty, sortBy } = req.query
 
+    // 追踪搜索词
+    if (q && q.trim()) trackSearch(q.trim())
+
     if (page < 1) page = 1
     if (pageSize > 100) pageSize = 100
     if (pageSize < 1) pageSize = 20
@@ -550,6 +591,23 @@ router.get('/suggestions', async (req, res) => {
     return res.status(200).json(resJSON(0, 'ok', { list: rows, total: rows.length }))
   } catch (err) {
     console.error('[GET /recipes/suggestions] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /hot-searches — 热门搜索词（内存频率统计 Top 8）
+// ─────────────────────────────────────────────────────────────────
+router.get('/hot-searches', async (req, res) => {
+  res.set({
+    'Cache-Control': 'public, max-age=60, s-maxage=300',
+    Vary: 'Accept-Encoding',
+  })
+  try {
+    const list = getHotSearches(8)
+    return res.status(200).json(resJSON(0, 'ok', { list, total: list.length }))
+  } catch (err) {
+    console.error('[GET /recipes/hot-searches] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 })

@@ -200,6 +200,93 @@
   color: white;
 }
 
+/* ── 搜索历史：带删除按钮的标签 ── */
+.search-history-tag-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.search-history-tag--del {
+  padding: 5px 10px;
+  font-size: 13px;
+  background: var(--color-primary-bg, #fff3ed);
+  border: none;
+  border-radius: 16px 0 0 16px;
+  color: var(--color-primary-dark, #c94f2a);
+  cursor: pointer;
+  transition: all 0.2s;
+  touch-action: manipulation;
+}
+
+.search-history-tag--del:hover {
+  background: var(--color-primary, #e8663e);
+  color: white;
+}
+
+.search-history-tag__del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 24px;
+  font-size: 10px;
+  background: var(--color-primary-bg, #fff3ed);
+  border: none;
+  border-radius: 0 16px 16px 0;
+  color: var(--color-text-muted, #999);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1;
+  touch-action: manipulation;
+}
+
+.search-history-tag__del:hover {
+  background: var(--color-danger, #e74c3c);
+  color: white;
+}
+
+[data-theme="dark"] .search-history-tag--del {
+  background: #2a1a12;
+  color: #f0946e;
+}
+
+[data-theme="dark"] .search-history-tag--del:hover {
+  background: var(--color-primary, #e8663e);
+  color: white;
+}
+
+[data-theme="dark"] .search-history-tag__del {
+  background: #2a1a12;
+  color: #806050;
+}
+
+[data-theme="dark"] .search-history-tag__del:hover {
+  background: var(--color-danger, #c0392b);
+  color: white;
+}
+
+/* ── 热门搜索词加载状态 ── */
+.search-hot-words__loading {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.search-hot-words__loading-item {
+  width: 64px;
+  height: 32px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--color-bg, #f0ece8) 25%, var(--color-border, #e0ddd9) 50%, var(--color-bg, #f0ece8) 75%);
+  background-size: 200% 100%;
+  animation: shimmer-loading 1.4s ease infinite;
+}
+
+@keyframes shimmer-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    标签式筛选栏 (Tag-based Filters — 替代下拉框)
    ═══════════════════════════════════════════════════════════════ */

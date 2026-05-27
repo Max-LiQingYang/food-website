@@ -64,3 +64,53 @@
   font-size: 14px;
   flex-shrink: 0;
 }
+
+.search-autocomplete__title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-autocomplete__goto {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--color-text-muted, #bbb);
+  margin-left: auto;
+  padding-left: 8px;
+  transition: color 0.15s;
+}
+
+.search-autocomplete__item:hover .search-autocomplete__goto,
+.search-autocomplete__item.is-active .search-autocomplete__goto {
+  color: var(--color-primary, #e8663e);
+}
+
+/* 暗色模式 */
+body.dark .search-autocomplete__input {
+  background: var(--color-card, #2d2d3a);
+  border-color: var(--color-border, #3d3d4a);
+  color: var(--color-text, #e0ded9);
+}
+
+body.dark .search-autocomplete__dropdown {
+  background: var(--color-card, #2d2d3a);
+  border: 1px solid var(--color-border, #3d3d4a);
+}
+
+body.dark .search-autocomplete__item:hover,
+body.dark .search-autocomplete__item.is-active {
+  background: rgba(232, 102, 62, 0.15);
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
+  .search-autocomplete__item {
+    padding: 12px 14px;
+    font-size: 15px;
+    min-height: 44px;
+  }
+  .search-autocomplete__item {
+    gap: 8px;
+  }
+}

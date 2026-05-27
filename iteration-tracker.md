@@ -1189,30 +1189,50 @@
 
 ---
 
-## 迭代 #68 — A/UI/UX：构建警告修复与图片加载体验优化 ⏳
+## 迭代 #68 — A/UI/UX：构建警告修复与图片加载体验优化 ✅
 **派发时间**: 2026-05-26
+**完成时间**: 2026-05-26
 **方向**: A（UI/UX）/ 🟡 体验优化
 **基线 Commit**: `306c7be`
-**交付 Commit**: `待填充`
+**交付 Commit**: `f764335`（工作内容合并至迭代 #69）
 **部署**: http://39.103.68.205/
 
-### 背景
-网站巡检通过，功能完整无遗留错误，迭代#67已完成。方向评估中发现以下体验瑕疵：
-- 前端构建产生 2 个 CSS syntax warnings（Unexpected "/" 和 Unexpected "}"）
-- 抽样检查 10 道食谱中 4 道 Unsplash 封面图片返回 404（水煮鱼/班尼迪克蛋/鱼香肉丝等）
-- 图片加载失败虽有 onError fallback，但降级体验可进一步优化
+### 完成状态
+- 工作内容与迭代 #69 合并执行并交付
+- CSS warnings 已修复（0 warnings）
+- 11 张失效封面图已替换
+- ImagePlaceholder 组件已升级（shimmer + blur-in 过渡）
 
-### 任务内容
-1. **定位并修复 CSS syntax warnings** — 找出产生 warnings 的 CSS 文件，修复语法错误，确保构建 0 warnings
-2. **修复失效封面图片** — 检查并替换返回 404 的 Unsplash 图片 URL，恢复视觉完整性
-3. **图片加载体验优化** — 增强 RecipeCard 图片降级展示，优化 ProgressiveImage 过渡效果
-4. **构建验证** — 本地 `npm run build` 0 errors 0 warnings
-5. **部署闭环** — commit → build → deploy → 验证
-6. **更新 iteration-tracker.md 和 iteration-lessons.md**
+**下一个方向**: B（功能增强）
 
-### 用户价值
-- 消除构建警告，提升代码质量和维护性
-- 修复失效图片，提升首页和详情页视觉体验
-- 更优雅的图片加载失败降级，减少用户感知到的"破损感"
+---
+
+## 迭代 #69 — A/UI/UX：修复11张404封面图+图片降级优化 ✅
+**派发时间**: 2026-05-26
+**完成时间**: 2026-05-26
+**方向**: A（UI/UX）/ 🟡 体验优化
+**基线 Commit**: `c84fa68`
+**交付 Commit**: `f764335`
+**部署**: http://39.103.68.205/
+
+### 任务内容（已完成）
+1. ✅ DB 替换 11 张返回 404 的 Unsplash 封面图为可用的对应题材图片
+2. ✅ seed.js 同步更新红烧肉、麻婆豆腐封面图
+3. ✅ ImagePlaceholder 组件升级：支持 fallbackText 显示食谱名、shimmer 脉冲过渡、blur-in 加载效果
+4. ✅ global.css 新增 `.image-placeholder-shimmer` CSS 动画
+5. ✅ RecipeCard 传递 `recipe.title` 作为 fallbackText
+6. ✅ 修复 SearchPage.css syntax warnings
+7. ✅ 构建 0 warnings（仅 chunk 容量提示）
+8. ✅ 部署验证：所有 11 张替换图返回 200
+
+### 实际成果
+- 修复封面：水煮鱼/水煮鱼改编/班尼迪克蛋/鱼香肉丝v2/麻婆豆腐/章鱼小丸子/蒜蓉粉丝蒸扇贝/西红柿炒鸡蛋/红烧肉/东坡肉/酸菜鱼
+- ImagePlaceholder 降级体验从纯色背景 → shimmer + blur-in 渐进过渡
+- 构建 warnings：2 → 0
+
+### 关键经验
+- Unsplash URL 应定期巡检，建议每月检查封面图有效性
+- 图片加载组件应包含 shimmer → blur-in → 完整图的渐进过渡
+- 构建 0 warnings 是基线
 
 **下一个方向**: B（功能增强）

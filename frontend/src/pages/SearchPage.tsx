@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { searchRecipes } from '../api'
+import { searchRecipes, getHotSearches } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import SearchAutocomplete from '../components/SearchAutocomplete'
@@ -38,17 +38,6 @@ const SORT_OPTIONS: Record<string, string> = {
 }
 
 /** 热门搜索词（带图标） */
-const HOT_SEARCH_WORDS = [
-  { text: '番茄炒蛋', icon: '🍅' },
-  { text: '红烧肉', icon: '🥩' },
-  { text: '蛋糕', icon: '🎂' },
-  { text: '鸡肉', icon: '🍗' },
-  { text: '汤', icon: '🥣' },
-  { text: '牛肉', icon: '🐂' },
-  { text: '素菜', icon: '🥬' },
-  { text: '面条', icon: '🍜' },
-]
-
 /** localStorage 搜索历史 */
 function getSearchHistory(): string[] {
   try {
@@ -65,6 +54,12 @@ function addToSearchHistory(query: string) {
 
 function clearSearchHistory() {
   localStorage.removeItem('search_history')
+}
+
+/** 单条删除搜索历史 */
+function removeFromSearchHistory(query: string) {
+  const history = getSearchHistory().filter(h => h !== query)
+  localStorage.setItem('search_history', JSON.stringify(history))
 }
 
 export default function SearchPage() {
@@ -84,6 +79,12 @@ export default function SearchPage() {
   const [filterCategory, setFilterCategory] = useState(categoryParam)
   const [filterDifficulty, setFilterDifficulty] = useState(difficultyParam)
   const [filterSortBy, setFilterSortBy] = useState(sortByParam)
+
+  // 动态热门搜索词
+  const [hotSearches, setHotSearches] = useState<Array<{ text: string; count: number }>>([])
+  const [hotLoading, setHotLoading] = useState(false)
+  // 历史刷新触发器（删除时触发重新渲染）
+  const [historyRev, setHistoryRev] = useState(0)
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -125,6 +126,21 @@ export default function SearchPage() {
       })
       .finally(() => setLoading(false))
   }, [q, page, filterCategory, filterDifficulty, filterSortBy])
+
+  // 加载热门搜索词
+  useEffect(() => {
+    if (!q) {
+      setHotLoading(true)
+      getHotSearches()
+        .then((res: any) => {
+          const data = res.data?.data || res.data
+          const list = data?.list || []
+          setHotSearches(list)
+        })
+        .catch(() => setHotSearches([]))
+        .finally(() => setHotLoading(false))
+    }
+  }, [q])
 
   const handleSearchSubmit = (query: string) => {
     if (!query.trim()) return
@@ -298,25 +314,36 @@ export default function SearchPage() {
                   className="search-history__clear"
                   onClick={() => {
                     clearSearchHistory()
-                    // Force re-render
                     setInputValue('')
                   }}
                 >
-                  清除
+                  清除全部
                 </button>
               </div>
               <div className="search-history__tags">
                 {getSearchHistory().map((word, i) => (
-                  <button
-                    key={i}
-                    className="search-history-tag"
-                    onClick={() => {
-                      setInputValue(word)
-                      setTimeout(() => handleSearchSubmit(word), 0)
-                    }}
-                  >
-                    {word}
-                  </button>
+                  <span key={i} className="search-history-tag-wrap">
+                    <button
+                      className="search-history-tag"
+                      onClick={() => {
+                        setInputValue(word)
+                        setTimeout(() => handleSearchSubmit(word), 0)
+                      }}
+                    >
+                      {word}
+                    </button>
+                    <button
+                      className="search-history-tag__del"
+                      onClick={e => {
+                        e.stopPropagation()
+                        removeFromSearchHistory(word)
+                        setHistoryRev(v => v + 1)
+                      }}
+                      title="删除此条"
+                    >
+                      ✕
+                    </button>
+                  </span>
                 ))}
               </div>
             </div>
@@ -325,20 +352,28 @@ export default function SearchPage() {
           {/* 热门搜索词 */}
           <div className="search-hot-words">
             <span className="search-hot-words__label">🔥 热门搜索</span>
-            <div className="search-hot-words__tags">
-              {HOT_SEARCH_WORDS.map(({ text, icon }) => (
-                <button
-                  key={text}
-                  className="search-hot-word"
-                  onClick={() => {
-                    setInputValue(text)
-                    setTimeout(() => handleSearchSubmit(text), 0)
-                  }}
-                >
-                  {icon} {text}
-                </button>
-              ))}
-            </div>
+            {hotLoading ? (
+              <div className="search-hot-words__loading">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span key={i} className="search-hot-words__loading-item" />
+                ))}
+              </div>
+            ) : hotSearches.length > 0 ? (
+              <div className="search-hot-words__tags">
+                {hotSearches.map(({ text }) => (
+                  <button
+                    key={text}
+                    className="search-hot-word"
+                    onClick={() => {
+                      setInputValue(text)
+                      setTimeout(() => handleSearchSubmit(text), 0)
+                    }}
+                  >
+                    {text}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         </>
       )}
@@ -374,18 +409,33 @@ export default function SearchPage() {
           <div className="search-empty__suggestions">
             <p className="search-empty__suggestions-label">💡 试试这些热搜词：</p>
             <div className="search-empty__suggestion-tags">
-              {HOT_SEARCH_WORDS.slice(0, 4).map(({ text, icon }) => (
-                <button
-                  key={text}
-                  className="search-hot-word"
-                  onClick={() => {
-                    setInputValue(text)
-                    setTimeout(() => handleSearchSubmit(text), 0)
-                  }}
-                >
-                  {icon} {text}
-                </button>
-              ))}
+              {hotSearches.length > 0 ? (
+                hotSearches.slice(0, 4).map(({ text }) => (
+                  <button
+                    key={text}
+                    className="search-hot-word"
+                    onClick={() => {
+                      setInputValue(text)
+                      setTimeout(() => handleSearchSubmit(text), 0)
+                    }}
+                  >
+                    {text}
+                  </button>
+                ))
+              ) : (
+                ['番茄炒蛋', '红烧肉', '蛋糕', '牛肉'].map(text => (
+                  <button
+                    key={text}
+                    className="search-hot-word"
+                    onClick={() => {
+                      setInputValue(text)
+                      setTimeout(() => handleSearchSubmit(text), 0)
+                    }}
+                  >
+                    {text}
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </div>
