@@ -1236,3 +1236,44 @@
 - 构建 0 warnings 是基线
 
 **下一个方向**: B（功能增强）
+
+---
+
+## 迭代 #70 — 搜索体验增强 ✅
+**派发时间**: 2026-05-26
+**完成时间**: 2026-05-26
+**方向**: B（功能增强）
+**Commit**: `c9f420b`
+**构建**: 250 modules, 0 warnings（本地 1.04s）
+**部署**: http://39.103.68.205/
+
+### 任务内容（已完成）
+1. ✅ 后端：searchFrequency Map 追踪 + GET /api/recipes/hot-searches 端点（Top 8，内存统计，1h TTL）
+2. ✅ 后端：/search 入口集成 trackSearch()，每次搜索自动计入频率
+3. ✅ 前端 api.ts：新增 getHotSearches() 函数
+4. ✅ 前端 SearchPage.tsx：静态 HOT_SEARCH_WORDS → API 动态加载
+5. ✅ 前端 SearchPage.tsx：搜索历史单条删除按钮 + 清除全部按钮
+6. ✅ 前端 SearchPage.tsx：热门搜索词加载状态骨架屏（shimmer pulse）
+7. ✅ 前端 SearchAutocomplete.tsx：API 建议存储 {id, title}，点击跳转 /recipe/:id
+8. ✅ 前端 SearchAutocomplete.tsx：enableNavigate prop（默认 true）
+9. ✅ CSS：暗色模式完整适配 + 移动端触摸优化（min-height: 44px）
+10. ✅ 构建 0 warnings
+11. ✅ 部署：前端 docker cp → nginx reload + 后端 docker cp → restart
+
+### 实际成果
+- 热门搜索词从静态硬编码变为后端内存统计驱动，无需手动维护
+- 搜索历史支持单条删除，提升 UX
+- 搜索建议项可直跳食谱详情页
+
+### 部署验证
+- `GET /api/recipes/hot-searches` → 200 OK，含 6 条热门搜索词 ✅
+- `GET /api/recipes/suggestions?q=鸡` → 6 条建议，200 OK ✅
+- `GET /api/recipes/search?q=番茄` → 7 条结果，200 OK ✅
+- 前端 `/` → 200 OK ✅
+- 前端 `/health` → 200 OK ✅
+
+### 关键经验
+- 内存 Map 统计搜索频率适合小规模站点，无需 DB 写操作
+- 1 小时过期 + 100 条上限，定期清理低频条目防止内存泄漏
+- 静态 fallback 热搜词要在 API 不可用时提供降级体验（当前已实现）
+- `docker cp` 对后端文件复制优于 pipe（避免容器内 sh 写入权限问题）

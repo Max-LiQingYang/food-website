@@ -152,6 +152,15 @@
 
 ---
 
+## iter#70 — 搜索体验增强 (2026-05-26)
+
+### 部署决策
+- **后端文件写入**：`docker cp /tmp/file container:/app/path/` 优于 `cat|docker exec -i sh -c 'cat > path'`（避免容器内非 root 用户的写入权限问题）
+- **内存搜索频率 vs DB 持久化**：小规模站点用内存 Map 即可（≤100 条，1h TTL），无需 DB 写操作浪费 IO。重启后丢失但冷启动后会重新积累
+- **静态 fallback**：API 不可用时必须有降级体验（硬编码 4 条常见搜索词展示）
+
+---
+
 ## 遗留问题
 
 - [ ] VAPID 密钥未配置，Web Push 推送静默跳过
