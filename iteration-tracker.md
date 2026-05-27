@@ -1405,12 +1405,43 @@
 
 ---
 
-## 迭代 #73 — A/UI/UX：移动端交互体验深化与首屏性能优化 ⏳
+## 迭代 #73 — A/UI/UX：移动端交互体验深化与首屏性能优化 ✅
 **派发时间**: 2026-05-27
+**完成时间**: 2026-05-27
 **方向**: A（UI/UX）/ 🟡 体验优化
-**基线 Commit**: `d978e81`
-**交付 Commit**: `待填充`
+**基线 Commit**: `285fc7b`
+**交付 Commit**: `c328511`
 **部署**: http://39.103.68.205/
+
+### 变更文件
+- **index.html**: 新增 4 组 dns-prefetch + preconnect (Unsplash/Bilibili/YouTube CDN)
+- **global.css**: html scroll-behavior:smooth, body overscroll-behavior:none, :active触摸反馈, input:focus-visible统一样式
+- **MobileBottomNav.css**: 活动指示器动画增强（scaleX弹性入场过渡）
+- **ProgressiveImage.css**: 增加 aspect-ratio防布局偏移 + blur-in过渡
+- **App.tsx**: 移动端focusin事件→scrollIntoView防键盘遮挡
+
+### 6项优化完成状态
+1. ✅ 触摸反馈: .btn/button/recipe-card :active scale(0.97) + filter brightness
+2. ✅ 底部导航: 指示器 opacity+scaleX 弹性过渡动画
+3. ✅ 滚动性能: body overscroll-behavior:none + html scroll-behavior:smooth
+4. ✅ DNS预解析: Unsplash/Bilibili/YouTube 完成 preconnect + dns-prefetch
+5. ✅ 图片加载: 增加 aspect-ratio + blur(8px)→blur(0)过渡
+6. ✅ 表单focus: 全局 focusin事件→scrollIntoView + 统一 focus-visible样式
+
+### 构建验证
+- 250 modules, 0 warnings, 1.05s ✅
+
+### 部署验证
+- 前端 200 ✅ | 后端 health 200 ✅
+
+### 用户价值
+- 移动端用户获得更流畅的触摸反馈体验
+- 首屏加载更快（DNS 预解析减少白屏时间）
+- 图片加载 blur-in 过渡视觉更平滑
+- 表单输入自动滚动到视口，键盘不遮挡
+- 暗色模式全覆盖
+
+**下一个方向**: B（功能增强）
 
 ### 背景
 网站巡检通过，无遗留错误，无未完成任务。方向评估：

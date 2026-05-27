@@ -179,3 +179,30 @@
 
 - [ ] VAPID 密钥未配置，Web Push 推送静默跳过
 
+
+---
+
+## iter#74 — 移动端交互体验深化 (2026-05-27)
+
+### 迭代方向
+- 🟡 ui-optimization（移动端交互 + 首屏性能优化）
+
+### 变更总结
+1. **index.html**: 新增 Unsplash、Bilibili CDN(i0/i1.hdslb.com)、YouTube CDN(i.ytimg.com) 的 dns-prefetch + preconnect
+2. **global.css**: html scroll-behavior:smooth, body overscroll-behavior:none, :active 触摸反馈（scale+filter）, input:focus-visible 统一样式 + 暗色模式适配
+3. **MobileBottomNav.css**: 底部指示器动画从 width 切换改为 opacity + scaleX + cubic-bezier 弹性弹簧动画
+4. **ProgressiveImage.css**: aspect-ratio 防布局偏移; 图片渐入从纯 opacity 改为 filter blur(8px)→blur(0) + opacity
+5. **App.tsx**: 全局 focusin 事件监听 → input/textarea focus 时 300ms 后 scrollIntoView(center)，防止移动端键盘遮挡
+
+### 关键发现
+1. **ProgressiveImage 的 aspect-ratio 冲突**：大部分图片容器已有明确宽高（如 recipe-card 的固定 400x300），加 aspect-ratio: 1/1 作默认值，但覆盖规则需排除已设 style aspect-ratio 的容器
+2. **iOS input font-size 陷阱**：iOS Safari 在 input font-size < 16px 时会自动缩放页面。全局 CSS 设置 `input { font-size: 16px; }` 是必要的
+3. **:focus-visible vs :focus**：:focus-visible 只显示键盘 focus（不显示鼠标 click focus），更符合用户体验（避免点击按钮后残留蓝色外框）
+4. **overscroll-behavior 全局设置**：body 设置 overscroll-behavior:none 后，仍可在特定容器（如 scroll 区域）单独设置 overscroll-behavior:contain 或 auto
+5. **前端部署 curl 验证**：前端容器 curl localhost:3001 不通（因为是不同容器），需用 nginx 代理路径 `/api/health` 或从宿主机 curl localhost:3000
+6. **Safe-area 已在底部导航中处理**：`padding-bottom: env(safe-area-inset-bottom)` 防止 iPhone X+ 的下巴遮挡
+
+### 自优化建议
+- **ProgressiveImage 过渡**：blur(8px)→blur(0) + opacity 组合过渡效果比纯 opacity 视觉更好，但 GPU 消耗略高。对低端移动设备可考虑降级为纯 opacity
+- **dns-prefetch 数量控制**：不宜超过 6 个域名，否则浏览器优先队列被稀释。当前 3 个域名合理
+- **input focus 滚动延迟**：300ms 是平衡值（等键盘弹起），但在 Android 某些浏览器上可能需要更长（400ms）。可通过 UA 检测调整
