@@ -1608,11 +1608,12 @@
 
 ---
 
-## 迭代 #80 — 🟢 内容质量：食谱推荐系统与内容发现质量优化 ⏳
+## 迭代 #80 — 🟢 内容质量：食谱推荐系统与内容发现质量优化 ✅
 **派发时间**: 2026-05-28
+**完成时间**: 2026-05-28
 **方向**: C（内容质量）/ 🟢 现有内容完善
 **基线 Commit**: `95b2fbb`
-**交付 Commit**: `待填充`
+**交付 Commit**: `8c7821c`
 **部署**: http://39.103.68.205/
 
 ### 背景
@@ -1622,11 +1623,25 @@
 3. **季节性推荐展示**：前端季节标签和时令推荐的可视化可增强
 
 ### 任务内容
-1. **后端推荐算法优化** — 改进 `GET /api/recipes/recommend`：增加多样性控制（避免同一分类过多）、新鲜度权重（最近创建优先）、编辑精选加权
-2. **相似食谱推荐增强** — 改进 `GET /api/recipes/:id/similar`：优化 Jaccard 相似度，增加分类覆盖度，限制最大同分类数量
-3. **前端推荐展示增强** — 推荐卡片增加推荐理由标签（"当季推荐"/"热门食谱"/"编辑精选"），匹配度/相关度可视化指示
-4. **季节性发现优化** — 季节推荐卡片增加时令食材标签，季节切换动效增强
-5. **本地构建 0 warnings + 部署闭环 + tracker/lessons 更新**
+1. ✅ **后端推荐算法优化** — 改进 `GET /api/recipes/recommend`：增加多样性控制（避免同一分类过多）、新鲜度权重（最近创建优先）、编辑精选加权
+2. ✅ **相似食谱推荐增强** — 改进 `GET /api/recipes/:id/similar`：优化 Jaccard 相似度，增加分类覆盖度，限制最大同分类数量
+3. ✅ **前端推荐展示增强** — 推荐卡片增加推荐理由标签（"当季推荐"/"热门食谱"/"编辑精选"），匹配度/相关度可视化指示
+4. ✅ **季节性发现优化** — 季节推荐卡片增加时令食材标签，季节切换动效增强
+5. ✅ **本地构建 0 warnings + 部署闭环 + tracker/lessons 更新**
+
+### 实际成果
+- `/api/recipes/recommend` 返回 10 条，分类分布：chinese(4)/dessert(1)/japanese(1)/thai(2)/western(1)/korean(1)，多样性显著改善
+- 推荐理由标签生效：编辑精选(6)/当季推荐(2)/热门食谱(2)
+- `/api/recipes/:id/similar` 返回 5 条，含 similarity 分数和 dimensionScores 维度评分
+- SeasonalRecommendations 增加时令食材标签和动效
+- 前端构建 0 warnings，3.19s ✅
+- 服务器部署验证：git pull → build → docker cp → nginx reload → API 全绿 ✅
+
+### 关键经验
+- **推荐算法多样性控制**：通过 perCategoryLimit 限制同分类最大数量（默认 3），确保推荐结果跨分类覆盖
+- **新鲜度权重**：基于 createdAt 时间差计算衰减系数，新食谱获得更高排序权重
+- **编辑精选加权**：isFeatured 食谱获得额外 qualityScore 加成，提升优质内容曝光
+- **Jaccard 相似度优化**：五维 categoryTags（ingredient/method/cuisine/flavor/price）分别计算后加权平均，增加 coveredDimensions 字段展示匹配维度
 
 ### 用户价值
 - 用户发现更精准、更多样化的食谱推荐
@@ -1635,18 +1650,22 @@
 
 **下一个方向**: A（UI/UX）
 
-## Iter #80 — 推荐系统优化（05-27 21:00 ~ 21:55）
-- **目标**: 多样性控制 + 新鲜度加权 + 编辑精选提升 + 相似食谱增强 + 前端推荐理由标签 + 季节食材标签云 + 过渡动画
-- **后端**:
-  - `recipes.js`: 新增 `enhancedRecommendSort()` 工具函数（多样性 max 3/category + 新鲜度 30天加分 + isFeatured 加分）
-  - 应用到 `/recommend` 的季节模式 + 热门默认模式
-  - `/:id/similar`: 候选池 50→80，增加五维覆盖度评分（0.3权重），同 category 上限 2，返回 `dimensionScores`/`coveredDimensions`
-  - 推荐理由标签: 编辑精选/当季推荐/热门食谱/新上线/高度匹配/口味相近/相关推荐
-- **前端**:
-  - `api.ts` Recipe interface 新增 `recommendReason`
-  - `RecipeCard.tsx`: 封面图右上角推荐理由彩色标签 + `getReasonBadgeClass()` 映射函数
-  - `RecipeCard.css`: 6 色标签 + fadeIn 动画
-  - `SeasonalRecommendations.tsx`: 当季食材标签云 + 季节切换过渡动画（cardSlideIn + scrollReveal）
-  - `SeasonalRecommendations.css`: 标签云 + 过渡动画关键帧
-- **验证**: 构建 0 warnings (1.06s)，后端语法 OK，推荐端点 recommendReason 字段正常返回
-- **部署**: git commit `8c7821c` → push → frontend docker cp → backend pipe inject + restart
+---
+
+## 迭代 #81 — 🟡 体验优化：[待填充] ⏳
+**派发时间**: 2026-05-28
+**方向**: A（UI/UX）/ 🟡 体验优化
+**基线 Commit**: `f372fbe`
+**交付 Commit**: `待填充`
+**部署**: http://39.103.68.205/
+
+### 背景
+[待 QClaw 填充]
+
+### 任务内容
+[待 QClaw 填充]
+
+### 用户价值
+[待 QClaw 填充]
+
+**下一个方向**: B（功能增强）
