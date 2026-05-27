@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from 'react'
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { searchByIngredients } from '../api'
 import type { IngredientSearchResult, AiRecipeRecommend } from '../api'
@@ -34,18 +34,20 @@ export default function IngredientSearchPage() {
   const [aiGenerated, setAiGenerated] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedSuggestion, setSelectedSuggestion] = useState(-1)
+  const [debouncedInput, setDebouncedInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const suggestionRef = useRef<HTMLDivElement>(null)
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // 输入建议：基于输入过滤常见食材，排除已选的
+  // 输入建议：基于输入过滤常见食材，排除已选的（带防抖）
   const suggestions = useMemo(() => {
-    if (!input.trim()) return []
-    const lower = input.toLowerCase()
+    if (!debouncedInput.trim()) return []
+    const lower = debouncedInput.toLowerCase()
     return COMMON_INGREDIENTS.filter(i =>
       !ingredients.includes(i) &&
       i.toLowerCase().includes(lower)
     ).slice(0, 8)
-  }, [input, ingredients])
+  }, [debouncedInput, ingredients])
 
   const addIngredient = (name?: string) => {
     const trimmed = (name || input).trim()
@@ -291,9 +293,18 @@ export default function IngredientSearchPage() {
                   {r.coverImage && <img src={r.coverImage} alt="" className="is-card-img" />}
                   <div className="is-card-body">
                     <h3>{r.title}</h3>
+                    {/* 匹配度进度条（双指标） */}
                     <div className="match-bar">
-                      <div className="match-fill" style={{ width: `${r.matchRatio}%` }} />
-                      <span className="match-text">{r.matchRatio}% 匹配 ({r.matchCount}/{r.totalIngredients} 种食材)</span>
+                      <div
+                        className={`match-fill match-fill--${r.inputMatchScore >= 80 ? 'high' : r.inputMatchScore >= 50 ? 'mid' : 'low'}`}
+                        style={{ width: `${r.inputMatchScore || r.matchRatio}%` }}
+                      />
+                      <span className="match-text">
+                        {r.inputMatchScore != null
+                          ? `${r.inputMatchScore}% 覆盖 (已匹配 ${r.matchedIngredients.length}/${r.totalInput || '?'} 种输入食材)`
+                          : `${r.matchRatio}% 匹配 (${r.matchCount}/${r.totalIngredients} 种食材)`
+                        }
+                      </span>
                     </div>
                     {r.matchedIngredients.length > 0 && (
                       <p className="matched">✅ {r.matchedIngredients.join('、')}</p>

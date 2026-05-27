@@ -19,6 +19,7 @@ const auth = require('../middleware/auth')
 
 const { createActivity } = require('../utils/activity')
 const { checkAllAchievements } = require('../utils/achievementChecker')
+const { searchByIngredients, aiFallbackSearch } = require('../utils/ingredientSearch')
 
 const router = express.Router()
 
@@ -834,7 +835,7 @@ router.get('/recommend', async (req, res) => {
       return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'seasonal', season: currentSeason }))
     }
 
-    // ─── 模式3: 食材推荐（原逻辑增强 + 质量分） ───
+    // ─── 模式3: 食材推荐（智能匹配 + 部分匹配 + AI 降级） ───
     if (!ingredients || String(ingredients).trim().length === 0) {
       // 无参数时返回热门推荐
       const hotRecipes = await Recipe.findAll({
@@ -848,7 +849,7 @@ router.get('/recommend', async (req, res) => {
       })
       await attachRatingInfo(list)
 
-    return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'popular' }))
+      return res.status(200).json(resJSON(0, 'ok', { list, recommendType: 'popular' }))
     }
 
     // 解析输入食材列表
@@ -861,123 +862,29 @@ router.get('/recommend', async (req, res) => {
       return res.status(400).json(resJSON(400, '请输入有效的食材名称', null))
     }
 
-    // 构建 where 条件
-    const where = {
-      [Op.or]: inputList.map(name => ({
-        ingredients: { [Op.like]: `%${name}%` },
-      })),
+    // 使用 ingredientSearch 模块（别名感知 + 部分匹配 + 加权排序）
+    const searchOptions = {
+      ingredients: inputList,
+      strict: false,  // 非严格模式：支持部分匹配
     }
 
     // 食材排除
-    const excludeCond = buildExcludeCondition(exclude)
-    if (excludeCond) {
-      where[Op.and] = excludeCond
+    if (exclude) {
+      searchOptions.exclude = exclude
     }
 
-    // 1. 数据库模糊匹配（OR 逻辑：匹配任意一种食材即可，按匹配数量排序）
-    const dbRecipes = await Recipe.findAll({
-      where,
-      attributes: LIST_ATTRIBUTES.concat(['ingredients']),
-    })
-
-    // 2. 计算匹配度
-    const results = dbRecipes.map(recipe => {
-      const data = recipe.toJSON()
-      let recipeIngredientNames = []
-      if (data.ingredients) {
-        try {
-          const parsed = JSON.parse(data.ingredients)
-          recipeIngredientNames = (Array.isArray(parsed) ? parsed : []).map(i => i.name)
-        } catch {
-          // 非 JSON 格式则直接用原文
-          recipeIngredientNames = [String(data.ingredients)]
-        }
-      }
-
-      let matchedCount = 0
-      const matchedNames = []
-      for (const input of inputList) {
-        const found = recipeIngredientNames.some(name =>
-          name.toLowerCase().includes(input.toLowerCase())
-        )
-        if (found) {
-          matchedCount++
-          matchedNames.push(input)
-        }
-      }
-
-      const matchScore = Math.round((matchedCount / inputList.length) * 100)
-
-      return {
-        id: data.id,
-        title: data.title,
-        coverImage: data.coverImage,
-        author: data.author,
-        cookTime: data.cookTime,
-        description: data.description,
-        category: data.category,
-        difficulty: data.difficulty,
-        servings: data.servings,
-        userId: data.userId,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-        viewCount: data.viewCount || 0,
-        favoriteCount: data.favoriteCount || 0,
-        commentCount: data.commentCount || 0,
-        matchScore,
-        matchedIngredients: matchedNames,
-        totalIngredients: recipeIngredientNames.length,
-        recommendType: 'ingredient',
-      }
-    })
-
-    // 按匹配度降序
-    results.sort((a, b) => b.matchScore - a.matchScore)
+    const { list: results } = await searchByIngredients(searchOptions)
     await attachRatingInfo(results)
 
-    // 3. AI 无结果增强（仅当数据库匹配不到时）
+    // AI 降级增强（仅当 DB 匹配不到时）
     let aiGenerated = false
-    let aiRecipes = []
+    let aiRecommends = null
 
     if (results.length === 0 && process.env.AI_API_KEY && process.env.NODE_ENV !== 'test') {
-      try {
-        const ingredientStr = inputList.join('、')
-        const aiPrompt = `你是一个美食食谱推荐专家。用户提供了以下食材：${ingredientStr}。请推荐 3 道包含这些食材的菜谱，每道菜谱包含：菜名、简介、所需食材列表（从用户食材中选取）、烹饪时长（分钟）、难度（easy/medium/hard）、份数。以 JSON 数组格式返回，每个元素包含 title, description, ingredients(数组[{name, amount, unit}]), cookTime, difficulty, servings 字段。只返回 JSON，不要其他文字。`
-
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 15000)
-
-        const aiRes = await fetch(
-          `${process.env.AI_API_BASE_URL || 'https://ark.cn-beijing.volces.com/api/coding/v3'}/chat/completions`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${process.env.AI_API_KEY}`,
-            },
-            body: JSON.stringify({
-              model: process.env.AI_MODEL || 'deepseek-v3.2',
-              messages: [{ role: 'user', content: aiPrompt }],
-              temperature: 0.7,
-            }),
-            signal: controller.signal,
-          }
-        )
-
-        clearTimeout(timeout)
-
-        if (aiRes.ok) {
-          const aiData = await aiRes.json()
-          const content = aiData.choices?.[0]?.message?.content || ''
-          // 提取 JSON 数组
-          const jsonMatch = content.match(/\[\s*\{[\s\S]*?\}\s*\]/)
-          if (jsonMatch) {
-            aiRecipes = JSON.parse(jsonMatch[0])
-            aiGenerated = true
-          }
-        }
-      } catch (aiErr) {
-        console.warn('[RECOMMEND] AI fallback failed:', aiErr.message)
+      const aiResult = await aiFallbackSearch(inputList)
+      if (aiResult) {
+        aiGenerated = aiResult.aiGenerated
+        aiRecommends = aiResult.aiRecommends
       }
     }
 
@@ -986,7 +893,7 @@ router.get('/recommend', async (req, res) => {
         input: inputList,
         list: results,
         aiGenerated,
-        aiRecipes,
+        aiRecommends,
       })
     )
   } catch (err) {

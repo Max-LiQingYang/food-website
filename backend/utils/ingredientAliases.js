@@ -98,6 +98,49 @@ const ALIAS_GROUPS = [
   ['腐竹', '豆腐皮', '腐皮'],
   ['花椒油', '花椒油（藤椒油）'],
   ['辣椒油', '红油', '油泼辣子'],
+
+  // ── 第3轮：扩展肉类/水产 ──
+  ['鱼', '草鱼', '鲈鱼', '鲫鱼', '罗非鱼', '三文鱼', '鳕鱼', '鱼片', '鱼块', '鱼肉', '龙利鱼'],
+  ['羊肉', '羊腿', '羊排', '羊肉片', '羊腩', '羊里脊'],
+  ['鸭', '鸭肉', '鸭腿', '鸭翅', '鸭胸', '烤鸭'],
+
+  // ── 第4轮：豆制品/蔬菜扩展 ──
+  ['豆腐', '嫩豆腐', '老豆腐', '豆腐干', '千张', '豆制品'],
+  ['青椒', '甜椒', '灯笼椒', '菜椒', '彩椒', '柿子椒'],
+  ['辣椒', '红辣椒', '干辣椒', '小米辣', '尖椒', '杭椒', '青尖椒'],
+  ['姜', '生姜', '老姜', '嫩姜', '子姜', '姜片', '姜末'],
+  ['蒜', '大蒜', '蒜头', '蒜瓣', '蒜末', '蒜片'],
+  ['胡萝卜', '红萝卜', '甘荀', '胡萝贝'],
+  ['芹菜', '西芹', '旱芹', '香芹'],
+  ['南瓜', '南瓜泥', '金瓜', '老南瓜', '嫩南瓜'],
+  ['韭菜', '韭黄', '韭葱', '韭菜苔'],
+  ['豆芽', '绿豆芽', '黄豆芽', '银芽'],
+  ['玉米', '甜玉米', '玉米粒', '玉米笋', '玉米棒'],
+
+  // ── 第5轮：米面/干货 ──
+  ['面条', '挂面', '切面', '拉面', '乌冬面', '意面', '意大利面', '通心粉', '意粉', '细面'],
+  ['大米', '白米', '米饭', '粳米', '籼米', '香米'],
+  ['糯米', '糯米粉', '江米', '糯米饭'],
+  ['面粉', '中筋面粉', '高筋面粉', '低筋面粉', '普通面粉', '小麦粉', '中粉', '高粉', '低粉'],
+  ['酵母', '干酵母', '发酵粉', '泡打粉', '即发干酵母'],
+  ['面包糠', '面包屑', '面包粉', '酥炸粉'],
+  ['紫菜', '海苔', '紫菜片'],
+  ['红枣', '大枣', '金丝枣', '红枣干', '去核红枣'],
+  ['枸杞', '枸杞子', '杞子'],
+  ['莲子', '莲子干', '白莲'],
+  ['百合', '百合干', '鲜百合'],
+
+  // ── 第6轮：调味品扩展 ──
+  ['料酒', '米酒', '黄酒', '绍兴酒', '料理酒', '花雕酒'],
+  ['香油', '芝麻油', '麻油', '香油（麻油）'],
+  ['蚝油', '蚝油酱'],
+  ['豆瓣酱', '辣豆瓣酱', '郫县豆瓣酱', '豆瓣'],
+  ['咖喱', '咖喱粉', '咖喱块', '咖喱酱', '咖喱膏'],
+  ['桂皮', '肉桂', '肉桂粉', '桂枝'],
+  ['牛奶', '鲜奶', '全脂牛奶', '纯牛奶', '牛奶（全脂）'],
+  ['八角', '大料', '八角茴香'],
+  ['花椒', '麻椒', '藤椒', '青花椒', '红花椒'],
+  ['白芝麻', '芝麻', '熟芝麻', '白芝麻粒'],
 ]
 
 // 构建双向映射
@@ -176,10 +219,70 @@ function getHotIngredients(limit = 20) {
   return hot.slice(0, limit)
 }
 
+/**
+ * 别名感知匹配：判断用户搜索的食材是否与食谱中的某种食材匹配
+ * @param {string} searchTerm — 用户输入的搜索词
+ * @param {string[]} recipeIngredientNames — 食谱中的食材名数组
+ * @returns {{ matched: boolean, matchedName: string|null }} — 是否匹配 + 匹配到的食材名
+ */
+function matchIngredient(searchTerm, recipeIngredientNames) {
+  const trimmed = searchTerm.trim().toLowerCase()
+  if (!trimmed) return { matched: false, matchedName: null }
+
+  for (const recipeIngredient of recipeIngredientNames) {
+    const name = String(recipeIngredient).toLowerCase()
+
+    // 1. 精确子串匹配（最高优先级）
+    if (name.includes(trimmed) || trimmed.includes(name)) {
+      return { matched: true, matchedName: recipeIngredient }
+    }
+
+    // 2. 别名映射匹配
+    const canonical = ALIAS_TO_CANONICAL[trimmed]
+    if (canonical) {
+      // 看食谱食材是否属于该别名组
+      for (const alias of CANONICAL_TO_ALIASES[canonical]) {
+        if (name.includes(alias.toLowerCase())) {
+          return { matched: true, matchedName: recipeIngredient }
+        }
+      }
+    }
+
+    // 3. 反向：食谱中的食材是否有别名映射到搜索词
+    const canonicalReverse = ALIAS_TO_CANONICAL[name]
+    if (canonicalReverse) {
+      for (const alias of CANONICAL_TO_ALIASES[canonicalReverse]) {
+        if (alias.toLowerCase().includes(trimmed) || trimmed.includes(alias.toLowerCase())) {
+          return { matched: true, matchedName: recipeIngredient }
+        }
+      }
+    }
+
+    // 4. 部分匹配：搜索词的一部分匹配食谱食材
+    // 处理如 "鸡" → "鸡腿" 的场景（搜索词是食材名的一部分）
+    if (trimmed.length >= 2 && (name.includes(trimmed) || trimmed.includes(name))) {
+      return { matched: true, matchedName: recipeIngredient }
+    }
+  }
+
+  return { matched: false, matchedName: null }
+}
+
+/**
+ * 对输入食材列表批量展开别名
+ * @param {string[]} terms — 用户输入的食材列表
+ * @returns {string[]} — 展开后的搜索词列表（去重）
+ */
+function expandSearchTerms(terms) {
+  return expandIngredients(terms)
+}
+
 module.exports = {
   expandIngredients,
   getAllCanonicalNames,
   getHotIngredients,
+  matchIngredient,
+  expandSearchTerms,
   ALIAS_GROUPS,
   ALIAS_TO_CANONICAL,
   CANONICAL_TO_ALIASES,

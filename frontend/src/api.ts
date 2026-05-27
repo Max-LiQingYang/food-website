@@ -1318,6 +1318,9 @@ export interface IngredientSearchResult {
   matchRatio: number
   matchCount: number
   totalIngredients: number
+  inputMatchScore?: number
+  totalInput?: number
+  inputMatchedCount?: number
   matchedIngredients: string[]
   missingIngredients: string[]
   nutrition?: any

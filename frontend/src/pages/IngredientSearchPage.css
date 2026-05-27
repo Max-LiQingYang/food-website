@@ -54,7 +54,10 @@
 
 /* ═══ Match Bar ═══ */
 .match-bar { height: 8px; background: var(--bg-secondary); border-radius: 4px; position: relative; margin-bottom: 8px; overflow: hidden; }
-.match-fill { height: 100%; background: linear-gradient(90deg, #4caf50, #66bb6a); border-radius: 4px; transition: width 0.5s; }
+.match-fill { height: 100%; transition: width 0.5s ease; }
+.match-fill--high { background: linear-gradient(90deg, #43a047, #66bb6a); }
+.match-fill--mid { background: linear-gradient(90deg, #f9a825, #ffca28); }
+.match-fill--low { background: linear-gradient(90deg, #ef5350, #e57373); }
 .match-text { position: absolute; right: 0; top: -18px; font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; }
 
 /* ═══ Matched / Missing ═══ */

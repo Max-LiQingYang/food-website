@@ -24,50 +24,53 @@ router.post('/recipes/by-ingredients', async (req, res) => {
     // ── 别名展开 ──
     const expandedIngredients = expandIngredients(ingredients)
     const originalInput = ingredients.map(i => i.trim().toLowerCase())
+    const totalInput = originalInput.length
+
+    // ── 部分匹配阈值 ──
+    // 输入N种食材，最少匹配M种即可召回
+    let minMatch
+    if (strictMode) {
+      minMatch = totalInput  // 严格模式：全部匹配
+    } else if (totalInput <= 2) {
+      minMatch = totalInput
+    } else if (totalInput === 3) {
+      minMatch = 2
+    } else if (totalInput === 4) {
+      minMatch = 3
+    } else {
+      minMatch = Math.ceil(totalInput * 0.6)
+    }
 
     // ── 构建搜索条件 ──
-    // 使用别名展开后的列表进行 OR 匹配（只要食材字段包含任意别名即匹配）
-    const ingredientsWhere = {
-      [Op.and]: originalInput.map(orig => ({
-        ingredients: {
-          [Op.like]: `%${orig}%`,
-        },
-      })),
-    }
-
-    // 对于严格模式，只使用完全扩展搜索
-    // 对于非严格模式，使用 OR 匹配提高召回率
-    if (!strictMode) {
-      // 使用别名展开的食材做 OR 匹配
-      const aliasConditions = expandedIngredients.map(alias => ({
-        ingredients: { [Op.like]: `%${alias}%` },
-      }))
-
-      // 把 AND 条件改为：用户输入的所有原始食材都要出现（通过别名展开），用 OR 匹配每个别名
-      ingredientsWhere[Op.and] = originalInput.map(orig => {
-        // 找到该食材的所有别名（通过别名组）
-        const lowerOrig = orig.toLowerCase()
-        const canonical = ALIAS_TO_CANONICAL[lowerOrig]
-        let relatedAliases
-        if (canonical) {
-          const { CANONICAL_TO_ALIASES } = require('../utils/ingredientAliases')
-          relatedAliases = CANONICAL_TO_ALIASES[canonical].map(n => n.toLowerCase())
-        } else {
-          relatedAliases = [lowerOrig]
-        }
-        return {
-          [Op.or]: relatedAliases.map(a => ({
-            ingredients: { [Op.like]: `%${a}%` },
-          })),
-        }
-      })
-
-    }
+    // 使用 OR 逻辑：只要食材字段匹配任一原始输入（或其别名）即可
+    // 注意：这可能在 DB 级别产生很多匹配，后续在 JS 层面精确计算重新过滤
+    const orConditions = originalInput.map(orig => {
+      const lowerOrig = orig.toLowerCase()
+      const canonical = ALIAS_TO_CANONICAL[lowerOrig]
+      let relatedAliases
+      if (canonical) {
+        const { CANONICAL_TO_ALIASES } = require('../utils/ingredientAliases')
+        relatedAliases = CANONICAL_TO_ALIASES[canonical].map(n => n.toLowerCase())
+      } else {
+        relatedAliases = [lowerOrig]
+      }
+      return {
+        [Op.or]: relatedAliases.map(a => ({
+          ingredients: { [Op.like]: `%${a}%` },
+        })),
+      }
+    })
 
     const offsetVal = (parseInt(page) - 1) * parseInt(pageSize)
     const limitVal = parseInt(pageSize)
+
+    // DB 级别：OR 匹配（提高召回率），后续在 JS 层面做精确过滤
+    const dbWhere = {
+      [Op.or]: orConditions,
+    }
+
     const { count, rows } = await Recipe.findAndCountAll({
-      where: ingredientsWhere,
+      where: dbWhere,
       limit: limitVal,
       offset: offsetVal,
       attributes: ['id', 'title', 'coverImage', 'description', 'category', 'difficulty', 'cookTime', 'servings', 'ingredients', 'favoriteCount', 'nutrition'],
@@ -94,30 +97,54 @@ router.post('/recipes/by-ingredients', async (req, res) => {
         return !userLowerExpanded.some(ui => riLower.includes(ui) || ui.includes(riLower))
       })
 
+      // 两种匹配分：
+      // - matchRatio ：基于食谱本身（匹配的食材数/食谱总食材数 × 100）
+      // - inputMatchScore：基于用户输入（匹配的输入数/总输入数 × 100）
       const matchRatio = recipeIngredients.length > 0
         ? Math.round((matchedIngredients.length / recipeIngredients.length) * 100)
         : 0
 
+      // 统计用户输入的食材中有多少被这个食谱覆盖（别名感知）
+      let inputMatchedCount = 0
+      for (const inputItem of originalInput) {
+        const matched = recipeIngredients.some(ri => {
+          const riLower = ri.toLowerCase()
+          return userLowerExpanded.some(ui => riLower.includes(ui) || ui.includes(riLower))
+        })
+        if (matched) inputMatchedCount++
+      }
+      const inputMatchScore = Math.round((inputMatchedCount / totalInput) * 100)
+
       return {
         ...recipe.toJSON(),
         matchRatio,
+        inputMatchScore,
         matchedIngredients: matchedIngredients.slice(0, 5),
         missingIngredients: missingIngredients.slice(0, 10),
         matchCount: matchedIngredients.length,
+        inputMatchedCount,
         totalIngredients: recipeIngredients.length,
+        totalInput,
         // 提示别名匹配
         aliasExpanded: expandedIngredients.length > originalInput.length,
       }
     })
 
-    // 按匹配度降序排序
-    result.sort((a, b) => b.matchRatio - a.matchRatio)
+    // 过滤：只保留达到最少输入匹配数的食谱
+    const filtered = result.filter(r => r.inputMatchedCount >= minMatch)
+
+    // 排序：inputMatchScore 降序 → 同分时 matchRatio 降序 → 同分时 favoriteCount 降序
+    filtered.sort((a, b) => {
+      if (b.inputMatchScore !== a.inputMatchScore) return b.inputMatchScore - a.inputMatchScore
+      if (b.matchRatio !== a.matchRatio) return b.matchRatio - a.matchRatio
+      return (b.favoriteCount || 0) - (a.favoriteCount || 0)
+    })
 
     // ── AI fallback：无匹配时调用 AI 生成推荐 ──
     let aiRecipes = null
     let aiGenerated = false
 
-    if (count === 0 && process.env.AI_API_KEY && process.env.NODE_ENV !== 'test') {
+    if (filtered.length === 0 && process.env.AI_API_KEY && process.env.NODE_ENV !== 'test') {
       try {
         const ingredientStr = ingredients.join('、')
         const aiPrompt = `你是一个美食食谱推荐专家。用户提供了以下食材：${ingredientStr}。请推荐 3 道包含这些食材的菜谱，每道菜谱包含：菜名、简介、所需食材列表、烹饪时长（分钟）、难度（easy/medium/hard）、份数。以 JSON 数组格式返回，每个元素包含 title, description, ingredients(数组[{name, amount, unit}]), cookTime, difficulty, servings 字段。只返回 JSON，不要其他文字。`
@@ -232,12 +259,14 @@ router.post('/recipes/by-ingredients', async (req, res) => {
     res.json({
       code: 0,
       data: {
-        list: result,
-        total: count,
+        list: filtered,
+        total: filtered.length,
+        totalDb: count,
         page: parseInt(page),
         pageSize: parseInt(pageSize),
         userIngredients: ingredients,
         aliasExpanded: expandedIngredients,
+        minMatch,
         aiRecommends: aiRecipes,
         aiGenerated,
       },
