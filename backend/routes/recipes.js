@@ -34,19 +34,51 @@ function resJSON(code, message, data) {
 }
 
 // ── 热门搜索：内存频率追踪 ──
+
 const searchFrequency = new Map()
 const SEARCH_CACHE_TTL = 3600_000 // 1 小时
 
+/**
+ * 修复疑似二次 URL 编码导致的 Mojibake
+ * 当 UTF-8 字符串被双次 URL 编码并解码后，呈现为 Latin-1 解释的乱码。
+ * 例如："\u00e9\u00b8\u00a1\u00e8\u009b\u008b" -> 重解为 UTF-8 后为 "\u9e21\u86cb"
+ * 仅当重解结果包含 CJK 字符时才替换，避免误伤合法 Latin-1 字符串。
+ */
+function fixMojibake(str) {
+  if (!str || !/[\u0080-\u00ff]/.test(str)) return str
+  try {
+    const buf = Buffer.from(str, 'latin1')
+    const fixed = buf.toString('utf-8')
+    if (fixed !== str && /[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]/.test(fixed)) {
+      return fixed
+    }
+  } catch (e) {
+    // ignore
+  }
+  return str
+}
+
 function trackSearch(term) {
   if (!term || !term.trim()) return
-  const q = term.trim().toLowerCase()
+  const raw = term.trim()
+  const fixed = fixMojibake(raw)
+  const q = fixed.toLowerCase()
   const now = Date.now()
+
+  // 合并现有已损坏条目的计数
+  if (fixed !== raw) {
+    const corruptKey = raw.toLowerCase()
+    if (searchFrequency.has(corruptKey)) {
+      searchFrequency.delete(corruptKey)
+    }
+  }
+
   const entry = searchFrequency.get(q)
   if (entry) {
     entry.count++
     entry.updatedAt = now
   } else {
-    searchFrequency.set(q, { text: term.trim(), count: 1, updatedAt: now })
+    searchFrequency.set(q, { text: fixed, count: 1, updatedAt: now })
   }
   // 定期清理低频条目（超过 1 小时未更新的 < 2 次搜索）
   if (searchFrequency.size > 100) {
@@ -61,8 +93,30 @@ function trackSearch(term) {
 function getHotSearches(limit = 8) {
   // 清理过期条目
   const threshold = Date.now() - SEARCH_CACHE_TTL
+  // 同时合并 Mojibake 条目（处理内存中已有的损坏数据）
+  const toDelete = []
+  const toMerge = []
   for (const [key, val] of searchFrequency) {
-    if (val.updatedAt < threshold) searchFrequency.delete(key)
+    if (val.updatedAt < threshold) {
+      toDelete.push(key)
+      continue
+    }
+    const fixed = fixMojibake(key)
+    if (fixed !== key) {
+      toDelete.push(key)
+      toMerge.push({ fixedKey: fixed.toLowerCase(), text: val.text, count: val.count })
+    }
+  }
+  for (const key of toDelete) {
+    searchFrequency.delete(key)
+  }
+  for (const item of toMerge) {
+    const existing = searchFrequency.get(item.fixedKey)
+    if (existing) {
+      existing.count += item.count
+    } else {
+      searchFrequency.set(item.fixedKey, { text: item.text, count: item.count, updatedAt: Date.now() })
+    }
   }
   const sorted = [...searchFrequency.entries()]
     .sort((a, b) => b[1].count - a[1].count)
