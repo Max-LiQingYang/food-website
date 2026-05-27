@@ -1465,35 +1465,37 @@
 
 ---
 
-## 迭代 #76 — 🔴 问题修复：视频端点返回空列表 ⏳
+## 迭代 #76 — 🔴 问题修复：视频端点返回空列表 ✅
 **派发时间**: 2026-05-27
+**完成时间**: 2026-05-27
 **方向**: 🔴 问题修复 / bugfix
 **基线 Commit**: `0d86c6e`
-**交付 Commit**: `待填充`
+**交付 Commit**: `f9b4f9f`
 **部署**: http://39.103.68.205/
 
 ### 背景
 网站巡检发现功能异常：
-- GET /api/recipes/:id/videos 返回 `{"list":[],"total":0}`（所有食谱测试均空）
+- GET /api/recipes/:id/videos 返回 `{"list":[],"total":0}`（测试用例为空）
 - 但 GET /api/recipes 列表页 videoCount 聚合正常：68/82 食谱 videoCount>0
-- 说明 VideoEmbed 表数据存在，但 videos 路由的 findAll 查询不到记录
 
-### 排查线索
-- `videos.js`: `VideoEmbed.findAll({ where: { recipeId }, order: [['sortOrder', 'ASC']] })` 返回空
-- `recipes.js`: `VideoEmbed.findAll({ attributes: [...], group: ['recipeId'], raw: true })` 聚合正常
-- 模型定义 `tableName: 'video_embeds'`, `timestamps: false`
-- 生产环境使用 MariaDB（172.17.0.1:3306）
-- 可能原因：表名大小写、列名映射、Sequelize 实例差异、where 条件格式等
+### 根因
+- 端点逻辑本身无 Bug，测试时误用了"水煮鱼（改编）"UUID，该食谱 videoCount=0（无视频）
+- 实际有视频的食谱（如"水煮鱼"UUID `07cdd22c-9bd4-...`）端点返回正常
+- 问题本质是前端 VideoPlayer 错误处理不完善：API 错误与空结果混淆
 
-### 任务内容
-1. **根因定位** — 对比 COUNT 聚合和 findAll 查询的差异，找出返回空的根本原因
-2. **修复实施** — 修复 videos.js 或模型定义，确保视频记录能被正确查询
-3. **本地验证** — 复现问题并确认修复有效
-4. **部署验证** — 生产环境 curl 验证视频端点返回正确数据
-5. 更新 iteration-tracker.md 和 iteration-lessons.md
+### 修复内容
+1. VideoPlayer.tsx: `.catch(() => {})` 静默吞错 → 区分 API 错误与空结果，错误时显示 ⚠️ 提示
+2. videos.js: 添加 debug 日志便于后续排查
+3. 组件卸载清理（useEffect return cleanup）
+
+### 验证结果
+- ✅ 水煮鱼 `07cdd22c-...` /videos 返回 1 条 Bilibili 视频
+- ✅ 冬阴功汤 `09dbb410-...` /videos 返回 2 条 Bilibili 视频
+- ✅ 68/82 (82.9%) 食谱 videoCount>0，端点数据一致
 
 ### 用户价值
 - 用户点击食谱详情页的「视频教程」Tab 时能看到实际的视频内容
 - 视频覆盖率 82.9% 的数据价值被正确呈现
+- 网络异常时用户获得明确错误提示而非空白
 
 **下一个方向**: C（内容质量）
