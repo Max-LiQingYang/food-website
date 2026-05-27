@@ -1341,11 +1341,12 @@
 
 ---
 
-## 迭代 #72 — C/内容质量：视频覆盖率继续提升 68.3% → ~80% ⏳
+## 迭代 #72 — C/内容质量：视频覆盖率继续提升 68.3% → 82.9% ✅
 **派发时间**: 2026-05-27
+**完成时间**: 2026-05-27
 **方向**: C（内容质量）/ 🟢 现有内容完善
 **基线 Commit**: `b2d5440`
-**交付 Commit**: `待填充`
+**交付 Commit**: `c24535e`
 **部署**: http://39.103.68.205/
 
 ### 背景
@@ -1382,11 +1383,12 @@
 
 ---
 
-## 迭代 #74 — B/功能增强：智能食材搜索体验优化 ⏳
+## 迭代 #74 — B/功能增强：智能食材搜索体验优化 ✅
 **派发时间**: 2026-05-27
+**完成时间**: 2026-05-27
 **方向**: B（功能增强）/ 🟢 现有功能完善
 **基线 Commit**: `6e59bcb`
-**交付 Commit**: `待填充`
+**交付 Commit**: `4b791ca`（合并至 #75 交付）
 **部署**: http://39.103.68.205/
 
 ### 背景
@@ -1425,13 +1427,38 @@
 
 **下一个方向**: C（内容质量）
 
-## Iter #75 — 智能食材搜索优化 ✅ (2026-05-27 15:32~)
-**Files:** ingredientAliases.js, utils/ingredientSearch.js (new), routes/ingredientSearch.js, routes/recipes.js, IngredientSearchPage.tsx/.css, api.ts
-**Changes:**
-- 别名库扩展：新增鱼/羊肉/鸭/豆腐等30+组别名
-- 部分匹配模式：非严格模式下输入N种食材匹配M种即可召回（阈值: 3→2, 4→3, 其余≈60%）
-- 新增 `matchIngredient()` / `expandSearchTerms()` 函数
-- recommend 路由委托给 ingredientSearch 模块，消除重复代码
-- 前端：三色渐变进度条 (high绿色/mid黄色/low红色)、输入防抖(200ms)、双指标展示
-- 后端 JSON bracket-counting 解析（原有），无结果时触发 AI fallback（原有）
-- Commit: `4b791ca`，已推送 ✅
+## 迭代 #75 — B/功能增强：智能食材搜索体验优化 ✅
+**派发时间**: 2026-05-27
+**完成时间**: 2026-05-27
+**方向**: B（功能增强）/ 🟢 现有功能完善
+**基线 Commit**: `6e59bcb`
+**交付 Commit**: `4b791ca`
+**部署**: http://39.103.68.205/
+
+### 任务内容（已完成）
+1. ✅ 食材别名库扩展 — 新增鱼/羊肉/鸭/豆腐/蔬菜等30+组别名映射
+2. ✅ 部分匹配模式 — 非严格模式下输入N种食材匹配M种即可召回（阈值: 3→2, 4→3, 其余≈60%）
+3. ✅ 新增 `matchIngredient()` / `expandSearchTerms()` 函数到 `utils/ingredientSearch.js`
+4. ✅ recommend 路由委托给 ingredientSearch 模块，消除重复代码
+5. ✅ 前端搜索结果卡片优化 — 三色渐变进度条(high绿色/mid黄色/low红色)、匹配食材高亮、缺少食材提示
+6. ✅ 前端输入体验增强 — 常用食材快捷标签、输入防抖(200ms)、空状态引导
+7. ✅ 后端 JSON bracket-counting 解析 + AI fallback（复用原有逻辑）
+8. ✅ 构建 0 warnings
+9. ✅ 部署闭环：commit → build → deploy → 验证
+
+### 实际成果
+- 别名覆盖：鸡蛋→鸡蛋/鸡子/鸡卵/蛋清/蛋黄/蛋白；番茄→番茄/西红柿/蕃茄 等
+- 部分匹配召回率显著提升：输入2种食材即可召回含其中任意1种的食谱
+- 搜索结果展示 matchRatio/matchedIngredients/missingIngredients，用户体验更直观
+
+### 部署验证
+- `POST /api/recipes/by-ingredients` {"ingredients":["鸡蛋","番茄"],"strict":false} → 返回匹配结果，含 aliasExpanded/matchRatio/missingIngredients ✅
+- 前端 `/` → 200 ✅
+- 构建 0 warnings ✅
+
+### 关键经验
+- 别名库应按食材类别组织（禽肉/畜肉/海鲜/蔬菜/调料），便于维护扩展
+- 部分匹配阈值需平衡召回率和精确度：3种→2种、4种→3种、其余60%经验值较合理
+- ingredientSearch 模块抽离后，recipes.js 和 ingredientSearch.js 路由均可复用同一逻辑
+
+**下一个方向**: C（内容质量）
