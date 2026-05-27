@@ -83,6 +83,7 @@ export interface Recipe {
   season?: string
   qualityScore?: number
   qualityLabel?: string
+  recommendReason?: string
   favoriteCount?: number
   commentCount?: number
   nutriScore?: string
@@ -114,6 +115,8 @@ export interface RecipeDetail extends Recipe {
 export interface SimilarRecipe {
   recipe: Recipe
   similarity: number
+  dimensionScores?: Record<string, number>
+  coveredDimensions?: string[]
 }
 
 export interface SeasonalRecipes {

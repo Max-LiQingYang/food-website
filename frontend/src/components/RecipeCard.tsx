@@ -58,6 +58,17 @@ const SEASON_LABELS: Record<string, string> = {
   all: '四季皆宜',
 }
 
+// 推荐理由标签 → CSS 类名
+function getReasonBadgeClass(reason: string): string {
+  if (reason.includes('编辑精选') || reason === '编辑精选') return 'reason--featured'
+  if (reason.includes('当季') || reason === '当季推荐') return 'reason--seasonal'
+  if (reason.includes('热门') || reason === '热门食谱') return 'reason--popular'
+  if (reason.includes('新上线') || reason === '新上线') return 'reason--new'
+  if (reason.includes('高度匹配')) return 'reason--match'
+  if (reason.includes('口味')) return 'reason--taste'
+  return 'reason--default'
+}
+
 function getCalories(recipe: Recipe): number | null {
   if (!recipe.nutrition) return null
   if (typeof recipe.nutrition === 'object') {
@@ -152,6 +163,13 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
         {recipe.qualityLabel && (
           <span className="recipe-card__badge recipe-card__badge--quality">
             {recipe.qualityLabel}
+          </span>
+        )}
+
+        {/* 推荐理由标签 */}
+        {recipe.recommendReason && (
+          <span className={`recipe-card__badge recipe-card__badge--reason ${getReasonBadgeClass(recipe.recommendReason)}`}>
+            {recipe.recommendReason}
           </span>
         )}
 

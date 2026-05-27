@@ -10,7 +10,70 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+
+/* ── 当季食材标签云 ── */
+.seasonal-rec__ingredients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.seasonal-rec__ingredient-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--color-bg-secondary, #f5f0eb);
+  color: var(--color-text-secondary, #555);
+  font-size: 13px;
+  border: 1px solid var(--color-border, #e0d8d0);
+  animation: ingredientFadeIn 0.4s ease both;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.seasonal-rec__ingredient-tag:hover {
+  background: var(--color-primary-bg, #fff3ed);
+  border-color: var(--color-primary, #e8663e);
+  transform: translateY(-1px);
+}
+
+@keyframes ingredientFadeIn {
+  from { opacity: 0; transform: scale(0.85) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+body.dark .seasonal-rec__ingredient-tag {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+body.dark .seasonal-rec__ingredient-tag:hover {
+  border-color: var(--color-primary, #e8663e);
+  background: #331810;
+}
+
+/* ── 季节切换过渡动画 ── */
+.seasonal-rec__scroll--transition {
+  opacity: 0;
+  animation: scrollReveal 0.5s ease forwards;
+}
+
+@keyframes scrollReveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.seasonal-rec__card--enter {
+  animation: cardSlideIn 0.4s ease both;
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 .seasonal-rec__title {
