@@ -220,3 +220,24 @@
 - **内存缓存数据定期清理**：hot-searches Map 设置 1h TTL + 上限 100 条，防止历史脏数据长期滞留
 - **测试数据隔离**：开发/测试环境插入的挑战赛数据应带 `isTest: true` 标记，生产环境查询自动过滤
 
+
+---
+
+## iter#79 — 挑战赛内容填充与首页入口优化 (2026-05-28)
+
+### 关键陷阱
+- **docker cp 时间戳不可靠**：容器 overlayfs 下文件时间戳不更新，不能仅凭 `ls -la` 判断部署是否成功，需用内容 grep 验证
+- **QClaw 迭代编号混淆**：commit message 和 tracker 记录可能写错迭代编号，需人工核对 commit 日期和内容匹配性
+
+### 修复方法
+- 服务器执行 `git pull` → `npm run build` → `docker cp` → `nginx -s reload` 完整闭环
+- 部署验证：容器内 JS bundle grep 组件名 + API curl 验证数据 + 页面 HTTP 200
+
+### 自优化建议
+- **部署验证必须内容级**：不要只看文件存在/时间戳，要 grep bundle 内容确认组件被编译进去
+- **生产 DB 操作与前端部署解耦**：先 pipe-inject 插入 DB 数据，验证 API 后再 build + docker cp 前端
+- **迭代编号在 prompt 中显式声明**：派发 QClaw 时在任务描述中写明 "这是迭代 #N"，减少编号混淆
+
+### 遗留问题
+- 无 🔴 待修复
+
