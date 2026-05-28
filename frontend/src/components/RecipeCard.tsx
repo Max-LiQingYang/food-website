@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Recipe } from '../api'
 import type { AuthorLevelInfo } from '../api'
 import { highlightText } from '../utils/highlightText'
+import { tapFeedback } from '../utils/hapticFeedback'
 import FavoriteButton from './FavoriteButton'
 import ImagePlaceholder from './ImagePlaceholder'
 import AuthorLevelBadge from './AuthorLevelBadge'
+import { useLongPress } from '../hooks/useLongPress'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -80,10 +82,95 @@ function getCalories(recipe: Recipe): number | null {
 export default function RecipeCard({ recipe, highlightQuery, animationDelay, authorLevel }: RecipeCardProps) {
   const navigate = useNavigate()
   const [imgLoaded, setImgLoaded] = useState(false)
+  const [showContextMenu, setShowContextMenu] = useState(false)
+  const [contextMenuPos, setContextMenuPos] = useState<{ x: number; y: number } | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  const handleClick = useCallback(() => {
-    navigate(`/recipe/${recipe.id}`)
-  }, [navigate, recipe.id])
+  const handleClick = useCallback(
+    (e: React.TouchEvent | React.MouseEvent) => {
+      if ((e as any)._isLongPress) return // 由长按触发，跳过
+      navigate(`/recipe/${recipe.id}`)
+    },
+    [navigate, recipe.id]
+  )
+
+  const handleLongPress = useCallback(
+    (e: React.TouchEvent | React.MouseEvent) => {
+      ;(e as any)._isLongPress = true
+      // 阻止触发 onClick
+      e.preventDefault()
+      tapFeedback()
+
+      // 计算菜单位置
+      let x: number, y: number
+      if ('touches' in e && e.touches.length > 0) {
+        x = e.touches[0].clientX
+        y = e.touches[0].clientY
+      } else if ('clientX' in e) {
+        x = e.clientX
+        y = e.clientY
+      } else {
+        x = 0
+        y = 0
+      }
+
+      setContextMenuPos({ x, y })
+      setShowContextMenu(true)
+    },
+    []
+  )
+
+  const handleContextAction = useCallback(
+    (action: string) => {
+      setShowContextMenu(false)
+      setContextMenuPos(null)
+
+      switch (action) {
+        case 'favorite':
+          // 触发收藏按钮的点击 - 找到 card 内的收藏按钮
+          const favBtn = document.querySelector(`[data-recipe-id="${recipe.id}"] .favorite-button`)
+          favBtn?.click()
+          break
+        case 'shopping':
+          navigate(`/recipe/${recipe.id}?addToShopping=1`)
+          break
+        case 'share':
+          const shareUrl = `${window.location.origin}/recipe/${recipe.id}`
+          if (navigator.share) {
+            navigator.share({ title: recipe.title, url: shareUrl }).catch(() => {})
+          } else {
+            navigator.clipboard.writeText(shareUrl).catch(() => {})
+          }
+          break
+        default:
+          break
+      }
+    },
+    [navigate, recipe.id, recipe.title]
+  )
+
+  // 点击外部关闭菜单
+  useEffect(() => {
+    if (!showContextMenu) return
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowContextMenu(false)
+        setContextMenuPos(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [showContextMenu])
+
+  const longPress = useLongPress({
+    onLongPress: handleLongPress,
+    onClick: handleClick,
+    threshold: 500,
+  })
 
   const titleContent = highlightQuery ? highlightText(recipe.title, highlightQuery) : recipe.title
   const difficulty = recipe.difficulty?.toLowerCase() || ''
@@ -102,10 +189,12 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
 
   const preview = getPreviewInfo()
 
+  const menuX = contextMenuPos ? Math.min(contextMenuPos.x, window.innerWidth - 180) : 0
+  const menuY = contextMenuPos ? Math.min(contextMenuPos.y, window.innerHeight - 200) : 0
+
   return (
     <div
-      className="recipe-card"
-      onClick={handleClick}
+      className={`recipe-card${showContextMenu ? ' recipe-card--menu-open' : ''}`}
       role="button"
       tabIndex={0}
       onKeyDown={e => {
@@ -115,6 +204,9 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
         }
       }}
       style={animationDelay != null ? { animationDelay: `${animationDelay}ms` } : undefined}
+      {...longPress.touchHandlers}
+      {...longPress.mouseHandlers}
+      data-recipe-id={recipe.id}
     >
       {/* 封面图 */}
       <div className="recipe-card__cover">
@@ -145,7 +237,7 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
         )}
 
         {/* 收藏按钮 - 浮在图片右上角 */}
-        <div className="recipe-card__fav" onClick={e => e.stopPropagation()}>
+        <div className="recipe-card__fav" onPointerDown={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); tapFeedback() }}>
           <FavoriteButton recipeId={recipe.id} inline />
         </div>
 
@@ -270,6 +362,42 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
           )}
         </div>
       </div>
+
+      {/* ── 长按/右键上下文菜单 ── */}
+      {showContextMenu && contextMenuPos && (
+        <div
+          ref={menuRef}
+          className="recipe-card__context-menu"
+          style={{
+            position: 'fixed',
+            left: `${menuX}px`,
+            top: `${menuY}px`,
+            zIndex: 9999,
+          }}
+        >
+          <button
+            className="recipe-card__context-item"
+            onClick={() => handleContextAction('favorite')}
+          >
+            <span className="recipe-card__context-icon">❤️</span>
+            <span>收藏</span>
+          </button>
+          <button
+            className="recipe-card__context-item"
+            onClick={() => handleContextAction('shopping')}
+          >
+            <span className="recipe-card__context-icon">🛒</span>
+            <span>加入购物清单</span>
+          </button>
+          <button
+            className="recipe-card__context-item"
+            onClick={() => handleContextAction('share')}
+          >
+            <span className="recipe-card__context-icon">📤</span>
+            <span>分享</span>
+          </button>
+        </div>
+      )}
     </div>
   )
 }

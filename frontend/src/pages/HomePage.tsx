@@ -104,7 +104,7 @@ export default function HomePage() {
     fetchRecipes()
   }, [fetchRecipes])
 
-  const { refreshing, pullDistance } = usePullToRefresh({ onRefresh: fetchRecipes })
+  const { refreshing, pullDistance, statusText, touchHandlers } = usePullToRefresh({ onRefresh: fetchRecipes })
 
   const handleCategoryChange = (cat: string) => {
     if (cat === category) return
@@ -144,10 +144,20 @@ export default function HomePage() {
   const showFullLayout = category === '全部' && !filters.difficulty && filters.maxCookTime === null && !filters.sortBy
 
   return (
-    <div className="home-page">
+    <div className="home-page pull-to-refresh-container" {...touchHandlers}>
       {pullDistance > 0 && (
         <div className="pull-indicator" style={{ height: `${pullDistance}px`, opacity: pullDistance / 60 }}>
-          {refreshing ? <span className="pull-indicator__spinner" /> : pullDistance >= 60 ? '释放刷新' : '下拉刷新'}
+          {refreshing ? (
+            <>
+              <span className="pull-indicator__spinner" />
+              <span className="pull-indicator__text">{statusText === 'done' ? '✅ 刷新完成' : '刷新中...'}</span>
+            </>
+          ) : (
+            <span className="pull-indicator__text">
+              <span className="pull-indicator__arrow" style={{ transform: pullDistance >= 60 ? 'rotate(180deg)' : 'rotate(0deg)' }}>↓</span>
+              {pullDistance >= 60 ? '释放刷新' : '下拉刷新'}
+            </span>
+          )}
         </div>
       )}
 

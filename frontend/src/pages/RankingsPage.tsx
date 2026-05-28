@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { getRankings } from '../api'
 import type { RankedRecipe } from '../api'
 import { useToast } from '../context/ToastContext'
 import RecipeCard from '../components/RecipeCard'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import './RankingsPage.css'
 
 const PERIODS = [
@@ -40,13 +41,19 @@ export default function RankingsPage() {
   const [loading, setLoading] = useState(true)
   const toast = useToast()
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     setLoading(true)
     getRankings(period, sortBy)
       .then(res => setList(res.list || []))
       .catch(() => toast.error('加载排行榜失败'))
       .finally(() => setLoading(false))
   }, [period, sortBy])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  const { refreshing, pullDistance, statusText, touchHandlers } = usePullToRefresh({ onRefresh: fetchData })
 
   const rankEmoji = (rank: number) => {
     if (rank === 1) return '🥇'
@@ -65,7 +72,22 @@ export default function RankingsPage() {
   }
 
   return (
-    <div className="rankings-page">
+    <div className="rankings-page pull-to-refresh-container" {...touchHandlers}>
+      {pullDistance > 0 && (
+        <div className="pull-indicator" style={{ height: `${pullDistance}px`, opacity: pullDistance / 60 }}>
+          {refreshing ? (
+            <>
+              <span className="pull-indicator__spinner" />
+              <span className="pull-indicator__text">{statusText === 'done' ? '✅ 刷新完成' : '刷新中...'}</span>
+            </>
+          ) : (
+            <span className="pull-indicator__text">
+              <span className="pull-indicator__arrow" style={{ transform: pullDistance >= 60 ? 'rotate(180deg)' : 'rotate(0deg)' }}>↓</span>
+              {pullDistance >= 60 ? '释放刷新' : '下拉刷新'}
+            </span>
+          )}
+        </div>
+      )}
       <div className="rankings-page__header">
         <h1>🏆 食谱排行榜</h1>
         <p className="rankings-page__subtitle">

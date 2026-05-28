@@ -247,7 +247,26 @@ const PantryPage: React.FC = () => {
         </aside>
 
         <main className="pantry-content">
-          {loading && <div className="pantry-loading">加载中...</div>}
+          {loading && <div className="pantry-loading">
+            <div className="pantry-loading__skeleton">
+              <div className="pantry-header-skeleton">
+                <div className="skeleton-box" style={{ width: 140, height: 28, borderRadius: 6 }} />
+                <div className="skeleton-box" style={{ width: 100, height: 36, borderRadius: 18 }} />
+              </div>
+              <div className="pantry-grid">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="pantry-card-skeleton">
+                    <div className="pantry-card-skeleton__header">
+                      <div className="skeleton-box" style={{ width: 40, height: 16, borderRadius: 4 }} />
+                    </div>
+                    <div className="skeleton-box" style={{ width: '65%', height: 18, borderRadius: 4, marginTop: 8 }} />
+                    <div className="skeleton-box" style={{ width: '40%', height: 14, borderRadius: 4, marginTop: 6 }} />
+                    <div className="skeleton-box" style={{ width: '50%', height: 12, borderRadius: 4, marginTop: 8 }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>}
           {error && <div className="pantry-error">{error}</div>}
           {!loading && !error && sorted.length === 0 && (
             <div className="pantry-empty">
