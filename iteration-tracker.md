@@ -354,6 +354,13 @@
 
 **下一个方向**: B（功能增强）
 
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
+
 ---
 
 ## 迭代 #42 — B/功能增强：批量操作+设置页+智能推荐+日志增强
@@ -465,6 +472,13 @@
 - **搜索筛选移动端** — <480px水平滚动+sticky分类标签+32px触摸目标
 
 **下一个方向**: B（功能增强）
+
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
 
 ---
 
@@ -822,6 +836,13 @@
 
 **下一个方向**: B（功能增强）
 
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
+
 ---
 
 ## 迭代 #59 — B/功能增强：通知触发机制与互动提醒完善 ✅
@@ -1013,6 +1034,13 @@
 7. 更新 iteration-tracker.md 和 iteration-lessons.md
 
 **下一个方向**: B（功能增强）
+
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
 
 ---
 
@@ -1229,6 +1257,13 @@
 
 **下一个方向**: B（功能增强）
 
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
+
 ---
 
 ## 迭代 #69 — A/UI/UX：修复11张404封面图+图片降级优化 ✅
@@ -1260,6 +1295,13 @@
 - 构建 0 warnings 是基线
 
 **下一个方向**: B（功能增强）
+
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
 
 ---
 
@@ -1589,6 +1631,13 @@
 
 **下一个方向**: B（功能增强）
 
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
+
 ---
 
 ## 迭代 #79 — 🟢 功能增强：挑战赛内容填充与首页入口优化 ✅
@@ -1720,6 +1769,13 @@
 
 **下一个方向**: B（功能增强）
 
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
+
 ---
 
 ## 迭代 #82 — 🟢 功能增强：用户成就与徽章系统 ✅
@@ -1847,23 +1903,30 @@
 
 ---
 
-## 迭代 #84 — A/UI/UX：分类浏览与内容发现体验优化 ⏳
+## 迭代 #84 — A/UI/UX：分类浏览与内容发现体验优化 ✅
 **派发时间**: 2026-05-28
-**方向**: A（UI/UX）/ 🟡 体验优化
+**完成时间**: 2026-05-28
+**方向**: A（UI/UX）/ 🟢 已完成
 **基线 Commit**: `2dc3be6`
-**交付 Commit**: `待填充`
+**交付 Commit**: `fad345a`
 **部署**: http://39.103.68.205/
 
 ### 背景
 网站食谱库已扩充至 94 道，覆盖 10 个分类（中餐/西餐/日料/泰料/韩料/甜点/印度/墨西哥/地中海/越南）。新分类（地中海/墨西哥/印度增量）刚上线，用户发现渠道有限。当前首页分类入口为静态 6 个卡片，无法展示全部分类，且新内容缺少曝光位。
 
-### 任务内容
-1. **分类浏览入口扩展** — 首页分类卡片从 6 个扩展为支持横向滑动/网格展示全部 10 个分类，新增分类（地中海/墨西哥/越南）添加主题色和图标
-2. **新内容曝光区** — 首页新增"最新上架"板块，展示最近添加的 12 道国际食谱
-3. **分类详情页体验** — /category/:name 页面优化：食谱网格展示 + 分类介绍 + 相关标签
-4. **分类筛选增强** — 搜索/列表页增加分类多选筛选，支持组合筛选（如"地中海+素食"）
-5. **分类徽章可视化** — RecipeCard 增加分类图标徽章，提升分类辨识度
-6. **本地构建 0 warnings + 部署闭环 + tracker/lessons 更新**
+### 任务内容（已完成）
+1. ✅ **分类浏览入口扩展** — CategoryCards 从5分类扩展至10分类，移动端横向滑动+桌面grid，新增共享分类常量 constants/categories.ts
+2. ✅ **新内容曝光区** — 首页ChallengeHomeCards后插入"✨ 最新上架"板块，显示8道最新食谱，标题+查看全部链接
+3. ✅ **分类详情页** — 新增 /category/:name 路由，含分类头部（图标+色块+介绍）、4列网格+骨架屏+分页加载+空/错误状态
+4. ✅ **分类筛选增强** — SearchPage filterCategory 单值→filterCategories 数组，支持多选标签切换；API后端categories逗号分隔→Op.in
+5. ✅ **分类徽章可视化** — RecipeCard分类标签 icon+中文名+动态var(--cat-bg)颜色
+6. ✅ 本地构建 0 warnings，13文件修改，部署验证前端/后端/category页面/categories过滤全部200
+
+### 关键经验
+- 共享常量文件 constants/categories.ts 有效减少多组件硬编码
+- SearchPage 从单值→多值数组涉及较多状态同步逻辑（URL↔本地状态闭环）
+- 后端 Op.in + categories.split(',') 兼容旧 category 单参数
+- 路由 /category/:name 需在 catch-all 之前注册
 
 ### 用户价值
 - 用户更容易发现新上线的国际美食内容
@@ -1871,3 +1934,67 @@
 - 新食谱获得曝光，鼓励内容多样性消费
 
 **下一个方向**: B（功能增强）
+
+### 🔴 紧急修复（commit 6137af5）— RecipeDetailPage null guard
+- **现象**: TypeError: Cannot read properties of null (reading "steps") — 组件渲染时 recipe 为 null
+- **根因**: missing recipe?. optional chaining on 3/4 .steps access points
+- **修复**: Line 117 recipe?.steps?.map, Line 186 (recipe?.steps || []), Line 809 recipe?.steps?.length || 0
+- **经验**: 任何从 API 延迟加载的对象属性访问都必须加 ?. 前置保护
+
+
+---
+
+## 🔴 紧急修复 — RecipeDetailPage steps null access 崩溃（2026-05-28）
+**类型**: 🔴 bugfix
+**根因**: `recipe.steps?.map(...)` 缺少 `recipe?.` optional chaining
+**位置**: frontend/src/pages/RecipeDetailPage.tsx Line 117, 186
+**现象**: 食谱详情页加载时 TypeError: Cannot read properties of null (reading 'steps')
+**修复**: recipe.steps?.map → recipe?.steps?.map; (recipe.steps || []) → ((recipe?.steps) || [])
+**QClaw任务**: nCbAfv（紧急插队）
+
+---
+
+## 迭代 #84 补充 — 首页服务端筛选与 AbortController 优化 ✅
+**完成时间**: 2026-05-28
+**方向**: A（UI/UX）/ 🟡 体验优化
+**交付 Commit**: `6c91d00` → `4f54c35` → `65624e6` → `2d5acec`
+**部署**: ✅ http://39.103.68.205/
+
+### 任务内容（已完成）
+1. ✅ **API 限流放宽** (`6c91d00`) — 全局 max 100→200，GET 请求 500/15min，/health 跳过限流
+2. ✅ **服务端筛选** (`4f54c35`) — GET /recipes 支持 difficulty/maxCookTime/sortBy 服务端过滤，修复客户端分页 total 不匹配
+3. ✅ **首页 Tab 去重** (`65624e6`) — 移除独立"最新上架"和"编辑精选"区块，改为"全部/最新/精选" Tab 切换
+4. ✅ **AbortController 竞态修复** (`2d5acec`) — 分类/页码/筛选切换时取消进行中请求，防止旧响应覆盖新数据
+5. ✅ 本地构建 0 warnings，服务器部署验证全绿
+
+### 关键经验
+- 客户端分页 + 客户端过滤会导致 total 与实际展示数量不一致，必须移至服务端
+- AbortController 在 React 组件中需用 ref 保存，cleanup 时 abort
+- 服务端 sortBy=rating 需要先查全量 ID 再关联评分排序，性能注意上限
+
+**下一个方向**: B（功能增强）
+
+---
+
+## 迭代 #85 — B/功能增强：评论图片上传与用户作品墙 ⏳
+**派发时间**: 2026-05-28
+**方向**: B（功能增强）/ 🟢 功能完善
+**基线 Commit**: `2d5acec`
+
+### 背景
+网站已有完善的评论系统（文字+评分+嵌套回复），但用户做完菜后无法上传成品图分享。评论图片上传能显著增强社区真实感和互动性，同时为用户决策提供视觉参考。
+
+### 任务内容
+1. **后端**：扩展 Comment 模型添加 `imageUrls` JSON 字段（支持最多3张图）
+2. **后端**：POST /api/recipes/:id/comments 支持 multipart/form-data 图片上传（复用 Multer 头像配置）
+3. **前端**：CommentForm 添加图片上传（点击/拖拽，缩略图预览，最多3张，可删除）
+4. **前端**：CommentItem 展示图片缩略图网格，点击打开 Lightbox 全屏查看
+5. **前端**：RecipeDetailPage 新增"用户作品"横向滚动区（聚合该食谱下带图评论的封面缩略图）
+6. 本地构建 0 warnings + 部署闭环 + tracker/lessons 更新
+
+### 用户价值
+- 用户可分享菜品成品图，增加社区互动
+- 为其他用户提供真实视觉参考，辅助决策
+- 增强食谱详情页内容丰富度
+
+**下一个方向**: C（内容质量）
