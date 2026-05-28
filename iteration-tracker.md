@@ -1725,3 +1725,34 @@
 - 为用户主页增加个性化展示元素
 
 **下一个方向**: C（内容质量）
+
+---
+
+## #74 — 智能食材搜索优化（2026-05-28 ✅ 已部署）
+
+### 背景
+用户手头有几种食材时，往往不知道能做什么菜。现有搜索（title/ingredients模糊搜索）不擅长处理"食材组合"场景。用户需要输入食材列表→返回能做的食谱+缺少哪些食材。
+
+### 任务内容
+1. **食材别名库扩展**（ingredientAliases.js）：从 ~35 组扩充至 60+ 组，覆盖鱼/羊肉/鸭/豆腐/青椒/辣椒/姜蒜/胡萝卜/芹菜/南瓜/韭菜/豆芽/玉米/面条/大米/糯米/面粉/酵母/面包糠/紫菜/红枣/枸杞/莲子/百合/料酒/香油/蚝油/豆瓣酱/咖喱/桂皮/牛奶/八角/花椒/白芝麻 等
+2. **部分匹配+加权排序引擎**（ingredientSearch.js）：DB AND→OR 查询 → JS 级精确过滤，按匹配率 + 收藏数加权排序
+3. **路由增强**（ingredientSearch.js）：POST /api/recipes/by-ingredients，返回含 inputMatchScore/matchRatio/matchedIngredients/missingIngredients 等字段
+4. **前端 IngredientSearchPage**：防抖 200ms 搜索，三色进度条（高/中/低匹配度），缺失食材列表
+5. **部署闭环**：git pull + backend docker cp + frontend npm build + docker cp + nginx reload
+
+### 验收
+- ✅ POST /api/recipes/by-ingredients {"ingredients":["鸡肉","土豆"]} → 10条匹配结果（含 inputMatchScore/matchRatio）
+- ✅ 别名展开识别"鸡胸肉/鸡腿肉"来源于"鸡肉"，"马铃薯"来源于"土豆"
+- ✅ GET /api/recipes/hot-searches → 200
+- ✅ 前端/后端 HTTP 200
+- ✅ 构建 0 warnings（3.35s）
+- ✅ git push + 部署闭环
+
+### 用户价值
+- 食材搜索从"模糊匹配"升级为"智能食材组合匹配"
+- 用户输入手头食材→系统推荐能做啥+还缺啥
+- 三色进度条直观展示匹配度
+
+### 下一个方向
+- 成就系统激活入口（吐司通知 + 用户主页成就区增强）
+
