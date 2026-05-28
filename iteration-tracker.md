@@ -1652,20 +1652,46 @@
 
 ---
 
-## 迭代 #81 — 🟡 体验优化：[待填充] ⏳
-**派发时间**: 2026-05-28
+## 迭代 #81 — A/UI/UX 移动端交互细节与触摸反馈优化 ✅
+**状态**: ✅ 已部署 (2026-05-28 00:06 CST)
 **方向**: A（UI/UX）/ 🟡 体验优化
-**基线 Commit**: `f372fbe`
-**交付 Commit**: `待填充`
-**部署**: http://39.103.68.205/
-
-### 背景
-[待 QClaw 填充]
+**基线 Commit**: `5f403dd`
+**交付 Commit**: `4b64676`
+**构建**: 0 errors, 0 warnings, ~790ms
+**部署**: http://39.103.68.205/ (前端 docker cp → nginx reload)
 
 ### 任务内容
-[待 QClaw 填充]
+1. **全局触摸反馈增强** — 补全 .nav-link, .tag, .menu-item, .dropdown-item, .tab 等可点击元素的 :active 状态
+2. **RecipeCard 长按快捷菜单** — 新建 useLongPress hook, 移动端底部浮动菜单[收藏/购物清单/分享], 桌面端右键支持
+3. **按钮交互统一** — 增强 .btn hover/active/loading/disabled, 新增 btn--secondary/ghost/danger/sm/lg 变体
+4. **表单焦点优化** — focus 渐变边框, @keyframes shake 抖动, .input-error/input-success 状态
+5. **骨架屏补全** — PantryPage/NutritionDashboard 从文字升级为结构匹配骨架
+6. **下拉刷新优化** — statusText 四状态(pull/ready/refreshing/done), spring 回弹
+7. **RankingsPage 增加下拉刷新** — 集成 usePullToRefresh + touchHandlers
+8. **触觉反馈系统** — hapticFeedback.ts: 5种 navigator.vibrate 模式
 
-### 用户价值
-[待 QClaw 填充]
+### 文件变更（10 files, +874/-19）
+- frontend/src/utils/hapticFeedback.ts — 新建: 5种触觉反馈模式
+- frontend/src/hooks/useLongPress.ts — 新建: 长按检测 hook
+- frontend/src/global.css — 增强: 触摸反馈/按钮状态/表单动画/下拉刷新
+- frontend/src/components/RecipeCard.css — 新增: 上下文菜单样式含 dark 变体
+- frontend/src/components/RecipeCard.tsx — 修改: 集成长按菜单 + haptic
+- frontend/src/hooks/usePullToRefresh.ts — 修改: 新增 statusText 动态状态
+- frontend/src/pages/HomePage.tsx — 修改: 集成 touchHandlers + 箭头动画
+- frontend/src/pages/RankingsPage.tsx — 修改: 增加 pull-to-refresh
+- frontend/src/pages/PantryPage.tsx — 修改: 文本→6骨架卡片
+- frontend/src/pages/NutritionDashboard.tsx — 修改: 文本→营养骨架
 
-**下一个方向**: B（功能增强）
+### 验收结果
+- ✅ Vite build: 0 errors, 0 warnings
+- ✅ 部署: scp dist → docker cp → nginx reload → HTTP 200
+- ✅ git commit + push (4b64676)
+- ✅ 后端无修改
+
+### 关键经验
+- long press + click 冲突: 通过 _isLongPress 标记防止冲突
+- 移动端 context menu: >480px 跟随触摸位置, <480px 底部全宽
+- pull-to-refresh: pull→ready→refreshing→done→reset 四阶段闭环
+- CSS variable 自动化: 新增组件全部使用 var(--color-xxx)
+
+**下一个方向**: C（内容质量）
