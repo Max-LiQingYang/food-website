@@ -8,7 +8,6 @@ import FilterPanel from '../components/FilterPanel'
 import HeroSection from '../components/HeroSection'
 import CategoryCards from '../components/CategoryCards'
 import ChallengeHomeCards from '../components/ChallengeHomeCards'
-import FeaturedSection from '../components/FeaturedSection'
 import SeasonalRecommendations from '../components/SeasonalRecommendations'
 import SeasonalIngredients from '../components/SeasonalIngredients'
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations'
@@ -22,6 +21,7 @@ import './HomePage.css'
 const CATEGORIES = ['全部', '中餐', '西餐', '甜点', '日韩', '其他'] as const
 const PAGE_SIZE = 12
 const FEATURED_TITLES = ['宫保鸡丁', '提拉米苏', '西红柿炒鸡蛋']
+type TabType = 'all' | 'newest' | 'featured'
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -44,6 +44,8 @@ export default function HomePage() {
     maxCookTime: initialMaxCookTime,
     sortBy: initialSortBy,
   })
+  const [activeTab, setActiveTab] = useState<TabType>('all')
+  const [heroLoaded, setHeroLoaded] = useState(false)
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -61,48 +63,41 @@ export default function HomePage() {
     const params: Record<string, any> = { page, pageSize: PAGE_SIZE }
     if (category !== '全部') params.category = category
 
+    // Tab-based sorting
+    if (activeTab === 'featured') {
+      params.sortBy = 'rating'
+    } else if (activeTab === 'newest') {
+      params.sortBy = 'newest'
+    } else if (filters.sortBy) {
+      params.sortBy = filters.sortBy
+    }
+
+    // Pass server-side filters
+    if (filters.difficulty) params.difficulty = filters.difficulty
+    if (filters.maxCookTime !== null) params.maxCookTime = filters.maxCookTime
+
     try {
       const res: any = await getRecipes(params)
       const data = res.data || res
-      const rawList = data.list || []
+      setRecipes(data.list || [])
       setTotal(data.total || 0)
-
-      let filteredList = rawList
-      if (filters.difficulty) {
-        filteredList = filteredList.filter((r: Recipe) => r.difficulty === filters.difficulty)
-      }
-      if (filters.maxCookTime !== null) {
-        if (filters.maxCookTime === 61) {
-          filteredList = filteredList.filter((r: Recipe) => (r.cookTime || 0) > 60)
-        } else {
-          filteredList = filteredList.filter((r: Recipe) => (r.cookTime || 0) <= filters.maxCookTime)
-        }
-      }
-      if (filters.sortBy === 'rating') {
-        filteredList = [...filteredList].sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))
-      } else if (filters.sortBy === 'time') {
-        filteredList = [...filteredList].sort((a: any, b: any) => (a.cookTime || 999) - (b.cookTime || 999))
-      }
-      setRecipes(filteredList)
     } catch {
       setRecipes([])
       setTotal(0)
     } finally {
       setLoading(false)
     }
-  }, [category, page, filters])
+  }, [category, page, filters, activeTab])
 
-  // Load full recipe list for hero + featured sections (only once)
+  // Load hero data (full list for featured titles matching)
   useEffect(() => {
-    Promise.all([
-      getRecipes({ page: 1, pageSize: 55 }),
-      getRecipes({ page: 1, pageSize: 12, sortBy: 'newest' }),
-    ]).then(([allRes, newRes]) => {
-      const allData = allRes.data || allRes
-      setAllRecipes(allData.list || [])
-      const newData = newRes.data || newRes
-      setNewRecipes(newData.list || [])
-    }).catch(() => {}).finally(() => setLoadingNew(false))
+    getRecipes({ page: 1, pageSize: 100 })
+      .then(res => {
+        const data = res.data || res
+        setAllRecipes(data.list || [])
+      })
+      .catch(() => {})
+      .finally(() => setHeroLoaded(true))
   }, [])
 
   useEffect(() => {
@@ -126,8 +121,14 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const handleTabChange = (tab: TabType) => {
+    if (tab === activeTab) return
+    setActiveTab(tab)
+    setPage(1)
+  }
+
   // Build featured recipes for hero from fetched data
-  const heroRecipes = allRecipes.length > 0
+  const heroRecipes = heroLoaded && allRecipes.length > 0
     ? FEATURED_TITLES.map(title => allRecipes.find(r => r.title === title)).filter(Boolean).map(r => ({
         id: r!.id,
         title: r!.title,
@@ -136,21 +137,17 @@ export default function HomePage() {
       }))
     : undefined
 
-  // Featured section: use API endpoint
-  const [showFeatured, setShowFeatured] = useState(true)
-
-  // 最新上架食谱
-  const [newRecipes, setNewRecipes] = useState<Recipe[]>([])
-  const [loadingNew, setLoadingNew] = useState(true)
-
   // SEO meta
-  usePageTitle("美食食谱 - 三餐四季，与美食相伴")
+  usePageTitle('美食食谱 - 三餐四季，与美食相伴')
   useMetaTags({
-    description: "美食食谱分享平台 —— 发现中餐、西餐、甜点、日韩等多国美食菜谱。家常菜、私房菜、烘焙甜品，简单易学，让烹饪成为享受。",
+    description: '美食食谱分享平台 —— 发现中餐、西餐、甜点、日韩等多国美食菜谱。家常菜、私房菜、烘焙甜品，简单易学，让烹饪成为享受。',
   })
 
-  // Show category is 全部 and no filters
+  // Show full layout (hero + extras) only when category is 全部 and no filters
   const showFullLayout = category === '全部' && !filters.difficulty && filters.maxCookTime === null && !filters.sortBy
+
+  // Tab labels
+  const tabLabel: Record<TabType, string> = { all: '全部', newest: '最新', featured: '精选' }
 
   return (
     <div className="home-page pull-to-refresh-container" {...touchHandlers}>
@@ -173,8 +170,7 @@ export default function HomePage() {
       {/* ── 精选轮播 ── */}
       {showFullLayout && <HeroSection recipes={heroRecipes} />}
 
-      {/* ── 分类快速入口 ── */}
-      {/* 排行榜入口 */}
+      {/* ── 排行榜入口 ── */}
       {showFullLayout && (
         <Link to="/rankings" className="rankings-entry">
           <span className="rankings-entry__icon">🏆</span>
@@ -183,27 +179,11 @@ export default function HomePage() {
         </Link>
       )}
 
+      {/* ── 分类快速入口 ── */}
       {showFullLayout && <CategoryCards />}
 
       {/* ── 挑战赛入口 ── */}
       {showFullLayout && <ChallengeHomeCards />}
-
-      {/* ── 最新上架 ── */}
-      {showFullLayout && !loadingNew && newRecipes.length > 0 && (
-        <div className="home-new-recipes">
-          <div className="home-new-recipes__header">
-            <h2 className="home-new-recipes__title">✨ 最新上架</h2>
-            <Link to="/search?sortBy=newest" className="home-new-recipes__more">
-              查看全部 →
-            </Link>
-          </div>
-          <div className="home-new-recipes__grid">
-            {newRecipes.slice(0, 8).map(r => (
-              <RecipeCard key={r.id} recipe={r} />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ── 搜索栏 ── */}
       <form className="home-search" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>
@@ -233,9 +213,6 @@ export default function HomePage() {
       {/* ── 筛选面板 ── */}
       <FilterPanel filters={filters} onChange={setFilters} />
 
-      {/* ── 编辑精选区 ── */}
-      {showFullLayout && showFeatured && <FeaturedSection />}
-
       {/* 季节性推荐 */}
       {showFullLayout && <SeasonalRecommendations />}
 
@@ -245,15 +222,29 @@ export default function HomePage() {
       {/* 热门标签快捷入口 */}
       {showFullLayout && <HomeTagsSection />}
 
-      {/* 个性化推荐（编辑精选/热门/新手） */}
+      {/* 个性化推荐 */}
       {showFullLayout && <PersonalizedRecommendations />}
 
-      {/* ── 全部食谱（或搜索结果） ── */}
+      {/* ── 食谱主网格 ── */}
       <section className="home-section">
-        <h2 className="home-section__title">
-          <span className="home-section__icon">{showFullLayout ? '📋' : '🔍'}</span>
-          {showFullLayout ? '全部食谱' : '搜索结果'}
-        </h2>
+        {showFullLayout ? (
+          <div className="home-tabs">
+            {(['all', 'newest', 'featured'] as TabType[]).map(tab => (
+              <button
+                key={tab}
+                className={`home-tab ${activeTab === tab ? 'active' : ''}`}
+                onClick={() => handleTabChange(tab)}
+              >
+                {tabLabel[tab]}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <h2 className="home-section__title">
+            <span className="home-section__icon">🔍</span>
+            搜索结果
+          </h2>
+        )}
 
         {loading && (
           <div className="home-grid">

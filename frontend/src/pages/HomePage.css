@@ -347,24 +347,53 @@ body.dark .rankings-entry__sub {
   opacity: 0.75;
 }
 
-.home-new-recipes__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+/* ── Tab Bar ── */
+.home-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0;
 }
 
-@media (max-width: 768px) {
-  .home-new-recipes__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
+.home-tab {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #666;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.home-tab:hover {
+  color: #e67e22;
+}
+
+.home-tab.active {
+  color: #e67e22;
+  font-weight: 600;
+}
+
+.home-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e67e22;
+  border-radius: 1px;
 }
 
 @media (max-width: 480px) {
-  .home-new-recipes__title {
-    font-size: 16px;
+  .home-tabs {
+    gap: 2px;
   }
-  .home-new-recipes__grid {
-    gap: 8px;
+  .home-tab {
+    padding: 8px 14px;
+    font-size: 13px;
   }
 }
