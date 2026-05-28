@@ -1,4 +1,5 @@
 | #84 | 05-28 | 🟡 ui-optimization | 无特殊故障。SearchPage 多选分类需同步 URL params ↔ 本地状态 | 共享常量文件减少多组件硬编码；后端 Op.in 兼容数组参数；路由顺序需注意 |
+| #86 | 05-28 | 🟢 feature | 13道国际食谱无评分；docker cp tar 含 Apple metadata 扩展属性 | fill_ratings.js 需国际专属评论映射（taggedComments）；tar 打包加了--no-xattrs 选项 |
 
 | 迭代 | 日期 | 方向 | 核心根因 | 关键自优化建议 |
 |------|------|------|----------|--------------|
