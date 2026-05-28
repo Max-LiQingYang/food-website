@@ -264,3 +264,28 @@
 
 ### 遗留问题
 - 无 🔴 待修复
+
+
+---
+
+## iter#81 — 移动端交互细节与触摸反馈优化 (2026-05-28)
+
+### 关键陷阱
+- **触摸事件与鼠标事件冲突**：长按菜单同时触发 click 事件，导致菜单闪现后立即跳转。需要在 long press 触发后阻止后续的 click 事件传播
+- **CSS :active 在 iOS 上默认不生效**：iOS Safari 对非链接元素的 :active 样式需要额外设置 `-webkit-tap-highlight-color` 和 `touch-action: manipulation`
+- **haptic feedback 兼容性**：navigator.vibrate 在 iOS 上不支持（静音模式），需要静默降级避免报错
+- **下拉刷新与页面滚动冲突**：下拉手势可能误触发页面滚动，需要在 touchstart 时记录初始位置，在 touchmove 中判断是下拉还是页面滚动
+
+### 修复方法
+- **长按事件隔离**：useLongPress hook 中设置 `isLongPressed` 标志，在 click 事件中检测该标志，若为 true 则 `preventDefault()` 并阻止冒泡
+- **iOS :active 兼容**：全局 CSS 添加 `-webkit-tap-highlight-color: transparent` + `touch-action: manipulation`，并为按钮/卡片显式添加 `:active` 伪类样式
+- **haptic 静默降级**：hapticFeedback.ts 中先检测 `'vibrate' in navigator`，不支持时直接 return，不抛异常
+- **下拉手势识别**：usePullToRefresh 中计算 `deltaY > 0 && scrollTop === 0`，仅在页面顶部且向下滑动时触发动画
+
+### 自优化建议
+- **交互模式沉淀**：将 useLongPress + tapFeedback + hapticFeedback 组合封装为统一的可复用交互工具包
+- **设备能力检测前置**：在应用启动时检测 touch/vibration/keyboard 能力，写入 context 避免运行时重复检测
+- **动画性能**：下拉刷新和按钮反馈动画统一使用 transform + opacity（GPU 加速），避免触发布局重排
+
+### 遗留问题
+- 无 🔴 待修复

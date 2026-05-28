@@ -1694,4 +1694,4 @@
 - pull-to-refresh: pull→ready→refreshing→done→reset 四阶段闭环
 - CSS variable 自动化: 新增组件全部使用 var(--color-xxx)
 
-**下一个方向**: C（内容质量）
+**下一个方向**: B（功能增强）
