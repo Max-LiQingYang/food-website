@@ -399,7 +399,12 @@ body.dark .recipe-card__cover-placeholder {
 }
 
 .recipe-card__tag--category {
-  background: var(--color-primary, #E8663E);
+  background: var(--cat-bg, var(--color-primary, #E8663E));
+  color: #fff;
+}
+
+body.dark .recipe-card__tag--category {
+  background: var(--cat-bg, var(--color-primary, #E8663E));
   color: #fff;
 }
 

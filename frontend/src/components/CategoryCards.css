@@ -1,13 +1,31 @@
+.category-cards-wrapper {
+  margin-bottom: 28px;
+}
+
 .category-cards {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 12px;
-  margin-bottom: 28px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .category-cards {
-    gap: 8px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 0 0 4px;
+  }
+
+  .category-cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-card {
+    flex: 0 0 80px;
+    scroll-snap-align: start;
   }
 }
 
@@ -75,6 +93,37 @@
   color: var(--cat-color);
 }
 
+/* 全部分类按钮 */
+.category-cards__all {
+  display: none;
+}
+
+@media (min-width: 481px) {
+  .category-cards__all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px;
+    border: 1.5px dashed var(--color-border, #ddd);
+    border-radius: var(--radius-md, 12px);
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-text-secondary, #888);
+    transition: all var(--transition-normal, 0.3s ease);
+  }
+
+  .category-cards__all:hover {
+    border-color: var(--color-primary, #e8663e);
+    color: var(--color-primary, #e8663e);
+    background: color-mix(in srgb, var(--color-primary, #e8663e) 4%, transparent);
+  }
+}
+
 @media (max-width: 480px) {
   .category-card {
     padding: 14px 4px 12px;
@@ -95,4 +144,14 @@ body.dark .category-card {
 
 body.dark .category-card:hover {
   background: color-mix(in srgb, var(--cat-color) 8%, var(--color-card, #1e1e32));
+}
+
+body.dark .category-cards__all {
+  border-color: var(--color-border, #444);
+  color: var(--color-text-secondary, #999);
+}
+
+body.dark .category-cards__all:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #f0906a);
 }

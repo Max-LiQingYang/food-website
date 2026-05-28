@@ -457,7 +457,7 @@ router.get('/', async (req, res) => {
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
-    const { category, userId, exclude } = req.query
+    const { category, categories, userId, exclude } = req.query
 
     if (page < 1) page = 1
     if (pageSize > 100) pageSize = 100
@@ -468,6 +468,9 @@ router.get('/', async (req, res) => {
 
     if (category) {
       where.category = category
+    }
+    if (categories) {
+      where.category = { [Op.in]: categories.split(',').map(c => c.trim()) }
     }
     if (userId) {
       where.userId = userId
@@ -549,9 +552,14 @@ router.get('/search', async (req, res) => {
       ],
     }
 
-    // 分类筛选
-    if (category) {
-      where.category = category
+    // 分类筛选（单分类或分类数组）
+    const catFilter = req.query.categories || req.query.category
+    if (catFilter) {
+      if (req.query.categories) {
+        where.category = { [Op.in]: req.query.categories.split(',').map(c => c.trim()) }
+      } else {
+        where.category = req.query.category
+      }
     }
 
     // 难度筛选
@@ -563,9 +571,14 @@ router.get('/search', async (req, res) => {
     const excludeCond = buildExcludeCondition(exclude)
     if (excludeCond) {
       const andConds = [excludeCond]
-      if (category || difficulty) {
+      const catFilter = req.query.categories || req.query.category
+      if (catFilter || difficulty) {
         const directWhere = {}
-        if (category) directWhere.category = category
+        if (req.query.categories) {
+          directWhere.category = { [Op.in]: req.query.categories.split(',').map(c => c.trim()) }
+        } else if (req.query.category) {
+          directWhere.category = req.query.category
+        }
         if (difficulty) directWhere.difficulty = difficulty
         andConds.push(directWhere)
         delete where.category

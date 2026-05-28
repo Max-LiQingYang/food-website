@@ -244,7 +244,7 @@ export function getFeaturedRecipes() {
  * 搜索食谱
  * GET /api/recipes/search?q=关键词&page=1&pageSize=20
  */
-export function searchRecipes(params: { q: string; page?: number; pageSize?: number }) {
+export function searchRecipes(params: { q: string; page?: number; pageSize?: number; category?: string; categories?: string; difficulty?: string; sortBy?: string; [key: string]: any }) {
   return apiClient.get('/recipes/search', { params: { page: 1, pageSize: 20, ...params } })
 }
 

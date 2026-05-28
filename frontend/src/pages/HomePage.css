@@ -315,3 +315,56 @@ body.dark .rankings-entry__text {
 body.dark .rankings-entry__sub {
   color: #ffab91;
 }
+
+/* ── 最新上架 ── */
+.home-new-recipes {
+  margin-bottom: 28px;
+}
+
+.home-new-recipes__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.home-new-recipes__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+}
+
+.home-new-recipes__more {
+  font-size: 13px;
+  color: var(--color-primary, #e8663e);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-normal, 0.3s ease);
+}
+
+.home-new-recipes__more:hover {
+  opacity: 0.75;
+}
+
+.home-new-recipes__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .home-new-recipes__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-new-recipes__title {
+    font-size: 16px;
+  }
+  .home-new-recipes__grid {
+    gap: 8px;
+  }
+}

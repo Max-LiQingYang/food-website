@@ -94,10 +94,15 @@ export default function HomePage() {
 
   // Load full recipe list for hero + featured sections (only once)
   useEffect(() => {
-    getRecipes({ page: 1, pageSize: 55 }).then((res: any) => {
-      const data = res.data || res
-      setAllRecipes(data.list || [])
-    }).catch(() => {})
+    Promise.all([
+      getRecipes({ page: 1, pageSize: 55 }),
+      getRecipes({ page: 1, pageSize: 12, sortBy: 'newest' }),
+    ]).then(([allRes, newRes]) => {
+      const allData = allRes.data || allRes
+      setAllRecipes(allData.list || [])
+      const newData = newRes.data || newRes
+      setNewRecipes(newData.list || [])
+    }).catch(() => {}).finally(() => setLoadingNew(false))
   }, [])
 
   useEffect(() => {
@@ -133,6 +138,10 @@ export default function HomePage() {
 
   // Featured section: use API endpoint
   const [showFeatured, setShowFeatured] = useState(true)
+
+  // 最新上架食谱
+  const [newRecipes, setNewRecipes] = useState<Recipe[]>([])
+  const [loadingNew, setLoadingNew] = useState(true)
 
   // SEO meta
   usePageTitle("美食食谱 - 三餐四季，与美食相伴")
@@ -178,6 +187,23 @@ export default function HomePage() {
 
       {/* ── 挑战赛入口 ── */}
       {showFullLayout && <ChallengeHomeCards />}
+
+      {/* ── 最新上架 ── */}
+      {showFullLayout && !loadingNew && newRecipes.length > 0 && (
+        <div className="home-new-recipes">
+          <div className="home-new-recipes__header">
+            <h2 className="home-new-recipes__title">✨ 最新上架</h2>
+            <Link to="/search?sortBy=newest" className="home-new-recipes__more">
+              查看全部 →
+            </Link>
+          </div>
+          <div className="home-new-recipes__grid">
+            {newRecipes.slice(0, 8).map(r => (
+              <RecipeCard key={r.id} recipe={r} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── 搜索栏 ── */}
       <form className="home-search" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>

@@ -8,6 +8,7 @@ import FavoriteButton from './FavoriteButton'
 import ImagePlaceholder from './ImagePlaceholder'
 import AuthorLevelBadge from './AuthorLevelBadge'
 import { useLongPress } from '../hooks/useLongPress'
+import { getCategoryInfo } from '../constants/categories'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -285,9 +286,18 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
         {/* 紧凑标签行 */}
         <div className="recipe-card__tags">
           {/* 分类标签 */}
-          {recipe.category && (
-            <span className="recipe-card__tag recipe-card__tag--category">{recipe.category}</span>
-          )}
+          {recipe.category && (() => {
+            const catInfo = getCategoryInfo(recipe.category)
+            return (
+              <span
+                className="recipe-card__tag recipe-card__tag--category"
+                style={{ '--cat-bg': catInfo.color } as React.CSSProperties}
+                title={catInfo.description}
+              >
+                {catInfo.icon} {catInfo.label}
+              </span>
+            )
+          })()}
 
           {/* 难度 */}
           {difficulty && DIFFICULTY_LABELS[difficulty] && (

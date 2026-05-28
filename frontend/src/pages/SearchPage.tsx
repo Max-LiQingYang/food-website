@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { searchRecipes, getHotSearches } from '../api'
 import RecipeCard from '../components/RecipeCard'
@@ -6,22 +6,16 @@ import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import SearchAutocomplete from '../components/SearchAutocomplete'
 import { highlightText } from '../utils/highlightText'
 import { useToast } from '../context/ToastContext'
+import { CATEGORIES as CATEGORIES_SHARED } from '../constants/categories'
 import type { Recipe } from '../api'
 import './SearchPage.css'
 
 const PAGE_SIZE = 12
 
-/** 分类中文映射 */
-const CATEGORIES: Record<string, string> = {
-  chinese: '中餐',
-  western: '西餐',
-  japanese: '日料',
-  korean: '韩料',
-  dessert: '甜点',
-  thai: '泰式',
-  indian: '印式',
-  vietnamese: '越式',
-}
+/** 分类中文映射（用共享常量） */
+const CATEGORIES: Record<string, string> = Object.fromEntries(
+  CATEGORIES_SHARED.map(c => [c.key, c.label])
+)
 
 /** 难度中文映射 */
 const DIFFICULTIES: Record<string, string> = {
@@ -37,7 +31,6 @@ const SORT_OPTIONS: Record<string, string> = {
   cookTime_desc: '烹饪时间 ↓',
 }
 
-/** 热门搜索词（带图标） */
 /** localStorage 搜索历史 */
 function getSearchHistory(): string[] {
   try {
@@ -56,7 +49,6 @@ function clearSearchHistory() {
   localStorage.removeItem('search_history')
 }
 
-/** 单条删除搜索历史 */
 function removeFromSearchHistory(query: string) {
   const history = getSearchHistory().filter(h => h !== query)
   localStorage.setItem('search_history', JSON.stringify(history))
@@ -67,6 +59,7 @@ export default function SearchPage() {
   const q = searchParams.get('q') || ''
   const page = Number(searchParams.get('page')) || 1
   const categoryParam = searchParams.get('category') || ''
+  const categoriesParam = searchParams.get('categories') || ''
   const difficultyParam = searchParams.get('difficulty') || ''
   const sortByParam = searchParams.get('sortBy') || ''
 
@@ -76,14 +69,17 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false)
   const toast = useToast()
 
-  const [filterCategory, setFilterCategory] = useState(categoryParam)
+  /** 多选分类：支持 categories 数组参数或旧的 single category */
+  const [filterCategories, setFilterCategories] = useState<string[]>(
+    categoriesParam ? categoriesParam.split(',').map(s => s.trim()).filter(Boolean) :
+    categoryParam ? [categoryParam] : []
+  )
   const [filterDifficulty, setFilterDifficulty] = useState(difficultyParam)
   const [filterSortBy, setFilterSortBy] = useState(sortByParam)
 
   // 动态热门搜索词
   const [hotSearches, setHotSearches] = useState<Array<{ text: string; count: number }>>([])
   const [hotLoading, setHotLoading] = useState(false)
-  // 历史刷新触发器（删除时触发重新渲染）
   const [historyRev, setHistoryRev] = useState(0)
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
@@ -91,10 +87,13 @@ export default function SearchPage() {
   // 同步 URL 参数到本地状态
   useEffect(() => {
     setInputValue(q)
-    setFilterCategory(categoryParam)
+    setFilterCategories(
+      categoriesParam ? categoriesParam.split(',').map(s => s.trim()).filter(Boolean) :
+      categoryParam ? [categoryParam] : []
+    )
     setFilterDifficulty(difficultyParam)
     setFilterSortBy(sortByParam)
-  }, [q, categoryParam, difficultyParam, sortByParam])
+  }, [q, categoryParam, categoriesParam, difficultyParam, sortByParam])
 
   useEffect(() => {
     if (!q.trim()) {
@@ -105,7 +104,7 @@ export default function SearchPage() {
 
     setLoading(true)
     const params: any = { q: q.trim(), page, pageSize: PAGE_SIZE }
-    if (filterCategory) params.category = filterCategory
+    if (filterCategories.length > 0) params.categories = filterCategories.join(',')
     if (filterDifficulty) params.difficulty = filterDifficulty
     if (filterSortBy) params.sortBy = filterSortBy
 
@@ -125,7 +124,7 @@ export default function SearchPage() {
         setTotal(0)
       })
       .finally(() => setLoading(false))
-  }, [q, page, filterCategory, filterDifficulty, filterSortBy])
+  }, [q, page, filterCategories, filterDifficulty, filterSortBy])
 
   // 加载热门搜索词
   useEffect(() => {
@@ -142,43 +141,54 @@ export default function SearchPage() {
     }
   }, [q])
 
+  const buildUrlParams = (overrides: Record<string, string> = {}) => {
+    const params: Record<string, string> = { ...overrides }
+    if (!params.q) params.q = q
+    if (!params.page) params.page = '1'
+    if (filterCategories.length > 0) params.categories = filterCategories.join(',')
+    else delete params.categories
+    if (filterDifficulty) params.difficulty = filterDifficulty
+    if (filterSortBy) params.sortBy = filterSortBy
+    return params
+  }
+
   const handleSearchSubmit = (query: string) => {
     if (!query.trim()) return
     addToSearchHistory(query.trim())
-    const params: Record<string, string> = { q: query.trim(), page: '1' }
-    if (filterCategory) params.category = filterCategory
-    if (filterDifficulty) params.difficulty = filterDifficulty
-    if (filterSortBy) params.sortBy = filterSortBy
-    setSearchParams(params)
+    setSearchParams(buildUrlParams({ q: query.trim(), page: '1' }))
+  }
+
+  const handleCategoryToggle = (catKey: string) => {
+    const next = filterCategories.includes(catKey)
+      ? filterCategories.filter(c => c !== catKey)
+      : [...filterCategories, catKey]
+    setFilterCategories(next)
+    setSearchParams(buildUrlParams({ categories: next.join(',') }))
   }
 
   const handleFilterChange = (key: string, value: string) => {
-    const params: Record<string, string> = { q, page: '1' }
-    if (key === 'category') {
-      if (value) params.category = value
-      setFilterCategory(value)
+    if (key === 'category' || key === 'categories') {
+      if (value) {
+        setFilterCategories([value])
+        setSearchParams(buildUrlParams({ categories: value }))
+      } else {
+        setFilterCategories([])
+        setSearchParams(buildUrlParams({ categories: '' }))
+      }
     } else if (key === 'difficulty') {
-      if (value) params.difficulty = value
       setFilterDifficulty(value)
+      setSearchParams(buildUrlParams({ difficulty: value }))
     } else if (key === 'sortBy') {
-      if (value) params.sortBy = value
       setFilterSortBy(value)
+      setSearchParams(buildUrlParams({ sortBy: value }))
     }
-    // Preserve other filters
-    if (key !== 'category' && filterCategory) params.category = filterCategory
-    if (key !== 'difficulty' && filterDifficulty) params.difficulty = filterDifficulty
-    if (key !== 'sortBy' && filterSortBy) params.sortBy = filterSortBy
-    setSearchParams(params)
   }
 
-  const hasActiveFilters = filterCategory || filterDifficulty || filterSortBy
+  const hasActiveFilters = filterCategories.length > 0 || filterDifficulty || filterSortBy
   const hasResults = results.length > 0
 
   const goPage = (newPage: number) => {
-    const params: Record<string, string> = { q, page: String(newPage) }
-    if (filterCategory) params.category = filterCategory
-    if (filterDifficulty) params.difficulty = filterDifficulty
-    if (filterSortBy) params.sortBy = filterSortBy
+    const params = buildUrlParams({ page: String(newPage) })
     setSearchParams(params)
   }
 
@@ -215,24 +225,27 @@ export default function SearchPage() {
         </p>
       )}
 
-      {/* 标签式筛选栏 — 替代下拉框 */}
+      {/* 标签式筛选栏 */}
       {q && !loading && (
         <div className="search-tag-filters">
-          {/* 分类标签 */}
+          {/* 分类标签 - 多选 */}
           <div className="search-tag-group">
             <span className="search-tag-group__label">分类</span>
             <div className="search-tag-group__tags">
               <button
-                className={`search-filter-tag ${!filterCategory ? 'is-active' : ''}`}
-                onClick={() => handleFilterChange('category', '')}
+                className={`search-filter-tag ${filterCategories.length === 0 ? 'is-active' : ''}`}
+                onClick={() => {
+                  setFilterCategories([])
+                  setSearchParams(buildUrlParams({ categories: '' }))
+                }}
               >
                 全部
               </button>
               {Object.entries(CATEGORIES).map(([key, label]) => (
                 <button
                   key={key}
-                  className={`search-filter-tag ${filterCategory === key ? 'is-active' : ''}`}
-                  onClick={() => handleFilterChange('category', key)}
+                  className={`search-filter-tag ${filterCategories.includes(key) ? 'is-active' : ''}`}
+                  onClick={() => handleCategoryToggle(key)}
                 >
                   {label}
                 </button>
@@ -289,11 +302,10 @@ export default function SearchPage() {
             <button
               className="search-filter-clear-all"
               onClick={() => {
-                setFilterCategory('')
+                setFilterCategories([])
                 setFilterDifficulty('')
                 setFilterSortBy('')
-                const params: Record<string, string> = { q, page: '1' }
-                setSearchParams(params)
+                setSearchParams({ q, page: '1' })
               }}
             >
               ✕ 清除筛选
@@ -305,7 +317,6 @@ export default function SearchPage() {
       {/* 搜索历史和热门搜索 - 无搜索词时展示 */}
       {!q && !loading && (
         <>
-          {/* 搜索历史 */}
           {getSearchHistory().length > 0 && (
             <div className="search-history">
               <div className="search-history__header">
@@ -349,7 +360,6 @@ export default function SearchPage() {
             </div>
           )}
 
-          {/* 热门搜索词 */}
           <div className="search-hot-words">
             <span className="search-hot-words__label">🔥 热门搜索</span>
             {hotLoading ? (
@@ -400,7 +410,7 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* 空状态 — 增强版 */}
+      {/* 空状态 */}
       {!loading && q && !hasResults && (
         <div className="search-empty search-empty--no-results">
           <div className="search-empty__icon">🔍</div>
@@ -441,7 +451,7 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* 无搜索词时默认提示 — AI 推荐搜索 */}
+      {/* 无搜索词时默认提示 */}
       {!q && !loading && (
         <div className="search-empty">
           <div className="search-empty__icon">🍳</div>
