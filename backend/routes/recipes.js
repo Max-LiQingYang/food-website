@@ -457,7 +457,7 @@ router.get('/', async (req, res) => {
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
-    const { category, categories, userId, exclude } = req.query
+    const { category, categories, userId, exclude, difficulty, maxCookTime, sortBy } = req.query
 
     if (page < 1) page = 1
     if (pageSize > 100) pageSize = 100
@@ -475,6 +475,17 @@ router.get('/', async (req, res) => {
     if (userId) {
       where.userId = userId
     }
+    if (difficulty) {
+      where.difficulty = difficulty
+    }
+    if (maxCookTime) {
+      const maxTime = parseInt(maxCookTime, 10)
+      if (maxTime === 61) {
+        where.cookTime = { [Op.gt]: 60 }
+      } else if (!isNaN(maxTime) && maxTime > 0) {
+        where.cookTime = { [Op.lte]: maxTime }
+      }
+    }
 
     // 食材排除
     const excludeCond = buildExcludeCondition(exclude)
@@ -482,25 +493,57 @@ router.get('/', async (req, res) => {
       where[Op.and] = excludeCond
     }
 
-    const { count, rows } = await Recipe.findAndCountAll({
-      where,
-      order: [['createdAt', 'DESC']],
-      offset,
-      limit: pageSize,
-      attributes: LIST_ATTRIBUTES,
-    })
+    // 排序
+    let order
+    let list, total
 
-    const list = rows.map(r => r.toJSON())
+    if (sortBy === 'rating') {
+      // rating 由 attachRatingInfo 在查询后计算（非 DB 列），
+      // 需要先查全部 recipeId（上限200条防止过载），关联评分后排序再分页
+      const allMatching = await Recipe.findAll({ where, attributes: ['id'], order: [['createdAt', 'DESC']], limit: 200 })
+      const allIds = allMatching.map(r => r.id)
+      total = allIds.length
+
+      const ratingMap = await fetchAvgRatings(allIds)
+      const sorted = allIds
+        .map(id => ({ id, rating: (ratingMap[id]?.avgRating || 0) }))
+        .sort((a, b) => b.rating - a.rating || a.id.localeCompare(b.id))
+
+      const pageIds = sorted.slice(offset, offset + pageSize).map(s => s.id)
+      if (pageIds.length === 0) {
+        list = []
+      } else {
+        const { rows: raw } = await Recipe.findAndCountAll({
+          where: { id: { [Op.in]: pageIds } },
+          attributes: LIST_ATTRIBUTES,
+        })
+        // 保持分页排序顺序
+        const idOrder = {}
+        pageIds.forEach((id, i) => { idOrder[id] = i })
+        raw.sort((a, b) => (idOrder[a.id] || 999) - (idOrder[b.id] || 999))
+        list = raw.map(r => r.toJSON())
+      }
+    } else if (sortBy === 'time') {
+      order = [['cookTime', 'ASC NULLS LAST']]
+      const { count, rows: raw } = await Recipe.findAndCountAll({
+        where, order, offset, limit: pageSize, attributes: LIST_ATTRIBUTES,
+      })
+      total = count
+      list = raw.map(r => r.toJSON())
+    } else {
+      order = [['createdAt', 'DESC']]
+      const { count, rows: raw } = await Recipe.findAndCountAll({
+        where, order, offset, limit: pageSize, attributes: LIST_ATTRIBUTES,
+      })
+      total = count
+      list = raw.map(r => r.toJSON())
+    }
+
     await attachRatingInfo(list)
     attachContentScore(list)
 
     return res.status(200).json(
-      resJSON(0, 'ok', {
-        list,
-        total: count,
-        page,
-        pageSize,
-      })
+      resJSON(0, 'ok', { list, total, page, pageSize })
     )
   } catch (err) {
     console.error('[GET /recipes] Error:', err)
