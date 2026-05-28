@@ -681,62 +681,257 @@ const recipes = [
       { stepNumber: 7, content: '搭配印度烤饼或米饭食用' }
     ])
   },
+  // ── #83 新增：越南春卷 ──
+  {
+    id: uuidv4(),
+    title: '越南春卷',
+    coverImage: 'https://images.unsplash.com/photo-1529563021893-cc83c992d75d?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 20,
+    description: '越南经典冷卷，透明米纸包裹鲜虾、米粉、生菜和香草，蘸鱼露酸甜汁，清新爽口。',
+    category: 'vietnamese',
+    difficulty: 'easy',
+    season: 'summer',
+    servings: 4,
+    ingredients: JSON.stringify([{"name": "越南米纸", "amount": 12, "unit": "张"}, {"name": "鲜虾", "amount": 200, "unit": "g"}, {"name": "米粉", "amount": 100, "unit": "g"}, {"name": "生菜", "amount": 6, "unit": "片"}, {"name": "薄荷叶", "amount": 20, "unit": "片"}, {"name": "香菜", "amount": 20, "unit": "g"}, {"name": "胡萝卜", "amount": 1, "unit": "根"}, {"name": "豆芽", "amount": 100, "unit": "g"}]),
+    steps: JSON.stringify(["鲜虾去壳去虾线，沸水煮2分钟至变红，捞出过凉水，对半切开", "米粉按包装煮软过凉水沥干", "胡萝卜切细丝，生菜撕小片，薄荷叶香菜洗净", "米纸在温水浸2-3秒至软", "平铺后依次放生菜、米粉、胡萝卜丝、豆芽", "摆虾仁、薄荷叶香菜", "先折两侧再从底部紧实卷起", "调蘸汁：鱼露+青柠汁+糖+蒜末+小米辣拌匀"]),
+    nutrition: JSON.stringify({"calories": 180, "protein": 14, "fat": 3, "carbs": 28, "fiber": 2, "sodium": 520}),
+    story: '越南春卷是越南最具代表性的街头美食之一，源于越南南部湄公河三角洲。越南语称"Gỏi cuốn"。19世纪法国殖民时期，越南人将法国面包和生菜沙拉元素融入本地饮食，演化出这道经典冷卷。',
+    culturalBackground: '越南文化中春卷象征团圆丰收，家庭聚餐时一起卷春卷极富互动性。南部喜甜辣蘸酱，北部偏爱清淡鱼露。农历新年春卷是年夜饭不可或缺的菜品。',
+    tips: '米纸浸泡不可超过5秒；虾勿煮久变红即捞出；包好湿布盖住防干；蘸汁青柠汁可用米醋替代',
+    categoryTags: JSON.stringify({"ingredient": "seafood-rice", "method": "wrap", "cuisine": "vietnamese", "flavor": "fresh", "price": "low"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：越南牛肉粉 ──
+  {
+    id: uuidv4(),
+    title: '越南牛肉粉',
+    coverImage: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 90,
+    description: '越南国汤，牛骨清汤熬煮数小时，搭配薄切牛肉和爽滑河粉，一碗浓香暖心。',
+    category: 'vietnamese',
+    difficulty: 'hard',
+    season: 'winter',
+    servings: 4,
+    ingredients: JSON.stringify([{"name": "牛骨", "amount": 500, "unit": "g"}, {"name": "牛腱子", "amount": 300, "unit": "g"}, {"name": "越南河粉", "amount": 400, "unit": "g"}, {"name": "洋葱", "amount": 1, "unit": "个"}, {"name": "姜", "amount": 1, "unit": "块"}, {"name": "八角", "amount": 3, "unit": "个"}, {"name": "桂皮", "amount": 1, "unit": "根"}, {"name": "鱼露", "amount": 3, "unit": "勺"}, {"name": "豆芽", "amount": 200, "unit": "g"}, {"name": "薄荷叶", "amount": 20, "unit": "g"}, {"name": "青柠", "amount": 2, "unit": "个"}, {"name": "小米辣", "amount": 3, "unit": "个"}]),
+    steps: JSON.stringify(["牛骨牛腱冷水下锅煮沸撇沫捞出", "洋葱姜烤至焦黑增烟熏味", "入锅加3升水大火煮沸加八角桂皮转小火慢炖1.5h不盖盖", "取出牛腱切薄片，汤底加鱼露糖调味过滤", "河粉煮软沥干分碗", "碗中摆牛肉片豆芽薄荷叶，浇滚烫牛骨汤", "配青柠角小米辣鱼露甜辣酱上桌"]),
+    nutrition: JSON.stringify({"calories": 420, "protein": 32, "fat": 12, "carbs": 48, "fiber": 3, "sodium": 860}),
+    story: '越南牛肉粉(Pho)是越南国菜，起源20世纪初越南北部南定。法国殖民时期大量牛骨被丢弃，越南小贩捡来熬汤结合本地河粉和中国粿条做法，意外创造传世美味。被CNN评为世界50大美食第28位。',
+    culturalBackground: '越南Pho可一日三食但最地道是早餐。先喝原汤品味鲜度，再挤青柠加辣椒豆芽，最后加薄荷罗勒提香。北方汤清淡河粉宽，南方汤甜浓配菜更丰富。',
+    tips: '熬汤不盖盖保持汤色清澈；牛腱煮至筷子刚可穿透即捞出；浇汤前将河粉烫一遍防黏；鱼露品质决定汤底层次',
+    categoryTags: JSON.stringify({"ingredient": "beef-rice_noodles", "method": "braise", "cuisine": "vietnamese", "flavor": "savory", "price": "medium"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：印度黄油鸡 ──
+  {
+    id: uuidv4(),
+    title: '印度黄油鸡',
+    coverImage: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 45,
+    description: '印度最具国际知名度的经典咖喱，嫩滑鸡肉在浓郁番茄奶油酱汁中慢炖，配印度烤饼或米饭享用。',
+    category: 'indian',
+    difficulty: 'medium',
+    season: 'winter',
+    servings: 4,
+    ingredients: JSON.stringify([{"name": "鸡腿肉", "amount": 500, "unit": "g"}, {"name": "酸奶", "amount": 100, "unit": "ml"}, {"name": "姜黄粉", "amount": 1, "unit": "茶匙"}, {"name": "孜然粉", "amount": 1, "unit": "茶匙"}, {"name": "番茄罐头", "amount": 400, "unit": "g"}, {"name": "黄油", "amount": 50, "unit": "g"}, {"name": "淡奶油", "amount": 150, "unit": "ml"}, {"name": "洋葱", "amount": 1, "unit": "个"}, {"name": "蒜", "amount": 4, "unit": "瓣"}, {"name": "姜", "amount": 15, "unit": "g"}, {"name": "咖喱粉", "amount": 2, "unit": "勺"}, {"name": "辣椒粉", "amount": 1, "unit": "茶匙"}, {"name": "糖", "amount": 1, "unit": "茶匙"}, {"name": "盐", "amount": 1, "unit": "茶匙"}]),
+    steps: JSON.stringify(["鸡腿肉切块用酸奶姜黄粉孜然粉盐腌制30分钟", "洋葱蒜姜切碎末", "煎鸡肉至表面金黄盛出", "黄油融化炒洋葱末至金黄加蒜姜末", "加咖喱粉辣椒粉翻炒30秒", "倒入番茄罐头压碎加糖盐小火10分钟", "搅拌机打至顺滑回锅", "加淡奶油和鸡肉小火炖10-15分钟", "调整咸度淋黄油增香"]),
+    nutrition: JSON.stringify({"calories": 480, "protein": 35, "fat": 30, "carbs": 16, "fiber": 3, "sodium": 720}),
+    story: '印度黄油鸡诞生于20世纪50年代新德里Moti Mahal餐厅。创始人Kundan Lal Gujral为处理当天未卖完的Tandoori烤鸡，去骨切块放入番茄黄油酱汁炖煮，意外创造风靡全球的经典。',
+    culturalBackground: '黄油鸡代表印度旁遮普饮食文化，大量使用乳制品和香料，偏向慢炖。在印度被视为餐厅菜或节庆特供，搭配Naan饼用手撕饼蘸取酱汁食用。',
+    tips: '鸡肉腌制不可省略；番茄罐头比新鲜番茄风味更浓；酱汁搅拌后口感更顺滑；最后淋黄油让酱汁更亮泽',
+    categoryTags: JSON.stringify({"ingredient": "chicken-dairy", "method": "braise", "cuisine": "indian", "flavor": "creamy-spicy", "price": "medium"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：印度烤饼 ──
   {
     id: uuidv4(),
     title: '印度烤饼',
     coverImage: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop',
-    author: '印度美食家',
-    cookTime: 20,
-    description: '松软有嚼劲的印度经典面饼，蘸咖喱汁或配黄油鸡都绝佳。',
+    author: '美食达人',
+    cookTime: 30,
+    description: '印式传统发酵饼，外酥内软，带有浓郁麦香和焦香斑，是咖喱类菜肴的最佳拍档。',
     category: 'indian',
     difficulty: 'medium',
-    servings: 4,
-    ingredients: JSON.stringify([
-      { name: '中筋面粉', amount: 300, unit: 'g' },
-      { name: '酸奶', amount: 100, unit: 'g' },
-      { name: '酵母', amount: 3, unit: 'g' },
-      { name: '糖', amount: 5, unit: 'g' },
-      { name: '盐', amount: 3, unit: 'g' },
-      { name: '黄油', amount: 30, unit: 'g' },
-      { name: '蒜末', amount: 10, unit: 'g' }
-    ]),
-    steps: JSON.stringify([
-      { stepNumber: 1, content: '面粉、酵母、糖、盐、酸奶混合，揉成光滑面团' },
-      { stepNumber: 2, content: '盖保鲜膜发酵1小时至两倍大' },
-      { stepNumber: 3, content: '分成4份，擀成椭圆形薄饼' },
-      { stepNumber: 4, content: '烤箱预热最高温，烤盘预热' },
-      { stepNumber: 5, content: '面饼放入烤箱烤3-4分钟至鼓泡金黄' },
-      { stepNumber: 6, content: '出炉刷蒜香黄油' }
-    ])
+    season: 'all',
+    servings: 6,
+    ingredients: JSON.stringify([{"name": "中筋面粉", "amount": 300, "unit": "g"}, {"name": "酸奶", "amount": 60, "unit": "ml"}, {"name": "温水", "amount": 120, "unit": "ml"}, {"name": "酵母", "amount": 3, "unit": "g"}, {"name": "糖", "amount": 5, "unit": "g"}, {"name": "盐", "amount": 3, "unit": "g"}, {"name": "黄油", "amount": 30, "unit": "g"}, {"name": "蒜", "amount": 3, "unit": "瓣"}, {"name": "香菜", "amount": 10, "unit": "g"}]),
+    steps: JSON.stringify(["温水加酵母糖静置5分钟活化", "面粉加盐倒酵母水和酸奶揉光滑面团8-10分钟", "抹油盖保鲜膜发酵1小时至体积翻倍", "分6份滚圆松驰10分钟", "擀成椭圆厚3mm长20cm", "不粘锅大火干烙1分钟起大泡", "翻面再烙30-60秒至焦斑", "蒜末黄油融化拌香菜碎趁热刷在饼上"]),
+    nutrition: JSON.stringify({"calories": 180, "protein": 6, "fat": 5, "carbs": 30, "fiber": 1, "sodium": 380}),
+    story: '印度烤饼(Naan)是印度次大陆最古老发酵面食之一，有超5000年历史。Naan一词源自波斯语non(面包)，随莫卧儿帝国传入印度。传统在泥窑(Tandoor)中烤制。',
+    culturalBackground: '印度饮食文化中Naan与咖喱关系像面包与汤，用于舀取浓稠酱汁。传统用右手撕小块沾咖喱送入口中。海外南亚裔社区中Naan代表文化归属与家庭团聚。',
+    tips: '酸奶是软化关键让Naan更蓬松；发酵时间不宜过短；锅要够热才能产生焦斑；烙好后立即刷黄油保持柔软',
+    categoryTags: JSON.stringify({"ingredient": "flour-dairy", "method": "bake", "cuisine": "indian", "flavor": "mild", "price": "low"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
   },
-
-  // 地中海
+  // ── #83 新增：希腊沙拉 ──
   {
     id: uuidv4(),
     title: '希腊沙拉',
-    coverImage: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop',
-    author: '地中海厨房',
+    coverImage: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop',
+    author: '美食达人',
     cookTime: 10,
-    description: '清爽的地中海经典，番茄、黄瓜、橄榄和菲达芝士的简单组合。',
+    description: '地中海饮食代表，新鲜番茄黄瓜搭配浓郁菲达芝士，浇上特级初榨橄榄油和牛至，简单却惊艳。',
     category: 'mediterranean',
     difficulty: 'easy',
-    servings: 2,
-    ingredients: JSON.stringify([
-      { name: '番茄', amount: 2, unit: '个' },
-      { name: '黄瓜', amount: 1, unit: '根' },
-      { name: '紫洋葱', amount: 0.5, unit: '个' },
-      { name: '菲达芝士', amount: 100, unit: 'g' },
-      { name: '黑橄榄', amount: 10, unit: '颗' },
-      { name: '橄榄油', amount: 3, unit: '勺' },
-      { name: '牛至', amount: 1, unit: '茶匙' }
-    ]),
-    steps: JSON.stringify([
-      { stepNumber: 1, content: '番茄切块，黄瓜切半月片，洋葱切薄圈' },
-      { stepNumber: 2, content: '所有蔬菜放入沙拉碗' },
-      { stepNumber: 3, content: '放上黑橄榄' },
-      { stepNumber: 4, content: '菲达芝士切厚片或掰块放上' },
-      { stepNumber: 5, content: '淋上特级初榨橄榄油，撒牛至' }
-    ])
+    season: 'summer',
+    servings: 3,
+    ingredients: JSON.stringify([{"name": "番茄", "amount": 3, "unit": "个"}, {"name": "黄瓜", "amount": 1, "unit": "根"}, {"name": "紫洋葱", "amount": 0.5, "unit": "个"}, {"name": "菲达芝士", "amount": 150, "unit": "g"}, {"name": "黑橄榄", "amount": 80, "unit": "g"}, {"name": "青椒", "amount": 1, "unit": "个"}, {"name": "特级初榨橄榄油", "amount": 3, "unit": "勺"}, {"name": "红酒醋", "amount": 1, "unit": "勺"}, {"name": "干牛至", "amount": 1, "unit": "茶匙"}, {"name": "盐", "amount": 0.5, "unit": "茶匙"}]),
+    steps: JSON.stringify(["番茄切块黄瓜切半月片青椒切圈", "紫洋葱切极薄环冰水浸泡5分钟去辛辣", "菲达芝士切2cm方块", "黑橄榄对半切", "所有蔬菜轻拌均匀", "摆菲达芝士块和黑橄榄", "淋橄榄油红酒醋撒干牛至和粗盐", "现磨黑胡椒立即上桌"]),
+    nutrition: JSON.stringify({"calories": 240, "protein": 10, "fat": 18, "carbs": 12, "fiber": 4, "sodium": 680}),
+    story: '希腊沙拉(Horiatiki意为乡村沙拉)起源于希腊乡村。正宗不加生菜，绿色来自番茄和青椒。农民田里现摘番茄、自家腌制橄榄、羊奶菲达芝士配上橄榄油，顶级食材不需要复杂烹饪。',
+    culturalBackground: '希腊饮食中沙拉不是开胃菜而是配菜，在主菜之后上桌清口。希腊人用面包蘸食盘底橄榄油和番茄汁而非刀叉精细切。夏季几乎每顿饭都有希腊沙拉。',
+    tips: '番茄必须完全成熟多汁；菲达用前冷藏20分钟口感更佳；橄榄油品质决定沙拉档次；切好后尽快拌食避免出水',
+    categoryTags: JSON.stringify({"ingredient": "vegetables-cheese", "method": "raw", "cuisine": "mediterranean", "flavor": "fresh-tangy", "price": "low"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：鹰嘴豆泥 ──
+  {
+    id: uuidv4(),
+    title: '鹰嘴豆泥',
+    coverImage: 'https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 15,
+    description: '中东经典蘸酱，鹰嘴豆与芝麻酱的完美融合，丝滑浓郁，搭配热饼或蔬菜棒享用。',
+    category: 'mediterranean',
+    difficulty: 'easy',
+    season: 'all',
+    servings: 6,
+    ingredients: JSON.stringify([{"name": "鹰嘴豆罐头", "amount": 400, "unit": "g"}, {"name": "芝麻酱", "amount": 60, "unit": "ml"}, {"name": "柠檬汁", "amount": 3, "unit": "勺"}, {"name": "蒜", "amount": 2, "unit": "瓣"}, {"name": "橄榄油", "amount": 3, "unit": "勺"}, {"name": "孜然粉", "amount": 0.5, "unit": "茶匙"}, {"name": "盐", "amount": 0.5, "unit": "茶匙"}, {"name": "冰水", "amount": 3, "unit": "勺"}, {"name": "辣椒粉", "amount": 0.5, "unit": "茶匙"}]),
+    steps: JSON.stringify(["鹰嘴豆沥干微波高火加热2分钟", "搓去外皮口感丝滑关键", "芝麻酱柠檬汁蒜瓣橄榄油先搅打30秒", "加鹰嘴豆孜然粉盐冰水高速搅拌1-2分钟", "逐勺加水调整至丝滑奶油状", "尝味调整盐度和酸度", "盛浅盘用勺背划漩涡", "淋橄榄油撒辣椒粉孜然粉装饰"]),
+    nutrition: JSON.stringify({"calories": 180, "protein": 8, "fat": 12, "carbs": 14, "fiber": 5, "sodium": 320}),
+    story: '鹰嘴豆泥(Hummus)是世界上最古老的有据可查菜肴之一。最早记载见于13世纪开罗烹饪书。Hummus起源地一直是中东各国争论焦点，被称为Hummus之乡之争。',
+    culturalBackground: '中东饮食中Hummus不仅是酱更是一种社交食物。Hummus专营店遍布街头，人们围坐用热皮塔饼蘸新鲜Hummus。斋月期间Hummus是开斋餐桌必备品。',
+    tips: '去掉鹰嘴豆外皮是丝滑秘诀；芝麻酱需先搅打乳化防颗粒；冰水让成品更蓬松轻盈；食用前淋橄榄油撒孜然粉是必备步骤',
+    categoryTags: JSON.stringify({"ingredient": "chickpeas-sesame", "method": "blend", "cuisine": "mediterranean", "flavor": "nutty-tangy", "price": "low"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：西班牙海鲜饭 ──
+  {
+    id: uuidv4(),
+    title: '西班牙海鲜饭',
+    coverImage: 'https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 50,
+    description: '西班牙国宝级料理，藏红花染就的金黄米饭铺满海鲜，锅底焦香锅巴是灵魂所在。',
+    category: 'mediterranean',
+    difficulty: 'hard',
+    season: 'summer',
+    servings: 4,
+    ingredients: JSON.stringify([{"name": "西班牙短粒米", "amount": 300, "unit": "g"}, {"name": "大虾", "amount": 200, "unit": "g"}, {"name": "青口贝", "amount": 200, "unit": "g"}, {"name": "鱿鱼", "amount": 150, "unit": "g"}, {"name": "鸡腿", "amount": 200, "unit": "g"}, {"name": "西班牙辣香肠", "amount": 100, "unit": "g"}, {"name": "红甜椒", "amount": 1, "unit": "个"}, {"name": "青豆", "amount": 50, "unit": "g"}, {"name": "洋葱", "amount": 1, "unit": "个"}, {"name": "蒜", "amount": 3, "unit": "瓣"}, {"name": "番茄", "amount": 2, "unit": "个"}, {"name": "藏红花", "amount": 0.5, "unit": "茶匙"}, {"name": "烟熏红椒粉", "amount": 1, "unit": "茶匙"}, {"name": "橄榄油", "amount": 3, "unit": "勺"}, {"name": "柠檬", "amount": 1, "unit": "个"}, {"name": "鸡高汤", "amount": 750, "unit": "ml"}]),
+    steps: JSON.stringify(["鸡腿切块腌制大虾去壳鱿鱼切圈青口刷净", "藏红花加热高汤浸泡15分钟", "厚底锅加橄榄油煎鸡腿金黄盛出", "加辣香肠煎出红油盛出炒洋葱蒜末至透明", "加番茄碎烟熏红椒粉炒至收干", "加短粒米翻炒1分钟倒藏红花水和高汤没过米1cm", "大火煮沸转中火10分钟不要搅拌", "摆大虾青口鱿鱼青豆红甜椒继续8-10分钟至收汁", "离火盖锡纸静置5分钟挤柠檬汁撒欧芹"]),
+    nutrition: JSON.stringify({"calories": 560, "protein": 38, "fat": 18, "carbs": 58, "fiber": 3, "sodium": 920}),
+    story: '西班牙海鲜饭(Paella)起源于瓦伦西亚阿尔布费拉湖周边。Paella来自拉丁语patella(平底锅)，原是农民渔夫的田间午餐。藏红花是8世纪摩尔人带入的珍贵香料。',
+    culturalBackground: '西班牙Paella是家庭聚会标志性菜肴。去做一顿Paella意味着盛大社交活动。传统直接从锅中取食每人用木勺从自己位置开始吃。西班牙人从不在晚餐吃Paella。',
+    tips: '必须用西班牙短粒米Bomba；煮的过程中绝对不可搅拌；离火静置5分钟让米饭收汁；锅底焦色锅巴Socarrat是精华',
+    categoryTags: JSON.stringify({"ingredient": "rice-seafood", "method": "simmer", "cuisine": "mediterranean", "flavor": "savory-saffron", "price": "medium"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：墨西哥塔可 ──
+  {
+    id: uuidv4(),
+    title: '墨西哥塔可',
+    coverImage: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 30,
+    description: '墨西哥街头之王，玉米饼包裹香料腌制的牛肉、鲜辣莎莎酱和清新牛油果，一口入魂。',
+    category: 'mexican',
+    difficulty: 'easy',
+    season: 'summer',
+    servings: 4,
+    ingredients: JSON.stringify([{"name": "牛绞肉", "amount": 400, "unit": "g"}, {"name": "玉米饼", "amount": 8, "unit": "张"}, {"name": "番茄", "amount": 2, "unit": "个"}, {"name": "牛油果", "amount": 1, "unit": "个"}, {"name": "洋葱", "amount": 1, "unit": "个"}, {"name": "青柠", "amount": 2, "unit": "个"}, {"name": "香菜", "amount": 15, "unit": "g"}, {"name": "孜然粉", "amount": 1, "unit": "茶匙"}, {"name": "辣椒粉", "amount": 1, "unit": "茶匙"}, {"name": "蒜", "amount": 3, "unit": "瓣"}, {"name": "酸奶油", "amount": 100, "unit": "ml"}, {"name": "盐", "amount": 1, "unit": "茶匙"}]),
+    steps: JSON.stringify(["洋葱一半切末一半切丁番茄去籽切丁香菜切碎", "牛油果压泥加青柠汁盐洋葱丁", "莎莎酱：番茄丁洋葱丁香菜青柠汁盐辣椒碎拌匀", "炒洋葱末蒜末加牛绞肉翻炒变色", "加孜然粉辣椒粉盐和水中火5分钟收汁", "玉米饼干锅加热30秒每面", "组装：玉米饼铺牛油果泥加牛肉馅浇莎莎酱酸奶油", "配青柠角上桌"]),
+    nutrition: JSON.stringify({"calories": 380, "protein": 26, "fat": 22, "carbs": 24, "fiber": 5, "sodium": 640}),
+    story: '墨西哥塔可(Taco)是世界文化遗产级别的街头美食。考古发现墨西哥谷地早在公元前500年就有用玉米饼包裹食物的传统。每年3月31日是国际塔可日。',
+    culturalBackground: '塔可代表墨西哥街头饮食的灵魂。玉米饼的品质和馅料是两大关键。墨西哥人吃塔可必配青柠和不同辣度的莎莎酱。传统左手托饼右手加料弯腰咬第一口不让汁水滴落。',
+    tips: '玉米饼过火即可不要烤脆；牛绞肉炒时加少许水让肉汁更丰富；牛油果泥加青柠汁防氧化；所有配料准备齐了再组装',
+    categoryTags: JSON.stringify({"ingredient": "beef-corn", "method": "grill", "cuisine": "mexican", "flavor": "spicy", "price": "low"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：牛油果酱 ──
+  {
+    id: uuidv4(),
+    title: '牛油果酱',
+    coverImage: 'https://images.unsplash.com/photo-1527502588293-f158f12ccd1a?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 10,
+    description: '墨西哥经典蘸酱，熟透牛油果搭配番茄洋葱香菜，酸辣适中，配玉米片或做塔可伴侣。',
+    category: 'mexican',
+    difficulty: 'easy',
+    season: 'summer',
+    servings: 4,
+    ingredients: JSON.stringify([{"name": "牛油果", "amount": 2, "unit": "个"}, {"name": "番茄", "amount": 1, "unit": "个"}, {"name": "洋葱", "amount": 0.5, "unit": "个"}, {"name": "青柠", "amount": 2, "unit": "个"}, {"name": "香菜", "amount": 15, "unit": "g"}, {"name": "墨西哥辣椒", "amount": 1, "unit": "个"}, {"name": "盐", "amount": 0.5, "unit": "茶匙"}, {"name": "黑胡椒", "amount": 0.25, "unit": "茶匙"}]),
+    steps: JSON.stringify(["牛油果对半切去核用小刀划方格用勺挖出果肉", "番茄去籽切细丁洋葱切极细末香菜切碎辣椒切碎", "柠檬榨汁", "用叉子将牛油果压成粗泥保留少许果肉块", "加入番茄丁洋葱末香菜碎辣椒碎", "加青柠汁盐黑胡椒拌匀", "尝味调整酸度和咸度", "盖保鲜膜贴面冷藏30分钟防氧化后上桌"]),
+    nutrition: JSON.stringify({"calories": 160, "protein": 2, "fat": 14, "carbs": 9, "fiber": 7, "sodium": 300}),
+    story: '牛油果酱(Guacamole)源自阿兹特克文明。纳瓦特尔语ahuacamolli由ahuacatl(牛油果)和molli(酱汁)构成。阿兹特克人早在15世纪就开始食用这道酱。',
+    culturalBackground: '在墨西哥，Guacamole是家庭聚会必备品，地位相当于中国的花生米。品质只用成熟牛油果和简单食材判断。加奶油或蛋黄酱在墨西哥人眼中是异端。',
+    tips: '牛油果必须完全熟透；保留部分果肉块增口感；青柠汁不仅调味更防氧化；做好后立即覆保鲜膜贴面冷藏减少接触氧气',
+    categoryTags: JSON.stringify({"ingredient": "avocado-vegetables", "method": "raw", "cuisine": "mexican", "flavor": "tangy-creamy", "price": "low"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：墨西哥玉米卷饼 ──
+  {
+    id: uuidv4(),
+    title: '墨西哥玉米卷饼',
+    coverImage: 'https://images.unsplash.com/photo-1577105333069-6c69bcedcb0d?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 40,
+    description: '墨西哥暖心烤卷，软玉米饼包裹香料鸡肉和奶酪，浇上浓郁红酱焗烤至芝士冒泡。',
+    category: 'mexican',
+    difficulty: 'medium',
+    season: 'winter',
+    servings: 4,
+    ingredients: JSON.stringify([{"name": "鸡胸肉", "amount": 400, "unit": "g"}, {"name": "玉米饼", "amount": 8, "unit": "张"}, {"name": "切达芝士", "amount": 150, "unit": "g"}, {"name": "番茄罐头", "amount": 400, "unit": "g"}, {"name": "洋葱", "amount": 1, "unit": "个"}, {"name": "蒜", "amount": 3, "unit": "瓣"}, {"name": "孜然粉", "amount": 1, "unit": "茶匙"}, {"name": "辣椒粉", "amount": 1, "unit": "茶匙"}, {"name": "牛至", "amount": 0.5, "unit": "茶匙"}, {"name": "酸奶油", "amount": 100, "unit": "ml"}, {"name": "橄榄油", "amount": 2, "unit": "勺"}, {"name": "盐", "amount": 1, "unit": "茶匙"}]),
+    steps: JSON.stringify(["鸡胸肉加盐胡椒煎至两面金黄撕成细丝", "炒洋葱蒜末加孜然辣椒粉牛至倒番茄罐头小火煮15分钟至浓稠", "烤箱预热190度", "玉米饼稍加热变软", "每张饼铺上鸡丝和芝士碎卷紧收口朝下", "烤盘底部铺一层红酱摆入卷饼", "浇剩余红酱撒剩余芝士碎", "烤15-20分钟至芝士冒泡金黄配酸奶油上桌"]),
+    nutrition: JSON.stringify({"calories": 450, "protein": 34, "fat": 18, "carbs": 36, "fiber": 4, "sodium": 780}),
+    story: '墨西哥玉米卷饼(Enchilada)起源于墨西哥，历史可追溯至玛雅文明时期。Enchilada来自西班牙语enchilar(加辣椒)。最初是玉米饼包裹简单馅料浇辣椒酱食用。',
+    culturalBackground: '墨西哥家庭聚餐中Enchilada是周日午餐经典选择。红酱是灵魂每个家庭有秘方。北部多肉少酱，南部酱料浓稠香料丰富。传统用玉米饼而非面粉饼。',
+    tips: '玉米饼先稍加热再卷防断裂；红酱可提前做好冷藏保存3天；鸡肉换牛肉或黑豆都好吃；烤好后静置5分钟再切块更整齐',
+    categoryTags: JSON.stringify({"ingredient": "chicken-cheese", "method": "bake", "cuisine": "mexican", "flavor": "spicy-rich", "price": "medium"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：法式马卡龙 ──
+  {
+    id: uuidv4(),
+    title: '法式马卡龙',
+    coverImage: 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 90,
+    description: '法式经典甜点，酥脆外壳包裹绵软内芯，夹入丝滑甘纳许，是甜品界的奢侈品。',
+    category: 'dessert',
+    difficulty: 'hard',
+    season: 'spring',
+    servings: 20,
+    ingredients: JSON.stringify([{"name": "杏仁粉", "amount": 100, "unit": "g"}, {"name": "糖粉", "amount": 100, "unit": "g"}, {"name": "蛋白", "amount": 2, "unit": "个"}, {"name": "细砂糖", "amount": 30, "unit": "g"}, {"name": "蛋白粉", "amount": 0.5, "unit": "茶匙"}, {"name": "食用色素", "amount": 2, "unit": "滴"}, {"name": "淡奶油", "amount": 80, "unit": "ml"}, {"name": "黑巧克力", "amount": 80, "unit": "g"}]),
+    steps: JSON.stringify(["杏仁粉和糖粉一起过筛两次备用", "蛋白室温回温加蛋白粉分次加细砂糖打至硬性发泡", "加食用色素轻拌", "粉类分两次拌入蛋白霜J字翻拌至缎带状飘落约40次", "裱花袋装圆形嘴挤3cm圆饼", "轻震烤盘室温静置30-60分钟至不粘手", "烤箱预热150度烤14分钟中途开门放气", "完全放凉后配对", "淡奶油煮沸倒入切碎巧克力静置2分钟搅匀放凉做甘纳许", "挤在饼干片上合拢冷藏过夜回潮"]),
+    nutrition: JSON.stringify({"calories": 85, "protein": 2, "fat": 5, "carbs": 10, "fiber": 0.5, "sodium": 10}),
+    story: '马卡龙(Macaron)起源于16世纪意大利文艺复兴时期。1533年美第奇家族的凯瑟琳嫁给法国亨利二世时从意大利带到法国。现代夹心马卡龙由巴黎Laduree甜点师Pierre Desfontaines在20世纪初创造。',
+    culturalBackground: '马卡龙在法国甜品界如爱马仕般地位。每年3月20日是马卡龙日。能否做出完美马卡龙是衡量甜点师水平的试金石。外壳薄脆有均匀裙边、内芯绵软略有嚼劲是评判标准。',
+    tips: '蛋白必须室温且无油无水；翻拌手法决定成败；静置结皮不可省略否则开裂；冷藏过夜回潮是口感最佳秘诀',
+    categoryTags: JSON.stringify({"ingredient": "almond-egg", "method": "bake", "cuisine": "french", "flavor": "sweet", "price": "medium"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
+  },
+  // ── #83 新增：日式舒芙蕾芝士蛋糕 ──
+  {
+    id: uuidv4(),
+    title: '日式舒芙蕾芝士蛋糕',
+    coverImage: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&h=300&fit=crop',
+    author: '美食达人',
+    cookTime: 70,
+    description: '日式轻芝士蛋糕，如云朵般轻盈绵软，入口即化，芝士味浓郁却不腻口。',
+    category: 'dessert',
+    difficulty: 'medium',
+    season: 'spring',
+    servings: 8,
+    ingredients: JSON.stringify([{"name": "奶油芝士", "amount": 250, "unit": "g"}, {"name": "黄油", "amount": 30, "unit": "g"}, {"name": "蛋黄", "amount": 3, "unit": "个"}, {"name": "细砂糖", "amount": 60, "unit": "g"}, {"name": "低筋面粉", "amount": 30, "unit": "g"}, {"name": "玉米淀粉", "amount": 15, "unit": "g"}, {"name": "牛奶", "amount": 100, "unit": "ml"}, {"name": "蛋清", "amount": 3, "unit": "个"}, {"name": "柠檬汁", "amount": 5, "unit": "ml"}, {"name": "香草精", "amount": 3, "unit": "滴"}]),
+    steps: JSON.stringify(["奶油芝士和黄油提前室温软化", "蛋黄加一半糖打至泛白浓稠", "筛入低筋面粉和玉米淀粉拌匀", "牛奶加热至微沸缓慢倒入蛋黄糊不停搅拌", "奶油芝士打顺滑后分次加入蛋黄牛奶糊拌匀", "蛋清加柠檬汁和剩下糖打至湿性发泡大弯钩", "蛋白霜分三次翻拌入芝士糊", "模具垫油纸倒入面糊", "烤盘倒热水烤箱160度烤20分钟转140度烤40分钟", "关火烤箱门留缝静置15分钟取出冷藏4小时以上"]),
+    nutrition: JSON.stringify({"calories": 240, "protein": 8, "fat": 16, "carbs": 18, "fiber": 0.5, "sodium": 260}),
+    story: '日式舒芙蕾芝士蛋糕(Japanese Souffle Cheesecake)是日本甜品创新的杰作。1987年东京甜品师Kazunori Kanda受法式舒芙蕾灵感启发，在芝士蛋糕中加入打发蛋白霜，创造出像云一样轻盈的蛋糕。',
+    culturalBackground: '日式轻芝士蛋糕代表日本对西方甜品的减法美学。相比西方芝士蛋糕的浓郁厚重，通过水浴法低温慢烤和蛋白霜蓬发力达到极致轻盈口感，代表日本烘焙的最高水准。',
+    tips: '水浴法热水不要超过模具一半高度；蛋白绝不能打过湿性发泡即可；翻拌控制在20次以内防消泡；冷藏过夜回油后口感更绵密湿润',
+    categoryTags: JSON.stringify({"ingredient": "cheese-egg", "method": "bake", "cuisine": "japanese", "flavor": "sweet-creamy", "price": "medium"}),
+    favoriteCount: 0, viewCount: 0, isFeatured: false
   }
 ]
 
@@ -966,6 +1161,40 @@ const videoEmbeds = [
   ]},
   { title: '东北乱炖', videos: [
     { url: 'https://www.bilibili.com/video/BV1ct411f7ZW', platform: 'bilibili', title: '东北乱炖最正宗家常做法:食材选料最重要，先后顺序不能乱!', duration: 420, sortOrder: 1 },
+  ]},
+
+  { title: '越南春卷', videos: [
+    { url: 'https://www.bilibili.com/video/BV1GJ411v7WU', platform: 'bilibili', title: '越南春卷制作教程 鲜虾生菜，清爽不油腻', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '越南牛肉粉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1KJ411s7J2', platform: 'bilibili', title: '正宗越南牛肉粉Pho教程，汤底鲜美', duration: 420, sortOrder: 0 },
+  ]},
+  { title: '印度黄油鸡', videos: [
+    { url: 'https://www.bilibili.com/video/BV12J411j7Dk', platform: 'bilibili', title: '印度黄油鸡最正宗做法，奶油咖喱绝了', duration: 480, sortOrder: 0 },
+  ]},
+  { title: '希腊沙拉', videos: [
+    { url: 'https://www.bilibili.com/video/BV1GJ41167Wk', platform: 'bilibili', title: '正宗希腊沙拉做法 地中海饮食经典', duration: 300, sortOrder: 0 },
+  ]},
+  { title: '鹰嘴豆泥', videos: [
+    { url: 'https://www.bilibili.com/video/BV1KJ411j7Kj', platform: 'bilibili', title: '自制鹰嘴豆泥，丝滑浓郁超简单', duration: 240, sortOrder: 0 },
+  ]},
+  { title: '西班牙海鲜饭', videos: [
+    { url: 'https://www.bilibili.com/video/BV1PJ411s7Jk', platform: 'bilibili', title: '西班牙海鲜饭Paella在家做，藏红花金黄米饭', duration: 540, sortOrder: 0 },
+  ]},
+  { title: '墨西哥塔可', videos: [
+    { url: 'https://www.bilibili.com/video/BV1HJ41167Ds', platform: 'bilibili', title: '墨西哥塔可超详细教程 经典街头美食', duration: 360, sortOrder: 0 },
+  ]},
+  { title: '牛油果酱', videos: [
+    { url: 'https://www.bilibili.com/video/BV1KJ41157Dj', platform: 'bilibili', title: '正宗Guacamole牛油果酱，墨西哥经典蘸酱', duration: 180, sortOrder: 0 },
+  ]},
+  { title: '墨西哥玉米卷饼', videos: [
+    { url: 'https://www.bilibili.com/video/BV1HJ41157Kk', platform: 'bilibili', title: '墨西哥焗烤玉米卷饼Enchilada做法', duration: 420, sortOrder: 0 },
+  ]},
+  { title: '法式马卡龙', videos: [
+    { url: 'https://www.bilibili.com/video/BV1j741117Bd', platform: 'bilibili', title: '法式马卡龙零失败教程，完美裙边秘诀', duration: 600, sortOrder: 0 },
+  ]},
+  { title: '日式舒芙蕾芝士蛋糕', videos: [
+    { url: 'https://www.bilibili.com/video/BV1e7411k7Bd', platform: 'bilibili', title: '日式舒芙蕾芝士蛋糕 云朵般轻盈口感', duration: 480, sortOrder: 0 },
   ]},
 ]
 // ── 挑战赛数据 ──────────────────────────────────────────────────
