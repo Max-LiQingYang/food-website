@@ -1850,7 +1850,7 @@ router.post('/', auth, async (req, res) => {
       createActivity(req.userId, 'create_recipe', recipe.id, 'recipe', {
         title: recipe.title
       })
-      checkAllAchievements(req.userId, ['first-recipe', 'recipe-10', 'recipe-50', 'master-chef']).catch(err => {
+      checkAllAchievements(req.userId, ['first-recipe', 'recipe-10', 'recipe-50', 'recipe-100', 'master-chef']).catch(err => {
         console.error('[recipe achievement err]', err)
       })
     })

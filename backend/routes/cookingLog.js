@@ -17,6 +17,7 @@ const express = require('express')
 const { CookingLog, Recipe } = require('../models')
 const { Op, fn, col, literal } = require('sequelize')
 const auth = require('../middleware/auth')
+const { checkAllAchievements } = require('../utils/achievementChecker')
 
 const router = express.Router()
 
@@ -83,6 +84,14 @@ router.post('/', auth, async (req, res) => {
       duration: duration || null,
       photoUrl: photoUrl || null
     })
+
+    // 烹饪成就检查（不阻塞响应）
+    setImmediate(() => {
+      checkAllAchievements(req.userId, ['first-cook', 'cook-10', 'cook-50', 'cook-100']).catch(err => {
+        console.error('[cooking achievement err]', err)
+      })
+    })
+
     res.status(201).json(resJSON(0, 'ok', log))
   } catch (err) {
     console.error('[cookingLog] POST error:', err.message)

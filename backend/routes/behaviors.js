@@ -10,6 +10,7 @@ const router = express.Router()
 const { Op } = require('sequelize')
 const { BehaviorEvent, Recipe } = require('../models')
 const auth = require('../middleware/auth')
+const { checkAllAchievements } = require('../utils/achievementChecker')
 
 // POST /api/behaviors/track — 记录用户行为事件
 router.post('/behaviors/track', auth, async (req, res) => {
@@ -51,6 +52,15 @@ router.post('/behaviors/track', auth, async (req, res) => {
       metadata: metadata || null,
       timestamp: new Date(),
     })
+
+    // 浏览成就检查（不阻塞响应）
+    if (eventType === 'view') {
+      setImmediate(() => {
+        checkAllAchievements(userId, ['browse-100', 'browse-500', 'browse-1000']).catch(err => {
+          console.error('[browse achievement err]', err)
+        })
+      })
+    }
 
     res.json({ code: 0, message: 'ok', eventId: event.id })
   } catch (err) {

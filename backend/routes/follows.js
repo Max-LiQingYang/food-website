@@ -81,7 +81,8 @@ router.post('/:id/follow', auth, async (req, res) => {
       checkAllAchievements(followerId, ['social-butterfly']).catch(err => {
         console.error('[follow achievement err]', err)
       })
-      checkAllAchievements(followingId, ['social-butterfly']).catch(err => {
+      // 检查被关注者的成就：被关注数相关 + 人气食谱
+      checkAllAchievements(followingId, ['social-butterfly', 'follow-10', 'follow-50', 'follow-100', 'popular-recipe']).catch(err => {
         console.error('[follow achievement err2]', err)
       })
     })

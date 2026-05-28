@@ -294,7 +294,7 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
           targetType: 'recipe'
         }).catch(err => console.error('[comment notif err]', err))
       }
-      checkAllAchievements(req.userId, ['first-comment']).catch(err => {
+      checkAllAchievements(req.userId, ['first-comment', 'comment-10', 'comment-50', 'comment-100']).catch(err => {
         console.error('[comment achievement err]', err)
       })
     })

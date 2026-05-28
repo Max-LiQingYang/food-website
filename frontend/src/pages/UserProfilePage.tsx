@@ -20,6 +20,7 @@ import {
 import RecipeCard from '../components/RecipeCard'
 import BrowsingHistory from '../components/BrowsingHistory'
 import ActivityHeatmap from '../components/ActivityHeatmap'
+import AchievementDetailModal from '../components/AchievementDetailModal'
 import './UserProfilePage.css'
 
 type TabType = 'recipes' | 'favorites' | 'collections'
@@ -66,20 +67,20 @@ function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: 
 }
 
 // ─── Achievement 成就徽章组件 ───
-function AchievementBadge({ achievement }: { achievement: AchievementItem }) {
-  const defaultIcons: Record<string, string> = {
-    'first-recipe': '👨‍🍳',
-    'first-favorite': '💖',
-    'first-comment': '💬',
-    'popular-recipe': '🏆',
-    'favorite-50': '⭐',
-    'master-chef': '👑',
-  }
-  const icon = achievement.icon || defaultIcons[achievement.type] || '🎖️'
+function AchievementBadge({ achievement, onClick }: { achievement: AchievementItem; onClick?: () => void }) {
+  const icon = achievement.icon || '🎖️'
+  const unlocked = achievement.unlocked !== false
 
   return (
-    <div className="achievement-badge" title={`${achievement.title}: ${achievement.description}`}>
-      <div className="achievement-badge__glow">
+    <div
+      className={`achievement-badge ${unlocked ? '' : 'achievement-badge--locked'}`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.() } }}
+      title={`${achievement.title}: ${achievement.description}`}
+    >
+      <div className="achievement-badge__glow" style={unlocked ? {} : { filter: 'grayscale(1)', opacity: 0.5 }}>
         <span className="achievement-badge__icon">{icon}</span>
       </div>
       <span className="achievement-badge__name">{achievement.title}</span>
@@ -87,17 +88,22 @@ function AchievementBadge({ achievement }: { achievement: AchievementItem }) {
         <div className="achievement-badge__progress">
           <div
             className="achievement-badge__progress-fill"
-            style={{ width: `${Math.min(100, (achievement.progress / achievement.maxProgress) * 100)}%` }}
+            style={{
+              width: `${Math.min(100, (achievement.progress / achievement.maxProgress) * 100)}%`,
+              background: unlocked ? 'linear-gradient(90deg, #f5a623, #f7c948)' : '#888'
+            }}
           />
         </div>
       )}
-      <div className="achievement-badge__tooltip">
-        <div className="achievement-badge__tooltip-title">{achievement.title}</div>
-        <div className="achievement-badge__tooltip-desc">{achievement.description}</div>
-        <div className="achievement-badge__tooltip-date">
-          获得于 {new Date(achievement.unlockedAt).toLocaleDateString('zh-CN')}
+      {unlocked && achievement.unlockedAt && (
+        <div className="achievement-badge__tooltip">
+          <div className="achievement-badge__tooltip-title">{achievement.title}</div>
+          <div className="achievement-badge__tooltip-desc">{achievement.description}</div>
+          <div className="achievement-badge__tooltip-date">
+            获得于 {new Date(achievement.unlockedAt).toLocaleDateString('zh-CN')}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -193,6 +199,7 @@ export default function UserProfilePage() {
   const [isOwnProfile, setIsOwnProfile] = useState(false)
   const [achievements, setAchievements] = useState<AchievementItem[]>([])
   const [authorLevel, setAuthorLevel] = useState<AuthorLevelInfo | null>(null)
+  const [selectedAchievement, setSelectedAchievement] = useState<AchievementItem | null>(null)
 
   // Recipes state
   const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -250,7 +257,8 @@ export default function UserProfilePage() {
       .then(([profileRes, statsRes, achRes]: [any, any, any]) => {
         const p = profileRes.data ?? profileRes
         const s = statsRes.data ?? statsRes
-        const a = Array.isArray(achRes) ? achRes : (achRes.data ?? [])
+        // 新 API 直接返回完整成就列表（含 unlocked 字段）
+        const a = Array.isArray(achRes) ? achRes : (Array.isArray(achRes.data) ? achRes.data : [])
         setProfile(p)
         setStats(s)
         setAchievements(a)
@@ -497,10 +505,22 @@ export default function UserProfilePage() {
       {/* 成就徽章区 */}
       {achievements.length > 0 && (
         <div className="profile-achievements">
-          <h4 className="profile-achievements__title">🏅 成就</h4>
+          <div className="profile-achievements__header">
+            <h4 className="profile-achievements__title">🏅 成就</h4>
+            <div className="profile-achievements__stats">
+              已解锁 {achievements.filter(a => a.unlocked).length} / {achievements.length}
+            </div>
+            <Link to="/achievements" className="profile-achievements__view-all">
+              查看全部成就 ›
+            </Link>
+          </div>
           <div className="profile-achievements__list">
-            {achievements.map(ach => (
-              <AchievementBadge key={ach.id} achievement={ach} />
+            {achievements.filter(a => a.unlocked).slice(0, 12).map(ach => (
+              <AchievementBadge
+                key={ach.type}
+                achievement={ach}
+                onClick={() => setSelectedAchievement(ach)}
+              />
             ))}
           </div>
         </div>
@@ -643,6 +663,14 @@ export default function UserProfilePage() {
           </>
         )}
       </div>
+
+      {/* Achievement Detail Modal */}
+      {selectedAchievement && (
+        <AchievementDetailModal
+          achievement={selectedAchievement}
+          onClose={() => setSelectedAchievement(null)}
+        />
+      )}
 
       {/* Edit Profile Modal */}
       {showEditModal && (

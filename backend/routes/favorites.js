@@ -77,7 +77,7 @@ async function addFavorite(req, res) {
           }
         }).catch(err => console.error('[fav notif lookup err]', err))
         // 成就检查
-        checkAllAchievements(userId, ['favorite-10', 'favorite-50']).catch(err => {
+        checkAllAchievements(userId, ['favorite-10', 'favorite-50', 'favorite-100', 'favorite-500']).catch(err => {
           console.error('[fav achievement err]', err)
         })
       })

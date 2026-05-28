@@ -377,19 +377,21 @@ export function getSeasonalIngredientRecipes(ingredients: string[]) {
  * GET /api/achievements/user/:userId
  */
 export interface AchievementItem {
-  id: string
-  userId: string
+  id?: string
+  userId?: string
   type: string
   title: string
   description: string
   icon?: string
-  unlockedAt: string
+  unlocked?: boolean
+  unlockedAt?: string
+  category?: string
   progress?: number
   maxProgress?: number
 }
 
 export function getUserAchievements(userId: string): Promise<AchievementItem[]> {
-  return apiClient.get(`/achievements/user/${userId}`)
+  return apiClient.get(`/achievements/user/${userId}`).then(r => r.data?.data || r.data || [])
 }
 
 // ─────────────────────────────────────────────────────────────────

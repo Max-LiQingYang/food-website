@@ -14,11 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       type: {
-        type: DataTypes.ENUM(
-          'first-recipe', 'recipe-10', 'recipe-50',
-          'first-comment', 'favorite-10', 'favorite-50',
-          'popular-recipe', 'social-butterfly', 'master-chef'
-        ),
+        type: DataTypes.STRING(50),
         allowNull: false
       },
       title: {
