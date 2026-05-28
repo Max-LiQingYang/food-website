@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { getRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
@@ -46,6 +46,7 @@ export default function HomePage() {
   })
   const [activeTab, setActiveTab] = useState<TabType>('all')
   const [heroLoaded, setHeroLoaded] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -59,6 +60,11 @@ export default function HomePage() {
   }, [category, filters, setSearchParams])
 
   const fetchRecipes = useCallback(async () => {
+    // Cancel any in-flight request to prevent stale overwrites
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
     setLoading(true)
     const params: Record<string, any> = { page, pageSize: PAGE_SIZE }
     if (category !== '全部') params.category = category
@@ -78,14 +84,19 @@ export default function HomePage() {
 
     try {
       const res: any = await getRecipes(params)
+      // If aborted by a newer request, discard this response
+      if (controller.signal.aborted) return
       const data = res.data || res
       setRecipes(data.list || [])
       setTotal(data.total || 0)
-    } catch {
+    } catch (err: any) {
+      if (err?.name === 'CanceledError' || controller.signal.aborted) return
       setRecipes([])
       setTotal(0)
     } finally {
-      setLoading(false)
+      if (!controller.signal.aborted) {
+        setLoading(false)
+      }
     }
   }, [category, page, filters, activeTab])
 
@@ -150,17 +161,17 @@ export default function HomePage() {
   const tabLabel: Record<TabType, string> = { all: '全部', newest: '最新', featured: '精选' }
 
   return (
-    <div className="home-page pull-to-refresh-container" {...touchHandlers}>
+    <div className="\home-page pull-to-refresh-container'" {...touchHandlers}>
       {pullDistance > 0 && (
-        <div className="pull-indicator" style={{ height: `${pullDistance}px`, opacity: pullDistance / 60 }}>
+        <div className="\pull-indicator'" style={{ height: `${pullDistance}px`, opacity: pullDistance / 60 }}>
           {refreshing ? (
             <>
-              <span className="pull-indicator__spinner" />
-              <span className="pull-indicator__text">{statusText === 'done' ? '✅ 刷新完成' : '刷新中...'}</span>
+              <span className="\pull-indicator__spinner'" />
+              <span className="\pull-indicator__text'">{statusText === 'done' ? '✅ 刷新完成' : '刷新中...'}</span>
             </>
           ) : (
-            <span className="pull-indicator__text">
-              <span className="pull-indicator__arrow" style={{ transform: pullDistance >= 60 ? 'rotate(180deg)' : 'rotate(0deg)' }}>↓</span>
+            <span className="\pull-indicator__text'">
+              <span className="\pull-indicator__arrow'" style={{ transform: pullDistance >= 60 ? 'rotate(180deg)' : 'rotate(0deg)' }}>↓</span>
               {pullDistance >= 60 ? '释放刷新' : '下拉刷新'}
             </span>
           )}
@@ -172,10 +183,10 @@ export default function HomePage() {
 
       {/* ── 排行榜入口 ── */}
       {showFullLayout && (
-        <Link to="/rankings" className="rankings-entry">
-          <span className="rankings-entry__icon">🏆</span>
-          <span className="rankings-entry__text">食谱排行榜</span>
-          <span className="rankings-entry__sub">发现最受欢迎的食谱 →</span>
+        <Link to="/rankings" className="\rankings-entry'">
+          <span className="\rankings-entry__icon'">🏆</span>
+          <span className="\rankings-entry__text'">食谱排行榜</span>
+          <span className="\rankings-entry__sub'">发现最受欢迎的食谱 →</span>
         </Link>
       )}
 
@@ -186,19 +197,19 @@ export default function HomePage() {
       {showFullLayout && <ChallengeHomeCards />}
 
       {/* ── 搜索栏 ── */}
-      <form className="home-search" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>
+      <form className="\home-search'" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>
         <SearchAutocomplete
           value={searchInput}
           onChange={setSearchInput}
           onSubmit={handleSearchSubmit}
-          placeholder="搜索食谱..."
-          inputClassName="home-search__input"
+          placeholder="\搜索食谱...'"
+          inputClassName="\home-search__input'"
         />
-        <button type="submit" className="home-search__btn">搜索</button>
+        <button type="\submit'" className="\home-search__btn'">搜索</button>
       </form>
 
       {/* ── 分类标签 ── */}
-      <div className="home-categories">
+      <div className="\home-categories'">
         {CATEGORIES.map(cat => (
           <button
             key={cat}
@@ -226,9 +237,9 @@ export default function HomePage() {
       {showFullLayout && <PersonalizedRecommendations />}
 
       {/* ── 食谱主网格 ── */}
-      <section className="home-section">
+      <section className="\home-section'">
         {showFullLayout ? (
-          <div className="home-tabs">
+          <div className="\home-tabs'">
             {(['all', 'newest', 'featured'] as TabType[]).map(tab => (
               <button
                 key={tab}
@@ -240,41 +251,41 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <h2 className="home-section__title">
-            <span className="home-section__icon">🔍</span>
+          <h2 className="\home-section__title'">
+            <span className="\home-section__icon'">🔍</span>
             搜索结果
           </h2>
         )}
 
         {loading && (
-          <div className="home-grid">
+          <div className="\home-grid'">
             {Array.from({ length: 6 }).map((_, i) => <RecipeCardSkeleton key={i} />)}
           </div>
         )}
 
         {!loading && recipes.length > 0 && (
-          <div className="home-grid">
+          <div className="\home-grid'">
             {recipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
           </div>
         )}
 
         {!loading && recipes.length === 0 && (
-          <div className="home-empty">
-            <div className="home-empty__icon">🍳</div>
-            <p className="home-empty__text">暂无食谱</p>
-            <p className="home-empty__hint">试试其它筛选条件~</p>
+          <div className="\home-empty'">
+            <div className="\home-empty__icon'">🍳</div>
+            <p className="\home-empty__text'">暂无食谱</p>
+            <p className="\home-empty__hint'">试试其它筛选条件~</p>
           </div>
         )}
       </section>
 
       {/* ── 分页 ── */}
       {total > PAGE_SIZE && (
-        <div className="home-pagination">
-          <button className="pagination-btn" disabled={page <= 1 || loading} onClick={() => goPage(page - 1)}>
+        <div className="\home-pagination'">
+          <button className="\pagination-btn'" disabled={page <= 1 || loading} onClick={() => goPage(page - 1)}>
             ← 上一页
           </button>
-          <span className="pagination-info">第 {page} / {totalPages} 页</span>
-          <button className="pagination-btn" disabled={page >= totalPages || loading} onClick={() => goPage(page + 1)}>
+          <span className="\pagination-info'">第 {page} / {totalPages} 页</span>
+          <button className="\pagination-btn'" disabled={page >= totalPages || loading} onClick={() => goPage(page + 1)}>
             下一页 →
           </button>
         </div>
