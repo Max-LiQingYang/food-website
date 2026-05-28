@@ -30,6 +30,8 @@ const preferencesRoutes = require('./preferences')
 const seasonalRoutes = require('./seasonal')
 const mealPlanRoutes = require('./mealPlan')
 const cookingLogRoutes = require('./cookingLog')
+const uploadRoutes = require('./uploads')
+const userWorksRoutes = require('./userWorks')
 
 // 迭代#38: SEO — sitemap.xml / robots.txt （必须在 recipes 之前防止 /:id 拦截）
 router.use('/', require('./seo'))
@@ -141,6 +143,12 @@ router.delete('/favorites/:recipeId', favoriteRoutes.removeFavorite)
 router.get('/favorites/:recipeId/status', favoriteRoutes.getFavoriteStatus)
 router.get('/favorites/:recipeId/count', favoriteRoutes.getFavoriteCount)
 router.post('/favorites/batch', favoriteRoutes.batchFavorite)
+
+// 文件上传（需认证）
+router.use('/', uploadRoutes)
+
+// 用户作品墙
+router.use('/', userWorksRoutes)
 
 // 食谱克隆与改编系统
 router.use('/recipes', require('./recipeForks'))

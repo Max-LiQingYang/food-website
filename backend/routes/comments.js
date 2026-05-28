@@ -232,7 +232,7 @@ router.get('/recipes/:recipeId/ratings/trends', async (req, res) => {
 router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
   try {
     const { recipeId } = req.params
-    const { content, rating } = req.body
+    const { content, rating, imageUrls } = req.body
 
     if (!content || content.trim().length === 0) {
       return res.status(400).json(resJSON(400, '评论内容不能为空', null))
@@ -255,12 +255,22 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
 
     const user = await User.findByPk(req.userId)
 
+    // 验证 imageUrls
+    let parsedImageUrls = []
+    if (imageUrls && Array.isArray(imageUrls)) {
+      if (imageUrls.length > 3) {
+        return res.status(400).json(resJSON(400, '最多上传3张图片', null))
+      }
+      parsedImageUrls = imageUrls
+    }
+
     const comment = await Comment.create({
       content: content.trim(),
       rating: rating || null,
       userId: req.userId,
       recipeId,
-      likesCount: 0
+      likesCount: 0,
+      imageUrls: parsedImageUrls.length > 0 ? parsedImageUrls : null
     })
 
     setImmediate(() => {

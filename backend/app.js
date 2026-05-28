@@ -22,6 +22,7 @@ const compression = require('compression')
 const rateLimit = require('express-rate-limit')
 
 const errorHandler = require('./middleware/errorHandler')
+const path = require('path')
 
 const app = express()
 
@@ -94,6 +95,11 @@ app.get('/health', (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
+
+// ─────────────────────────────────────────────────────────────────
+// 6.6 静态文件服务（上传的图片）
+// ─────────────────────────────────────────────────────────────────
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // ─────────────────────────────────────────────────────────────────
 // 6.5 请求耗时日志中间件

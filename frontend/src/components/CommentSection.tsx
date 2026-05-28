@@ -1,20 +1,20 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getComments, getCommentStats, createComment, deleteComment, likeComment, unlikeComment } from '../api'
+import { getComments, getCommentStats, createComment, deleteComment, likeComment, unlikeComment, uploadCommentImages } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
+import CommentImagePicker from './CommentImagePicker'
+import ImageLightbox from './ImageLightbox'
 import type { Comment, CommentStats } from '../api'
 import './CommentSection.css'
 
 interface Props {
   recipeId: string
-  /** Callback when a rating-based comment is submitted (for optimistic UI update) */
   onRatingUpdate?: (newAvg: number, newCount: number) => void
 }
 
 type SortMode = 'latest' | 'hot'
 
-// 星级选择器组件
 function StarRating({
   value,
   onChange,
@@ -27,16 +27,13 @@ function StarRating({
   size?: 'sm' | 'md' | 'lg'
 }) {
   const [hover, setHover] = useState(0)
-
   return (
     <div className={`star-rating star-rating--${size}`}>
       {[1, 2, 3, 4, 5].map(star => (
         <button
           key={star}
           type="button"
-          className={`star-rating__star ${
-            star <= (readonly ? value : hover || value) ? 'is-active' : ''
-          }`}
+          className={`star-rating__star ${star <= (readonly ? value : hover || value) ? 'is-active' : ''}`}
           onClick={() => !readonly && onChange?.(star)}
           onMouseEnter={() => !readonly && setHover(star)}
           onMouseLeave={() => !readonly && setHover(0)}
@@ -50,7 +47,6 @@ function StarRating({
   )
 }
 
-// 格式化时间
 function formatTime(dateStr: string) {
   const date = new Date(dateStr)
   const now = new Date()
@@ -58,7 +54,6 @@ function formatTime(dateStr: string) {
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   const days = Math.floor(diff / 86400000)
-
   if (minutes < 1) return '刚刚'
   if (minutes < 60) return `${minutes} 分钟前`
   if (hours < 24) return `${hours} 小时前`
@@ -66,7 +61,6 @@ function formatTime(dateStr: string) {
   return date.toLocaleDateString('zh-CN')
 }
 
-// 评分分布条
 function RatingBar({ count, total }: { count: number; total: number }) {
   const percent = total > 0 ? (count / total) * 100 : 0
   return (
@@ -87,12 +81,14 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [sortMode, setSortMode] = useState<SortMode>('latest')
 
-  // 表单状态
   const [content, setContent] = useState('')
   const [rating, setRating] = useState(0)
   const [showForm, setShowForm] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
-  // 分页
+  const [lbImages, setLbImages] = useState<string[]>([])
+  const [lbIndex, setLbIndex] = useState(0)
+
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const pageSize = 10
@@ -131,21 +127,25 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
       toast.warning('请输入评论内容')
       return
     }
-
     setSubmitting(true)
     try {
+      let imageUrls: string[] = []
+      if (selectedFiles.length > 0) {
+        const uploadRes = await uploadCommentImages(selectedFiles)
+        imageUrls = uploadRes.urls || []
+      }
       await createComment(recipeId, {
         content: content.trim(),
-        rating: rating || undefined
+        rating: rating || undefined,
+        imageUrls: imageUrls.length > 0 ? imageUrls : undefined
       })
       setContent('')
       setRating(0)
+      setSelectedFiles([])
       setShowForm(false)
       toast.success('评论发表成功')
       setPage(1)
       await fetchData()
-
-      // Optimistic rating update: estimate new avg/ratingCount
       if (rating > 0 && onRatingUpdate) {
         const prev = stats
         const prevCount = prev?.ratedCount || 0
@@ -184,7 +184,6 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
       } else {
         await likeComment(commentId)
       }
-      // 乐观更新 UI
       setComments(prev =>
         prev.map(c =>
           c.id === commentId
@@ -195,6 +194,16 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
     } catch (err: any) {
       toast.error(err?.message || (isLiked ? '取消点赞失败' : '点赞失败'))
     }
+  }
+
+  const openLightbox = (images: string[], idx: number) => {
+    setLbImages(images)
+    setLbIndex(idx)
+  }
+
+  const closeLightbox = () => {
+    setLbImages([])
+    setLbIndex(0)
   }
 
   const totalPages = Math.ceil(total / pageSize)
@@ -218,25 +227,17 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
         {total > 0 && <span className="comment-section__count">{total}</span>}
       </h2>
 
-      {/* 排序切换 */}
       {total > 0 && (
         <div className="comment-sort-tabs">
-          <button
-            className={`comment-sort-tab ${sortMode === 'latest' ? 'is-active' : ''}`}
-            onClick={() => handleSortChange('latest')}
-          >
+          <button className={`comment-sort-tab ${sortMode === 'latest' ? 'is-active' : ''}`} onClick={() => handleSortChange('latest')}>
             📅 最新
           </button>
-          <button
-            className={`comment-sort-tab ${sortMode === 'hot' ? 'is-active' : ''}`}
-            onClick={() => handleSortChange('hot')}
-          >
+          <button className={`comment-sort-tab ${sortMode === 'hot' ? 'is-active' : ''}`} onClick={() => handleSortChange('hot')}>
             🔥 最热
           </button>
         </div>
       )}
 
-      {/* 评分概览 */}
       {stats && stats.ratedCount > 0 && (
         <div className="comment-stats">
           <div className="comment-stats__main">
@@ -250,10 +251,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
             {[5, 4, 3, 2, 1].map(star => (
               <div key={star} className="comment-stats__row">
                 <span className="comment-stats__label">{star} 星</span>
-                <RatingBar
-                  count={stats.distribution[star] || 0}
-                  total={stats.ratedCount}
-                />
+                <RatingBar count={stats.distribution[star] || 0} total={stats.ratedCount} />
                 <span className="comment-stats__num">{stats.distribution[star] || 0}</span>
               </div>
             ))}
@@ -261,7 +259,6 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
         </div>
       )}
 
-      {/* 发表评论 */}
       {isAuthenticated ? (
         !showForm ? (
           <button className="comment-form__toggle" onClick={() => setShowForm(true)}>
@@ -282,16 +279,13 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
               maxLength={1000}
               rows={3}
             />
+            <CommentImagePicker images={selectedFiles} onChange={setSelectedFiles} />
             <div className="comment-form__actions">
               <span className="comment-form__count">{content.length}/1000</span>
               <button
                 type="button"
                 className="btn btn--ghost"
-                onClick={() => {
-                  setShowForm(false)
-                  setContent('')
-                  setRating(0)
-                }}
+                onClick={() => { setShowForm(false); setContent(''); setRating(0); setSelectedFiles([]) }}
               >
                 取消
               </button>
@@ -312,17 +306,14 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
         </div>
       )}
 
-      {/* 评论列表 */}
       {comments.length === 0 ? (
         <div className="comment-empty">
           <div className="comment-empty__icon">{stats && stats.ratedCount > 0 ? '💬' : '🌟'}</div>
           <p className="comment-empty__text">
-            {stats && stats.ratedCount > 0
-              ? '还没有人留下文字评论' : '还没有评分和评论'}
+            {stats && stats.ratedCount > 0 ? '还没有人留下文字评论' : '还没有评分和评论'}
           </p>
           <p className="comment-empty__hint">
-            {stats && stats.ratedCount > 0
-              ? '分享你的烹饪体验吧！' : '来做第一个品尝并评分的人吧！'}
+            {stats && stats.ratedCount > 0 ? '分享你的烹饪体验吧！' : '来做第一个品尝并评分的人吧！'}
           </p>
         </div>
       ) : (
@@ -337,13 +328,22 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
                   <span className="comment-item__name">
                     {comment.user?.nickname || comment.user?.username || '匿名用户'}
                   </span>
-                  {comment.rating && (
-                    <StarRating value={comment.rating} readonly size="sm" />
-                  )}
+                  {comment.rating && <StarRating value={comment.rating} readonly size="sm" />}
                 </div>
                 <span className="comment-item__time">{formatTime(comment.createdAt)}</span>
               </div>
               <p className="comment-item__content">{comment.content}</p>
+
+              {comment.imageUrls && Array.isArray(comment.imageUrls) && comment.imageUrls.length > 0 && (
+                <div className="comment-images">
+                  {comment.imageUrls.map((url, idx) => (
+                    <div key={idx} className="comment-images__item" onClick={() => openLightbox(comment.imageUrls, idx)}>
+                      <img src={url} alt={`评论图片 ${idx + 1}`} className="comment-images__img" loading="lazy" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="comment-item__actions">
                 <button
                   className={`comment-like-btn ${comment.isLiked ? 'is-liked' : ''}`}
@@ -353,10 +353,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
                   <span className="comment-like-btn__count">{comment.likesCount || 0}</span>
                 </button>
                 {isAuthenticated && user?.id === comment.userId && (
-                  <button
-                    className="comment-item__delete"
-                    onClick={() => handleDelete(comment.id)}
-                  >
+                  <button className="comment-item__delete" onClick={() => handleDelete(comment.id)}>
                     删除
                   </button>
                 )}
@@ -364,29 +361,28 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
             </div>
           ))}
 
-          {/* 分页 */}
           {totalPages > 1 && (
             <div className="comment-pagination">
-              <button
-                className="btn btn--ghost btn--sm"
-                disabled={page <= 1}
-                onClick={() => setPage(p => p - 1)}
-              >
+              <button className="btn btn--ghost btn--sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
                 上一页
               </button>
-              <span className="comment-pagination__info">
-                {page} / {totalPages}
-              </span>
-              <button
-                className="btn btn--ghost btn--sm"
-                disabled={page >= totalPages}
-                onClick={() => setPage(p => p + 1)}
-              >
+              <span className="comment-pagination__info">{page} / {totalPages}</span>
+              <button className="btn btn--ghost btn--sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>
                 下一页
               </button>
             </div>
           )}
         </div>
+      )}
+
+      {lbImages.length > 0 && (
+        <ImageLightbox
+          images={lbImages}
+          currentIndex={lbIndex}
+          onClose={closeLightbox}
+          onPrev={lbIndex > 0 ? () => setLbIndex(i => i - 1) : undefined}
+          onNext={lbIndex < lbImages.length - 1 ? () => setLbIndex(i => i + 1) : undefined}
+        />
       )}
     </section>
   )

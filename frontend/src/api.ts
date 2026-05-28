@@ -414,6 +414,7 @@ export interface Comment {
   likesCount?: number
   isLiked?: boolean
   user?: CommentUser
+  imageUrls?: string[]
 }
 
 export interface CommentStats {
@@ -459,7 +460,7 @@ export function getCommentStats(recipeId: string): Promise<{ data: CommentStats 
  */
 export function createComment(
   recipeId: string,
-  data: { content: string; rating?: number }
+  data: { content: string; rating?: number; imageUrls?: string[] }
 ): Promise<{ data: Comment }> {
   return apiClient.post(`/recipes/${recipeId}/comments`, data)
 }
@@ -2230,5 +2231,41 @@ export function getRecipeForkLineage(recipeId: string): Promise<ForkLineageRespo
 // 获取用户的所有改编食谱
 export function getUserForks(userId: string, params?: { page?: number; pageSize?: number }): Promise<ForkListResponse> {
   return apiClient.get(`/users/${userId}/forks`, { params }).then(r => r.data)
+}
+
+// ─────────────────────────────────────────────────────────────
+// 评论图片上传
+// ─────────────────────────────────────────────────────────────
+
+/** 上传评论图片 */
+export function uploadCommentImages(files: File[]): Promise<{ urls: string[] }> {
+  const fd = new FormData()
+  files.forEach(f => fd.append('images', f))
+  return apiClient.post('/upload/comment-images', fd).then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────
+// 用户作品墙
+// ─────────────────────────────────────────────────────────────
+
+export interface WorkItem {
+  id: number
+  content: string
+  imageUrls: string[]
+  recipe: { id: string; title: string; coverImage: string } | null
+  rating: number | null
+  createdAt: string
+}
+
+export interface WorksResponse {
+  list: WorkItem[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+/** 获取用户的带图评论（作品） */
+export function getUserWorks(userId: string, params?: { page?: number; pageSize?: number }): Promise<WorksResponse> {
+  return apiClient.get(`/users/${userId}/works`, { params }).then(r => r.data?.data || r.data)
 }
 

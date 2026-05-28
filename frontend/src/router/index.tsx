@@ -26,6 +26,7 @@ const CollectionsPage = lazy(() => import('../pages/CollectionsPage'))
 const CollectionsDetailPage = lazy(() => import('../pages/CollectionsDetailPage'))
 const ShoppingListPage = lazy(() => import('../pages/ShoppingListPage'))
 const RankingsPage = lazy(() => import('../pages/RankingsPage'))
+const UserWorksPage = lazy(() => import('../pages/UserWorksPage'))
 const MealPlannerPage = lazy(() => import('../pages/MealPlannerPage'))
 const CookingJournalPage = lazy(() => import('../pages/CookingJournalPage'))
 const SettingsPage = lazy(() => import('../pages/SettingsPage'))
@@ -106,6 +107,7 @@ const router = createBrowserRouter([
       { path: '/collections/:id', element: <CollectionsDetailPage /> },
       { path: '/shopping-list', element: <ShoppingListPage /> },
       { path: '/rankings', element: <RankingsPage /> },
+      { path: '/works/:userId', element: <UserWorksPage /> },
       { path: '/compare', element: <ComparePage /> },
       { path: '/preferences', element: <PreferencesPage /> },
       { path: '/preferences/recommendations', element: <PreferenceRecommendations /> },

@@ -590,3 +590,35 @@
 [data-theme='dark'] .rating-bar {
   background: #3a3028;
 }
+
+/* ────────────────────────────────────────────── */
+/* 评论图片展示 */
+/* ────────────────────────────────────────────── */
+
+.comment-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.comment-images__item {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border-color, #eee);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.comment-images__item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comment-images__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
