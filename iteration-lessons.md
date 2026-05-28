@@ -289,3 +289,13 @@
 
 ### 遗留问题
 - 无 🔴 待修复
+
+---
+
+## #82 — 成就系统增强（2026-05-28）
+
+| 方向 | 核心根因 | 关键自优化建议 |
+|------|----------|--------------|
+| 🟢 feature | 容器 pipe 注入的 EACCES 权限炸弹（`/app/routes/favorites.js` 因权限不可读导致容器 crash loop） | 1) 所有 pipe 注入必须后跟 `chmod a+r`；2) 容灾恢复：先 `docker stop` + `chmod -R a+r /app/` + `docker start` 修复 crash loop；3) 不可同时 pipe inject 大量文件再 restart，应逐个 inject+验证 |
+| 🟢 feature | 成就进度需 API 返回未解锁状态+进度，前端无法仅从已解锁记录推断 | `getAllAchievementsWithProgress()` 返回所有成就定义的完整清单（含 unlocked/unlockedAt/progress/maxProgress），前端无需重复定义成就列表 |
+| 🟢 feature | 成就检测引擎只有 hook 触发，无 retroactive scan | 成就仅对新行为起作用，已有数据不会回溯解锁（设计如此：event-driven 非 state-scanning） |
