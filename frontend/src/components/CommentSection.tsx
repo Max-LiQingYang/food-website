@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getComments, getCommentStats, createComment, deleteComment, likeComment, unlikeComment, uploadCommentImages } from '../api'
 import { useToast } from '../context/ToastContext'
@@ -265,7 +265,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
             ✍️ 写评论
           </button>
         ) : (
-          <form className="comment-form" onSubmit={handleSubmit}>
+          <form ref={formRef} className="comment-form" onSubmit={handleSubmit}>
             <div className="comment-form__header">
               <span className="comment-form__user">{user?.nickname || user?.username}</span>
               <StarRating value={rating} onChange={setRating} />

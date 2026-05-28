@@ -151,23 +151,35 @@
 /* Empty */
 .works-empty {
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
 }
 
 .works-empty__icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 64px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.works-empty__heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary, #333);
+  margin: 0 0 10px;
 }
 
 .works-empty__text {
-  font-size: 16px;
-  color: var(--text-primary, #333);
-  margin-bottom: 6px;
+  font-size: 15px;
+  color: var(--text-secondary, #888);
+  margin: 0 auto 24px;
+  max-width: 320px;
+  line-height: 1.6;
 }
 
-.works-empty__hint {
-  font-size: 14px;
-  color: var(--text-secondary, #999);
+.works-empty__cta {
+  font-size: 15px;
+  padding: 10px 28px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 /* Pagination */

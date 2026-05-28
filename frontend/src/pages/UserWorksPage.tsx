@@ -78,8 +78,11 @@ export default function UserWorksPage() {
       {works.length === 0 ? (
         <div className="works-empty">
           <div className="works-empty__icon">📸</div>
-          <p className="works-empty__text">还没有发布过带图片的评论</p>
-          <p className="works-empty__hint">去食谱详情页发表带图的评论吧~</p>
+          <h2 className="works-empty__heading">还没有作品呢</h2>
+          <p className="works-empty__text">去任意食谱页面发表评论并上传成品图，你的作品就会在这里展示！</p>
+          <button className="btn btn--primary works-empty__cta" onClick={() => navigate('/')}>
+            去发现食谱
+          </button>
         </div>
       ) : (
         <>
