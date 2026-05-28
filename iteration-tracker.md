@@ -1976,21 +1976,39 @@
 
 ---
 
-## 迭代 #85 — B/功能增强：评论图片上传与用户作品墙 ⏳
+## 迭代 #85 — B/功能增强：评论图片上传与用户作品墙 ✅
 **派发时间**: 2026-05-28
+**完成时间**: 2026-05-28
 **方向**: B（功能增强）/ 🟢 功能完善
 **基线 Commit**: `2d5acec`
+**交付 Commit**: `838a4ed`
+**部署**: ✅ http://39.103.68.205/
 
 ### 背景
 网站已有完善的评论系统（文字+评分+嵌套回复），但用户做完菜后无法上传成品图分享。评论图片上传能显著增强社区真实感和互动性，同时为用户决策提供视觉参考。
 
-### 任务内容
-1. **后端**：扩展 Comment 模型添加 `imageUrls` JSON 字段（支持最多3张图）
-2. **后端**：POST /api/recipes/:id/comments 支持 multipart/form-data 图片上传（复用 Multer 头像配置）
-3. **前端**：CommentForm 添加图片上传（点击/拖拽，缩略图预览，最多3张，可删除）
-4. **前端**：CommentItem 展示图片缩略图网格，点击打开 Lightbox 全屏查看
-5. **前端**：RecipeDetailPage 新增"用户作品"横向滚动区（聚合该食谱下带图评论的封面缩略图）
-6. 本地构建 0 warnings + 部署闭环 + tracker/lessons 更新
+### 任务内容（已完成）
+1. ✅ **后端**：扩展 Comment 模型添加 `imageUrls` JSON 字段（支持最多3张图）
+2. ✅ **后端**：POST /api/recipes/:id/comments 支持 multipart/form-data 图片上传（复用 Multer 配置，`upload.array('images', 3)`）
+3. ✅ **后端**：新增 uploads.js 路由（`/upload/comment-images`）+ userWorks.js 路由（`/users/:userId/works`）
+4. ✅ **前端**：CommentForm 添加图片上传（点击/拖拽，缩略图预览，最多3张，可删除）
+5. ✅ **前端**：CommentItem 展示图片缩略图网格，点击打开 Lightbox 全屏查看
+6. ✅ **前端**：RecipeDetailPage 新增"用户作品"横向滚动区
+7. ✅ **前端**：新增 UserWorksPage 独立页面（`/user/:userId/works`）
+8. ✅ 本地构建 0 warnings，18 文件变更（+1215/-369 行）
+9. ✅ 部署闭环：服务器 git pull → build → docker cp → nginx reload → 验证
+
+### 实际成果
+- 评论系统支持图片上传（最多3张/评论）
+- 用户作品 API `/api/users/:userId/works` 200 正常
+- 上传 API `/api/upload/comment-images` 正常（需登录）
+- 前端构建 3.46s，0 warnings
+- 全部关键 API 巡检通过（首页/列表/评论/作品/排行/季节/搜索/分类/推荐/挑战）
+
+### 关键经验
+- multipart 上传时前端 axios 不应手动设置 Content-Type，让浏览器自动设置 boundary
+- Multer 配置应按场景差异化（avatar 1 张 vs comment 3 张）
+- Lightbox 组件复用现有 ImageLightbox，减少重复开发
 
 ### 用户价值
 - 用户可分享菜品成品图，增加社区互动
