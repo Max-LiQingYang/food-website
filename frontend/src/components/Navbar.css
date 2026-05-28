@@ -5,6 +5,9 @@
   background: var(--color-card, #fff);
   border-bottom: 1px solid var(--color-border, #e8e0d8);
   box-shadow: var(--shadow-sm, 0 1px 4px rgba(0, 0, 0, 0.06));
+  display: flex;
+  align-items: center;
+  min-height: 56px;
 }
 
 .navbar__inner {
@@ -27,7 +30,7 @@
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  line-height: normal;
+  line-height: 1;
   padding: 0;
 }
 
@@ -62,6 +65,12 @@
 
 .navbar__auth {
   flex-shrink: 0;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .navbar__user {
