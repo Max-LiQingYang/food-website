@@ -793,8 +793,7 @@ body.dark .back-to-top {
 /* ── Pull-to-refresh ── */
 .pull-to-refresh-container {
   position: relative;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  min-height: 100vh;
 }
 
 .pull-to-refresh-indicator {
@@ -873,7 +872,6 @@ body.dark .back-to-top {
 
 @media (max-width: 767px) {
   .pull-to-refresh-container {
-    overscroll-behavior: contain;
   }
 }
 

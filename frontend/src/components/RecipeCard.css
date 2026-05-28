@@ -236,12 +236,12 @@ body.dark .recipe-card__cover-placeholder {
 
 /* ── 信息区 ── */
 .recipe-card__info {
-  padding: 12px 14px 14px;
+  padding: 10px 12px 12px;
 }
 
 .recipe-card__title {
-  margin: 0 0 6px;
-  font-size: 16px;
+  margin: 0 0 4px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.4;
   color: var(--color-text, #333);

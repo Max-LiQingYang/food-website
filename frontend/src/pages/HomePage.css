@@ -39,16 +39,16 @@
 /* ── 搜索栏 ── */
 .home-search {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .home-search__input {
   flex: 1;
-  padding: 10px 18px;
+  padding: 8px 14px;
   border: 1px solid var(--color-border, #e8e0d8);
-  border-radius: 24px;
-  font-size: 15px;
+  border-radius: 20px;
+  font-size: 14px;
   color: var(--color-text, #333);
   outline: none;
   background: var(--color-input-bg, #fff);
@@ -61,12 +61,12 @@
 }
 
 .home-search__btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 24px;
+  border-radius: 20px;
   background: var(--color-primary, #e8663e);
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: background var(--transition-fast, 0.2s ease), transform var(--transition-fast, 0.2s ease);
@@ -85,7 +85,7 @@
 .home-categories {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -98,12 +98,12 @@
 
 .home-category {
   flex-shrink: 0;
-  padding: 8px 18px;
+  padding: 6px 14px;
   border: 1px solid var(--color-border, #e8e0d8);
-  border-radius: 20px;
+  border-radius: 16px;
   background: var(--color-card, #fff);
   color: var(--color-text, #333);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all var(--transition-fast, 0.2s ease);
   white-space: nowrap;
@@ -123,18 +123,18 @@
 
 /* ── 内容区块 ── */
 .home-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .home-section__title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 20px;
+  gap: 8px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-text, #333);
-  margin: 0 0 16px;
-  padding-bottom: 12px;
+  margin: 0 0 12px;
+  padding-bottom: 10px;
   border-bottom: 2px solid var(--color-border, #e8e0d8);
   position: relative;
 }
@@ -212,12 +212,12 @@
 }
 
 .pagination-btn {
-  padding: 8px 18px;
+  padding: 6px 14px;
   border: 1px solid var(--color-border, #e8e0d8);
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--color-card, #fff);
   color: var(--color-text, #333);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all var(--transition-fast, 0.2s ease);
   font-family: inherit;
@@ -234,7 +234,7 @@
 }
 
 .pagination-info {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-muted, #888);
 }
 
@@ -273,34 +273,34 @@
 .rankings-entry {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
+  gap: 10px;
+  padding: 10px 16px;
   margin-bottom: 16px;
   background: linear-gradient(135deg, #fff5ee 0%, #ffede0 100%);
-  border-radius: var(--radius-md, 12px);
+  border-radius: 10px;
   text-decoration: none;
   transition: transform 0.2s, box-shadow 0.2s;
   border: 1px solid rgba(232, 102, 62, 0.1);
 }
 
 .rankings-entry:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(232, 102, 62, 0.15);
 }
 
 .rankings-entry__icon {
-  font-size: 28px;
+  font-size: 24px;
 }
 
 .rankings-entry__text {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   color: #c94f2a;
 }
 
 .rankings-entry__sub {
   margin-left: auto;
-  font-size: 13px;
+  font-size: 12px;
   color: #e8663e;
 }
 

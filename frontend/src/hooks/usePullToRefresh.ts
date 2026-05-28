@@ -34,7 +34,8 @@ export function usePullToRefresh({
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     // Only activate if scrolled to top
     const el = e.currentTarget as HTMLElement
-    scrollTop.current = el.scrollTop
+    // Check both container scrollTop and window scrollY (supports native body scroll)
+    scrollTop.current = el.scrollTop > 0 ? el.scrollTop : window.scrollY
     if (scrollTop.current > 10) return
 
     startY.current = e.touches[0].clientY
