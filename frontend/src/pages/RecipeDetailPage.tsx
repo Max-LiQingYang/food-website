@@ -114,7 +114,7 @@ export default function RecipeDetailPage() {
   ]
 
   // 兼容 steps 字符串数组格式
-  const normalizedSteps = recipe.steps?.map((step, index) =>
+  const normalizedSteps = recipe?.steps?.map((step, index) =>
     typeof step === 'string'
       ? { stepNumber: index + 1, content: step, image: null }
       : step
@@ -183,7 +183,7 @@ export default function RecipeDetailPage() {
         description: recipe.description,
         image: recipe.coverImage,
         recipeIngredient: (recipe.ingredients || []).map((i) => `${i.name} ${i.amount || ''}${i.unit || ''}`.trim()),
-        recipeInstructions: (recipe.steps || []).map((s) => ({
+        recipeInstructions: ((recipe?.steps) || []).map((s) => ({
           text: typeof s === 'string' ? s : s.content || '',
           name: typeof s !== 'string' ? s.name : undefined,
         })),
@@ -806,7 +806,7 @@ export default function RecipeDetailPage() {
           >
             <h2 className="detail-section__title">
               📝 制作步骤
-              <span className="section-count">{recipe.steps.length} 步</span>
+              <span className="section-count">{recipe?.steps?.length || 0} 步</span>
             </h2>
             <ol className="detail-steps">
               {normalizedSteps.map(step => {
