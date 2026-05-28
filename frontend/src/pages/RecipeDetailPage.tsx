@@ -113,6 +113,13 @@ export default function RecipeDetailPage() {
     ),
   ]
 
+  // 兼容 steps 字符串数组格式
+  const normalizedSteps = recipe.steps?.map((step, index) =>
+    typeof step === 'string'
+      ? { stepNumber: index + 1, content: step, image: null }
+      : step
+  ) ?? []
+
   // ── 份量缩放 ──
   const scaleKey = id ? `serving_scale_${id}` : ''
   const [servingScale, setServingScale] = useState<number>(() => {
@@ -362,7 +369,7 @@ export default function RecipeDetailPage() {
   }
 
   // ── 步骤滑动导航 ──
-  const stepList = recipe?.steps || []
+  const stepList = normalizedSteps
   const [stepSwipeStart, setStepSwipeStart] = useState<number | null>(null)
   const [focusedStepIndex, setFocusedStepIndex] = useState(0)
 
@@ -791,7 +798,7 @@ export default function RecipeDetailPage() {
         )}
 
         {/* 制作步骤 */}
-        {recipe.steps && recipe.steps.length > 0 && (
+        {normalizedSteps.length > 0 && (
           <section
             className="detail-section"
             onTouchStart={handleStepSwipeStart}
@@ -802,7 +809,7 @@ export default function RecipeDetailPage() {
               <span className="section-count">{recipe.steps.length} 步</span>
             </h2>
             <ol className="detail-steps">
-              {recipe.steps.map(step => {
+              {normalizedSteps.map(step => {
                 const isActive = activeStep === step.stepNumber
                 return (
                   <li
@@ -879,12 +886,12 @@ export default function RecipeDetailPage() {
                 ◀ 上一步
               </button>
               <span className="step-nav__info">
-                {focusedStepIndex + 1} / {recipe.steps.length}
+                {focusedStepIndex + 1} / {normalizedSteps.length}
               </span>
               <button
                 className="step-nav__btn step-nav__btn--next"
                 onClick={goNextStep}
-                disabled={focusedStepIndex >= recipe.steps.length - 1}
+                disabled={focusedStepIndex >= normalizedSteps.length - 1}
                 aria-label="下一步"
               >
                 下一步 ▶

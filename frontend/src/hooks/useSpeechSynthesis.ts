@@ -28,7 +28,7 @@ export function useSpeechSynthesis(): SpeechSynthesisHook {
   }, [])
 
   const speak = useCallback((text: string, onEnd?: () => void) => {
-    if (!supported) return
+    if (!supported || !text) return
 
     // Cancel any ongoing speech
     window.speechSynthesis.cancel()

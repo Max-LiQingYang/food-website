@@ -637,13 +637,15 @@ body.dark .substitution-toggle:hover {
 
 .step-image {
   width: 100%;
-  max-height: 320px;
+  max-width: 400px;
+  height: auto;
   object-fit: cover;
-  border-radius: 10px;
-  margin-top: 10px;
+  border-radius: var(--radius-md, 8px);
+  margin-top: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   cursor: zoom-in;
   transition: opacity 0.2s ease;
+  display: block;
 }
 
 .step-image:hover {
