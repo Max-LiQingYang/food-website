@@ -8,6 +8,7 @@ import {
   type Recipe,
 } from '../api'
 import { useToast } from '../context/ToastContext'
+import EmptyState from '../components/EmptyState'
 import './CollectionsDetailPage.css'
 
 export default function CollectionsDetailPage() {
@@ -153,14 +154,14 @@ export default function CollectionsDetailPage() {
       </div>
 
       {(!collection.recipes || collection.recipes.length === 0) ? (
-        <div className="coll-detail-page__empty">
-          <div className="empty-icon">🍽️</div>
-          <p className="empty-text">收藏夹中还没有食谱</p>
-          <p className="empty-hint">去逛逛发现喜欢的菜品吧~</p>
-          <button className="btn btn--primary" onClick={() => navigate('/')}>
-            去探索
-          </button>
-        </div>
+        <EmptyState
+          icon="🍽️"
+          title="收藏夹中还没有食谱"
+          description="去逛逛发现喜欢的菜品吧~"
+          ctaText="去探索"
+          ctaLink="/"
+          variant="default"
+        />
       ) : (
         <div className="coll-detail-page__grid">
           {collection.recipes.map((recipe: Recipe) => (

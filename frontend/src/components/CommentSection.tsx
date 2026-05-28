@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getComments, getCommentStats, createComment, deleteComment, likeComment, unlikeComment, uploadCommentImages } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
+import EmptyState from './EmptyState'
 import CommentImagePicker from './CommentImagePicker'
 import ImageLightbox from './ImageLightbox'
 import type { Comment, CommentStats } from '../api'
@@ -74,6 +75,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
   const navigate = useNavigate()
   const toast = useToast()
   const { isAuthenticated, user } = useAuth()
+  const formRef = useRef<HTMLFormElement>(null)
 
   const [comments, setComments] = useState<Comment[]>([])
   const [stats, setStats] = useState<CommentStats | null>(null)
@@ -307,15 +309,14 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
       )}
 
       {comments.length === 0 ? (
-        <div className="comment-empty">
-          <div className="comment-empty__icon">{stats && stats.ratedCount > 0 ? '💬' : '🌟'}</div>
-          <p className="comment-empty__text">
-            {stats && stats.ratedCount > 0 ? '还没有人留下文字评论' : '还没有评分和评论'}
-          </p>
-          <p className="comment-empty__hint">
-            {stats && stats.ratedCount > 0 ? '分享你的烹饪体验吧！' : '来做第一个品尝并评分的人吧！'}
-          </p>
-        </div>
+        <EmptyState
+          icon={stats && stats.ratedCount > 0 ? '💬' : '🌟'}
+          title={stats && stats.ratedCount > 0 ? '还没有人留下文字评论' : '还没有评分和评论'}
+          description={stats && stats.ratedCount > 0 ? '分享你的烹饪体验吧！' : '来做第一个品尝并评分的人吧！'}
+          variant="compact"
+          ctaText={isAuthenticated ? '✍️ 写第一条评论' : undefined}
+          ctaOnClick={isAuthenticated ? () => formRef.current?.scrollIntoView({ behavior: 'smooth' }) : undefined}
+        />
       ) : (
         <div className="comment-list">
           {comments.map(comment => (

@@ -631,15 +631,13 @@ export default function UserProfilePage() {
                 ))}
               </div>
             ) : cur.items.length === 0 ? (
-              <div className="profile-empty">
-                <div className="profile-empty__icon">{cur.emptyIcon}</div>
-                <p className="profile-empty__text">{cur.emptyText}</p>
-                {activeTab === 'recipes' && (
-                  <Link to="/create" className="btn btn--primary" style={{ marginTop: 12 }}>
-                    发布第一个食谱
-                  </Link>
-                )}
-              </div>
+              <EmptyState
+                icon={cur.emptyIcon}
+                title={cur.emptyText}
+                variant="compact"
+                ctaText={activeTab === 'recipes' ? '发布第一个食谱' : '去探索'}
+                ctaLink={activeTab === 'recipes' ? '/create' : '/'}
+              />
             ) : (
               <>
                 <div className="profile-grid">

@@ -4,6 +4,7 @@ import { searchRecipes, getHotSearches } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import SearchAutocomplete from '../components/SearchAutocomplete'
+import EmptyState from '../components/EmptyState'
 import { highlightText } from '../utils/highlightText'
 import { useToast } from '../context/ToastContext'
 import { CATEGORIES as CATEGORIES_SHARED } from '../constants/categories'
@@ -410,54 +411,33 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* 空状态 */}
+      {/* 空状态 - 无结果 */}
       {!loading && q && !hasResults && (
-        <div className="search-empty search-empty--no-results">
-          <div className="search-empty__icon">🔍</div>
-          <p className="search-empty__text">没有找到相关食谱</p>
-          <p className="search-empty__hint">试试调整关键词或筛选条件</p>
-          <div className="search-empty__suggestions">
-            <p className="search-empty__suggestions-label">💡 试试这些热搜词：</p>
-            <div className="search-empty__suggestion-tags">
-              {hotSearches.length > 0 ? (
-                hotSearches.slice(0, 4).map(({ text }) => (
-                  <button
-                    key={text}
-                    className="search-hot-word"
-                    onClick={() => {
-                      setInputValue(text)
-                      setTimeout(() => handleSearchSubmit(text), 0)
-                    }}
-                  >
-                    {text}
-                  </button>
-                ))
-              ) : (
-                ['番茄炒蛋', '红烧肉', '蛋糕', '牛肉'].map(text => (
-                  <button
-                    key={text}
-                    className="search-hot-word"
-                    onClick={() => {
-                      setInputValue(text)
-                      setTimeout(() => handleSearchSubmit(text), 0)
-                    }}
-                  >
-                    {text}
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title="没有找到相关食谱"
+          description="试试调整关键词或筛选条件"
+          variant="search"
+          hotTags={(hotSearches.length > 0 ? hotSearches.slice(0, 8) : [
+            { text: '番茄炒蛋' }, { text: '红烧肉' }, { text: '蛋糕' }, { text: '牛肉' }
+          ]).map(item => ({
+            text: item.text,
+            onClick: () => {
+              setInputValue(item.text)
+              setTimeout(() => handleSearchSubmit(item.text), 0)
+            }
+          }))}
+        />
       )}
 
       {/* 无搜索词时默认提示 */}
       {!q && !loading && (
-        <div className="search-empty">
-          <div className="search-empty__icon">🍳</div>
-          <p className="search-empty__text">输入关键词搜索食谱</p>
-          <p className="search-empty__hint">试试搜「番茄炒蛋」「红烧肉」「蛋糕」...</p>
-        </div>
+        <EmptyState
+          icon="🍳"
+          title="输入关键词搜索食谱"
+          description="试试搜「番茄炒蛋」「红烧肉」「蛋糕」..."
+          variant="compact"
+        />
       )}
 
       {/* 分页 */}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getFavoriteList, removeFavorite } from '../api'
+import EmptyState from '../components/EmptyState'
 import './FavoriteList.css'
 
 // ── 类型定义 ──────────────────────────────────────────────────────────────────
@@ -125,14 +126,14 @@ export default function FavoriteList() {
           <h2 className="favorite-list__title">我的收藏</h2>
           <span className="favorite-list__count">共 0 个食谱</span>
         </div>
-        <div className="favorite-list__empty">
-          <div className="empty-icon">🍳</div>
-          <p className="empty-text">还没有收藏任何食谱</p>
-          <p className="empty-hint">去逛逛发现喜欢的菜品吧~</p>
-          <button className="btn btn--primary" onClick={() => navigate('/')}>
-            去探索
-          </button>
-        </div>
+        <EmptyState
+          icon="🍳"
+          title="还没有收藏任何食谱"
+          description="去逛逛发现喜欢的菜品吧~"
+          ctaText="去探索"
+          ctaLink="/"
+          variant="default"
+        />
       </div>
     )
   }

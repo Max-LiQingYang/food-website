@@ -8,6 +8,7 @@ import {
   type Collection,
 } from '../api'
 import { useToast } from '../context/ToastContext'
+import EmptyState from '../components/EmptyState'
 import './CollectionsPage.css'
 
 export default function CollectionsPage() {
@@ -126,14 +127,14 @@ export default function CollectionsPage() {
         <div className="collections-page__header">
           <h1 className="collections-page__title">我的收藏夹</h1>
         </div>
-        <div className="collections-page__empty">
-          <div className="empty-icon">📁</div>
-          <p className="empty-text">还没有收藏夹</p>
-          <p className="empty-hint">创建收藏夹来整理你喜欢的食谱吧~</p>
-          <button className="btn btn--primary" onClick={openCreate}>
-            + 创建收藏夹
-          </button>
-        </div>
+        <EmptyState
+          icon="📁"
+          title="还没有收藏夹"
+          description="创建收藏夹来整理你喜欢的食谱吧~"
+          ctaText="+ 创建收藏夹"
+          ctaOnClick={openCreate}
+          variant="default"
+        />
 
         {showModal && (
           <div className="collection-modal__backdrop" onClick={() => setShowModal(false)}>

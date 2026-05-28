@@ -4,6 +4,7 @@ import { getMealPlans, createMealPlan, updateMealPlan, deleteMealPlan, generateS
 import { searchRecipes } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import EmptyState from '../components/EmptyState'
 import type { MealPlanMeal } from '../api'
 import './MealPlannerPage.css'
 
@@ -344,7 +345,12 @@ export default function MealPlannerPage() {
             />
             <div className="meal-planner__search-results">
               {searchResults.length === 0 && searchQuery.trim() && (
-                <div className="meal-planner__search-empty">未找到相关食谱</div>
+                <EmptyState
+                  icon="🔍"
+                  title="未找到相关食谱"
+                  description="试试其他关键词"
+                  variant="compact"
+                />
               )}
               {searchResults.map((recipe: any) => (
                 <div key={recipe.id} className="meal-planner__search-item">
@@ -362,7 +368,12 @@ export default function MealPlannerPage() {
                 </div>
               ))}
               {!searchQuery.trim() && (
-                <div className="meal-planner__search-hint">输入食谱名称开始搜索</div>
+                <EmptyState
+                  icon="📋"
+                  title="输入食谱名称开始搜索"
+                  description="搜搜看你今天想吃什么~"
+                  variant="compact"
+                />
               )}
             </div>
           </div>

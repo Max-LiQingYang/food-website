@@ -10,6 +10,7 @@ import {
   type ShoppingListItem,
 } from '../api'
 import { useToast } from '../context/ToastContext'
+import EmptyState from '../components/EmptyState'
 import './ShoppingListPage.css'
 
 const CATEGORY_CONFIG = [
@@ -334,16 +335,14 @@ export default function ShoppingListPage() {
         )}
 
         {lists.length === 0 ? (
-          <div className="shop-page__empty">
-            <div className="empty-icon">🛒</div>
-            <p className="empty-text">还没有购物清单</p>
-            <p className="empty-hint">
-              在食谱详情页点击「🛒 加入购物清单」来创建，或点击上方按钮创建空白清单
-            </p>
-            <button className="btn btn--primary" onClick={() => navigate('/')}>
-              去找食谱
-            </button>
-          </div>
+          <EmptyState
+            icon="🛒"
+            title="还没有购物清单"
+            description="在食谱详情页点击「🛒 加入购物清单」来创建，或点击上方按钮创建空白清单"
+            ctaText="去找食谱"
+            ctaLink="/"
+            variant="default"
+          />
         ) : (
           <div className="shop-page__grid">
             {lists.map(list => {
