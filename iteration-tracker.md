@@ -1698,25 +1698,44 @@
 
 ---
 
-## 迭代 #82 — 🟢 功能增强：用户成就与徽章系统 ⏳
+## 迭代 #82 — 🟢 功能增强：用户成就与徽章系统 ✅
 **派发时间**: 2026-05-28
+**完成时间**: 2026-05-28
 **方向**: B（功能增强）/ 🟢 功能增强
 **基线 Commit**: `c1524ff`
-**交付 Commit**: `待填充`
+**交付 Commit**: `abbe358`
+**构建**: 0 errors, 0 warnings
 **部署**: http://39.103.68.205/
 
 ### 背景
 网站已有完善的用户行为数据（发布/收藏/评分/烹饪日志/关注），但缺少 gamification 机制激励用户持续参与。用户成就系统可将隐性行为转化为可视化的成长进度，提升留存和活跃度。
 
-### 任务内容
-1. **后端 Achievement 模型** — 成就定义表（id/名称/描述/图标/条件类型/阈值/等级）
-2. **后端 UserAchievement 模型** — 用户成就记录表（userId/achievementId/unlockedAt）
-3. **成就检测引擎** — 用户行为触发自动检测（发布食谱/收藏/评分/烹饪日志/被关注/连续登录）
-4. **成就 API** — GET /api/users/:id/achievements（含进度和已解锁）
-5. **前端用户主页成就区** — 徽章网格展示 + 已解锁/未解锁状态 + 进度条
-6. **成就详情弹窗** — 成就描述 + 解锁条件 + 解锁时间
-7. **成就解锁动画** — 新成就解锁时 Toast 通知 + 徽章发光动效
-8. **本地构建 0 warnings + 部署闭环 + tracker/lessons 更新**
+### 任务内容（已完成）
+1. ✅ **后端 Achievement 模型** — 成就定义表（id/名称/描述/图标/条件类型/阈值/等级）
+2. ✅ **后端 UserAchievement 模型** — 用户成就记录表（userId/achievementId/unlockedAt）
+3. ✅ **成就检测引擎** — 用户行为触发自动检测（发布食谱/收藏/评分/烹饪日志/被关注/连续登录）
+4. ✅ **成就 API** — GET /api/users/:id/achievements（含进度和已解锁）
+5. ✅ **前端用户主页成就区** — 徽章网格展示 + 已解锁/未解锁状态 + 进度条
+6. ✅ **成就详情弹窗** — 成就描述 + 解锁条件 + 解锁时间
+7. ✅ **成就解锁动画** — 新成就解锁时 Toast 通知 + 徽章发光动效
+8. ✅ **本地构建 0 warnings + 部署闭环 + tracker/lessons 更新**
+
+### 文件变更
+- `backend/models/achievement.js` — Achievement/UserAchievement 模型
+- `backend/routes/achievement.js` — 成就 CRUD API
+- `backend/utils/achievementChecker.js` — 成就检测引擎
+- `backend/routes/behaviors.js` — 行为追踪集成成就检测
+- `frontend/src/pages/AchievementsPage.tsx/.css` — 成就独立页面
+- `frontend/src/components/AchievementDetailModal.tsx` — 详情弹窗
+- `frontend/src/components/AchievementToast.tsx` — 解锁 Toast 通知
+- `frontend/src/pages/UserProfilePage.tsx/.css` — 用户主页成就区
+
+### 部署验证
+- ✅ 后端容器: /app/routes/achievement.js 存在，39 个路由文件
+- ✅ 前端容器: AchievementsPage.js/css, AchievementDetailModal.js 存在
+- ✅ GET /api/achievements → 401（需登录，端点存在非 404）
+- ✅ 前端构建: 0 errors, 0 warnings
+- ✅ nginx reload 成功，HTTP 200
 
 ### 用户价值
 - 用户获得可视化的成长进度和成就感
