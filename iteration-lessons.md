@@ -134,3 +134,28 @@
 ### 遗留问题
 - 无 🔴 待修复
 
+---
+
+## 2026-05-29 迭代#89-#92 — 关注动态+排行榜重写+首页简化
+
+### 关键陷阱
+- **feed.js JOIN 查询性能**：Activity + Recipe + User 三表 JOIN，未加索引时大数据量可能慢；当前 LIMIT 20 安全
+- **RankingsPage 浮点精度**：JavaScript 浮点计算 `#→数字` 显示异常，需 `toFixed(1)` 格式化
+- **TDZ 崩溃根因**：循环依赖或变量提升问题，构建时不报错但运行时偶发；需检查 import 顺序和 const/let 使用
+- **步骤图片 cover→contain**：`object-fit: cover` 会裁剪图片，`contain` 保证完整显示但可能留白，需配合 `background` 色过渡
+- **HomePage 冗余 section**：迭代积累导致首页 section 过多，用户滚动疲劳；定期审视页面信息架构必要
+
+### 修复方法
+- **feed.js**：JOIN 查询 + 按时间倒序 + LIMIT 20，过滤当前用户自己活动
+- **RankingsPage**：`Number(score).toFixed(1)` + 空值兜底 `|| 0`
+- **TDZ**：检查循环依赖链，用动态 import 或调整模块加载顺序
+- **Pagination 组件**：props 接收 currentPage/totalPages/onPageChange，7页面统一替换
+
+### 遗留问题
+- 无 🔴 待修复
+
+### 自优化建议
+- **定期首页信息架构审视**：每5-6次迭代检查首页是否section膨胀，保持核心功能突出
+- **组件抽取时机**：同一逻辑出现3次以上时立即抽取为独立组件（如 Pagination）
+- **P0修复响应**：生产TDZ/崩溃类问题应在发现后30分钟内派发修复，不等待正常迭代流程
+
