@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getFavoriteList, removeFavorite } from '../api'
 import EmptyState from '../components/EmptyState'
+import Pagination from '../components/Pagination'
 import './FavoriteList.css'
 
 // ── 类型定义 ──────────────────────────────────────────────────────────────────
@@ -23,7 +24,7 @@ interface FavoriteItem {
   removing?: boolean
 }
 
-interface Pagination {
+interface PaginationState {
   page: number
   pageSize: number
   total: number
@@ -48,7 +49,7 @@ export default function FavoriteList() {
 
   const [loading, setLoading] = useState(false)
   const [list, setList] = useState<FavoriteItem[]>([])
-  const [pagination, setPagination] = useState<Pagination>({
+  const [pagination, setPagination] = useState<PaginationState>({
     page: 1,
     pageSize: 12,
     total: 0,
@@ -197,27 +198,7 @@ export default function FavoriteList() {
       </div>
 
       {/* 分页 */}
-      {pagination.total > pagination.pageSize && (
-        <div className="favorite-list__pagination">
-          <button
-            className="pagination-btn"
-            disabled={pagination.page <= 1 || loading}
-            onClick={() => goPage(pagination.page - 1)}
-          >
-            ← 上一页
-          </button>
-          <span className="pagination-info">
-            第 {pagination.page} / {totalPages} 页
-          </span>
-          <button
-            className="pagination-btn"
-            disabled={pagination.page >= totalPages || loading}
-            onClick={() => goPage(pagination.page + 1)}
-          >
-            下一页 →
-          </button>
-        </div>
-      )}
+      <Pagination current={pagination.page} total={totalPages} onChange={goPage} />
 
       {/* 翻页加载遮罩 */}
       {loading && list.length > 0 && (

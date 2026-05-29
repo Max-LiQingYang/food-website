@@ -5,6 +5,7 @@ import { getRecipeById } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { getEnhancedCookingStats, searchCookingLogs, getCookingLogDetail } from '../api'
 import { useToast } from '../context/ToastContext'
+import Pagination from '../components/Pagination'
 import type { CookingLog, CookingLogStats } from '../api'
 import './CookingJournalPage.css'
 
@@ -424,25 +425,7 @@ export default function CookingJournalPage() {
           )}
 
           {/* 分页 */}
-          {total > pageSize && (
-            <div className="cooking-journal__pagination">
-              <button
-                className="cooking-journal__page-btn"
-                disabled={page <= 1}
-                onClick={() => setPage(p => p - 1)}
-              >
-                « 上一页
-              </button>
-              <span className="cooking-journal__page-info">{page} / {Math.ceil(total / pageSize)}</span>
-              <button
-                className="cooking-journal__page-btn"
-                disabled={page >= Math.ceil(total / pageSize)}
-                onClick={() => setPage(p => p + 1)}
-              >
-                下一页 »
-              </button>
-            </div>
-          )}
+          <Pagination current={page} total={Math.ceil(total / pageSize)} onChange={(p) => { setPage(p); window.scrollTo({ top: 0 }) }} />
         </>
       )}
 

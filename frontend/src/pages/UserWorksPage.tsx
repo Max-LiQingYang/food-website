@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getUserWorks } from '../api'
 import ImageLightbox from '../components/ImageLightbox'
+import Pagination from '../components/Pagination'
 import type { WorkItem } from '../api'
 import { usePageTitle } from '../hooks/useSEO'
 import './UserWorksPage.css'
@@ -130,25 +131,7 @@ export default function UserWorksPage() {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="works-pagination">
-              <button
-                className="pagination-btn"
-                disabled={page <= 1}
-                onClick={() => setPage(p => p - 1)}
-              >
-                ← 上一页
-              </button>
-              <span className="pagination-info">第 {page} / {totalPages} 页</span>
-              <button
-                className="pagination-btn"
-                disabled={page >= totalPages}
-                onClick={() => setPage(p => p + 1)}
-              >
-                下一页 →
-              </button>
-            </div>
-          )}
+          <Pagination current={page} total={totalPages} onChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />
         </>
       )}
 

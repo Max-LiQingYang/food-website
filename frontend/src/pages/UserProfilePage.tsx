@@ -18,6 +18,7 @@ import {
   type ForkInfo,
 } from '../api'
 import RecipeCard from '../components/RecipeCard'
+import Pagination from '../components/Pagination'
 import BrowsingHistory from '../components/BrowsingHistory'
 import ActivityHeatmap from '../components/ActivityHeatmap'
 import AchievementDetailModal from '../components/AchievementDetailModal'
@@ -645,17 +646,7 @@ export default function UserProfilePage() {
                     <RecipeCard key={recipe.id} recipe={recipe} />
                   ))}
                 </div>
-                {cur.total > pageSize && (
-                  <div className="profile-pagination">
-                    <button className="pagination-btn" disabled={cur.page <= 1} onClick={() => cur.setPage(p => p - 1)}>
-                      上一页
-                    </button>
-                    <span className="pagination-info">{cur.page} / {Math.ceil(cur.total / pageSize)}</span>
-                    <button className="pagination-btn" disabled={cur.page >= Math.ceil(cur.total / pageSize)} onClick={() => cur.setPage(p => p + 1)}>
-                      下一页
-                    </button>
-                  </div>
-                )}
+                <Pagination current={cur.page} total={Math.ceil(cur.total / pageSize)} onChange={(p) => { cur.setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />
               </>
             )}
           </>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import Pagination from '../components/Pagination'
 import {
   getNotifications,
   markNotificationRead,
@@ -321,25 +322,7 @@ export default function NotificationsPage() {
       )}
 
       {/* 分页 */}
-      {totalPages > 1 && (
-        <div className="notif-page__pagination">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-          >
-            上一页
-          </button>
-          <span className="notif-page__page-info">
-            {page} / {totalPages}
-          </span>
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-          >
-            下一页
-          </button>
-        </div>
-      )}
+      <Pagination current={page} total={totalPages} onChange={(p) => { setPage(p); window.scrollTo({ top: 0 }) }} />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getDrafts, saveDraft, updateDraft, deleteDraft, publishDraft, Draft } from '../api'
 import { useToast } from '../context/ToastContext'
+import Pagination from '../components/Pagination'
 import './DraftsPage.css'
 
 export default function DraftsPage() {
@@ -149,13 +150,7 @@ export default function DraftsPage() {
           </div>
         )}
 
-        {totalPages > 1 && (
-          <div className="drafts-pagination">
-            <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>上一页</button>
-            <span>{page} / {totalPages}</span>
-            <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>下一页</button>
-          </div>
-        )}
+        <Pagination current={page} total={totalPages} onChange={(p) => setPage(p)} />
       </div>
     </div>
   )

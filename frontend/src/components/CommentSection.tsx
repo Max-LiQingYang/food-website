@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import EmptyState from './EmptyState'
 import CommentImagePicker from './CommentImagePicker'
 import ImageLightbox from './ImageLightbox'
+import Pagination from './Pagination'
 import type { Comment, CommentStats } from '../api'
 import './CommentSection.css'
 
@@ -362,17 +363,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
             </div>
           ))}
 
-          {totalPages > 1 && (
-            <div className="comment-pagination">
-              <button className="btn btn--ghost btn--sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
-                上一页
-              </button>
-              <span className="comment-pagination__info">{page} / {totalPages}</span>
-              <button className="btn btn--ghost btn--sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>
-                下一页
-              </button>
-            </div>
-          )}
+          <Pagination current={page} total={totalPages} onChange={(p) => setPage(p)} />
         </div>
       )}
 
