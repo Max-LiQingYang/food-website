@@ -107,9 +107,9 @@ export default function RecipeDetailPage() {
   // 收集所有可查看的图片（封面 + 步骤图片）
   const allImages = [
     ...(recipe?.coverImage ? [{ src: recipe.coverImage, alt: recipe.title }] : []),
-    ...((recipe?.steps || [])
+    ...(normalizedSteps
       .filter(s => s.image)
-      .map(s => ({ src: s.image!, alt: `步骤 ${s.stepNumber}: ${typeof s === 'string' ? s : (s as any).content || ''}` }))
+      .map(s => ({ src: s.image || '', alt: `步骤 ${s.stepNumber}: ${s.content || ''}` }))
     ),
   ]
 
@@ -832,7 +832,7 @@ export default function RecipeDetailPage() {
                           {!speaking && (
                             <button
                               className="step-voice-btn"
-                              onClick={(e) => { e.stopPropagation(); speak(step.content) }}
+                              onClick={(e) => { e.stopPropagation(); speak(step.content || '') }}
                               title="朗读此步骤"
                             >
                               🔊 朗读
@@ -863,7 +863,7 @@ export default function RecipeDetailPage() {
                           aria-label={`点击查看步骤 ${step.stepNumber} 的图片`}
                           onClick={e => {
                             e.stopPropagation()
-                            const stepIdx = (steps || []).findIndex(s => s.image === step.image)
+                            const stepIdx = (normalizedSteps || []).findIndex(s => s.image === step.image)
                             const imgIdx = 1 + stepIdx // +1 因为 index 0 是封面
                             setLightboxIndex(imgIdx >= 0 ? imgIdx : 0)
                           }}

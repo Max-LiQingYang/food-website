@@ -56,6 +56,10 @@ export default function HomePage() {
   const [feedLoading, setFeedLoading] = useState(true)
   const [hasFollowings, setHasFollowings] = useState<boolean | null>(null)
 
+  // Show full layout (hero + extras) only when category is 全部 and no filters
+  // Moved before useEffect to avoid TDZ (Temporal Dead Zone) crash
+  const showFullLayout = category === '全部' && !filters.difficulty && filters.maxCookTime === null && !filters.sortBy
+
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   useEffect(() => {
@@ -199,9 +203,6 @@ export default function HomePage() {
   useMetaTags({
     description: '美食食谱分享平台 —— 发现中餐、西餐、甜点、日韩等多国美食菜谱。家常菜、私房菜、烘焙甜品，简单易学，让烹饪成为享受。',
   })
-
-  // Show full layout (hero + extras) only when category is 全部 and no filters
-  const showFullLayout = category === '全部' && !filters.difficulty && filters.maxCookTime === null && !filters.sortBy
 
   // Tab labels
   const tabLabel: Record<TabType, string> = { all: '全部 ›', newest: '最新', featured: '精选' }
