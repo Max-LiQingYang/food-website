@@ -133,6 +133,10 @@ export default function HomePage() {
   }
 
   const handleTabChange = (tab: TabType) => {
+    if (tab === 'all') {
+      navigate('/recipes')
+      return
+    }
     if (tab === activeTab) return
     setActiveTab(tab)
     setPage(1)
@@ -158,7 +162,7 @@ export default function HomePage() {
   const showFullLayout = category === '全部' && !filters.difficulty && filters.maxCookTime === null && !filters.sortBy
 
   // Tab labels
-  const tabLabel: Record<TabType, string> = { all: '全部', newest: '最新', featured: '精选' }
+  const tabLabel: Record<TabType, string> = { all: '全部 ›', newest: '最新', featured: '精选' }
 
   return (
     <div className="\home-page pull-to-refresh-container'" {...touchHandlers}>

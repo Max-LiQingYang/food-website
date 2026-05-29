@@ -50,6 +50,7 @@ const RecipeDiffPage = lazy(() => import('../pages/RecipeDiffPage'))
 const CookingAnalyticsPage = lazy(() => import('../pages/CookingAnalyticsPage'))
 const CategoryDetailPage = lazy(() => import('../pages/CategoryDetailPage'))
 const AchievementsPage = lazy(() => import('../pages/AchievementsPage'))
+const AllRecipesPage = lazy(() => import('../pages/AllRecipesPage'))
 
 const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
 
@@ -94,6 +95,7 @@ const router = createBrowserRouter([
       { path: '/', element: <HomePage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/favorites', element: <FavoriteList /> },
+      { path: '/recipes', element: <AllRecipesPage /> },
       { path: '/recipe/:id', element: <RecipeDetailPage /> },
       { path: '/recipe/:id/edit', element: <CreateRecipePage /> },
       { path: '/recipe/new', element: <CreateRecipePage /> },

@@ -1,0 +1,297 @@
+/* AllRecipesPage — 全部食谱独立页面 */
+
+.all-recipes-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+/* ── 头部 ── */
+.all-recipes-page__header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.all-recipes-page__header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  margin: 0 0 8px;
+}
+
+.all-recipes-page__subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted, #999);
+  margin: 0;
+}
+
+body.dark .all-recipes-page__header h1 {
+  color: var(--color-text-dark, #eee);
+}
+
+/* ── 分类标签（pill 样式） ── */
+.all-recipes-page__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.all-recipes-page__cat-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 9999px;
+  background: var(--color-card, #fff);
+  color: var(--color-text-secondary, #666);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.all-recipes-page__cat-btn:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.all-recipes-page__cat-btn:active {
+  transform: scale(0.97);
+}
+
+.all-recipes-page__cat-btn.active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+body.dark .all-recipes-page__cat-btn {
+  background: var(--color-card-dark, #222);
+  border-color: var(--color-border-dark, #333);
+  color: var(--color-text-dark, #ccc);
+}
+
+body.dark .all-recipes-page__cat-btn.active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+/* ── 工具栏（筛选 + 排序） ── */
+.all-recipes-page__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.all-recipes-page__sort {
+  display: flex;
+  gap: 6px;
+}
+
+.all-recipes-page__sort-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--color-text-secondary, #666);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.all-recipes-page__sort-btn:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.all-recipes-page__sort-btn.active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+/* ── 食谱网格 ── */
+.all-recipes-page__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1024px) {
+  .all-recipes-page__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .all-recipes-page__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .all-recipes-page__grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ── 空状态 ── */
+.all-recipes-page__empty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.all-recipes-page__empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.all-recipes-page__empty p {
+  font-size: 15px;
+  color: var(--color-text, #333);
+  margin: 0 0 4px;
+}
+
+.all-recipes-page__empty-hint {
+  font-size: 13px !important;
+  color: var(--color-text-muted, #999) !important;
+}
+
+.all-recipes-page__reset-btn {
+  margin-top: 16px;
+  padding: 8px 24px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.2s ease), transform var(--transition-fast, 0.2s ease);
+}
+
+.all-recipes-page__reset-btn:hover {
+  background: var(--color-primary-hover, #d45a30);
+}
+
+.all-recipes-page__reset-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── 分页 ── */
+.all-recipes-page__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.all-recipes-page__page-btn {
+  padding: 8px 18px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 8px;
+  background: var(--color-card, #fff);
+  color: var(--color-text, #333);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.all-recipes-page__page-btn:hover:not(:disabled) {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.all-recipes-page__page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.all-recipes-page__page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.all-recipes-page__page-num {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 8px;
+  background: var(--color-card, #fff);
+  color: var(--color-text-secondary, #666);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.all-recipes-page__page-num:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+.all-recipes-page__page-num.active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+.all-recipes-page__page-dots {
+  padding: 0 4px;
+  color: var(--color-text-muted, #999);
+  font-size: 14px;
+}
+
+body.dark .all-recipes-page__page-btn,
+body.dark .all-recipes-page__page-num {
+  background: var(--color-card-dark, #222);
+  border-color: var(--color-border-dark, #333);
+  color: var(--color-text-dark, #ccc);
+}
+
+body.dark .all-recipes-page__page-btn:hover:not(:disabled),
+body.dark .all-recipes-page__page-num:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+}
+
+body.dark .all-recipes-page__page-num.active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .all-recipes-page__pagination {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .all-recipes-page__page-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .all-recipes-page__page-num {
+    min-width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+}

@@ -24,14 +24,12 @@ export default function CategoryDetailPage() {
     setError('')
     getRecipes({ page: 1, pageSize: PAGE_SIZE, category: name })
       .then(res => {
-        const data = res.data
-        if (data.code === 0) {
-          setRecipes(data.data.list)
-          setTotal(data.data.total)
-          setPage(1)
-        } else {
-          setError(data.msg || '加载失败')
-        }
+        // res 已由响应拦截器解包: res = { code: 0, data: { list, total } }
+        // 兼容两种数据格式
+        const data = res.data || res
+        setRecipes(data.list || [])
+        setTotal(data.total || 0)
+        setPage(1)
       })
       .catch(() => setError('网络异常，请稍后重试'))
       .finally(() => setLoading(false))
@@ -43,11 +41,9 @@ export default function CategoryDetailPage() {
     setLoading(true)
     getRecipes({ page: nextPage, pageSize: PAGE_SIZE, category: name })
       .then(res => {
-        const data = res.data
-        if (data.code === 0) {
-          setRecipes(prev => [...prev, ...data.data.list])
-          setPage(nextPage)
-        }
+        const data = res.data || res
+        setRecipes(prev => [...prev, ...(data.list || [])])
+        setPage(nextPage)
       })
       .catch(() => setError('加载更多失败'))
       .finally(() => setLoading(false))

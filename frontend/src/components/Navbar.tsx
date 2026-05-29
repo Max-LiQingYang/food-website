@@ -34,6 +34,7 @@ export default function Navbar() {
   // Primary links — always visible on desktop
   const primaryLinks = [
     { to: '/', label: '首页' },
+    { to: '/recipes', label: '📋 全部食谱' },
     { to: '/recommend', label: '🥬 食材推荐' },
     { to: '/ingredient-search', label: '🔍 手头食材' },
     { to: '/favorites', label: '我的收藏' },
