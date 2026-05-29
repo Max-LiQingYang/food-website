@@ -141,7 +141,8 @@ async function getFavoriteStatus(req, res) {
     return res.status(200).json(
       resJSON(0, 'success', {
         isFavorited: result.isFavorited,
-        favoriteId: result.favoriteId || null
+        favoriteId: result.favoriteId || null,
+        note: result.note
       })
     )
   } catch (err) {
@@ -221,6 +222,60 @@ async function batchFavorite(req, res) {
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
   }
 }
+
+// ─────────────────────────────────────────────────────────────────
+// PUT /api/favorites/:recipeId/note — 更新收藏备注
+// ─────────────────────────────────────────────────────────────────
+async function updateNote(req, res) {
+  try {
+    const userId = req.userId
+    const { recipeId } = req.params
+    const { note } = req.body
+
+    // 校验 note 字段
+    if (typeof note !== 'string') {
+      return res.status(400).json(resJSON(400, 'note 必须为字符串', null))
+    }
+    if (note.length > 500) {
+      return res.status(400).json(resJSON(400, '备注最多 500 字', null))
+    }
+
+    // HTML 转义（简单防御 XSS）
+    const escapeHtml = (str) => {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+    }
+
+    const sanitizedNote = note.trim() === '' ? null : escapeHtml(note.trim())
+
+    // 查找收藏记录
+    const fav = await Favorite.findOne({
+      where: { userId, recipeId, isDeleted: false }
+    })
+    if (!fav) {
+      return res.status(404).json(resJSON(404, '未收藏该食谱', null))
+    }
+
+    await fav.update({ note: sanitizedNote })
+    favoriteService.clearCache()
+
+    return res.status(200).json(resJSON(0, '备注更新成功', {
+      id: fav.id,
+      userId: fav.userId,
+      recipeId: fav.recipeId,
+      note: fav.note,
+      createdAt: fav.createdAt
+    }))
+  } catch (err) {
+    console.error('[PUT /api/favorites/:recipeId/note] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+}
+
 module.exports = {
   getFavorites,
   batchFavorite,
@@ -228,5 +283,6 @@ module.exports = {
   removeFavorite,
   getFavoriteStatus,
   getFavoriteCount,
+  updateNote,
   batchFavorite
 }

@@ -159,7 +159,15 @@ router.get('/:id/favorites', async (req, res) => {
     for (const r of recipes) {
       recipeMap[r.id] = r
     }
-    const list = rows.map(f => recipeMap[f.recipeId]).filter(Boolean)
+    const list = rows.map(f => {
+      const recipe = recipeMap[f.recipeId]
+      if (!recipe) return null
+      return {
+        ...(recipe.toJSON ? recipe.toJSON() : recipe),
+        favoriteId: f.id,
+        note: f.note || null
+      }
+    }).filter(Boolean)
 
     return res.status(200).json(
       resJSON(0, 'ok', {

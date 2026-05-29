@@ -146,6 +146,7 @@ router.delete('/favorites/:recipeId', favoriteRoutes.removeFavorite)
 router.get('/favorites/:recipeId/status', favoriteRoutes.getFavoriteStatus)
 router.get('/favorites/:recipeId/count', favoriteRoutes.getFavoriteCount)
 router.post('/favorites/batch', favoriteRoutes.batchFavorite)
+router.put('/favorites/:recipeId/note', favoriteRoutes.updateNote)
 
 // 文件上传（需认证）
 router.use('/', uploadRoutes)

@@ -45,6 +45,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         comment: '软删除标记'
+      },
+      note: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: null,
+        validate: {
+          len: {
+            args: [0, 500],
+            msg: '备注最多 500 字'
+          }
+        },
+        comment: '收藏备注/烹饪笔记，最多500字'
       }
     },
     {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getFavoriteList, removeFavorite } from '../api'
 import EmptyState from '../components/EmptyState'
 import Pagination from '../components/Pagination'
+import FavoriteNoteModal from '../components/FavoriteNoteModal'
 import './FavoriteList.css'
 
 // ── 类型定义 ──────────────────────────────────────────────────────────────────
@@ -19,6 +20,7 @@ interface FavoriteItem {
   id: number
   userId: string
   recipeId: string
+  note: string | null
   createdAt: string
   recipe?: Recipe | null
   removing?: boolean
@@ -54,6 +56,10 @@ export default function FavoriteList() {
     pageSize: 12,
     total: 0,
   })
+
+  // 备注弹窗状态
+  const [noteModalVisible, setNoteModalVisible] = useState(false)
+  const [noteTargetItem, setNoteTargetItem] = useState<FavoriteItem | null>(null)
 
   const totalPages = Math.ceil(pagination.total / pagination.pageSize)
 
@@ -181,6 +187,20 @@ export default function FavoriteList() {
                 <p className="recipe-card__author">👨🍳 {item.recipe.author || '未知作者'}</p>
                 <p className="recipe-card__date">收藏于 {formatDate(item.createdAt)}</p>
               </div>
+              {/* 备注预览 */}
+              {item.note && (
+                <div
+                  className="note-preview"
+                  onClick={e => {
+                    e.stopPropagation()
+                    setNoteTargetItem(item)
+                    setNoteModalVisible(true)
+                  }}
+                >
+                  <span className="note-preview__icon">📝</span>
+                  <span className="note-preview__text">{item.note}</span>
+                </div>
+              )}
               <button
                 className="recipe-card__unfav"
                 disabled={item.removing}
@@ -205,6 +225,21 @@ export default function FavoriteList() {
         <div className="favorite-list__overlay">
           <div className="overlay-spinner" />
         </div>
+      )}
+
+      {/* 备注编辑弹窗 */}
+      {noteTargetItem && (
+        <FavoriteNoteModal
+          visible={noteModalVisible}
+          onClose={() => { setNoteModalVisible(false); setNoteTargetItem(null) }}
+          recipeId={noteTargetItem.recipeId}
+          initialNote={noteTargetItem.note}
+          onSaved={(newNote) => {
+            setList(prev => prev.map(i =>
+              i.id === noteTargetItem.id ? { ...i, note: newNote } : i
+            ))
+          }}
+        />
       )}
     </div>
   )

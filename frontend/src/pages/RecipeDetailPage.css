@@ -135,6 +135,73 @@
   }
 }
 
+/* ── 收藏备注按钮（详情页右上角） ── */
+.note-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text-secondary, #666);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  position: relative;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.note-button:hover {
+  border-color: var(--color-primary-light, #f5a885);
+  color: var(--color-primary, #e8663e);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.note-button:active {
+  transform: scale(0.92);
+}
+
+.note-button--empty {
+  opacity: 0.5;
+}
+
+.note-button--empty:hover {
+  opacity: 1;
+}
+
+.note-button--has-note::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary, #e8663e);
+  border: 2px solid #fff;
+}
+
+body.dark .note-button {
+  border-color: var(--color-border, #3a3a4e);
+  background: var(--color-card, #2a2a3e);
+  color: var(--color-text-secondary, #999);
+}
+
+body.dark .note-button:hover {
+  border-color: var(--color-primary-dark, #c94f2a);
+  color: var(--color-primary-dark, #c94f2a);
+  background: var(--color-card, #2a2a3e);
+}
+
+body.dark .note-button--has-note::after {
+  border-color: var(--color-card, #2a2a3e);
+}
+
 /* ── 基本信息 ── */
 .detail-header {
   padding: 28px 28px 0;

@@ -1035,6 +1035,16 @@ export default function RecipeDetailPage() {
           </span>
           <span>{isFavorited ? '已收藏' : '收藏'}</span>
         </button>
+        {isFavorited && (
+          <button
+            className="fab-btn"
+            onClick={() => setNoteModalVisible(true)}
+            title={favoriteNote ? '编辑备注' : '添加备注'}
+          >
+            <span className="fab-btn__icon">📝</span>
+            <span>{favoriteNote ? '备注' : '加备注'}</span>
+          </button>
+        )}
 
         <button className="fab-btn" onClick={handleFork} disabled={forking} title="改编食谱">
           <span className="fab-btn__icon">{forking ? '⋯' : '🍴'}</span>
@@ -1098,6 +1108,14 @@ export default function RecipeDetailPage() {
         />
       )}
 
+      {/* 收藏备注弹窗 */}
+      <FavoriteNoteModal
+        visible={noteModalVisible}
+        onClose={() => setNoteModalVisible(false)}
+        recipeId={id!}
+        initialNote={favoriteNote}
+        onSaved={(newNote) => setFavoriteNote(newNote)}
+      />
 
     </div>
   )

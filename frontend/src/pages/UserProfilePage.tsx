@@ -18,6 +18,7 @@ import {
   type ForkInfo,
 } from '../api'
 import RecipeCard from '../components/RecipeCard'
+import FavoriteNoteModal from '../components/FavoriteNoteModal'
 import Pagination from '../components/Pagination'
 import BrowsingHistory from '../components/BrowsingHistory'
 import ActivityHeatmap from '../components/ActivityHeatmap'
@@ -217,6 +218,12 @@ export default function UserProfilePage() {
   // Collections state
   const [collections, setCollections] = useState<Collection[]>([])
   const [collectionsLoading, setCollectionsLoading] = useState(true)
+
+  // Note modal state
+  const [noteModalVisible, setNoteModalVisible] = useState(false)
+  const [noteTargetId, setNoteTargetId] = useState<string>('')
+  const [noteTargetRecipe, setNoteTargetRecipe] = useState<Recipe | null>(null)
+  const [noteTargetNote, setNoteTargetNote] = useState<string | null>(null)
 
   // Edit profile modal
   const [showEditModal, setShowEditModal] = useState(false)
@@ -643,7 +650,26 @@ export default function UserProfilePage() {
               <>
                 <div className="profile-grid">
                   {cur.items.map((recipe: Recipe) => (
-                    <RecipeCard key={recipe.id} recipe={recipe} />
+                    <div key={recipe.id} className="profile-recipe-wrapper">
+                      <RecipeCard recipe={recipe} />
+                      {activeTab === 'favorites' && (
+                        <div
+                          className={`user-note-preview ${(recipe as any).note ? '' : 'user-note-preview--empty'}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setNoteTargetId(recipe.id)
+                            setNoteTargetNote((recipe as any).note || null)
+                            setNoteModalVisible(true)
+                          }}
+                        >
+                          {(recipe as any).note ? (
+                            <span className="user-note-preview__text">{(recipe as any).note}</span>
+                          ) : (
+                            <span className="user-note-preview__add">+ 添加备注</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
                 <Pagination current={cur.page} total={Math.ceil(cur.total / pageSize)} onChange={(p) => { cur.setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />
@@ -688,6 +714,19 @@ export default function UserProfilePage() {
           </div>
         </div>
       )}
+
+      {/* 收藏备注弹窗 */}
+      <FavoriteNoteModal
+        visible={noteModalVisible}
+        onClose={() => { setNoteModalVisible(false); setNoteTargetId(''); setNoteTargetNote(null) }}
+        recipeId={noteTargetId}
+        initialNote={noteTargetNote}
+        onSaved={(newNote) => {
+          setFavorites(prev => prev.map(r =>
+            r.id === noteTargetId ? { ...r, note: newNote } : r
+          ))
+        }}
+      />
     </div>
   )
 }

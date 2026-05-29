@@ -162,7 +162,7 @@ async function getFavoritesByUser(userId, page = 1, pageSize = 20) {
       order: [['createdAt', 'DESC']],
       offset,
       limit: pageSize,
-      attributes: ['id', 'userId', 'recipeId', 'createdAt'],
+      attributes: ['id', 'userId', 'recipeId', 'createdAt', 'note'],
       include: [
         {
           model: Recipe,
@@ -179,6 +179,7 @@ async function getFavoritesByUser(userId, page = 1, pageSize = 20) {
       id: row.id,
       userId: row.userId,
       recipeId: row.recipeId,
+      note: row.note || null,
       createdAt: row.createdAt,
       recipe: row.recipe
         ? {
@@ -209,12 +210,13 @@ async function getFavoritesByUser(userId, page = 1, pageSize = 20) {
 async function getFavoriteStatus(userId, recipeId) {
   const record = await Favorite.findOne({
     where: { userId, recipeId, isDeleted: false },
-    attributes: ['id']
+    attributes: ['id', 'note']
   })
 
   return {
     isFavorited: !!record,
-    favoriteId: record ? record.id : null
+    favoriteId: record ? record.id : null,
+    note: record ? (record.note || null) : null
   }
 }
 

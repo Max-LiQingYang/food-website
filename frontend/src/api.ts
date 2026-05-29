@@ -63,6 +63,7 @@ export interface FavoriteItem {
   id: number
   userId: string
   recipeId: string
+  note: string | null
   createdAt: string
   recipe?: Recipe | null
 }
@@ -138,6 +139,7 @@ export interface FavoriteListResponse {
 export interface FavoriteStatusResponse {
   isFavorited: boolean
   favoriteId: string
+  note: string | null
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -177,6 +179,14 @@ export function getFavoriteList(params: {
  */
 export function getFavoriteStatus(recipeId: string): Promise<FavoriteStatusResponse> {
   return apiClient.get(`/favorites/${recipeId}/status`)
+}
+
+/**
+ * 更新收藏备注
+ * PUT /api/favorites/{recipeId}/note
+ */
+export function updateFavoriteNote(recipeId: string, note: string): Promise<{ id: string; userId: string; recipeId: string; note: string | null; createdAt: string }> {
+  return apiClient.put(`/favorites/${recipeId}/note`, { note }).then((r: any) => r.data?.data || r.data)
 }
 
 // ─────────────────────────────────────────────────────────────────
