@@ -271,8 +271,8 @@ body.dark .rank-card__cover-placeholder {
 .rank-card__meta-row {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 2px;
+  font-size: 11px;
   color: var(--color-text-muted, #999);
   white-space: nowrap;
   overflow: hidden;
@@ -317,12 +317,7 @@ body.dark .rank-card__cover-placeholder {
 .rank-card__progress-fill {
   height: 100%;
   border-radius: 2px;
-  background: linear-gradient(
-    90deg,
-    var(--color-primary-light, #f5a885) 0%,
-    var(--color-primary, #e8663e) 60%,
-    var(--color-star, #f59e0b) 100%
-  );
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
   transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -369,8 +364,8 @@ body.dark .rank-card__primary-stat {
 }
 
 .rank-card__stat-label {
-  font-size: 11px;
-  color: var(--color-text-muted, #999);
+  font-size: 13px;
+  color: #666;
   white-space: nowrap;
 }
 
@@ -387,6 +382,10 @@ body.dark .rank-card__primary-stat {
   box-shadow: 0 4px 20px rgba(245,158,11,0.2);
 }
 
+.rank-card--gold .rank-card__progress-fill {
+  background: linear-gradient(90deg, #f59e0b, #ffd700);
+}
+
 /* 第2名 — 银牌 */
 .rank-card--silver {
   border-left: 3px solid var(--color-border, #e8e0d8);
@@ -397,6 +396,10 @@ body.dark .rank-card__primary-stat {
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
 
+.rank-card--silver .rank-card__progress-fill {
+  background: linear-gradient(90deg, #a8a8a8, #c0c0c0);
+}
+
 /* 第3名 — 铜牌 */
 .rank-card--bronze {
   border-left: 3px solid var(--color-primary-light, #f5a885);
@@ -405,6 +408,10 @@ body.dark .rank-card__primary-stat {
 
 .rank-card--bronze:hover {
   box-shadow: 0 4px 16px rgba(184,115,51,0.2);
+}
+
+.rank-card--bronze .rank-card__progress-fill {
+  background: linear-gradient(90deg, #b87333, #cd7f32);
 }
 
 /* ===== 暗色模式覆写 ===== */

@@ -63,7 +63,7 @@ function rankBadge(rank: number) {
   }
   return (
     <div className="rank-card__badge">
-      <span className="rank-card__rank-num rank-card__rank-num--normal">#{rank}</span>
+      <span className="rank-card__rank-num rank-card__rank-num--normal">{rank}</span>
     </div>
   )
 }
@@ -98,10 +98,10 @@ export default function RankingsPage() {
 
   const getPrimaryStat = (item: RankedRecipe) => {
     switch (sortBy) {
-      case 'views': return { value: item.viewCount ?? 0, label: '浏览' }
-      case 'favorites': return { value: item.favoriteCount ?? 0, label: '收藏' }
+      case 'views': return { value: Math.round(item.viewCount ?? 0), label: '浏览' }
+      case 'favorites': return { value: Math.round(item.favoriteCount ?? 0), label: '收藏' }
       case 'rating': return { value: item.avgRating ? item.avgRating.toFixed(1) : '-', label: '评分' }
-      default: return { value: item.compositeScore ?? 0, label: '综合分' }
+      default: return { value: (item.compositeScore ?? 0).toFixed(1), label: '综合分' }
     }
   }
 
@@ -273,7 +273,9 @@ export default function RankingsPage() {
                       ? primaryStat.value >= 1000
                         ? (primaryStat.value / 1000).toFixed(1) + 'k'
                         : primaryStat.value
-                      : primaryStat.value}
+                      : parseFloat(primaryStat.value) >= 1000
+                        ? (parseFloat(primaryStat.value) / 1000).toFixed(1) + 'k'
+                        : primaryStat.value}
                   </span>
                   <span className="rank-card__stat-label">{primaryStat.label}</span>
                 </div>
