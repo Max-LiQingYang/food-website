@@ -293,6 +293,16 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
       createActivity(req.userId, 'comment', recipeId, 'recipe', {
         content: content.trim().substring(0, 100)
       })
+
+      // 如果评论带有图片，额外创建 work 活动
+      if (parsedImageUrls.length > 0) {
+        createActivity(req.userId, 'work', String(comment.id), 'comment', {
+          imageUrl: parsedImageUrls[0],
+          recipeTitle: recipe.title,
+          recipeId: recipeId
+        })
+      }
+
       if (recipe.userId && recipe.userId !== req.userId) {
         createNotification({
           userId: recipe.userId,

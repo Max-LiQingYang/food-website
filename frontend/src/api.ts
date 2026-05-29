@@ -1890,6 +1890,8 @@ export default {
   getEnhancedCookingStats,
   // ═══ 迭代#46 ═══
   getAuthorInfo,
+  // 关注动态 Feed
+  getActivityFeed,
 }
 
 // ═══ 迭代#40: 食谱版本对比 ═══
@@ -2267,5 +2269,49 @@ export interface WorksResponse {
 /** 获取用户的带图评论（作品） */
 export function getUserWorks(userId: string, params?: { page?: number; pageSize?: number }): Promise<WorksResponse> {
   return apiClient.get(`/users/${userId}/works`, { params }).then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────
+// 关注动态 Feed
+// ─────────────────────────────────────────────────────────────
+
+export interface FeedActivityUser {
+  id: string
+  username: string
+  nickname?: string
+  avatar?: string
+}
+
+export interface FeedRecipeInfo {
+  title: string
+  coverImage?: string
+}
+
+export interface FeedActivityItem {
+  id: number
+  type: 'create_recipe' | 'comment' | 'favorite' | 'follow' | 'review' | 'work'
+  userId: string
+  targetId: string | null
+  targetType: string | null
+  extra: Record<string, any> | null
+  createdAt: string
+  user: FeedActivityUser | null
+  recipeInfo: FeedRecipeInfo | null
+}
+
+export interface FeedResponse {
+  list: FeedActivityItem[]
+  total: number
+  page: number
+  pageSize: number
+  hasMore: boolean
+}
+
+/** 获取关注用户的动态流 */
+export function getActivityFeed(page = 1, pageSize = 20): Promise<FeedResponse> {
+  return apiClient.get('/feed', { params: { page, pageSize } }).then(r => {
+    const data = r.data || r
+    return data.data || { list: [], total: 0, page: 1, pageSize: 20, hasMore: false }
+  })
 }
 

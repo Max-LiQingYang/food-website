@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
-import { getRecipes } from '../api'
+import { getRecipes, getActivityFeed } from '../api'
+import type { FeedActivityItem } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import SearchAutocomplete from '../components/SearchAutocomplete'
@@ -12,6 +13,8 @@ import SeasonalRecommendations from '../components/SeasonalRecommendations'
 import SeasonalIngredients from '../components/SeasonalIngredients'
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations'
 import HomeTagsSection from '../components/HomeTagsSection'
+import ActivityFeed from '../components/ActivityFeed'
+import EmptyState from '../components/EmptyState'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -47,6 +50,11 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabType>('all')
   const [heroLoaded, setHeroLoaded] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
+
+  // ── Activity Feed state ──
+  const [feedActivities, setFeedActivities] = useState<FeedActivityItem[]>([])
+  const [feedLoading, setFeedLoading] = useState(true)
+  const [hasFollowings, setHasFollowings] = useState<boolean | null>(null)
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -114,6 +122,40 @@ export default function HomePage() {
   useEffect(() => {
     fetchRecipes()
   }, [fetchRecipes])
+
+  // ── Fetch Activity Feed (only when logged in + full layout) ──
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token || !showFullLayout) {
+      setFeedLoading(false)
+      return
+    }
+
+    let cancelled = false
+    setFeedLoading(true)
+
+    getActivityFeed(1, 20)
+      .then(data => {
+        if (cancelled) return
+        setFeedActivities(data.list || [])
+        if (data.list && data.list.length > 0) {
+          setHasFollowings(true)
+        } else if (data.total === 0) {
+          // total=0 could mean either no followings or followings but no activities
+          setHasFollowings(null)
+        } else {
+          setHasFollowings(true)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFeedActivities([])
+      })
+      .finally(() => {
+        if (!cancelled) setFeedLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [showFullLayout])
 
   const { refreshing, pullDistance, statusText, touchHandlers } = usePullToRefresh({ onRefresh: fetchRecipes })
 
@@ -239,6 +281,47 @@ export default function HomePage() {
 
       {/* 个性化推荐 */}
       {showFullLayout && <PersonalizedRecommendations />}
+
+      {/* ── 关注动态 Feed ── */}
+      {showFullLayout && (() => {
+        const token = localStorage.getItem('token')
+        if (!token) return null
+        if (feedLoading) {
+          return <ActivityFeed activities={[]} loading={true} />
+        }
+        if (feedActivities.length > 0) {
+          return <ActivityFeed activities={feedActivities} loading={false} />
+        }
+        // feedActivities is empty: could be no followings or no recent activity
+        if (hasFollowings === null) {
+          // unknown (first load returned empty) — don't show anything yet
+          return null
+        }
+        // hasFollowings is false or true but no activities
+        if (hasFollowings === false) {
+          return (
+            <div className="activity-feed__empty">
+              <EmptyState
+                icon="🔍"
+                title="还没有关注任何人"
+                description="关注美食达人，在这里查看他们的最新动态"
+                ctaText="去发现美食达人"
+                ctaLink="/categories"
+              />
+            </div>
+          )
+        }
+        // hasFollowings is true but no activities (followings haven't done anything)
+        return (
+          <div className="activity-feed__empty">
+            <EmptyState
+              icon="📡"
+              title="暂无动态"
+              description="你关注的用户还没有新的动态，稍后再来看看吧"
+            />
+          </div>
+        )
+      })()}
 
       {/* ── 食谱主网格 ── */}
       <section className="\home-section'">

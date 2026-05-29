@@ -12,6 +12,7 @@
  *   'favorite'        - 收藏食谱
  *   'follow'          - 关注用户
  *   'review'          - 评分/评价
+ *   'work'            - 上传作品（评论带图片）
  *
  * targetType 表示活动目标类型：'recipe', 'user', 'comment'
  * targetId  为目标的主键 ID
@@ -36,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       type: {
         type: DataTypes.STRING(30),
         allowNull: false,
-        comment: '活动类型: create_recipe/comment/favorite/follow/review'
+        comment: '活动类型: create_recipe/comment/favorite/follow/review/work'
       },
       targetId: {
         type: DataTypes.STRING(36),

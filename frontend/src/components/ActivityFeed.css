@@ -1,0 +1,143 @@
+.activity-feed {
+  margin: 24px 0;
+}
+
+.activity-feed__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 0 20px;
+}
+
+.activity-feed__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.activity-feed__title-icon {
+  font-size: 20px;
+}
+
+.activity-feed__loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+/* ── Activity Card ── */
+.activity-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-card:hover {
+  background-color: #fafafa;
+}
+
+.activity-card:active {
+  background-color: #f5f5f5;
+}
+
+.activity-card__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.activity-card__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e8e8e8;
+}
+
+.activity-card__avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.activity-card__type-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.activity-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-card__user-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.activity-card__username {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.activity-card__action {
+  font-size: 13px;
+  color: #888;
+}
+
+.activity-card__recipe-title {
+  font-size: 13px;
+  color: #ff6b35;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.activity-card__time {
+  font-size: 12px;
+  color: #bbb;
+  margin-top: 2px;
+}
+
+.activity-card__cover {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f0f0f0;
+}
+
+/* ── Empty State ── */
+.activity-feed__empty {
+  padding: 0 20px;
+}
