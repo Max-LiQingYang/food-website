@@ -32,6 +32,49 @@ const SEASON_LABELS: Record<string, string> = {
   winter: '冬',
 }
 
+function renderStars(rating: number): string {
+  const full = Math.round(rating)
+  const empty = 5 - full
+  return '★'.repeat(full) + '☆'.repeat(empty)
+}
+
+function rankBadge(rank: number) {
+  if (rank === 1) {
+    return (
+      <div className="rank-card__badge">
+        <span className="rank-card__rank-crown">♛</span>
+        <span className="rank-card__rank-num rank-card__rank-num--gold">1</span>
+      </div>
+    )
+  }
+  if (rank === 2) {
+    return (
+      <div className="rank-card__badge">
+        <span className="rank-card__rank-num rank-card__rank-num--silver">2</span>
+      </div>
+    )
+  }
+  if (rank === 3) {
+    return (
+      <div className="rank-card__badge">
+        <span className="rank-card__rank-num rank-card__rank-num--bronze">3</span>
+      </div>
+    )
+  }
+  return (
+    <div className="rank-card__badge">
+      <span className="rank-card__rank-num rank-card__rank-num--normal">#{rank}</span>
+    </div>
+  )
+}
+
+function getCardClass(rank: number) {
+  if (rank === 1) return 'rank-card--gold'
+  if (rank === 2) return 'rank-card--silver'
+  if (rank === 3) return 'rank-card--bronze'
+  return 'rank-card--normal'
+}
+
 export default function RankingsPage() {
   const [period, setPeriod] = useState('alltime')
   const [sortBy, setSortBy] = useState('composite')
@@ -52,13 +95,6 @@ export default function RankingsPage() {
   }, [fetchData])
 
   const { refreshing, pullDistance, statusText, touchHandlers } = usePullToRefresh({ onRefresh: fetchData })
-
-  const rankEmoji = (rank: number) => {
-    if (rank === 1) return '🏆'
-    if (rank === 2) return '🥈'
-    if (rank === 3) return '🥉'
-    return `#${rank}`
-  }
 
   const getPrimaryStat = (item: RankedRecipe) => {
     switch (sortBy) {
@@ -131,10 +167,6 @@ export default function RankingsPage() {
                 <div className="skeleton-line w-50" />
                 <div className="skeleton-line w-30" />
               </div>
-              <div className="skeleton-stats">
-                <div className="skeleton-line w-40" />
-                <div className="skeleton-line w-40" />
-              </div>
             </div>
           ))}
         </div>
@@ -161,17 +193,15 @@ export default function RankingsPage() {
         <div className="rankings-page__list">
           {list.map((item) => {
             const primaryStat = getPrimaryStat(item)
-            const rankColor = item.rank <= 3 ? `rank-${item.rank}` : `rank-4`
+            const cardClass = getCardClass(item.rank)
             return (
               <Link
                 key={item.id}
                 to={`/recipe/${item.id}`}
-                className={`rank-card rank-card--${item.rank <= 3 ? 'top' : 'normal'}`}
+                className={`rank-card ${cardClass}`}
               >
                 {/* 排名徽章 */}
-                <div className="rank-card__badge">
-                  <span className={`rank-card__rank-num ${rankColor}`}>{rankEmoji(item.rank)}</span>
-                </div>
+                {rankBadge(item.rank)}
 
                 {/* 封面图 */}
                 <div className="rank-card__cover-wrap">
@@ -195,51 +225,57 @@ export default function RankingsPage() {
                 {/* 卡片信息 */}
                 <div className="rank-card__info">
                   <h3 className="rank-card__title">{item.title}</h3>
-                  <div className="rank-card__meta">
-                    <span className="rank-card__category-tag">{item.category}</span>
-                    <span className="rank-card__meta-item">
-                      {item.cookTime ? `${item.cookTime}分钟` : ''}
-                    </span>
+
+                  {/* 元信息合并单行：菜系·难度·时长·季节 */}
+                  <div className="rank-card__meta-row">
+                    <span className="rank-card__meta-category">{item.category}</span>
+                    <span className="rank-card__meta-sep">·</span>
                     {item.difficulty && (
-                      <span className="rank-card__difficulty">{DIFFICULTY_LABELS[item.difficulty] || item.difficulty}</span>
+                      <>
+                        <span className={`rank-card__meta-difficulty ${item.difficulty}`}>
+                          {DIFFICULTY_LABELS[item.difficulty] || item.difficulty}
+                        </span>
+                        <span className="rank-card__meta-sep">·</span>
+                      </>
+                    )}
+                    {item.cookTime ? (
+                      <>
+                        <span>{item.cookTime}分钟</span>
+                        <span className="rank-card__meta-sep">·</span>
+                      </>
+                    ) : null}
+                    {item.season && item.season !== 'all' ? (
+                      <span>{SEASON_LABELS[item.season] || item.season}季</span>
+                    ) : (
+                      <span>全年</span>
                     )}
                   </div>
-                  <div className="rank-card__meta" style={{ marginBottom: 0 }}>
-                    {item.season && item.season !== 'all' && (
-                      <span className="rank-card__season-tag">{SEASON_LABELS[item.season] || item.season}季推荐</span>
-                    )}
-                    {item.qualityScore !== undefined && item.qualityScore > 0 && (
-                      <span className="rank-card__quality-tag">优质</span>
-                    )}
-                  </div>
+
+                  {/* 评分进度条 + 星级 */}
+                  {item.avgRating != null && item.avgRating > 0 && (
+                    <div className="rank-card__rating-row">
+                      <div className="rank-card__progress-bar">
+                        <div
+                          className="rank-card__progress-fill"
+                          style={{ width: `${(item.avgRating / 5) * 100}%` }}
+                        />
+                      </div>
+                      <span className="rank-card__rating-value">{item.avgRating.toFixed(1)}</span>
+                      <span className="rank-card__stars">{renderStars(item.avgRating)}</span>
+                    </div>
+                  )}
                 </div>
 
-                {/* 统计区 */}
-                <div className="rank-card__stats">
-                  <div className="rank-card__primary-stat">
-                    <span className="rank-card__stat-value--primary">
-                      {typeof primaryStat.value === 'number'
-                        ? primaryStat.value >= 1000
-                          ? (primaryStat.value / 1000).toFixed(1) + 'k'
-                          : primaryStat.value
-                        : primaryStat.value}
-                    </span>
-                    <span className="rank-card__stat-label">{primaryStat.label}</span>
-                  </div>
-                  {sortBy !== 'rating' && item.avgRating != null && item.avgRating > 0 && (
-                    <div className="rank-card__stat">
-                      <div className="rank-card__rating">
-                        <span className="rank-card__rating-value">{item.avgRating.toFixed(1)}</span>
-                      </div>
-                      <span className="rank-card__stat-label">⭐ 评分</span>
-                    </div>
-                  )}
-                  {sortBy !== 'views' && item.viewCount != null && item.viewCount > 0 && (
-                    <div className="rank-card__stat" style={{ display: sortBy === 'rating' ? 'none' : 'flex' }}>
-                      <span className="rank-card__stat-value">{item.viewCount >= 1000 ? (item.viewCount / 1000).toFixed(1) + 'k' : item.viewCount}</span>
-                      <span className="rank-card__stat-label">浏览</span>
-                    </div>
-                  )}
+                {/* 主统计值 */}
+                <div className="rank-card__primary-stat">
+                  <span className="rank-card__stat-value--primary">
+                    {typeof primaryStat.value === 'number'
+                      ? primaryStat.value >= 1000
+                        ? (primaryStat.value / 1000).toFixed(1) + 'k'
+                        : primaryStat.value
+                      : primaryStat.value}
+                  </span>
+                  <span className="rank-card__stat-label">{primaryStat.label}</span>
                 </div>
               </Link>
             )
