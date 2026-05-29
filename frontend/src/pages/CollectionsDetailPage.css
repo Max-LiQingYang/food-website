@@ -256,3 +256,21 @@
   0% { background-position: 100% 50%; }
   100% { background-position: 0 50%; }
 }
+
+/* ── CollectionsDetailPage 暗色覆写 ── */
+body.dark .recipe-card__remove-btn {
+  border-color: var(--color-border);
+  background: var(--color-card);
+}
+
+body.dark .recipe-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+body.dark .detail-notfound h2 {
+  color: var(--color-text);
+}
+
+body.dark .detail-notfound p {
+  color: var(--color-text-secondary);
+}

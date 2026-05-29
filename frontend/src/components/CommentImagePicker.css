@@ -86,3 +86,37 @@
   font-size: 13px;
   margin-top: 6px;
 }
+
+/* ── CommentImagePicker 暗色覆写 ── */
+body.dark .comment-image-picker__item {
+  border-color: var(--color-border);
+}
+
+body.dark .comment-image-picker__remove {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+body.dark .comment-image-picker__remove:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+body.dark .comment-image-picker__add {
+  border-color: var(--color-border);
+}
+
+body.dark .comment-image-picker__add:hover {
+  border-color: var(--color-primary);
+  background: rgba(232, 102, 62, 0.08);
+}
+
+body.dark .comment-image-picker__plus {
+  color: var(--color-text-muted);
+}
+
+body.dark .comment-image-picker__hint {
+  color: var(--color-text-muted);
+}
+
+body.dark .comment-image-picker__error {
+  color: var(--color-error);
+}

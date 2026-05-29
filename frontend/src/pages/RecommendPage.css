@@ -742,3 +742,82 @@
     padding: 12px;
   }
 }
+
+/* ── RecommendPage 暗色覆写 ── */
+body.dark .recommend-card__desc {
+  color: var(--color-text-secondary);
+}
+
+body.dark .recommend-card__reason {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+}
+
+body.dark .recommend-empty__hint {
+  color: var(--color-text-muted);
+}
+
+body.dark .recommend-empty__step {
+  color: var(--color-text-secondary);
+}
+
+body.dark .recommend-history__tag {
+  border-color: var(--color-border);
+}
+
+body.dark .recommend-card__fav {
+  background: rgba(30, 30, 50, 0.85);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .recommend-empty__banner {
+  background: linear-gradient(135deg, #1e1e32, #1a1a2e);
+}
+
+body.dark .recommend-card__cover--ai {
+  background: linear-gradient(135deg, #2e1a14, #1a1a2e);
+}
+
+body.dark .recommend-card {
+  box-shadow: var(--shadow-sm);
+}
+
+body.dark .recommend-card:hover {
+  box-shadow: 0 8px 24px rgba(232, 102, 62, 0.25);
+}
+
+/* Badge 暗色 */
+body.dark .recommend-badge--high {
+  background: #1b3d1b;
+  color: #a5d6a7;
+}
+
+body.dark .recommend-badge--mid {
+  background: #3d3d1b;
+  color: #ffca28;
+}
+
+body.dark .recommend-badge--low {
+  background: #3d2e1b;
+  color: #ff8a65;
+}
+
+body.dark .recommend-badge--ai {
+  background: #2d1b3d;
+  color: #ce93d8;
+}
+
+/* Tag 暗色 */
+body.dark .recommend-tag {
+  background: #1b3d1b;
+  color: #a5d6a7;
+}
+
+body.dark .recommend-tag--ai {
+  background: #2d1b3d;
+  color: #ce93d8;
+}
+
+body.dark .recommend-card__reason strong {
+  color: var(--color-primary);
+}

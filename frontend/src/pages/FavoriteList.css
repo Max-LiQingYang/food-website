@@ -384,3 +384,29 @@
     font-size: 16px;
   }
 }
+
+/* ── FavoriteList 暗色覆写 ── */
+body.dark .pagination-btn:hover:not(:disabled) {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+body.dark .overlay-spinner {
+  border-top-color: var(--color-error);
+}
+
+body.dark .btn--primary {
+  background: var(--color-error);
+}
+
+body.dark .btn--primary:hover {
+  background: #e04040;
+}
+
+body.dark .favorite-list__overlay {
+  background: rgba(18, 18, 30, 0.7);
+}
+
+body.dark .recipe-card__cooktime {
+  background: rgba(0, 0, 0, 0.75);
+}

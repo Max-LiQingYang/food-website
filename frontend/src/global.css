@@ -62,6 +62,7 @@ body.dark {
   --color-skeleton-from: #262640;
   --color-skeleton-to: #303050;
   --color-scrollbar: #3e3e58;
+  --color-bg-secondary: #1a1a2e;
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);

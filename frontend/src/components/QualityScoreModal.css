@@ -121,8 +121,29 @@
 .score-poor { color: #c62828; }
 .score-bad { color: #b71c1c; }
 
-.dark .score-excellent { color: #66bb6a; }
-.dark .score-good { color: #ffca28; }
-.dark .score-average { color: #ff8a65; }
-.dark .score-poor { color: #ef5350; }
-.dark .score-bad { color: #e57373; }
+body.dark .score-excellent { color: #66bb6a; }
+body.dark .score-good { color: #ffca28; }
+body.dark .score-average { color: #ff8a65; }
+body.dark .score-poor { color: #ef5350; }
+body.dark .score-bad { color: #e57373; }
+
+/* ── QualityScoreModal 暗色附加覆写 ── */
+body.dark .quality-score-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+body.dark .quality-score-modal {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+body.dark .quality-close-btn:hover {
+  background: var(--color-bg-secondary);
+}
+
+body.dark .quality-overall {
+  background: var(--color-bg-secondary);
+}
+
+body.dark .quality-progress-bar {
+  background: var(--color-bg-secondary);
+}

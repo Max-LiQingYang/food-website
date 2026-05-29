@@ -288,3 +288,8 @@
 .btn--primary:hover {
   background: var(--color-primary-dark);
 }
+
+/* ── CollectionsPage 暗色覆写 ── */
+body.dark .collection-modal__backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}

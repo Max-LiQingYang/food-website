@@ -141,3 +141,53 @@
 .activity-feed__empty {
   padding: 0 20px;
 }
+
+/* ── ActivityFeed 暗色覆写 ── */
+body.dark .activity-feed__title {
+  color: var(--color-text);
+}
+
+body.dark .activity-card {
+  border-bottom-color: var(--color-border);
+}
+
+body.dark .activity-card:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+body.dark .activity-card:active {
+  background-color: var(--color-bg-secondary);
+}
+
+body.dark .activity-card__avatar {
+  background: var(--color-skeleton-from);
+}
+
+body.dark .activity-card__avatar-placeholder {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+body.dark .activity-card__type-badge {
+  background: var(--color-card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .activity-card__username {
+  color: var(--color-text);
+}
+
+body.dark .activity-card__action {
+  color: var(--color-text-secondary);
+}
+
+body.dark .activity-card__recipe-title {
+  color: var(--color-primary);
+}
+
+body.dark .activity-card__time {
+  color: var(--color-text-muted);
+}
+
+body.dark .activity-card__cover {
+  background: var(--color-skeleton-from);
+}

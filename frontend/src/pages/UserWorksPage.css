@@ -216,3 +216,67 @@
   font-size: 14px;
   color: var(--text-secondary, #888);
 }
+
+/* ── UserWorksPage 暗色覆写 ── */
+body.dark .works-page__back {
+  color: var(--color-primary);
+}
+
+body.dark .works-page__title {
+  color: var(--color-text);
+}
+
+body.dark .works-page__count {
+  color: var(--color-text-secondary);
+}
+
+body.dark .works-card {
+  background: var(--color-card);
+  border-color: var(--color-border);
+}
+
+body.dark .works-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .works-card__image-wrap {
+  background: var(--color-skeleton-from);
+}
+
+body.dark .works-card__recipe {
+  color: var(--color-primary);
+}
+
+body.dark .works-card__content {
+  color: var(--color-text-secondary);
+}
+
+body.dark .works-card__meta {
+  color: var(--color-text-muted);
+}
+
+body.dark .works-card__rating {
+  color: #f5a623; /* 保留语义黄 */
+}
+
+body.dark .works-empty__heading {
+  color: var(--color-text);
+}
+
+body.dark .works-empty__text {
+  color: var(--color-text-secondary);
+}
+
+body.dark .works-pagination .pagination-btn {
+  border-color: var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+body.dark .works-pagination .pagination-btn:not(:disabled):hover {
+  background: var(--color-bg-secondary);
+}
+
+body.dark .works-pagination .pagination-info {
+  color: var(--color-text-secondary);
+}
