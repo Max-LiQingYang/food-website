@@ -56,6 +56,7 @@ export default function RecommendPage() {
   const [personalizedLoading, setPersonalizedLoading] = useState(false)
   const [recommendTab, setRecommendTab] = useState<'personalized' | 'popular'>('popular')
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const toast = useToast()
   const resultRef = useRef<HTMLDivElement>(null)
 
@@ -87,9 +88,9 @@ export default function RecommendPage() {
 
       try {
         const res: any = await recommendRecipes(query)
-        setResults(res.list || [])
-        setAiRecipes(res.aiRecipes || [])
-        setAiGenerated(res.aiGenerated || false)
+        setResults(res.data?.list || [])
+        setAiRecipes(res.data?.aiRecommends || [])
+        setAiGenerated(res.data?.aiGenerated || false)
         saveHistory(query)
         setHistory(loadHistory())
         // 滚动到结果区

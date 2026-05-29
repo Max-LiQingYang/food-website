@@ -51,6 +51,9 @@ router.use('/recipes/compare', compareRoutes)
 // 季节性推荐（无需认证，必须在 recipeRoutes 之前避免 /:id 拦截 /seasonal）
 router.use('/recipes/seasonal', seasonalRoutes)
 
+// 每日推荐（无需认证，必须在 recipeRoutes 之前避免 /:id 拦截 /daily-pick）
+router.use('/recipes', require('./dailyPick'))
+
 router.use('/recipes', recipeRoutes)
 router.use('/users', userRoutes)
 

@@ -1,0 +1,210 @@
+/* ── 今日推荐卡片 ── */
+.daily-pick-card {
+  background: linear-gradient(135deg, #fff8f0, #fff);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(232,102,62,0.08);
+  margin-bottom: 24px;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.daily-pick-card--shuffling {
+  opacity: 0.6;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+.daily-pick-card__inner {
+  display: flex;
+  flex-direction: row;
+  min-height: 220px;
+}
+
+/* ── 图片区 ── */
+.daily-pick-card__image-wrap {
+  width: 40%;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.daily-pick-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+  display: block;
+}
+
+/* ── 角标 ── */
+.daily-pick-card__badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #e8663e;
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 0 0 8px 0;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+/* ── 内容区 ── */
+.daily-pick-card__content {
+  width: 60%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.daily-pick-card__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px;
+}
+.daily-pick-card__desc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.daily-pick-card__meta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.daily-pick-card__story {
+  font-style: italic;
+  color: #888;
+  font-size: 13px;
+  border-left: 3px solid #e8663e;
+  padding-left: 12px;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+/* ── 按钮区 ── */
+.daily-pick-card__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.daily-pick-card__btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.daily-pick-card__btn--primary {
+  background: #e8663e;
+  color: #fff;
+}
+.daily-pick-card__btn--primary:hover {
+  background: #d55a32;
+}
+.daily-pick-card__btn--ghost {
+  background: transparent;
+  color: #e8663e;
+  border: 1px solid #e8663e;
+}
+.daily-pick-card__btn--ghost:hover {
+  background: rgba(232,102,62,0.08);
+}
+.daily-pick-card__btn--ghost:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── 暗色模式 ── */
+body.dark .daily-pick-card {
+  background: linear-gradient(135deg, #2a2520, #1e1e1e);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+body.dark .daily-pick-card__title {
+  color: #e0e0e0;
+}
+body.dark .daily-pick-card__desc {
+  color: #aaa;
+}
+body.dark .daily-pick-card__meta {
+  color: #888;
+}
+body.dark .daily-pick-card__story {
+  color: #999;
+}
+
+/* ── 骨架屏 ── */
+.daily-pick-skeleton {
+  display: flex;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  min-height: 220px;
+}
+.daily-pick-skeleton__img {
+  width: 40%;
+  background: #eee;
+}
+.daily-pick-skeleton__content {
+  width: 60%;
+  padding: 24px;
+}
+body.dark .daily-pick-skeleton__img {
+  background: #333;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+body.dark .shimmer {
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── 响应式 ── */
+@media (max-width: 768px) {
+  .daily-pick-card__inner {
+    flex-direction: column;
+  }
+  .daily-pick-card__image-wrap,
+  .daily-pick-card__image {
+    width: 100%;
+  }
+  .daily-pick-card__image {
+    height: 200px;
+    aspect-ratio: auto;
+  }
+  .daily-pick-card__content {
+    width: 100%;
+    padding: 16px;
+  }
+  .daily-pick-card__title {
+    font-size: 18px;
+  }
+}
+@media (max-width: 480px) {
+  .daily-pick-card__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .daily-pick-card__btn {
+    text-align: center;
+  }
+}

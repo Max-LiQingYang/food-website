@@ -154,6 +154,9 @@ export default function HomePage() {
       {/* ── 精选轮播 ── */}
       {showFullLayout && <HeroSection recipes={heroRecipes} />}
 
+      {/* ── 今日推荐 ── */}
+      {showFullLayout && <DailyPickCard />}
+
       {/* ── 搜索栏 ── */}
       <form className="home-search" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>
         <SearchAutocomplete

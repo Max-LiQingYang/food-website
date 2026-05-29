@@ -275,6 +275,15 @@ export function getSeasonalRecipes(season?: string) {
 }
 
 /**
+ * 每日食谱推荐
+ * GET /api/recipes/daily-pick
+ */
+export function getDailyPick(random?: boolean): Promise<any> {
+  const params = random ? { random: 1 } : {}
+  return apiClient.get('/recipes/daily-pick', { params })
+}
+
+/**
  * 获取相似食谱推荐（含 Jaccard 相似度）
  * GET /api/recipes/:id/similar
  */
