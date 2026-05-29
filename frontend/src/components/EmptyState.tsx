@@ -33,6 +33,12 @@ interface Props {
   className?: string
 }
 
+const variantIcons: Record<string, string> = {
+  default: '📋',
+  compact: '📝',
+  search: '🔍',
+}
+
 export default function EmptyState({
   icon,
   title,
@@ -48,6 +54,7 @@ export default function EmptyState({
   className = '',
 }: Props) {
   const navigate = useNavigate()
+  const displayIcon = icon || variantIcons[variant] || variantIcons.default
 
   const handleCtaClick = () => {
     if (ctaLink) navigate(ctaLink)
@@ -61,7 +68,7 @@ export default function EmptyState({
 
   return (
     <div className={`empty-state empty-state--${variant} ${className}`} role="status">
-      {icon && <div className="empty-state__icon">{icon}</div>}
+      <div className="empty-state__icon">{displayIcon}</div>
 
       {title && <h3 className="empty-state__title">{title}</h3>}
 
@@ -93,6 +100,17 @@ export default function EmptyState({
             ))}
           </div>
         </>
+      )}
+
+      {variant === 'search' && (
+        <div className="empty-state__tips">
+          <p>试试这些热门搜索：</p>
+          <div className="empty-state__tags">
+            {['宫保鸡丁', '红烧肉', '蛋糕', '沙拉', '炒饭'].map(tag => (
+              <span key={tag} className="empty-state__tag">{tag}</span>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )
