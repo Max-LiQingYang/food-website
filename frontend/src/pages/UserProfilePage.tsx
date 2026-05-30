@@ -10,12 +10,14 @@ import {
   updateProfile,
   getAuthorInfo,
   getUserForks,
+  getCookedRecipes,
   type Recipe,
   type UserStats,
   type Collection,
   type AchievementItem,
   type AuthorLevelInfo,
   type ForkInfo,
+  type CookedRecipeItem,
 } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import FavoriteNoteModal from '../components/FavoriteNoteModal'
@@ -25,7 +27,7 @@ import ActivityHeatmap from '../components/ActivityHeatmap'
 import AchievementDetailModal from '../components/AchievementDetailModal'
 import './UserProfilePage.css'
 
-type TabType = 'recipes' | 'favorites' | 'collections'
+type TabType = 'recipes' | 'favorites' | 'collections' | 'cooked'
 type TabTypeWithHistory = TabType | 'history' | 'forks'
 
 // ─── CountUp 组件 ───
@@ -219,6 +221,13 @@ export default function UserProfilePage() {
   const [collections, setCollections] = useState<Collection[]>([])
   const [collectionsLoading, setCollectionsLoading] = useState(true)
 
+  // Cooked state (Iter#99)
+  const [cookedRecipes, setCookedRecipes] = useState<CookedRecipeItem[]>([])
+  const [cookedTotal, setCookedTotal] = useState(0)
+  const [cookedLoading, setCookedLoading] = useState(false)
+  const [cookedPage, setCookedPage] = useState(1)
+  const cookedPageSize = 20
+
   // Note modal state
   const [noteModalVisible, setNoteModalVisible] = useState(false)
   const [noteTargetId, setNoteTargetId] = useState<string>('')
@@ -320,6 +329,22 @@ export default function UserProfilePage() {
       .catch(() => {})
       .finally(() => setCollectionsLoading(false))
   }, [id, activeTab])
+
+  // Load cooked tab (Iter#99)
+  useEffect(() => {
+    if (!id || activeTab !== 'cooked') return
+    setCookedLoading(true)
+    getCookedRecipes(id, { page: cookedPage, pageSize: cookedPageSize })
+      .then(res => {
+        setCookedRecipes(res.list)
+        setCookedTotal(res.total)
+      })
+      .catch(() => {
+        setCookedRecipes([])
+        setCookedTotal(0)
+      })
+      .finally(() => setCookedLoading(false))
+  }, [id, activeTab, cookedPage])
 
   // Open edit modal
   function openEditModal() {

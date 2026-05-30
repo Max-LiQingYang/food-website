@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getRecipeById, deleteRecipe } from '../api'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
-import { getAuthorInfo } from '../api'
+import { getAuthorInfo, getCookStatus, cookRecipe, uncookRecipe } from '../api'
 import type { AuthorLevelInfo } from '../api'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
@@ -93,6 +93,12 @@ export default function RecipeDetailPage() {
   const [showCulturalBg, setShowCulturalBg] = useState(false)
   const [favoriteNote, setFavoriteNote] = useState('')
   const [noteModalVisible, setNoteModalVisible] = useState(false)
+
+  // ═══ Iter#99: "我做过"标记 ──
+  const [isCooked, setIsCooked] = useState(false)
+  const [cookCount, setCookCount] = useState(0)
+  const [totalCookedCount, setTotalCookedCount] = useState(0)
+  const [cookLoading, setCookLoading] = useState(false)
 
   // ═══ #63: 食谱改编 ──
   const [forks, setForks] = useState<ForkInfo[]>([])
@@ -240,12 +246,16 @@ export default function RecipeDetailPage() {
     Promise.all([
       getRecipeById(id),
       getFavoriteStatus(id).catch(() => ({ isFavorited: false, favoriteId: '' })),
+      getCookStatus(id).catch(() => ({ isCooked: false, count: 0, lastCookedAt: null, totalCookedCount: 0 })),
     ] as const)
-      .then(([res, favStatus]) => {
+      .then(([res, favStatus, cookStatus]) => {
         const recipeData = (res as any).data ?? res
         setRecipe(recipeData as RecipeDetail)
         setIsFavorited(favStatus.isFavorited)
         setFavoriteNote(favStatus.note || '')
+        setIsCooked(cookStatus.isCooked)
+        setCookCount(cookStatus.count)
+        setTotalCookedCount(cookStatus.totalCookedCount)
         // 获取改编版本列表
         if (recipeData && recipeData.forkCount > 0) {
           getRecipeForks(id).then(forkRes => {
@@ -320,6 +330,45 @@ export default function RecipeDetailPage() {
       toast.error(err?.message || '操作失败')
     } finally {
       setFavLoading(false)
+    }
+  }
+
+  // ═══ Iter#99: "我做过"标记切换 ──
+  const handleCookToggle = async () => {
+    if (!id || cookLoading) return
+    const token = localStorage.getItem('token')
+    if (!token) {
+      toast.info('请先登录')
+      navigate('/login')
+      return
+    }
+
+    setCookLoading(true)
+    const prevIsCooked = isCooked
+    const prevCount = cookCount
+
+    // Optimistic UI
+    try {
+      if (prevIsCooked) {
+        setIsCooked(false)
+        setCookCount(0)
+        setTotalCookedCount(prev => Math.max(0, prev - 1))
+        await uncookRecipe(id)
+        toast.success('已取消标记')
+      } else {
+        setIsCooked(true)
+        setCookCount(1)
+        setTotalCookedCount(prev => prev + 1)
+        const res = await cookRecipe(id)
+        setCookCount(res.count)
+        toast.success('已标记为做过')
+      }
+    } catch {
+      setIsCooked(prevIsCooked)
+      setCookCount(prevCount)
+      toast.error('操作失败，请重试')
+    } finally {
+      setCookLoading(false)
     }
   }
 
@@ -565,6 +614,23 @@ export default function RecipeDetailPage() {
               <span className="fav-text">{isFavorited ? '已收藏' : '收藏'}</span>
             </button>
             <AddToCollectionDropdown recipeId={id} label="📁 收藏到" />
+            {/* Cook It 按钮 */}
+            <button
+              className={`detail-cook-btn ${isCooked ? 'is-cooked' : ''}`}
+              onClick={handleCookToggle}
+              disabled={cookLoading}
+              title={isCooked ? '取消标记' : '我做过'}
+            >
+              <span className="cook-btn-icon">
+                {cookLoading ? '⋯' : isCooked ? '👨‍🍳' : '🍳'}
+              </span>
+              <span className="cook-btn-text">
+                {isCooked ? `已做过${cookCount > 1 ? `(${cookCount}次)` : ''}` : '我做过'}
+                {totalCookedCount > 0 && (
+                  <span className="cook-btn-count">({totalCookedCount})</span>
+                )}
+              </span>
+            </button>
           </div>
 
           {/* 作者操作栏 */}
@@ -1046,6 +1112,31 @@ export default function RecipeDetailPage() {
             <span className="fab-btn__icon">📝</span>
             <span>{favoriteNote ? '备注' : '加备注'}</span>
           </button>
+        )}
+
+        {/* Cook It 按钮 — 移动端 */}
+        <button
+          className={`fab-btn ${isCooked ? 'fab-btn--cooked' : ''}`}
+          onClick={handleCookToggle}
+          disabled={cookLoading}
+          title={isCooked ? '取消标记' : '我做过'}
+        >
+          <span className="fab-btn__icon">
+            {cookLoading ? '⋯' : isCooked ? '👨‍🍳' : '🍳'}
+          </span>
+          <span>
+            {cookLoading ? '' : isCooked
+              ? `已做过${cookCount > 1 ? cookCount + '次' : ''}`
+              : '我做过'}
+          </span>
+        </button>
+
+        {/* 做过状态下 → 写日志快捷入口 */}
+        {isCooked && (
+          <Link to={`/cooking-journal?recipeId=${id}`} className="fab-btn" title="写烹饪日志">
+            <span className="fab-btn__icon">📝</span>
+            <span>写日志</span>
+          </Link>
         )}
 
         <button className="fab-btn" onClick={handleFork} disabled={forking} title="改编食谱">

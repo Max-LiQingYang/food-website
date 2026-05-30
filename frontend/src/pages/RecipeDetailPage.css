@@ -1710,3 +1710,158 @@ body.dark .detail-forks-card__author {
 body.dark .detail-forks-card__note {
   color: #fbbf24;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   "我做过"按钮 — 桌面端 detail-cover-actions (Iter#99)
+   ═══════════════════════════════════════════════════════════════ */
+
+.detail-cook-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text, #2d2d2d);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 44px;
+}
+
+.detail-cook-btn:hover:not(:disabled) {
+  border-color: #52c41a;
+  color: #52c41a;
+  background: var(--color-card, #fff);
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.detail-cook-btn:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+/* 已做过状态 */
+.detail-cook-btn.is-cooked {
+  background: #e8f5e9;
+  border-color: #52c41a;
+  color: #2e7d32;
+  border-width: 2px;
+}
+
+.detail-cook-btn.is-cooked:hover:not(:disabled) {
+  background: #c8e6c9;
+  border-color: #52c41a;
+  color: #2e7d32;
+}
+
+/* Loading 状态 */
+.detail-cook-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.detail-cook-btn:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 子元素 */
+.cook-btn-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cook-btn-text {
+  white-space: nowrap;
+}
+
+.cook-btn-count {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-left: 2px;
+}
+
+/* CookBounce 动画 */
+@keyframes cookBounce {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.35); }
+  50%  { transform: scale(0.9); }
+  75%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.detail-cook-btn.is-cooked .cook-btn-icon {
+  animation: cookBounce 0.45s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   "我做过" — 暗色模式
+   ═══════════════════════════════════════════════════════════════ */
+
+body.dark .detail-cook-btn {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .detail-cook-btn:hover:not(:disabled) {
+  border-color: #52c41a;
+  color: #81c784;
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .detail-cook-btn.is-cooked {
+  background: #1b3a1b;
+  border-color: #4caf50;
+  color: #81c784;
+}
+
+body.dark .detail-cook-btn.is-cooked:hover:not(:disabled) {
+  background: #1f4a1f;
+  border-color: #66bb6a;
+  color: #a5d6a7;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   "我做过" — 移动端 FAB
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .fab-btn--cooked {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .fab-btn--cooked:hover,
+  .fab-btn--cooked:active {
+    background: #c8e6c9;
+    color: #2e7d32;
+  }
+
+  .fab-btn--cooked .fab-btn__icon {
+    animation: cookBounce 0.45s ease;
+  }
+}
+
+/* 移动端 FAB 暗色 */
+body.dark .fab-btn--cooked {
+  background: #1b3a1b;
+  color: #81c784;
+}
+
+body.dark .fab-btn--cooked:hover,
+body.dark .fab-btn--cooked:active {
+  background: #1f4a1f;
+  color: #a5d6a7;
+}

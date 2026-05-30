@@ -384,4 +384,63 @@ router.get('/:id/forks', async (req, res) => {
   }
 })
 
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/cooked-recipes — 用户做过的食谱列表（分页，公开）
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/cooked-recipes', async (req, res) => {
+  try {
+    const { id } = req.params
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1)
+    const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize, 10) || 20))
+    const offset = (page - 1) * pageSize
+
+    const user = await User.findByPk(id, { attributes: ['id'] })
+    if (!user) {
+      return res.status(404).json(resJSON(404, '用户不存在', null))
+    }
+
+    const { UserRecipeAction } = require('../models')
+
+    const { count, rows } = await UserRecipeAction.findAndCountAll({
+      where: { userId: id, action: 'cooked' },
+      order: [['lastCookedAt', 'DESC']],
+      offset,
+      limit: pageSize,
+    })
+
+    // JOIN Recipe 表获取食谱基本信息
+    const recipeIds = rows.map(r => r.recipeId)
+    const recipes = recipeIds.length > 0
+      ? await Recipe.findAll({
+          where: { id: { [Op.in]: recipeIds } },
+          attributes: ['id', 'title', 'coverImage', 'category'],
+        })
+      : []
+
+    const recipeMap = {}
+    for (const r of recipes) {
+      recipeMap[r.id] = r
+    }
+
+    const list = rows.map(action => {
+      const recipe = recipeMap[action.recipeId]
+      return {
+        recipeId: action.recipeId,
+        title: recipe ? recipe.title : '未知食谱',
+        coverImage: recipe ? recipe.coverImage : null,
+        category: recipe ? recipe.category : null,
+        cookCount: action.count,
+        lastCookedAt: action.lastCookedAt,
+      }
+    })
+
+    return res.status(200).json(
+      resJSON(0, 'ok', { list, total: count, page, pageSize })
+    )
+  } catch (err) {
+    console.error('[GET /users/:id/cooked-recipes] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
 module.exports = router

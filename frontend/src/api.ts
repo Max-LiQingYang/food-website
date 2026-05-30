@@ -1793,6 +1793,62 @@ export function getAuthorInfo(userId: string): Promise<AuthorInfoResponse> {
   return apiClient.get(`/users/${userId}/author-info`).then(r => r.data?.data || r.data)
 }
 
+// ─────────────────────────────────────────────────────────────────
+// "我做过"标记 (Cook It) — Iter#99
+// ─────────────────────────────────────────────────────────────────
+
+export interface CookStatus {
+  isCooked: boolean
+  count: number
+  lastCookedAt: string | null
+  totalCookedCount: number
+}
+
+export interface CookActionResponse {
+  id: string
+  count: number
+  lastCookedAt: string
+  isNewRecord: boolean
+}
+
+export interface CookedRecipeItem {
+  recipeId: string
+  title: string
+  coverImage: string | null
+  category: string | null
+  cookCount: number
+  lastCookedAt: string
+}
+
+export interface CookedRecipesResponse {
+  list: CookedRecipeItem[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+/** 标记做过 */
+export function cookRecipe(recipeId: string): Promise<CookActionResponse> {
+  return apiClient.post(`/recipes/${recipeId}/cook`).then(r => r.data?.data || r.data)
+}
+
+/** 取消标记 */
+export function uncookRecipe(recipeId: string): Promise<void> {
+  return apiClient.delete(`/recipes/${recipeId}/cook`).then(() => {})
+}
+
+/** 查询做过状态 */
+export function getCookStatus(recipeId: string): Promise<CookStatus> {
+  return apiClient.get(`/recipes/${recipeId}/cook-status`).then(r => r.data?.data || { isCooked: false, count: 0, lastCookedAt: null, totalCookedCount: 0 })
+}
+
+/** 获取用户做过的食谱列表 */
+export function getCookedRecipes(userId: string, params: { page?: number; pageSize?: number } = {}): Promise<CookedRecipesResponse> {
+  return apiClient.get(`/users/${userId}/cooked-recipes`, { params }).then(r => r.data?.data || { list: [], total: 0, page: 1, pageSize: 20 })
+}
+
+// ─────────────────────────────────────────────────────────────────
+
 export default {
   addFavorite,
   removeFavorite,
@@ -1933,6 +1989,11 @@ export default {
   getActivityFeed,
   // 内容质量巡检 (Iter#97)
   getContentQualityReport,
+  // Cook It (Iter#99)
+  cookRecipe,
+  uncookRecipe,
+  getCookStatus,
+  getCookedRecipes,
 }
 
 // ═══ 迭代#40: 食谱版本对比 ═══

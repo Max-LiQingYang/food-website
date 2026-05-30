@@ -1723,6 +1723,124 @@ router.get('/low-quality', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// POST /:id/cook — 标记做过（幂等 upsert，需认证）
+// ─────────────────────────────────────────────────────────────────
+router.post('/:id/cook', auth, async (req, res) => {
+  try {
+    const userId = req.userId
+    const recipeId = req.params.id
+
+    // 验证食谱存在
+    const recipe = await Recipe.findByPk(recipeId)
+    if (!recipe) return res.status(404).json(resJSON(404, '食谱不存在', null))
+
+    const { UserRecipeAction } = require('../models')
+
+    // 幂等 upsert：存在则 count++ + 更新 lastCookedAt，不存在则插入
+    const [action, created] = await UserRecipeAction.findOrCreate({
+      where: { userId, recipeId, action: 'cooked' },
+      defaults: { count: 1, lastCookedAt: new Date() },
+    })
+
+    if (!created) {
+      action.count += 1
+      action.lastCookedAt = new Date()
+      await action.save()
+    }
+
+    // 非阻塞成就检测
+    setImmediate(() => {
+      try {
+        const { checkAllAchievements } = require('../utils/achievementChecker')
+        checkAllAchievements(userId).catch(() => {})
+      } catch {}
+    })
+
+    return res.json(resJSON(0, '标记成功', {
+      id: action.id,
+      count: action.count,
+      lastCookedAt: action.lastCookedAt,
+      isNewRecord: created,
+    }))
+  } catch (err) {
+    console.error('[POST /recipes/:id/cook] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// DELETE /:id/cook — 取消做过标记（需认证）
+// ─────────────────────────────────────────────────────────────────
+router.delete('/:id/cook', auth, async (req, res) => {
+  try {
+    const userId = req.userId
+    const recipeId = req.params.id
+
+    const { UserRecipeAction } = require('../models')
+    const action = await UserRecipeAction.findOne({
+      where: { userId, recipeId, action: 'cooked' },
+    })
+
+    if (!action) {
+      return res.status(404).json(resJSON(404, '未标记过该食谱', null))
+    }
+
+    await action.destroy()
+
+    return res.json(resJSON(0, '已取消标记', null))
+  } catch (err) {
+    console.error('[DELETE /recipes/:id/cook] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/cook-status — 查询做过状态（需认证）
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/cook-status', auth, async (req, res) => {
+  try {
+    const userId = req.userId
+    const recipeId = req.params.id
+
+    const { UserRecipeAction } = require('../models')
+    const { fn, col } = require('sequelize')
+
+    const [myRecord, totalResult] = await Promise.all([
+      UserRecipeAction.findOne({
+        where: { userId, recipeId, action: 'cooked' },
+        attributes: ['count', 'lastCookedAt'],
+      }),
+      UserRecipeAction.findOne({
+        where: { recipeId, action: 'cooked' },
+        attributes: [[fn('COUNT', fn('DISTINCT', col('userId'))), 'totalCookedCount']],
+        raw: true,
+      }),
+    ])
+
+    const totalCookedCount = parseInt(totalResult?.totalCookedCount || 0, 10)
+
+    if (myRecord) {
+      return res.json(resJSON(0, 'success', {
+        isCooked: true,
+        count: myRecord.count,
+        lastCookedAt: myRecord.lastCookedAt,
+        totalCookedCount,
+      }))
+    }
+
+    return res.json(resJSON(0, 'success', {
+      isCooked: false,
+      count: 0,
+      lastCookedAt: null,
+      totalCookedCount,
+    }))
+  } catch (err) {
+    console.error('[GET /recipes/:id/cook-status] Error:', err)
+    return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
 // GET /:id — 食谱详情（含 ingredients 和 steps 解析为 JSON）
 // ─────────────────────────────────────────────────────────────────
 router.get('/:id', async (req, res) => {
