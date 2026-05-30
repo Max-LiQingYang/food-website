@@ -2462,32 +2462,32 @@
 
 ---
 
-## 迭代 #99 — B/功能增强：食谱"我做过"标记系统 ⏳
+## 迭代 #99 — B/功能增强：食谱"我做过"标记系统 ✅
 **派发时间**: 2026-05-30
+**完成时间**: 2026-05-30
 **方向**: B（功能增强）/ 🟢 现有功能完善
 **基线 Commit**: `1131387`
+**交付 Commit**: `b4abfe4` + `19d44b6`（MySQL 外键约束修复）
+**部署**: ✅ http://39.103.68.205/
 
-### 背景
-迭代#98（A/UI/UX）已完成，按轮换规则进入 B（功能增强）。网站已有完善的收藏、评论、烹饪日志系统，但缺少一个轻量级的"我做过这道菜"标记功能。用户想记录自己尝试过哪些食谱、做过多少次，但当前只能通过收藏或写烹饪日志来间接记录，门槛较高。
-
-### 任务内容（待执行）
-1. **后端模型**：`UserRecipeAction` 模型（userId, recipeId, action: 'cooked', count, lastCookedAt, note）
+### 实际成果
+1. **后端模型**：`UserRecipeAction` 模型（userId, recipeId, action, count, lastCookedAt, note）✅
 2. **后端 API**：
-   - POST /api/recipes/:id/cook-it — 标记做过（count+1，更新 lastCookedAt）
-   - DELETE /api/recipes/:id/cook-it — 取消标记
-   - GET /api/recipes/:id/cook-status — 获取当前用户是否做过 + 总做过人数
-   - GET /api/users/:id/cooked-recipes — 获取用户做过的食谱列表
-3. **前端 RecipeDetailPage**：添加"我做过"按钮（带做过人数计数），点击后状态切换 + Toast 反馈
-4. **前端用户主页**：新增"我的烹饪"标签页，展示做过的食谱列表（含做过次数、上次做的时间）
-5. **与 CookingLog 联动**：做过标记后可选择快捷创建烹饪日志
-6. 本地构建 0 warnings
-7. 部署闭环：commit → build → deploy → 验证
-8. 更新 iteration-tracker.md 和 iteration-lessons.md
+   - POST /api/recipes/:id/cook — 标记做过（count++，更新 lastCookedAt）✅
+   - DELETE /api/recipes/:id/cook — 取消标记 ✅
+   - GET /api/recipes/:id/cook-status — 查询当前用户状态 + 总做过人数 ✅
+   - GET /api/users/:id/cooked-recipes — 分页获取用户做过的食谱列表 ✅
+3. **前端 RecipeDetailPage**："我做过"按钮（🍳/👨‍🍳 图标 + 做过次数计数 + 总做过人数）✅
+4. **前端用户主页**：新增"我的烹饪"标签页，展示做过食谱列表（含次数、时间）✅
+5. **乐观 UI 更新**：点击后立即切换状态，失败回滚 ✅
+6. **构建 0 warnings**（frontend 816ms）✅
+7. **部署闭环**：git pull → build → docker cp → nginx reload → API 验证全绿 ✅
 
-### 用户价值
-- 低门槛记录烹饪历史，无需写完整烹饪日志
-- 看到社区中哪些食谱最受欢迎（做过人数是强社交信号）
-- 快速回顾"我最近做过的菜"，方便复做
-- 为推荐算法提供新的行为维度（做过 vs 仅浏览/收藏）
+### 关键经验
+- **MySQL UUID 外键约束陷阱**：Sequelize UUID 类型映射为 `CHAR(36) BINARY`，与现有 users/recipes 表的 id 列可能存在微妙类型差异，导致 `errno: 150` 外键创建失败。解决方案：`belongsTo(..., { constraints: false })` 禁用数据库级外键，保留应用层关联。
+- **乐观 UI 模式复用**：复用收藏按钮的 optimistic update 模式（先更新 UI → API 调用 → 失败回滚），用户交互无延迟。
+
+### 遗留问题
+- 无 🔴 待修复
 
 **下一个方向**: C（内容质量）

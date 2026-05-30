@@ -143,3 +143,22 @@
 ### 自优化建议
 - **暗色模式检查清单**：新增组件/页面时，强制检查 CSS 文件是否包含 body.dark 样式块
 - **定期覆盖率巡检**：每月运行一次 dark-mode 覆盖率扫描，防止再次下滑
+
+---
+
+## 2026-05-30 迭代#99 — 食谱"我做过"标记系统
+
+### 关键陷阱
+- **MySQL UUID 外键约束失败**：Sequelize `DataTypes.UUID` 映射为 `CHAR(36) BINARY`，与现有 users/recipes 表的 id 列存在微妙类型差异（如 COLLATE 或是否 BINARY），导致 `CREATE TABLE` 时 `errno: 150` 外键约束创建失败，后端容器循环重启
+- **容器重启后 nginx upstream 失效**：后端 `docker restart` 后 nginx `upstream food-backend:3001` 短暂不可解析，需等待容器 health check 通过后 reload
+
+### 修复方法
+- **禁用数据库级外键约束**：`belongsTo(..., { constraints: false })` 阻止 Sequelize sync 生成 FOREIGN KEY，保留应用层关联关系
+- **分离 commit 与修复**：代码 commit 后部署发现外键问题，单独 commit 修复（`19d44b6`），避免回滚整个功能
+
+### 遗留问题
+- 无 🔴 待修复
+
+### 自优化建议
+- **新模型部署前检查外键兼容性**：新增含外键的模型时，先在本地 SQLite 验证通过后再部署到 MySQL；或默认使用 `constraints: false`
+- **部署后第一时间验证容器状态**：后端 docker restart 后必须 `docker ps` 确认状态为 healthy，再执行 nginx reload
