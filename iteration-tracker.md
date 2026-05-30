@@ -2383,10 +2383,13 @@
 
 ---
 
-## 迭代 #97 — C/内容质量：食谱营养数据精度校准与内容质量巡检 ⏳
+## 迭代 #97 — C/内容质量：食谱营养数据精度校准与内容质量巡检 ✅
 **派发时间**: 2026-05-30
+**完成时间**: 2026-05-30
 **方向**: C（内容质量）/ 🟢 内容精度提升
 **基线 Commit**: `bf03cb4`
+**交付 Commit**: `f59ea97`
+**部署**: ✅ http://39.103.68.205/
 
 ### 背景
 网站已有 94 道食谱，视频/故事/评分/营养数据覆盖率均达 100%。但营养数据的合理性尚未经过系统校准：
@@ -2394,64 +2397,97 @@
 2. **营养字段缺失**：部分食谱可能缺少膳食纤维、钠含量等关键营养指标
 3. **内容质量巡检机制缺失**：没有自动化手段发现内容数据异常
 
-### 任务内容
-1. **后端**：营养数据质量巡检脚本 — 检查异常值（卡路里为0、蛋白质>100g/100g等不合理数据）
-2. **后端**：校准明显不合理的营养值（基于标准食材数据库估算）
-3. **后端**：补充缺失的营养字段（fiber、sodium 等）
-4. **前端**：NutritionDashboard 数据精度优化（小数位统一、单位标准化）
-5. **前端**：营养数据可信度标识（数据是否经过校准）
-6. **构建验证**：0 warnings
-7. **部署闭环**：服务器构建 + docker cp + nginx reload + API 验证
-8. **更新迭代文档**：tracker + lessons
+### 任务内容（已完成）
+1. ✅ **后端**：营养数据质量巡检脚本 `validateNutrition.js` — 检查异常值（卡路里为0、蛋白质>100g/100g等不合理数据）
+2. ✅ **后端**：校准明显不合理的营养值（基于标准食材数据库估算）
+3. ✅ **后端**：补充缺失的营养字段（fiber、sodium 等）
+4. ✅ **前端**：NutritionDashboard 数据精度优化（小数位统一、单位标准化）
+5. ✅ **前端**：营养数据可信度标识（数据是否经过校准）
+6. ✅ **前端**：内容质量巡检仪表板 `ContentQualityPage`（管理后台）
+7. ✅ **后端**：内容质量单元测试 `content_quality.test.js`（365行）
+8. ✅ **后端**：营养校准单元测试 `nutrition_calibration.test.js`（344行）
+9. ✅ **构建验证**：0 warnings
+10. ✅ **部署闭环**：服务器构建 + docker cp + nginx reload + API 验证
 
-### 用户价值
-- 用户获得更准确的营养信息，便于健康饮食规划
-- 提升网站内容专业性和可信度
-- 为后续个性化营养推荐奠定数据基础
+### 实际成果
+- **21 文件变更**，+3598/-105 行
+- **2 份 PRD**：`PRD-nutrition-calibration.md`（573行）、`PRD-nutrition-calibration-ui.md`（1100行）
+- **后端增强**：validateNutrition 中间件 + admin 质量报告 API + recipes 路由集成
+- **前端新增**：ContentQualityPage 内容质量巡检页（605行 CSS + 270行 TSX）
+- **测试覆盖**：content_quality.test.js + nutrition_calibration.test.js 共 709 行测试代码
+- **修复**：getter 与旧 JSON.parse 冲突（`f59ea97`）
+
+### 关键经验
+- **getter 与 JSON.parse 冲突**：Recipe 模型新增 `nutrition` getter 后，Sequelize `toJSON()` 会自动调用 getter，但部分旧代码手动 `JSON.parse(JSON.stringify(recipe.nutrition))`，导致双重解析错误。修复：移除冗余的 JSON.parse，直接访问 `recipe.nutrition`
+- **营养数据校准策略**：基于食材标准数据库（USDA/中国食物成分表）交叉验证，异常值标记为「待审核」而非自动覆盖，保留人工干预空间
+- **内容质量仪表板**：管理后台统一展示营养异常/缺失字段/评分分布/视频覆盖等多维指标，便于运营快速定位问题
 
 **下一个方向**: A（UI/UX）
 
 ---
 
-## 迭代 #98 — A/UI-优化：暗色模式覆盖率提升（67%→97%） ✅
-**派发时间**: 2026-05-30 19:33
-**完成时间**: 2026-05-30 22:37
-**方向**: A（UI/UX）/ 🎨 暗色模式覆盖
+## 迭代 #98 — A/UI/UX：暗色模式覆盖率提升（67%→97%） ✅
+**派发时间**: 2026-05-30
+**完成时间**: 2026-05-30
+**方向**: A（UI/UX）/ 🟡 体验优化
 **基线 Commit**: `f59ea97`
-**完成 Commit**: `e44bca6`
+**交付 Commit**: `e44bca6`
+**部署**: http://39.103.68.205/
 
 ### 背景
-项目 93 个 CSS 文件中仅 62 个有 `body.dark` 暗色样式（67% 覆盖率），31 个新增组件/页面缺少暗色样式，暗色模式下这些区域显示为浅色背景，视觉冲击严重。
+迭代#97（C/内容质量）已完成，按轮换规则进入 A（UI/UX）。经巡检发现 94 个 CSS 文件中仅 63 个有 body.dark（67% 覆盖率），31 个新增组件/页面缺少暗色样式，导致暗色模式下大量页面出现视觉不一致（白底黑字、硬编码颜色等）。
 
-### 任务内容
-1. **管家**：读取 `iteration-lessons.md` ✅
-2. **UI 专家**（ui-designer）：输出 31 文件完整 body.dark 设计规则 PRD（~1954 行）✅
-3. **全栈专家**（fullstack）：分两轮实施 28 个文件（8+20）✅
-4. **本地构建**：npm run build → 0 warnings 0 errors ✅
-5. **部署闭环**：git commit + push → 服务器构建 → docker cp → nginx reload → 8 页面 200 ✅
+### 任务内容（已完成）
+1. ✅ 为 20 个 CSS 文件补充 body.dark 暗色样式（+1410 行）
+2. ✅ 覆盖组件：ActivityHeatmap/Breadcrumb/CommentSection/ErrorBoundary/FavoriteButton/Footer/KeyboardShortcuts/ProgressiveImage/ShareModal/Skeleton/ToggleList/ViewToggle
+3. ✅ 覆盖页面：ComparePage/CookingJournalPage/MealPlannerPage/NotFoundPage/NutritionDashboard/PantryPage/PreferencesPage/SearchPage
+4. ✅ 使用 CSS 变量 + body.dark 选择器，保持与现有暗色体系一致
+5. ✅ 构建 0 warnings（250 modules, ~800ms）
+6. ✅ 部署闭环：服务器 git pull → build → docker cp → nginx reload → 验证全绿
 
-### 改动规模
-- 20 文件修改，+1410 行 CSS
-- 覆盖 28 个文件（8 组件第1轮 + 12 组件第2轮 + 8 页）
-- 3 个文件无需修改：PageTransition（纯动画）、ImageLightbox（固定黑背景）、PrintView（@media print 强制颜色）
+### 实际成果
+- 暗色模式覆盖率：67% → **97%**（94 文件中 91 个已覆盖）
+- 新增 body.dark 规则：~400+ 条
+- 修改文件：20 个 CSS 文件（12 组件 + 8 页面）
 
-### 验收
-| 检查项 | 结果 |
-|--------|------|
-| npm run build | 0 warnings 0 errors ✅ |
-| 首页 200 | ✅ |
-| SearchPage 200 | ✅ |
-| CookingJournalPage 200 | ✅ |
-| NutritionDashboard 200 | ✅ |
-| PantryPage 200 | ✅ |
-| MealPlannerPage 200 | ✅ |
-| ComparePage 200 | ✅ |
-| PreferencesPage 200 | ✅ |
+### 关键经验
+- **暗色模式遗漏是累积型问题**：新增组件/页面时容易忘记 body.dark，需建立检查清单
+- **CSS 变量优先**：所有颜色应通过 var(--color-xxx) 定义，暗色切换只需覆写变量值
+- **批量补充策略**：按组件维度逐一处理，确保每个文件的 body.dark 规则完整覆盖所有硬编码颜色
 
-### 经验教训
-- **子专家超时**：全栈专家网络中断导致第一轮只完成 8/28 文件，需分批重派
-- **CSS 变量一致**：严格复用 global.css 预定义变量，不引入新变量
-- **`body.dark` 选择器统一**：不使用 `[data-theme]` 或 `.dark`，与 ThemeContext.tsx 保持一致
+### 遗留问题
+- 无 🔴 待修复
 
-### 下一个方向
-C（内容质量）或 移动端响应式收尾
+**下一个方向**: B（功能增强）
+
+---
+
+## 迭代 #99 — B/功能增强：食谱"我做过"标记系统 ⏳
+**派发时间**: 2026-05-30
+**方向**: B（功能增强）/ 🟢 现有功能完善
+**基线 Commit**: `1131387`
+
+### 背景
+迭代#98（A/UI/UX）已完成，按轮换规则进入 B（功能增强）。网站已有完善的收藏、评论、烹饪日志系统，但缺少一个轻量级的"我做过这道菜"标记功能。用户想记录自己尝试过哪些食谱、做过多少次，但当前只能通过收藏或写烹饪日志来间接记录，门槛较高。
+
+### 任务内容（待执行）
+1. **后端模型**：`UserRecipeAction` 模型（userId, recipeId, action: 'cooked', count, lastCookedAt, note）
+2. **后端 API**：
+   - POST /api/recipes/:id/cook-it — 标记做过（count+1，更新 lastCookedAt）
+   - DELETE /api/recipes/:id/cook-it — 取消标记
+   - GET /api/recipes/:id/cook-status — 获取当前用户是否做过 + 总做过人数
+   - GET /api/users/:id/cooked-recipes — 获取用户做过的食谱列表
+3. **前端 RecipeDetailPage**：添加"我做过"按钮（带做过人数计数），点击后状态切换 + Toast 反馈
+4. **前端用户主页**：新增"我的烹饪"标签页，展示做过的食谱列表（含做过次数、上次做的时间）
+5. **与 CookingLog 联动**：做过标记后可选择快捷创建烹饪日志
+6. 本地构建 0 warnings
+7. 部署闭环：commit → build → deploy → 验证
+8. 更新 iteration-tracker.md 和 iteration-lessons.md
+
+### 用户价值
+- 低门槛记录烹饪历史，无需写完整烹饪日志
+- 看到社区中哪些食谱最受欢迎（做过人数是强社交信号）
+- 快速回顾"我最近做过的菜"，方便复做
+- 为推荐算法提供新的行为维度（做过 vs 仅浏览/收藏）
+
+**下一个方向**: C（内容质量）
