@@ -22,6 +22,7 @@ import SubstitutionPanel from '../components/SubstitutionPanel'
 import VideoPlayer from '../components/VideoPlayer'
 import QualityScoreModal from '../components/QualityScoreModal'
 import ExportMenu from '../components/ExportMenu'
+import FavoriteNoteModal from '../components/FavoriteNoteModal'
 import AuthorLevelBadge from '../components/AuthorLevelBadge'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import { trackBehavior, trackBehaviorAnonymous } from '../api'
@@ -90,6 +91,8 @@ export default function RecipeDetailPage() {
   const [authorLevel, setAuthorLevel] = useState<AuthorLevelInfo | null>(null)
   const [showStory, setShowStory] = useState(false)
   const [showCulturalBg, setShowCulturalBg] = useState(false)
+  const [favoriteNote, setFavoriteNote] = useState('')
+  const [noteModalVisible, setNoteModalVisible] = useState(false)
 
   // ═══ #63: 食谱改编 ──
   const [forks, setForks] = useState<ForkInfo[]>([])
@@ -244,6 +247,7 @@ export default function RecipeDetailPage() {
         const recipeData = (res as any).data ?? res
         setRecipe(recipeData as RecipeDetail)
         setIsFavorited(favStatus.isFavorited)
+        setFavoriteNote(favStatus.note || '')
         // 获取改编版本列表
         if (recipeData && recipeData.forkCount > 0) {
           getRecipeForks(id).then(forkRes => {
