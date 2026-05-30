@@ -290,3 +290,127 @@
 [data-theme=dark] .cmp-row-even td { background: #1a1815; }
 [data-theme=dark] .cmp-td-label { background: #1e1812; }
 [data-theme=dark] .cmp-ingredient-item { background: #2a2a2a; color: #aaa; }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .cmp-page {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-input-section {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cmp-input-label {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cmp-textarea {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-summary {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cmp-summary h2 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-summary p {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cmp-tag {
+  background: var(--color-primary-bg, #2e1a14);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .cmp-tag--info {
+  background: #1a2940;
+  color: #64b5f6;
+}
+
+body.dark .cmp-tag--warn {
+  background: #3d3515;
+  color: #ffb74d;
+}
+
+body.dark .cmp-tag--common {
+  background: #1a3a1a;
+  color: #81c784;
+}
+
+body.dark .cmp-table {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cmp-table th,
+body.dark .cmp-table td {
+  border-bottom-color: var(--color-border, #2e2e48);
+}
+
+body.dark .cmp-th-label {
+  background: var(--color-bg-secondary, #1a1a2e);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cmp-th-value {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-th--0 { background: #3a1e14; }
+body.dark .cmp-th--1 { background: #1a2e1a; }
+body.dark .cmp-th--2 { background: #14263a; }
+
+body.dark .cmp-link {
+  color: var(--color-primary, inherit);
+}
+
+body.dark .cmp-td-label {
+  color: var(--color-text-secondary, #9898b0);
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cmp-td-value {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-row-even td {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .cmp-meta {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cmp-null {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cmp-ingredient-item {
+  background: var(--color-bg-secondary, #1a1a2e);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cmp-nutrition-label {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cmp-nutrition-value {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-common {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cmp-common h3 {
+  color: var(--color-text, #e0e0ee);
+}

@@ -17,3 +17,15 @@
     background-position: 0% 50%;
   }
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #262640) 25%,
+    var(--color-skeleton-to, #303050) 37%,
+    var(--color-skeleton-from, #262640) 63%
+  );
+  background-size: 400% 100%;
+}

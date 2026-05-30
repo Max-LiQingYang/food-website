@@ -70,6 +70,24 @@
   color: #666;
 }
 
+/* ── body.dark 暗色模式 ── */
+
+body.dark .breadcrumb__link {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .breadcrumb__link:hover {
+  color: var(--color-primary, inherit);
+}
+
+body.dark .breadcrumb__current {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .breadcrumb__item + .breadcrumb__item::before {
+  color: var(--color-text-muted, #686880);
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
   .breadcrumb {

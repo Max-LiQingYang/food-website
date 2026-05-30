@@ -124,3 +124,39 @@
     padding: 20px 16px;
   }
 }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .shortcuts-panel {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .shortcuts-panel__header h2 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .shortcuts-panel__close {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .shortcuts-panel__close:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .shortcuts-panel__item {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .shortcuts-panel__key {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .shortcuts-panel__desc {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .shortcuts-panel__hint {
+  color: var(--color-text-muted, #686880);
+}

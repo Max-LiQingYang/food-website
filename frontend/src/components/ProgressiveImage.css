@@ -61,3 +61,18 @@
   font-size: 32px;
   background: var(--color-bg-secondary, #f0f0f0);
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .progressive-image__placeholder {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+}
+
+body.dark .progressive-image__error {
+  background: var(--color-bg-secondary, #1a1a2e);
+}

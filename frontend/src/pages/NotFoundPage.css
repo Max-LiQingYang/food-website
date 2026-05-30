@@ -153,3 +153,21 @@
 [data-theme='dark'] .not-found-desc {
   color: var(--dark-text-secondary, #999);
 }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .not-found-page {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .not-found-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .not-found-desc {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .not-found-recommend__title {
+  color: var(--color-text, #e0e0ee);
+}

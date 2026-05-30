@@ -149,6 +149,48 @@
   color: #fff;
 }
 
+/* ── body.dark 暗色模式 ── */
+
+body.dark .error-boundary {
+  background: var(--color-bg, #12121e);
+}
+
+body.dark .error-boundary__card {
+  background: var(--color-card, #1e1e32);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .error-boundary__title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .error-boundary__desc {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .error-boundary__details {
+  border-color: var(--color-border, #2e2e48);
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .error-boundary__details pre {
+  color: #ff6b6b;
+}
+
+body.dark .error-boundary__btn--retry {
+  background: var(--color-primary, inherit);
+}
+
+body.dark .error-boundary__btn--home {
+  background: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .error-boundary__btn--home:hover {
+  background: var(--color-text-muted, #686880);
+  color: #fff;
+}
+
 /* 响应式 */
 @media (max-width: 480px) {
   .error-boundary__card {

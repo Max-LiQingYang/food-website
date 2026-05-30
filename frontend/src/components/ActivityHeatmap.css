@@ -131,3 +131,28 @@
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .activity-heatmap__title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .activity-heatmap__cell--0 {
+  background: var(--color-bg-secondary, #1a1a2e);
+  opacity: 0.4;
+}
+
+body.dark .activity-heatmap__cell--1 { background: #1b5e20; }
+body.dark .activity-heatmap__cell--2 { background: #2e7d32; }
+body.dark .activity-heatmap__cell--3 { background: #388e3c; }
+body.dark .activity-heatmap__cell--4 { background: #43a047; }
+body.dark .activity-heatmap__cell--5 { background: #66bb6a; }
+
+body.dark .activity-heatmap__legend {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .heatmap-loading {
+  color: var(--color-text-muted, #686880);
+}

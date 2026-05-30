@@ -33,3 +33,16 @@
 .toggle-list__arrow--up {
   transform: rotate(180deg);
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .toggle-list__btn {
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .toggle-list__btn:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+  color: var(--color-primary, inherit);
+  border-color: var(--color-primary, inherit);
+}

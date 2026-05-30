@@ -301,3 +301,106 @@
   background: #333;
   color: #aaa;
 }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .pref-page {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pref-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pref-subtitle {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pref-section {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .pref-section-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pref-hint {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .pref-option-btn {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pref-option-btn:hover {
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .pref-option-btn.is-active {
+  background: var(--color-primary, inherit);
+  color: #fff;
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .pref-toggle {
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pref-toggle:hover {
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .pref-toggle:has(input:checked) {
+  background: #422006;
+  border-color: #f59e0b;
+  color: #fde68a;
+}
+
+body.dark .pref-input {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pref-tag {
+  background: #422006;
+  color: #fde68a;
+}
+
+body.dark .pref-tag-remove {
+  color: #fde68a;
+}
+
+body.dark .pref-recipe-card {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .pref-recipe-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pref-recipe-tag {
+  background: var(--color-primary-bg, #2e1a14);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .pref-recipe-tag--normal {
+  background: var(--color-bg-secondary, #1a1a2e);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pref-recipe-desc {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pref-empty {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .pref-recipe-cover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}

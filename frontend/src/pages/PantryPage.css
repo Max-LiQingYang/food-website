@@ -515,3 +515,120 @@
     text-align: center;
   }
 }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .pantry-page {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-alert.expired {
+  background: #3d1f1f;
+  color: #ef9a9a;
+}
+
+body.dark .pantry-alert.soon {
+  background: #3d3515;
+  color: #ffcc80;
+}
+
+body.dark .pantry-search,
+body.dark .pantry-sort,
+body.dark .pantry-sort-order {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-cat-btn {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pantry-cat-btn:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .pantry-cat-btn.active {
+  background: var(--color-primary, inherit);
+  color: #fff;
+}
+
+body.dark .pantry-loading,
+body.dark .pantry-error,
+body.dark .pantry-empty {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pantry-card {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .pantry-card-name {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-card-qty {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .pantry-card-cat {
+  background: var(--color-bg-secondary, #1a1a2e);
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .pantry-action-btn {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-action-btn.primary {
+  background: var(--color-primary, inherit);
+  color: #fff;
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .pantry-suggestions h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-suggestion-card span {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-modal {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .pantry-modal h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-modal label {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-modal label input,
+body.dark .pantry-modal label select {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-modal-actions button:not(.primary) {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .pantry-quick-row input,
+body.dark .pantry-quick-row select {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}

@@ -581,3 +581,183 @@
     display: none;
   }
 }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .nutrition-page {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-login-hint {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .nutrition-date-input {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-action-btn.small {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-action-btn.small:hover {
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .nutrition-loading,
+body.dark .nutrition-error {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .nutrition-summary-card {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .nutrition-cal-value {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-cal-label,
+body.dark .nutrition-bar-label {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .nutrition-bar-track {
+  background: var(--color-border, #2e2e48);
+}
+
+body.dark .nutrition-bar-value {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .nutrition-suggestion.warning { background: #3d3515; }
+body.dark .nutrition-suggestion.info { background: #1a2940; }
+body.dark .nutrition-suggestion.success { background: #1a3a1a; }
+
+body.dark .nutrition-meal-tab {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .nutrition-meal-tab.active {
+  background: var(--color-primary, inherit);
+  color: #fff;
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .nutrition-meal-tab:hover:not(.active) {
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .nutrition-empty {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .nutrition-log-item {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .nutrition-log-meal {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .nutrition-log-recipe {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-log-servings {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .nutrition-log-cal {
+  color: var(--color-primary, inherit);
+}
+
+body.dark .nutrition-log-delete {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .nutrition-log-delete:hover {
+  background: #3d1f1f;
+  color: #e74c3c;
+}
+
+body.dark .nutrition-add-btn {
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .nutrition-add-btn:hover {
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .nutrition-weekly h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-bar-chart {
+  border-bottom-color: var(--color-border, #2e2e48);
+}
+
+body.dark .nutrition-bar-col-label,
+body.dark .nutrition-bar-col-val {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .nutrition-monthly h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-monthly-item {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .nm-label {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .nm-value {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nm-value small {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .nutrition-modal {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .nutrition-modal h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-modal label {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-modal label input,
+body.dark .nutrition-modal label select {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .nutrition-modal-actions button:not(.primary) {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}

@@ -120,3 +120,14 @@
     display: none;
   }
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .footer {
+  background: var(--color-card, #1e1e32);
+  border-top-color: var(--color-border, #2e2e48);
+}
+
+body.dark .footer__bottom {
+  border-top-color: var(--color-border, #2e2e48);
+}

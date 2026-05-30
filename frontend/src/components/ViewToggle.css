@@ -35,3 +35,26 @@
 .view-toggle__btn:not(:last-child) {
   border-right: 1px solid var(--color-border, #ddd);
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .view-toggle {
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .view-toggle__btn {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .view-toggle__btn:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .view-toggle__btn--active {
+  background: var(--color-primary, inherit);
+  color: #fff;
+}
+
+body.dark .view-toggle__btn:not(:last-child) {
+  border-right-color: var(--color-border, #2e2e48);
+}

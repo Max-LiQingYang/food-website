@@ -431,3 +431,136 @@
     font-size: 0.65rem;
   }
 }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .meal-planner {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__btn--clear {
+  background: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .meal-planner__btn--clear:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .meal-planner__week-nav {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .meal-planner__week-btn {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__week-btn:hover {
+  background: var(--color-primary, inherit);
+  color: #fff;
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .meal-planner__week-label {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__loading {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .meal-planner__grid {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .meal-planner__grid-header {
+  border-bottom-color: var(--color-border, #2e2e48);
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .meal-planner__day-header {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__day-date {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .meal-planner__grid-row {
+  border-bottom-color: var(--color-border, #2e2e48);
+}
+
+body.dark .meal-planner__time-col {
+  border-right-color: var(--color-border, #2e2e48);
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .meal-planner__time-label {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .meal-planner__slot {
+  border-right-color: var(--color-border, #2e2e48);
+}
+
+body.dark .meal-planner__slot:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .meal-planner__slot-placeholder {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .meal-planner__meal-card {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .meal-planner__meal-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__search-modal {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .meal-planner__search-header h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__search-close {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .meal-planner__search-input {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__search-input:focus {
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .meal-planner__search-item:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .meal-planner__search-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .meal-planner__search-meta {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .meal-planner__search-empty,
+body.dark .meal-planner__search-hint {
+  color: var(--color-text-muted, #686880);
+}

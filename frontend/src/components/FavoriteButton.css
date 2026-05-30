@@ -44,3 +44,14 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .favorite-btn {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .favorite-btn:hover,
+body.dark .favorite-btn--active {
+  color: var(--color-primary, inherit);
+}

@@ -512,3 +512,155 @@
     gap: 0;
   }
 }
+
+/* ── body.dark 暗色模式 ── */
+
+body.dark .cooking-journal__title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__view-btn {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cooking-journal__view-btn.active {
+  background: var(--color-primary, inherit);
+  color: #fff;
+}
+
+body.dark .cooking-journal__view-btn:not(.active):hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .cooking-journal__loading,
+body.dark .cooking-journal__empty {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cooking-journal__stat-card {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cooking-journal__stat-number {
+  color: var(--color-primary, inherit);
+}
+
+body.dark .cooking-journal__stat-label {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cooking-journal__chart {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .cooking-journal__chart-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__chart-bars {
+  border-bottom-color: var(--color-border, #2e2e48);
+}
+
+body.dark .cooking-journal__chart-value,
+body.dark .cooking-journal__chart-label {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cooking-journal__category-name {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__category-bar-bg {
+  background: var(--color-border, #2e2e48);
+}
+
+body.dark .cooking-journal__category-count {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cooking-journal__card {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .cooking-journal__card-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__card-meta {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cooking-journal__card-cat {
+  background: var(--color-bg-secondary, #1a1a2e);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cooking-journal__card-notes {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cooking-journal__action-btn {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cooking-journal__action-btn:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .cooking-journal__action-btn--delete:hover {
+  background: #3d1f1f;
+}
+
+body.dark .cooking-journal__page-info {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cooking-journal__page-btn {
+  border-color: var(--color-border, #2e2e48);
+  background: var(--color-card, #1e1e32);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__page-btn:not(:disabled):hover {
+  background: var(--color-primary, inherit);
+  color: #fff;
+  border-color: var(--color-primary, inherit);
+}
+
+body.dark .cooking-journal__modal {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cooking-journal__modal-header h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__modal-close {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .cooking-journal__form-group label {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__form-group input,
+body.dark .cooking-journal__form-group textarea,
+body.dark .cooking-journal__form-group select {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cooking-journal__recipe-title-preview {
+  color: #4a90d9;
+}
+
+body.dark .cooking-journal__recipe-title-preview.error {
+  color: #e74c3c;
+}
+
+body.dark .cooking-journal__chart-bar {
+  background: linear-gradient(180deg, var(--color-primary, inherit), #f0a080);
+}
