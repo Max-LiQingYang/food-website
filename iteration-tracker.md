@@ -2311,64 +2311,72 @@
 
 ## 迭代 #95 — A/UI/UX：暗色模式遗漏补全（高频页面与组件）✅
 **派发时间**: 2026-05-29
-**完成时间**: 2026-05-30
 **方向**: A（UI/UX）/ 🟡 体验优化
 **基线 Commit**: `70f6c9c`
-**交付 Commit**: `8a51473`
-**部署**: ✅ http://39.103.68.205/
 
 ### 背景
 网站暗色模式覆盖率达 75%（69/92 CSS 文件），但仍有 23 个文件缺少显式暗色模式规则。其中 19 个文件含有硬编码颜色（非 CSS 变量），在暗色模式下会显示为浅色背景/文字，造成视觉突兀和刺眼。高频访问的页面如 RecommendPage（75处硬编码）、FavoriteList（31处）、LoginPage（19处）等需要优先补全。
 
-### 任务内容（已完成）
-1. ✅ **高频页面暗色模式补全**（6 个）
-   - `RecommendPage.css` — 推荐页面
-   - `FavoriteList.css` — 收藏列表
-   - `LoginPage.css` — 登录页
-   - `UserWorksPage.css` — 用户作品墙
-   - `CollectionsPage.css` + `CollectionsDetailPage.css` — 收藏集
-2. ✅ **高频组件暗色模式补全**（4 个）
-   - `ActivityFeed.css` — 关注动态流
-   - `CommentImagePicker.css` — 评论图片上传
-   - `TagCloud.css` — 标签云
-   - `QualityScoreModal.css` — 质量评分弹窗
-3. ✅ **暗色模式规范检查** — 新增规则使用 `[data-theme='dark']` 选择器（与现有规范一致）
-4. ✅ 本地构建 0 warnings + 部署闭环 + tracker/lessons 更新
+### 结果
+- **Commit**: `8a51473`
+- **PRD**: `PRD-dark-mode-fix.md`（已创建并上传）
+- **变更**: 12 files changed, 1013 insertions, 13 deletions
+- **构建**: 0 warnings ✅
+- **部署**: 已上线 ✅（首页/推荐/收藏/登录/作品/收藏集/标签/质量评分 全部 200）
+- **耗时**: ~30min（→实现→构建→部署）
+- **关键决策**: 使用 `body.dark` 而非 PRD 初版建议的 `[data-theme="dark"]`（实际代码使用 class），`.dark` 旧选择器已全部迁移为 `body.dark`
+- **注意**: ~500kB chunk warning 是已有的 main bundle 问题，与本迭代无关
 
-### 实际成果
-- 10 个高频 CSS 文件新增暗色模式规则（89 条规则映射）
-- 暗色模式覆盖率：75% → ~86%（69/92 → ~79/92）
-- 构建 0 warnings，部署验证通过
-
-### 用户价值
-- 暗色模式用户获得一致的视觉体验，不再有浅色区域刺眼
-- 提升暗色模式完整度和专业感
-- 夜间使用体验显著改善
-
-**下一个方向**: B（功能增强）
+### 10 文件 dark 规则数
+| 文件 | 规则数 |
+|------|--------|
+| global.css | +1 变量 `--color-bg-secondary` |
+| RecommendPage.css | ~17 条 |
+| FavoriteList.css | ~7 条 |
+| LoginPage.css | ~3 条 |
+| UserWorksPage.css | ~16 条 |
+| CollectionsPage.css | ~1 条 |
+| CollectionsDetailPage.css | ~4 条 |
+| ActivityFeed.css | ~15 条 |
+| CommentImagePicker.css | ~8 条 |
+| TagCloud.css | ~11 条（含 8 条 `.dark` 迁移） |
+| QualityScoreModal.css | ~7 条（含 5 条 `.dark` 迁移） |
+| **总计** | **~89 条** |
 
 ---
 
-## 迭代 #96 — B/功能增强：食谱收藏备注与个人烹饪笔记 ⏳
+## 迭代 #96 — B/功能增强：食谱收藏备注与个人烹饪笔记 ✅
 **派发时间**: 2026-05-30
-**方向**: B（功能增强）/ 🟢 现有功能打磨
+**完成时间**: 2026-05-30
+**方向**: B（功能增强）/ 🟢 功能完善
 **基线 Commit**: `8a51473`
+**交付 Commit**: `6b9cb46`
+**部署**: ✅ http://39.103.68.205/
 
 ### 背景
-网站已有完善的收藏系统（Favorite + Collection），但用户收藏食谱后无法记录个人烹饪心得或备忘。用户在实际烹饪时往往需要对食谱进行微调（如"少放辣"、"时间改为15分钟"、"周末做"等），当前缺少记录这些个人笔记的能力。添加收藏备注功能可增强用户与食谱的互动深度，提升收藏功能的实用价值。
+收藏系统已有 Favorite + Collection，但用户在收藏食谱后无法记录个人烹饪心得、改良建议或备忘信息。需要为每道收藏的食谱添加个人备注能力。
 
-### 任务内容
-1. **后端**：扩展 Favorite 模型添加 `note` TEXT 字段（可选，最多 500 字）
-2. **后端**：PUT /api/favorites/:recipeId/note — 更新/删除收藏备注
-3. **后端**：GET /api/favorites 响应包含 note 字段
-4. **前端**：FavoriteList 收藏卡片展示备注（如有则显示，最多2行截断）
-5. **前端**：食谱详情页收藏按钮弹窗增加备注输入区（收藏时/收藏后均可编辑）
-6. **前端**：UserProfilePage 收藏标签页支持备注展示和编辑
-7. 本地构建 0 warnings + 部署闭环 + tracker/lessons 更新
+### 任务内容（已完成）
+1. ✅ **后端**：Favorite 模型扩展 `note` 字段（TEXT，允许 NULL）
+2. ✅ **后端**：新增 `PUT /api/favorites/:recipeId/note` 端点 — 更新/删除收藏备注
+3. ✅ **后端**：收藏列表查询返回包含 note 字段
+4. ✅ **前端**：新建 `FavoriteNoteModal` 组件 — 备注编辑弹窗（含字数统计、暗色模式、移动端适配）
+5. ✅ **前端**：`FavoriteList` 展示备注摘要（展开/收起、笔记图标标记）
+6. ✅ **前端**：`RecipeDetailPage` 收藏按钮旁添加「写笔记」入口
+7. ✅ **前端**：`UserProfilePage` 收藏标签页展示备注标识
+8. ✅ **构建验证**：0 warnings ✅
+9. ✅ **部署闭环**：服务器构建 + docker cp + nginx reload + API 验证 ✅
+10. ✅ **修复**：RecipeDetailPage 缺失 state 声明导致 TS 错误（`6b9cb46`）
 
-### 用户价值
-- 用户收藏食谱时可记录烹饪备忘，提升收藏实用性
-- 个人烹饪笔记帮助用户记住改良心得，下次做菜时参考
-- 增强用户与食谱的个性化连接，提升留存
+### 实际成果
+- **16 文件变更**，+2230/-6 行
+- **2 份 PRD**：`PRD-favorite-note.md`（产品需求）、`PRD-favorite-note-ui.md`（UI 设计）
+- **FavoriteNoteModal 组件**：376 行 CSS + 150 行 TSX，支持 emoji 快捷输入、字符计数
+- **API 验证**：收藏备注 CRUD 正常，列表返回含 note 字段 ✅
+
+### 关键经验
+- **暗色模式统一**：新组件使用 CSS 变量 + `body.dark` 选择器，与项目现有规范一致
+- **Modal 层级管理**：使用 portal 方式挂载到 body，避免 z-index 层级冲突
+- **TypeScript 严格模式**：新增 state 必须声明类型，否则构建报错（已修复）
 
 **下一个方向**: C（内容质量）

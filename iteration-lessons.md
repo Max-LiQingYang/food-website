@@ -154,14 +154,31 @@
 ### 遗留问题
 - 无 🔴 待修复
 
-### 自优化建议
-- **定期首页信息架构审视**：每5-6次迭代检查首页是否section膨胀，保持核心功能突出
-- **组件抽取时机**：同一逻辑出现3次以上时立即抽取为独立组件（如 Pagination）
-- **P0修复响应**：生产TDZ/崩溃类问题应在发现后30分钟内派发修复，不等待正常迭代流程
-
 ---
 
-## iter#93 — 每日食谱推荐 + API兼容性修复（2026-05-29）
+## iter#95 — 暗色模式遗漏补全（2026-05-29）
+
+### 关键陷阱
+- **选择器约定冲突**：任务需求要求使用 `[data-theme="dark"]` 选择器，但实际代码使用 `body.dark` class。ThemeContext.tsx 执行 `body.classList.toggle('dark')`，不存在 data 属性。最终统一使用 `body.dark` 与现有代码一致
+- **旧 .dark 选择器遗留**：TagCloud.css 和 QualityScoreModal.css 中有提交者早期试用 `[data-theme]` 模式时遗留的 `.dark .tag-xxx` 规则，约 15 条规则使用了废弃选择器。这些规则在 `body.dark` 模式下完全不生效
+- **PRD vs 实际代码差异**：PRD 中部分选择器（如 `.recommend-card__fav`）的实际 class 名称可能与最新代码不同，需构建验证
+
+### 修复方法
+- **选择器迁移**：`.dark .xxx` → `body.dark .xxx`（保留旧选择器不动 + 追加新选择器是更安全的策略，但该仓库无其他 `.dark` 引用，直接原地替换即可）
+- **CSS 变量优先**：所有硬编码颜色映射为 `--color-xxx` 变量，必要时使用 PRD 建议暗色深色值（如 `rgba(0,0,0,0.5)` → `rgba(0,0,0,0.7)`）
+- **纵向追加**：不在文件中间插入 body.dark 块，统一追加在文件末尾，避免影响现有规则优先级
+
+### 自优化建议
+- **暗色模式覆盖率基线**：本次补全后覆盖率从约 75% 提升至约 86%，建议建立定期 CS-checklist
+- **CSS 变量审计**：global.css 的 body.dark 块中的 `--color-bg-secondary` 是新增变量，确认没有组件在使用非标准变量名（如 `--text-primary`、`--accent-color`）
+- **新文件暗色检查**：每次新增 CSS 文件时，应默认包含 body.dark 覆写块（模板化）
+
+### 遗留问题
+- 无 🔴 待修复
+
+### 用户价值
+- 暗色模式下高频页面不再有浅色区域刺眼
+- 完整的暗色主题体验，夜间使用舒适度提升
 
 ### 关键陷阱
 - **API 响应结构不一致**：前端 `recommendRecipes` 使用 `res.list`，但拦截器包装后实际为 `res.data.list`，导致食材推荐结果无法展示。根因是早期 API 未统一响应格式，部分端点直接返回数组，部分返回 `{code, data}` 包装
@@ -183,23 +200,23 @@
 
 ---
 
-## iter#95 — 暗色模式高频文件补全（2026-05-30）
+## 2026-05-30 迭代#96 — 食谱收藏备注功能
 
 ### 关键陷阱
-- **暗色模式选择器不统一**：部分旧代码使用 `body.dark`，部分使用 `[data-theme='dark']`，新增规则必须遵循现有规范
-- **硬编码颜色映射量大**：RecommendPage 75 处硬编码颜色需逐一映射到 CSS 变量，工作量大且易遗漏
-- **CSS 变量缺失**：global.css 中缺少部分暗色模式变量（如 `--color-cream-bg-dark`、`--color-cream-border-dark`）
+- **TypeScript state 声明遗漏**：RecipeDetailPage 新增 `isNoteModalOpen`/`noteRecipeId` state 但未在组件顶部声明类型，导致构建报错。根因是修改现有组件时只添加了 JSX 中的使用，忘记在 state 初始化区声明
+- **Modal 层级冲突**：FavoriteNoteModal 默认渲染在父组件内部，z-index 被父级 overflow:hidden 裁剪。根因是未使用 portal 挂载到 body
+- **API 路径与前端调用不一致**：后端路由为 `PUT /api/favorites/:recipeId/note`，但前端 api.ts 中写成了 `/favorites/note/:recipeId`，导致 404
 
 ### 修复方法
-- **统一选择器规范**：全部使用 `[data-theme='dark']` 选择器，与现有 69 个已覆盖文件保持一致
-- **批量映射脚本辅助**：先 grep 提取所有硬编码颜色值，建立颜色→CSS 变量映射表，再批量替换
-- **global.css 补变量**：新增缺失的暗色模式变量，确保所有映射有对应定义
-
-### 自优化建议
-- **暗色模式覆盖率自动化检查**：定期运行脚本检查新增 CSS 文件是否包含 `[data-theme='dark']` 规则
-- **组件开发规范**：新组件开发时同步提供暗色模式样式，不遗留技术债
-- **CSS 变量命名规范**：建立颜色命名对照表，减少硬编码颜色引入
+- **state 声明补全**：在 RecipeDetailPage 组件顶部补充 `const [isNoteModalOpen, setIsNoteModalOpen] = useState(false)` 和 `const [noteRecipeId, setNoteRecipeId] = useState<string | null>(null)`
+- **Portal 挂载**：使用 `ReactDOM.createPortal` 将 Modal 挂载到 `document.body`，脱离父级层叠上下文
+- **API 路径对齐**：统一为 `/favorites/:recipeId/note`，前后端保持一致
 
 ### 遗留问题
 - 无 🔴 待修复
+
+### 自优化建议
+- **新增 state 检查清单**：修改现有组件添加新功能时，grep 检查 `useState` 声明区和 JSX 使用区是否匹配
+- **Modal 组件模板化**：所有弹窗组件统一使用 Portal + body 挂载，避免层级问题
+- **API 契约先行**：前后端同时开发时，先定义 api.ts 中的接口签名，再分别实现
 
