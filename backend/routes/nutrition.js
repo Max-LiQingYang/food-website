@@ -50,11 +50,8 @@ router.post('/logs', auth, async (req, res) => {
 
     const sv = parseFloat(servings) || 1
 
-    // Parse nutrition from recipe
-    let nutrition = {}
-    try {
-      nutrition = typeof recipe.nutrition === 'string' ? JSON.parse(recipe.nutrition) : (recipe.nutrition || {})
-    } catch { nutrition = {} }
+    // Parse nutrition from recipe (getter auto-parses)
+    const nutrition = recipe.nutrition || {}
 
     const log = await NutritionLog.create({
       userId: req.userId,
@@ -137,8 +134,7 @@ router.put('/logs/:id', auth, async (req, res) => {
     if (update.servings !== undefined) {
       const recipe = await Recipe.findByPk(log.recipeId)
       if (recipe) {
-        let nutrition = {}
-        try { nutrition = typeof recipe.nutrition === 'string' ? JSON.parse(recipe.nutrition) : (recipe.nutrition || {}) } catch {}
+        let nutrition = recipe.nutrition || {}
         const sv = parseFloat(update.servings) || 1
         update.calories = (nutrition.calories || 0) * sv
         update.protein = (nutrition.protein || 0) * sv

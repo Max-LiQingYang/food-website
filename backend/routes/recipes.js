@@ -16,6 +16,7 @@ const express = require('express')
 const { Recipe } = require('../models')
 const { Op, fn, col, literal } = require('sequelize')
 const auth = require('../middleware/auth')
+const validateNutrition = require('../middleware/validateNutrition')
 
 const { createActivity } = require('../utils/activity')
 const { checkAllAchievements } = require('../utils/achievementChecker')
@@ -198,15 +199,9 @@ function computeSmartDifficulty(recipe) {
 function attachContentScore(items) {
   if (!items || items.length === 0) return
   for (const item of items) {
-    // 如果 DB 已有则使用，否则计算
+    // nutrition 已通过 Sequelize getter 自动解析为对象
     if (item.nutriScore == null && item.nutrition) {
-      let nutrition
-      if (typeof item.nutrition === 'string') {
-        try { nutrition = JSON.parse(item.nutrition) } catch { nutrition = null }
-      } else {
-        nutrition = item.nutrition
-      }
-      item.nutriScore = computeNutriScore(nutrition)
+      item.nutriScore = computeNutriScore(item.nutrition)
     }
     if (item.smartDifficulty == null) {
       item.smartDifficulty = computeSmartDifficulty(item)
@@ -1847,7 +1842,7 @@ router.get('/:id', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 // POST / — 创建食谱（需认证）
 // ─────────────────────────────────────────────────────────────────
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validateNutrition, async (req, res) => {
   try {
     const {
       title,
@@ -1921,7 +1916,7 @@ router.post('/', auth, async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 // PUT /:id — 编辑食谱（需认证 + 作者本人）
 // ─────────────────────────────────────────────────────────────────
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validateNutrition, async (req, res) => {
   try {
     const { id } = req.params
     const recipe = await Recipe.findByPk(id)

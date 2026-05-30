@@ -50,12 +50,24 @@ module.exports = (sequelize, DataTypes) => {
       ingredients: {
         type: DataTypes.TEXT,
         allowNull: true,
-        comment: '食材 JSON 数组: [{name, amount, unit}]'
+        comment: '食材 JSON 数组: [{name, amount, unit}]',
+        get() {
+          const raw = this.getDataValue('ingredients')
+          if (!raw) return null
+          if (typeof raw === 'object') return raw
+          try { return JSON.parse(raw) } catch { return null }
+        },
       },
       steps: {
         type: DataTypes.TEXT,
         allowNull: true,
-        comment: '步骤 JSON 数组: [{stepNumber, content, image?}]'
+        comment: '步骤 JSON 数组: [{stepNumber, content, image?}]',
+        get() {
+          const raw = this.getDataValue('steps')
+          if (!raw) return null
+          if (typeof raw === 'object') return raw
+          try { return JSON.parse(raw) } catch { return null }
+        },
       },
       servings: {
         type: DataTypes.INTEGER,
@@ -75,7 +87,13 @@ module.exports = (sequelize, DataTypes) => {
       nutrition: {
         type: DataTypes.TEXT,
         allowNull: true,
-        comment: '营养信息 JSON: {calories, protein, fat, carbs, fiber, sodium}'
+        comment: '营养信息 JSON: {calories, protein, fat, carbs, fiber, sodium}',
+        get() {
+          const raw = this.getDataValue('nutrition')
+          if (!raw) return null
+          if (typeof raw === 'object') return raw
+          try { return JSON.parse(raw) } catch { return null }
+        },
       },
       tips: {
         type: DataTypes.TEXT,

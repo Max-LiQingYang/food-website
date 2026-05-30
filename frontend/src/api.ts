@@ -1035,6 +1035,26 @@ export function getQualityCheck(params?: { page?: number; pageSize?: number }): 
 }
 
 // ─────────────────────────────────────────────────────────────────
+// 内容质量巡检 API (Iter#97)
+// ─────────────────────────────────────────────────────────────────
+
+export interface ContentQualityReport {
+  totalRecipes: number
+  fieldCoverage: Record<string, { count: number; pct: number }>
+  overallScore: { avg: number; distribution: Record<string, number> }
+  bottomRecipes: Array<{ id: string; title: string; score: number; missingFields: string[] }>
+  recipes: Array<{ id: string; title: string; score: number; fieldStatus: Record<string, boolean> }>
+}
+
+/**
+ * 获取内容质量巡检报告
+ * GET /api/admin/content-quality
+ */
+export function getContentQualityReport(): Promise<ContentQualityReport> {
+  return apiClient.get('/admin/content-quality').then(r => r.data?.data || r.data)
+}
+
+// ─────────────────────────────────────────────────────────────────
 // 每周餐单计划 (Meal Plan)
 // ─────────────────────────────────────────────────────────────────
 
@@ -1911,6 +1931,8 @@ export default {
   getAuthorInfo,
   // 关注动态 Feed
   getActivityFeed,
+  // 内容质量巡检 (Iter#97)
+  getContentQualityReport,
 }
 
 // ═══ 迭代#40: 食谱版本对比 ═══

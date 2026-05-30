@@ -28,19 +28,12 @@ const QUALITY_THRESHOLDS = {
 function computeScore(recipe) {
   if (!recipe) return 0
 
-  // 食材完整度 (0~10)
+  // ingredients/steps/nutrition already parsed by Sequelize getter (or manually below for raw queries)
   let ingredients = recipe.ingredients
-  if (typeof ingredients === 'string') {
-    try { ingredients = JSON.parse(ingredients) } catch { ingredients = [] }
-  }
   const ingCount = Array.isArray(ingredients) ? ingredients.length : 0
   const ingScore = Math.min(ingCount, 10) * 0.5 + (ingCount >= 2 ? 1 : 0) + (ingCount >= 5 ? 1 : 0)
 
-  // 步骤清晰度 (0~10)
   let steps = recipe.steps
-  if (typeof steps === 'string') {
-    try { steps = JSON.parse(steps) } catch { steps = [] }
-  }
   const stepCount = Array.isArray(steps) ? steps.length : 0
   const timePattern = /\d+\s*(分钟|小时|min|h)/i
   const stepsWithTime = Array.isArray(steps) ? steps.filter(s => {
@@ -52,16 +45,12 @@ function computeScore(recipe) {
                     (stepCount >= 5 ? 0.5 : 0) +
                     Math.min(stepsWithTime / Math.max(stepCount, 1) * 2, 2)
 
-  // 营养信息 (0~10)
+  // nutrition already parsed by Sequelize getter (or manual parse for raw queries below)
   let nutrition = recipe.nutrition
-  if (typeof nutrition === 'string') {
-    try { nutrition = JSON.parse(nutrition) } catch { nutrition = {} }
-  }
   const nutFields = ['calories', 'protein', 'fat', 'fiber', 'sodium']
   const nutCount = nutFields.filter(k => nutrition && nutrition[k] != null && nutrition[k] !== '' && nutrition[k] !== 0).length
   const nutScore = nutCount * 2
 
-  // 综合 (0~10)
   const total = Math.round(
     (ingScore / 10) * 3.5 +
     (stepScore / 10) * 4 +
@@ -76,6 +65,17 @@ function getLabel(score) {
   if (score >= 5) return '一般'
   if (score >= 3) return '较差'
   return '差'
+}
+
+// ── Helper: manually parse JSON fields for raw:true queries (getters don't fire on raw) ──
+function parseRawFields(recipe) {
+  const r = { ...recipe }
+  for (const field of ['ingredients', 'steps', 'nutrition', 'categoryTags']) {
+    if (typeof r[field] === 'string') {
+      try { r[field] = JSON.parse(r[field]) } catch { r[field] = null }
+    }
+  }
+  return r
 }
 
 // ─── GET /api/admin/quality-report ──────────────────────────────
@@ -94,19 +94,17 @@ router.get('/admin/quality-report', async (req, res) => {
     const scoreDist = { 优秀: 0, 良好: 0, 一般: 0, 较差: 0, 差: 0 }
 
     allRecipes.forEach(r => {
+      const parsed = parseRawFields(r)
       if (r.coverImage) hasCover++
-      if (r.nutrition) {
-        let n = r.nutrition
-        if (typeof n === 'string') { try { n = JSON.parse(n) } catch { n = {} } }
+      if (parsed.nutrition) {
+        const n = parsed.nutrition
         if (n && (n.calories || n.protein || n.fat)) hasNutrition++
       }
-      if (r.steps) {
-        let s = r.steps
-        if (typeof s === 'string') { try { s = JSON.parse(s) } catch { s = [] } }
-        if (Array.isArray(s) && s.length > 0) hasSteps++
+      if (parsed.steps) {
+        if (Array.isArray(parsed.steps) && parsed.steps.length > 0) hasSteps++
       }
 
-      const score = computeScore(r)
+      const score = computeScore(parsed)
       const label = getLabel(score)
       scoreDist[label] = (scoreDist[label] || 0) + 1
     })
@@ -158,7 +156,7 @@ router.get('/admin/quality-report', async (req, res) => {
 
     // ── 5. 低质量食谱列表 ──
     const lowQuality = allRecipes
-      .map(r => ({ ...r, _score: computeScore(r) }))
+      .map(r => ({ ...r, ...parseRawFields(r), _score: computeScore(parseRawFields(r)) }))
       .filter(r => r._score < 5)
       .sort((a, b) => a._score - b._score)
       .slice(0, 20)
@@ -168,7 +166,7 @@ router.get('/admin/quality-report', async (req, res) => {
         score: r._score,
         label: getLabel(r._score),
         hasCover: !!r.coverImage,
-        hasNutrition: !!(r.nutrition && JSON.parse(JSON.stringify(r.nutrition)).calories),
+        hasNutrition: !!(r.nutrition && r.nutrition.calories),
         ingredientCount: Array.isArray(r.ingredients) ? r.ingredients.length : 0,
         stepCount: Array.isArray(r.steps) ? r.steps.length : 0,
       }))
@@ -202,6 +200,147 @@ router.get('/admin/quality-report', async (req, res) => {
   } catch (err) {
     console.error('[GET /admin/quality-report] Error:', err)
     res.status(500).json({ code: 500, message: '获取质量报告失败', error: err.message })
+  }
+})
+
+// ─── GET /api/admin/content-quality ──────────────────────────────
+router.get('/admin/content-quality', async (req, res) => {
+  try {
+    const { Recipe, VideoEmbed } = require('../models')
+
+    // Get all recipes with raw:true for full scan (need to manually parse)
+    const allRecipes = await Recipe.findAll({ raw: true })
+
+    // Batch fetch video recipeIds
+    const videoRecords = await VideoEmbed.findAll({
+      attributes: ['recipeId'],
+      group: ['recipeId'],
+      raw: true,
+    })
+    const videoRecipeIds = new Set(videoRecords.map(v => v.recipeId))
+
+    const FIELD_LABELS = {
+      coverImage: '封面',
+      ingredients: '食材',
+      steps: '步骤',
+      nutrition: '营养',
+      story: '故事',
+      culturalBackground: '文化',
+      tips: '贴士',
+      video: '视频',
+    }
+
+    const fieldKeys = Object.keys(FIELD_LABELS)
+    const fieldCoverage = {}
+    const totalRecipes = allRecipes.length
+
+    // Init fieldCoverage counters
+    for (const key of fieldKeys) {
+      fieldCoverage[key] = { count: 0, pct: 0 }
+    }
+
+    const recipeResults = []
+    const scores = []
+
+    for (const r of allRecipes) {
+      const parsed = parseRawFields(r)
+      const fieldStatus = {}
+      let score = 0
+
+      // 1. coverImage
+      fieldStatus.coverImage = !!(r.coverImage && r.coverImage.includes('http'))
+      if (fieldStatus.coverImage) { score++; fieldCoverage.coverImage.count++ }
+
+      // 2. ingredients
+      fieldStatus.ingredients = Array.isArray(parsed.ingredients) && parsed.ingredients.length >= 2
+      if (fieldStatus.ingredients) { score++; fieldCoverage.ingredients.count++ }
+
+      // 3. steps
+      fieldStatus.steps = Array.isArray(parsed.steps) && parsed.steps.length >= 2
+      if (fieldStatus.steps) { score++; fieldCoverage.steps.count++ }
+
+      // 4. nutrition: non-empty, has calories + at least 2 other fields
+      let nutOk = false
+      if (parsed.nutrition && typeof parsed.nutrition === 'object') {
+        const n = parsed.nutrition
+        if (n.calories != null) {
+          const otherFields = ['protein', 'fat', 'carbs', 'fiber', 'sodium']
+          const filledOthers = otherFields.filter(k => n[k] != null && n[k] !== '')
+          if (filledOthers.length >= 2) nutOk = true
+        }
+      }
+      fieldStatus.nutrition = nutOk
+      if (fieldStatus.nutrition) { score++; fieldCoverage.nutrition.count++ }
+
+      // 5. story
+      fieldStatus.story = !!(r.story && String(r.story).length >= 20)
+      if (fieldStatus.story) { score++; fieldCoverage.story.count++ }
+
+      // 6. culturalBackground
+      fieldStatus.culturalBackground = !!(r.culturalBackground && String(r.culturalBackground).length >= 20)
+      if (fieldStatus.culturalBackground) { score++; fieldCoverage.culturalBackground.count++ }
+
+      // 7. tips
+      fieldStatus.tips = !!(r.tips && String(r.tips).length >= 10)
+      if (fieldStatus.tips) { score++; fieldCoverage.tips.count++ }
+
+      // 8. video
+      fieldStatus.video = videoRecipeIds.has(r.id)
+      if (fieldStatus.video) { score++; fieldCoverage.video.count++ }
+
+      scores.push(score)
+      recipeResults.push({
+        id: r.id,
+        title: r.title,
+        score,
+        fieldStatus,
+      })
+    }
+
+    // Calculate fieldCoverage percentages
+    for (const key of fieldKeys) {
+      fieldCoverage[key].pct = totalRecipes > 0
+        ? Math.round(fieldCoverage[key].count / totalRecipes * 1000) / 10
+        : 0
+    }
+
+    // Overall score distribution
+    const distribution = {}
+    for (const s of scores) {
+      const label = `${s}分`
+      distribution[label] = (distribution[label] || 0) + 1
+    }
+
+    const avgScore = scores.length > 0
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10
+      : 0
+
+    // Bottom 10 recipes
+    const bottomRecipes = recipeResults
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 10)
+      .map(r => ({
+        id: r.id,
+        title: r.title,
+        score: r.score,
+        missingFields: Object.entries(r.fieldStatus)
+          .filter(([, ok]) => !ok)
+          .map(([key]) => key),
+      }))
+
+    res.json({
+      code: 0,
+      data: {
+        totalRecipes,
+        fieldCoverage,
+        overallScore: { avg: avgScore, distribution },
+        bottomRecipes,
+        recipes: recipeResults,
+      },
+    })
+  } catch (err) {
+    console.error('[GET /admin/content-quality] Error:', err)
+    res.status(500).json({ code: 500, message: '获取内容质量报告失败', error: err.message })
   }
 })
 

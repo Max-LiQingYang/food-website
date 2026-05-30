@@ -19,9 +19,6 @@ function computeIngredientCompleteness(recipe) {
   if (!recipe.ingredients) return { score: 0, maxScore: 10, detail: '无食材列表' }
 
   let ingredients = recipe.ingredients
-  if (typeof ingredients === 'string') {
-    try { ingredients = JSON.parse(ingredients) } catch { ingredients = [] }
-  }
   if (!Array.isArray(ingredients) || ingredients.length === 0) {
     return { score: 0, maxScore: 10, detail: '食材列表为空' }
   }
@@ -57,9 +54,6 @@ function computeStepClarity(recipe) {
   if (!recipe.steps) return { score: 0, maxScore: 10, detail: '无烹饪步骤' }
 
   let steps = recipe.steps
-  if (typeof steps === 'string') {
-    try { steps = JSON.parse(steps) } catch { steps = [] }
-  }
   if (!Array.isArray(steps) || steps.length === 0) {
     return { score: 0, maxScore: 10, detail: '步骤列表为空' }
   }
@@ -112,9 +106,6 @@ function computeNutritionInfo(recipe) {
   if (!recipe.nutrition) return { score: 0, maxScore: 10, detail: '无营养信息' }
 
   let nutrition = recipe.nutrition
-  if (typeof nutrition === 'string') {
-    try { nutrition = JSON.parse(nutrition) } catch { nutrition = {} }
-  }
   if (!nutrition || typeof nutrition !== 'object') {
     return { score: 0, maxScore: 10, detail: '营养格式异常' }
   }

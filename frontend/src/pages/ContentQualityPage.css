@@ -1,0 +1,605 @@
+/* ContentQualityPage.css — 内容质量仪表板 (Iter#97) */
+
+.content-quality-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* ── 页头 ── */
+.cq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.cq-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.cq-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.cq-refresh-btn:hover {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  transform: rotate(45deg);
+}
+
+.cq-refresh-btn:active {
+  transform: rotate(45deg) scale(0.95);
+}
+
+.cq-refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cq-refresh-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Section 标题 ── */
+.cq-section {
+  margin-bottom: 32px;
+}
+
+.cq-section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 16px;
+}
+
+/* ── 覆盖率卡片网格 ── */
+.cq-coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* ── 单张覆盖率卡片 ── */
+.coverage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  text-align: center;
+  animation: cardFadeIn 0.4s ease both;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.coverage-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+}
+
+.coverage-card--is-100 {
+  --card-tint-color: #52c41a;
+  background: rgba(82, 196, 26, 0.08);
+  border-color: rgba(82, 196, 26, 0.2);
+}
+
+.coverage-card--is-ok {
+  --card-tint-color: #faad14;
+  background: rgba(250, 173, 20, 0.08);
+  border-color: rgba(250, 173, 20, 0.2);
+}
+
+.coverage-card--is-low {
+  --card-tint-color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.08);
+  border-color: rgba(255, 77, 79, 0.2);
+}
+
+.coverage-card__icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.coverage-card__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.coverage-card__percentage {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--card-tint-color, var(--color-text));
+}
+
+.coverage-card__count {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ── 迷你进度条 ── */
+.coverage-card__progress {
+  width: 100%;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.coverage-card__progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--card-tint-color, var(--color-primary));
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── 质量分布条 ── */
+.cq-distribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cq-distribution-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cq-distribution-bar__track {
+  flex: 1;
+  height: 28px;
+  background: var(--color-bg-secondary);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cq-distribution-bar__fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 0;
+}
+
+.cq-distribution-bar__fill.animate {
+  width: var(--bar-width);
+}
+
+.cq-distribution-bar__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  min-width: 70px;
+  text-align: right;
+}
+
+/* ── 各分数段颜色 ── */
+.bar-score-8  { --bar-color: #E8663E; }
+.bar-score-7  { --bar-color: #E87D5A; }
+.bar-score-6  { --bar-color: #E89470; }
+.bar-score-5  { --bar-color: #E8AB86; }
+.bar-score-4  { --bar-color: #E8C29C; }
+.bar-score-3  { --bar-color: #ff6b6b; }
+.bar-score-2  { --bar-color: #ff8787; }
+
+/* ── 质量最低食谱表格 ── */
+.cq-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+}
+
+.cq-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.cq-table thead {
+  background: var(--color-bg-secondary);
+}
+
+.cq-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.cq-table th:first-child {
+  width: 48px;
+  text-align: center;
+}
+
+.cq-table th:nth-child(3) {
+  width: 80px;
+  text-align: center;
+}
+
+.cq-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: middle;
+}
+
+.cq-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cq-table tbody tr:hover {
+  background: var(--color-primary-bg);
+}
+
+.cq-table__rank {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.cq-table__title {
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.cq-table__title:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+.cq-table__score {
+  text-align: center;
+}
+
+/* ── 得分圆形徽章 ── */
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.score-badge--low {
+  background: var(--color-danger, #e74c3c);
+}
+
+.score-badge--mid {
+  background: var(--color-warning, #f39c12);
+}
+
+.score-badge--high {
+  background: var(--color-success, #27ae60);
+}
+
+/* ── 缺失字段标签 ── */
+.cq-table__missing-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.missing-field-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #fff;
+  cursor: default;
+  transition: filter 0.15s;
+}
+
+.missing-field-tag:hover {
+  filter: brightness(1.15);
+}
+
+.missing-field-tag[data-field="tips"]           { background: #ff4d4f; }
+.missing-field-tag[data-field="video"]          { background: #722ed1; }
+.missing-field-tag[data-field="coverImage"]     { background: #1890ff; }
+.missing-field-tag[data-field="story"]          { background: #52c41a; }
+.missing-field-tag[data-field="culturalBackground"] { background: #fa8c16; }
+.missing-field-tag[data-field="ingredients"]    { background: #13c2c2; }
+.missing-field-tag[data-field="steps"]          { background: #eb2f96; }
+.missing-field-tag[data-field="nutrition"]      { background: #f5222d; }
+
+/* ── 骨架屏 ── */
+.cq-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.cq-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.cq-skeleton-card {
+  height: 140px;
+  border-radius: var(--radius-md, 8px);
+  animation: shimmer 1.5s infinite;
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #f5f0eb) 0%,
+    var(--color-skeleton-to, #e8e0d8) 50%,
+    var(--color-skeleton-from, #f5f0eb) 100%
+  );
+}
+
+.cq-skeleton-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cq-skeleton-bar {
+  height: 28px;
+  border-radius: 6px;
+  animation: shimmer 1.5s infinite;
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #f5f0eb) 0%,
+    var(--color-skeleton-to, #e8e0d8) 50%,
+    var(--color-skeleton-from, #f5f0eb) 100%
+  );
+}
+
+.cq-skeleton-bar:nth-child(1) { width: 85%; }
+.cq-skeleton-bar:nth-child(2) { width: 70%; }
+.cq-skeleton-bar:nth-child(3) { width: 60%; }
+.cq-skeleton-bar:nth-child(4) { width: 50%; }
+.cq-skeleton-bar:nth-child(5) { width: 35%; }
+
+/* ── 空状态 ── */
+.cq-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.cq-empty__icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+.cq-empty__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 8px;
+}
+
+.cq-empty__desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── 动画 ── */
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.cq-refresh-btn.is-spinning svg {
+  animation: spin 0.6s linear infinite;
+}
+
+/* ── 暗色模式覆写 ── */
+body.dark .coverage-card--is-100 {
+  background: rgba(82, 196, 26, 0.15);
+  border-color: rgba(82, 196, 26, 0.3);
+}
+
+body.dark .coverage-card--is-ok {
+  background: rgba(250, 173, 20, 0.15);
+  border-color: rgba(250, 173, 20, 0.3);
+}
+
+body.dark .coverage-card--is-low {
+  background: rgba(255, 77, 79, 0.15);
+  border-color: rgba(255, 77, 79, 0.3);
+}
+
+body.dark .cq-distribution-bar__track {
+  background: var(--color-bg-secondary);
+}
+
+body.dark .cq-table thead {
+  background: var(--color-bg-secondary);
+}
+
+body.dark .cq-table tbody tr:hover {
+  background: rgba(232, 102, 62, 0.1);
+}
+
+body.dark .cq-table td {
+  border-bottom-color: var(--color-border);
+}
+
+body.dark .cq-refresh-btn {
+  border-color: var(--color-border);
+  background: var(--color-card);
+}
+
+body.dark .cq-refresh-btn:hover {
+  background: rgba(232, 102, 62, 0.1);
+}
+
+body.dark .cq-skeleton-card,
+body.dark .cq-skeleton-bar {
+  --color-skeleton-from: #2a2a2a;
+  --color-skeleton-to: #3a3530;
+}
+
+/* ── 响应式布局 ── */
+
+/* 平板 (≤768px) */
+@media (max-width: 768px) {
+  .content-quality-page {
+    padding: 24px 16px;
+  }
+
+  .cq-header h1 {
+    font-size: 22px;
+  }
+
+  .cq-coverage-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cq-skeleton-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .coverage-card__percentage {
+    font-size: 28px;
+  }
+
+  .cq-section-title {
+    font-size: 18px;
+  }
+}
+
+/* 手机 (≤480px) */
+@media (max-width: 480px) {
+  .content-quality-page {
+    padding: 16px 12px;
+  }
+
+  .cq-header h1 {
+    font-size: 20px;
+  }
+
+  .cq-coverage-grid {
+    gap: 10px;
+  }
+
+  .coverage-card {
+    padding: 16px 12px;
+  }
+
+  .coverage-card__percentage {
+    font-size: 24px;
+  }
+
+  /* 表格 → 卡片列表 */
+  .cq-table thead {
+    display: none;
+  }
+
+  .cq-table,
+  .cq-table tbody,
+  .cq-table tr,
+  .cq-table td {
+    display: block;
+  }
+
+  .cq-table tr {
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    margin-bottom: 8px;
+  }
+
+  .cq-table tr:hover {
+    background: var(--color-primary-bg);
+  }
+
+  .cq-table td {
+    padding: 4px 0;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cq-table__rank {
+    display: inline-flex;
+    min-width: 20px;
+    text-align: left;
+  }
+
+  .cq-table__title {
+    flex: 1;
+  }
+
+  .cq-table__score {
+    justify-content: flex-end;
+  }
+
+  .cq-table td::before {
+    content: attr(data-label);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+
+  .cq-distribution-bar {
+    gap: 8px;
+  }
+
+  .cq-distribution-bar__label {
+    font-size: 12px;
+    min-width: 60px;
+  }
+}

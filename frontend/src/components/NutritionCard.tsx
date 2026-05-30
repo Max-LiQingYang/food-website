@@ -45,6 +45,7 @@ export default function NutritionCard({ nutrition }: { nutrition: NutritionData 
         {RING_ITEMS.map(item => {
           const rawValue = nutrition[item.key] ?? 0
           const value = Math.max(0, rawValue)
+          const displayValue = Number.isInteger(value) ? String(value) : value.toFixed(1)
           const percent = Math.min(value / item.dv, 1)
           const dashOffset = CIRCUMFERENCE - Math.min(value / item.maxRing, 1) * CIRCUMFERENCE
           const isExpanded = expandedKey === item.key
@@ -87,7 +88,7 @@ export default function NutritionCard({ nutrition }: { nutrition: NutritionData 
                   fontSize="14"
                   fontWeight="700"
                 >
-                  {value}
+                  {displayValue}
                 </text>
                 <text
                   x={CX} y={CY + 12}

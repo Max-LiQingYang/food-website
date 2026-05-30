@@ -51,6 +51,11 @@ export default function Navbar() {
     { to: '/preferences', label: '⚙️ 偏好' },
   ]
 
+  // Admin-only links
+  const adminLinks = user?.role === 'admin'
+    ? [{ to: '/content-quality', label: '📋 内容质量' }]
+    : []
+
   return (
     <nav className="navbar">
       <div className="navbar__inner">
@@ -107,6 +112,18 @@ export default function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+                {adminLinks.length > 0 && <hr className="navbar__more-divider" />}
+                {adminLinks.map(link => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="navbar__more-item"
+                    onClick={handleNavClick}
+                    role="menuitem"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
             )}
           </li>
@@ -126,6 +143,22 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              {adminLinks.length > 0 && (
+                <>
+                  <div className="navbar__mobile-secondary-label">管理</div>
+                  {adminLinks.map(link => (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      className="navbar__link"
+                      onClick={handleNavClick}
+                      role="menuitem"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </>
+              )}
             </li>
           )}
 

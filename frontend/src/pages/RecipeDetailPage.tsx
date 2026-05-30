@@ -194,9 +194,7 @@ export default function RecipeDetailPage() {
         recipeYield: recipe.servings ? `${recipe.servings}人份` : undefined,
         author: recipe.author || undefined,
         keywords: recipe.categoryTags ? [recipe.category, ...Object.values(recipe.categoryTags)] : [recipe.category].filter(Boolean),
-        nutrition: recipe.nutrition
-          ? (typeof recipe.nutrition === 'string' ? JSON.parse(recipe.nutrition) : recipe.nutrition)
-          : undefined,
+        nutrition: recipe.nutrition || undefined,
       }
     : null
 
