@@ -1743,41 +1743,18 @@ router.get('/:id', async (req, res) => {
 
     const data = recipe.toJSON()
 
-    // 解析 JSON 字段
-    if (data.ingredients) {
-      try {
-        data.ingredients = JSON.parse(data.ingredients)
-      } catch {
-        data.ingredients = []
-      }
-    } else {
+    // JSON 字段已由 Sequelize getter 自动解析，只需 null 兜底
+    if (!Array.isArray(data.ingredients)) {
       data.ingredients = []
     }
-
-    if (data.steps) {
-      try {
-        data.steps = JSON.parse(data.steps)
-      } catch {
-        data.steps = []
-      }
-    } else {
+    if (!Array.isArray(data.steps)) {
       data.steps = []
     }
-
-    if (data.categoryTags) {
-      try {
-        data.categoryTags = JSON.parse(data.categoryTags)
-      } catch {
-        data.categoryTags = null
-      }
+    if (data.categoryTags && typeof data.categoryTags === 'string') {
+      try { data.categoryTags = JSON.parse(data.categoryTags) } catch { data.categoryTags = null }
     }
-
-    if (data.nutrition) {
-      try {
-        data.nutrition = JSON.parse(data.nutrition)
-      } catch {
-        data.nutrition = null
-      }
+    if (data.nutrition && typeof data.nutrition === 'string') {
+      try { data.nutrition = JSON.parse(data.nutrition) } catch { data.nutrition = null }
     }
 
     // 添加质量评分
@@ -2014,26 +1991,15 @@ router.put('/:id', auth, validateNutrition, async (req, res) => {
 
     const updated = await Recipe.findByPk(id)
     const data = updated.toJSON()
-    if (data.ingredients) {
-      try {
-        data.ingredients = JSON.parse(data.ingredients)
-      } catch {
-        data.ingredients = []
-      }
+    // JSON 字段已由 Sequelize getter 自动解析，只需 null 兜底
+    if (!Array.isArray(data.ingredients)) {
+      data.ingredients = []
     }
-    if (data.steps) {
-      try {
-        data.steps = JSON.parse(data.steps)
-      } catch {
-        data.steps = []
-      }
+    if (!Array.isArray(data.steps)) {
+      data.steps = []
     }
-    if (data.nutrition) {
-      try {
-        data.nutrition = JSON.parse(data.nutrition)
-      } catch {
-        data.nutrition = null
-      }
+    if (data.nutrition && typeof data.nutrition === 'string') {
+      try { data.nutrition = JSON.parse(data.nutrition) } catch { data.nutrition = null }
     }
 
     return res.status(200).json(resJSON(0, 'ok', data))

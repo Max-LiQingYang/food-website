@@ -136,7 +136,9 @@ router.get('/recommend-by-preference', auth, async (req, res) => {
     // 后过滤排除食材
     if (excluded.length > 0) {
       recipes = recipes.filter(r => {
-        const ingredients = r.ingredients ? JSON.parse(r.ingredients) : []
+        // getter 已解析为数组，直接使用；否则 JSON.parse 字符串
+        const ingredients = Array.isArray(r.ingredients) ? r.ingredients
+          : (r.ingredients ? JSON.parse(r.ingredients) : [])
         const names = ingredients.map(i => (i.name || '').toLowerCase())
         return !excluded.some(ex => names.includes(ex))
       })

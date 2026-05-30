@@ -29,6 +29,8 @@ function resJSON(code, message, data) {
  */
 function parseIngredients(recipe) {
   if (!recipe || !recipe.ingredients) return []
+  // getter 已解析为数组，直接返回；否则 JSON.parse 字符串
+  if (Array.isArray(recipe.ingredients)) return recipe.ingredients
   try {
     const parsed = JSON.parse(recipe.ingredients)
     return Array.isArray(parsed) ? parsed : []
