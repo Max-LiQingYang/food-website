@@ -73,8 +73,8 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   UserRecipeAction.associate = (db) => {
-    UserRecipeAction.belongsTo(db.User, { foreignKey: 'userId', as: 'user' })
-    UserRecipeAction.belongsTo(db.Recipe, { foreignKey: 'recipeId', as: 'recipe' })
+    UserRecipeAction.belongsTo(db.User, { foreignKey: 'userId', as: 'user', constraints: false })
+    UserRecipeAction.belongsTo(db.Recipe, { foreignKey: 'recipeId', as: 'recipe', constraints: false })
   }
 
   return UserRecipeAction
