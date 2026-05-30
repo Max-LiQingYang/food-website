@@ -165,3 +165,77 @@
 .filter-panel__done-btn:hover {
   background: var(--color-primary-dark, #c94f2a);
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .filter-panel__toggle {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .filter-panel__toggle:hover {
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+  background: var(--color-primary-bg, #2e1a14);
+}
+
+body.dark .filter-panel__toggle.is-active {
+  background: var(--color-primary, inherit);
+  border-color: var(--color-primary, inherit);
+  color: #fff;
+}
+
+body.dark .filter-panel__body {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .filter-panel__label {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .filter-panel__option {
+  background: var(--color-bg-secondary, #1a1a2e);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .filter-panel__option:hover {
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .filter-panel__option.is-selected {
+  background: var(--color-primary, inherit);
+  border-color: var(--color-primary, inherit);
+  color: #fff;
+}
+
+body.dark .filter-panel__chip {
+  background: var(--color-primary-bg, #2e1a14);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .filter-panel__chip-close {
+  background: rgba(232, 102, 62, 0.2);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .filter-panel__reset {
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .filter-panel__reset:hover {
+  border-color: var(--color-error, #ff4d4f);
+  color: var(--color-error, #ff4d4f);
+}
+
+body.dark .filter-panel__done-btn {
+  background: var(--color-primary, inherit);
+}
+
+body.dark .filter-panel__done-btn:hover {
+  background: var(--color-primary-dark, #c94f2a);
+}

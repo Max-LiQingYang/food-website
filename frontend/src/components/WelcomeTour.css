@@ -145,6 +145,38 @@
   color: #777;
 }
 
+/* ── 暗色模式 ── */
+
+body.dark .tour-tooltip {
+  background: var(--color-card, #1e1e32);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
+
+body.dark .tour-tooltip__title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .tour-tooltip__content {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .tour-tooltip__progress {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .tour-tooltip__skip {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .tour-tooltip__skip:hover {
+  background: var(--color-bg-secondary, #1a1a2e);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .tour-tooltip__counter {
+  color: var(--color-text-muted, #686880);
+}
+
 /* Mobile */
 @media (max-width: 480px) {
   .tour-tooltip {

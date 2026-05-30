@@ -134,3 +134,33 @@
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .mobile-bottom-nav {
+  background: var(--color-card, #1e1e32);
+  border-top-color: var(--color-border, #2e2e48);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .mobile-bottom-nav__item {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .mobile-bottom-nav__item:hover,
+body.dark .mobile-bottom-nav__item.is-active {
+  color: var(--color-primary, inherit);
+}
+
+body.dark .mobile-bottom-nav__indicator {
+  background: var(--color-primary, inherit);
+}
+
+body.dark .mobile-bottom-nav__item:active {
+  background: var(--color-primary-bg, #2e1a14);
+}
+
+body.dark .mobile-bottom-nav__item[href="/recipe/new"] .mobile-bottom-nav__icon {
+  background: var(--color-primary, inherit);
+  box-shadow: 0 3px 12px rgba(232, 102, 62, 0.3);
+}

@@ -25,3 +25,17 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .atsl-btn {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .atsl-btn:hover:not(:disabled) {
+  background: var(--color-primary-bg, #2e1a14);
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}

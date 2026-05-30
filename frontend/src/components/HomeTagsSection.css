@@ -75,3 +75,17 @@
   border-color: #e67e22;
   color: #e67e22;
 }
+
+/* ── 暗色模式 ── */
+
+body.dark .home-tags-card {
+  background: var(--color-bg-secondary, #1a1a2e);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .home-tags-card:hover {
+  background: var(--color-primary-bg, #2e1a14);
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}

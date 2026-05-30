@@ -2410,3 +2410,48 @@
 - 为后续个性化营养推荐奠定数据基础
 
 **下一个方向**: A（UI/UX）
+
+---
+
+## 迭代 #98 — A/UI-优化：暗色模式覆盖率提升（67%→97%） ✅
+**派发时间**: 2026-05-30 19:33
+**完成时间**: 2026-05-30 22:37
+**方向**: A（UI/UX）/ 🎨 暗色模式覆盖
+**基线 Commit**: `f59ea97`
+**完成 Commit**: `e44bca6`
+
+### 背景
+项目 93 个 CSS 文件中仅 62 个有 `body.dark` 暗色样式（67% 覆盖率），31 个新增组件/页面缺少暗色样式，暗色模式下这些区域显示为浅色背景，视觉冲击严重。
+
+### 任务内容
+1. **管家**：读取 `iteration-lessons.md` ✅
+2. **UI 专家**（ui-designer）：输出 31 文件完整 body.dark 设计规则 PRD（~1954 行）✅
+3. **全栈专家**（fullstack）：分两轮实施 28 个文件（8+20）✅
+4. **本地构建**：npm run build → 0 warnings 0 errors ✅
+5. **部署闭环**：git commit + push → 服务器构建 → docker cp → nginx reload → 8 页面 200 ✅
+
+### 改动规模
+- 20 文件修改，+1410 行 CSS
+- 覆盖 28 个文件（8 组件第1轮 + 12 组件第2轮 + 8 页）
+- 3 个文件无需修改：PageTransition（纯动画）、ImageLightbox（固定黑背景）、PrintView（@media print 强制颜色）
+
+### 验收
+| 检查项 | 结果 |
+|--------|------|
+| npm run build | 0 warnings 0 errors ✅ |
+| 首页 200 | ✅ |
+| SearchPage 200 | ✅ |
+| CookingJournalPage 200 | ✅ |
+| NutritionDashboard 200 | ✅ |
+| PantryPage 200 | ✅ |
+| MealPlannerPage 200 | ✅ |
+| ComparePage 200 | ✅ |
+| PreferencesPage 200 | ✅ |
+
+### 经验教训
+- **子专家超时**：全栈专家网络中断导致第一轮只完成 8/28 文件，需分批重派
+- **CSS 变量一致**：严格复用 global.css 预定义变量，不引入新变量
+- **`body.dark` 选择器统一**：不使用 `[data-theme]` 或 `.dark`，与 ThemeContext.tsx 保持一致
+
+### 下一个方向
+C（内容质量）或 移动端响应式收尾

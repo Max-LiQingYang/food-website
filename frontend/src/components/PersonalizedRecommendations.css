@@ -88,6 +88,34 @@
   background: var(--color-bg-hover-dark, rgba(255,255,255,0.08));
 }
 
+/* ── 暗色模式 ── */
+
+body.dark .personalized-rec__title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .personalized-rec__tabs {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .personalized-rec__tab {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .personalized-rec__tab:hover {
+  color: var(--color-text, #e0e0ee);
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .personalized-rec__tab.active {
+  background: var(--color-primary, inherit);
+  color: #fff;
+}
+
+body.dark .personalized-rec__empty {
+  color: var(--color-text-secondary, #9898b0);
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .personalized-rec__header {

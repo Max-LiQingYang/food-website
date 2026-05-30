@@ -212,6 +212,69 @@
   background: #333;
 }
 
+/* ── 暗色模式 ── */
+
+body.dark .collection-comments {
+  border-top-color: var(--color-border, #2e2e48);
+}
+
+body.dark .comments-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .comment-input {
+  background: var(--color-input-bg, #282840);
+  border-color: var(--color-input-border, #3e3e58);
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .comment-input:focus {
+  border-color: var(--color-primary, inherit);
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .comment-char-count {
+  color: var(--color-text-muted, #686880);
+}
+
+body.dark .comment-login-hint {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .comments-loading,
+body.dark .comments-empty {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .comments-error {
+  color: var(--color-primary, inherit);
+}
+
+body.dark .comments-error button {
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .comment-item {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .comment-author {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .comment-time {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .comment-text {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .comment-delete-btn {
+  color: var(--color-text-secondary, #9898b0);
+}
+
 /* ── Responsive ── */
 @media (max-width: 480px) {
   .comment-item {
