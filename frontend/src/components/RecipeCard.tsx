@@ -313,7 +313,12 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
 
           {/* 季节标签 */}
           {recipe.season && recipe.season !== 'all' && SEASON_LABELS[recipe.season] && (
-            <span className="recipe-card__tag recipe-card__tag--season">{SEASON_LABELS[recipe.season]}</span>
+            <span
+              className={`recipe-card__tag recipe-card__tag--season recipe-card__tag--season-${recipe.season}`}
+              title={`${SEASON_LABELS[recipe.season]} 时令食材`}
+            >
+              {SEASON_LABELS[recipe.season]}
+            </span>
           )}
 
           {/* 智能难度 */}

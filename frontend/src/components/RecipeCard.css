@@ -418,14 +418,88 @@ body.dark .recipe-card__tag--category {
   color: var(--color-primary, #E8663E);
 }
 
+/* ===== 季节标签（4 套配色 + 暗色模式） ===== */
 .recipe-card__tag--season {
-  background: #e8f5e9;
-  color: #2e7d32;
+  position: relative;
+  cursor: help;
 }
 
-body.dark .recipe-card__tag--season {
-  background: rgba(46, 125, 50, 0.2);
+/* 春季 🌸 — 绿色系 */
+.recipe-card__tag--season-spring {
+  background: linear-gradient(135deg, #f1f8e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.18);
+}
+body.dark .recipe-card__tag--season-spring {
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.28) 0%, rgba(46, 125, 50, 0.16) 100%);
+  color: #a5d6a7;
+  border-color: rgba(129, 199, 132, 0.25);
+}
+
+/* 夏季 ☀️ — 橙色系 */
+.recipe-card__tag--season-summer {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%);
+  color: #e65100;
+  border: 1px solid rgba(230, 81, 0, 0.18);
+}
+body.dark .recipe-card__tag--season-summer {
+  background: linear-gradient(135deg, rgba(230, 81, 0, 0.28) 0%, rgba(230, 81, 0, 0.16) 100%);
+  color: #ffb74d;
+  border-color: rgba(255, 183, 77, 0.25);
+}
+
+/* 秋季 🍂 — 棕色系 */
+.recipe-card__tag--season-autumn {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  color: #4e342e;
+  border: 1px solid rgba(78, 52, 46, 0.20);
+}
+body.dark .recipe-card__tag--season-autumn {
+  background: linear-gradient(135deg, rgba(78, 52, 46, 0.34) 0%, rgba(78, 52, 46, 0.20) 100%);
+  color: #bcaaa4;
+  border-color: rgba(188, 170, 164, 0.30);
+}
+
+/* 冬季 ❄️ — 蓝色系 */
+.recipe-card__tag--season-winter {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+  border: 1px solid rgba(21, 101, 192, 0.18);
+}
+body.dark .recipe-card__tag--season-winter {
+  background: linear-gradient(135deg, rgba(21, 101, 192, 0.30) 0%, rgba(21, 101, 192, 0.18) 100%);
+  color: #90caf9;
+  border-color: rgba(144, 202, 249, 0.28);
+}
+
+/* 暗色模式兜底：兼容旧版 recipe.season=all 或未传具体季节 */
+body.dark .recipe-card__tag--season:not([class*="season-"]) {
+  background: rgba(46, 125, 50, 0.20);
   color: #81c784;
+}
+
+/* hover 微缩放 + 季节全名 tooltip */
+.recipe-card__tag--season-spring,
+.recipe-card__tag--season-summer,
+.recipe-card__tag--season-autumn,
+.recipe-card__tag--season-winter {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.recipe-card__tag--season-spring:hover,
+.recipe-card__tag--season-summer:hover,
+.recipe-card__tag--season-autumn:hover,
+.recipe-card__tag--season-winter:hover {
+  transform: scale(1.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
+  filter: brightness(1.04);
+}
+
+/* tooltip 暗色模式微调 */
+body.dark .recipe-card__tag--season-spring:hover,
+body.dark .recipe-card__tag--season-summer:hover,
+body.dark .recipe-card__tag--season-autumn:hover,
+body.dark .recipe-card__tag--season-winter:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.40);
 }
 
 .recipe-card__tag--smart {

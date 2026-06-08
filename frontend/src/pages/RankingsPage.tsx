@@ -99,10 +99,10 @@ export default function RankingsPage() {
 
   const getPrimaryStat = (item: RankedRecipe) => {
     switch (sortBy) {
-      case 'views': return { value: Math.round(item.viewCount ?? 0), label: '浏览' }
-      case 'favorites': return { value: Math.round(item.favoriteCount ?? 0), label: '收藏' }
-      case 'rating': return { value: item.avgRating ? item.avgRating.toFixed(1) : '-', label: '评分' }
-      default: return { value: (item.compositeScore ?? 0).toFixed(1), label: '综合分' }
+      case 'views': return { value: Math.round(item.viewCount ?? 0), label: '浏览', icon: '👁️' }
+      case 'favorites': return { value: Math.round(item.favoriteCount ?? 0), label: '收藏', icon: '❤️' }
+      case 'rating': return { value: item.avgRating ? item.avgRating.toFixed(1) : '-', label: '评分', icon: '⭐' }
+      default: return { value: (item.compositeScore ?? 0).toFixed(1), label: '综合分', icon: '🔥' }
     }
   }
 
@@ -258,6 +258,7 @@ export default function RankingsPage() {
                 {/* 主统计值 */}
                 <div className="rank-card__primary-stat">
                   <span className="rank-card__stat-value--primary">
+                    <span className="rank-card__stat-icon" aria-hidden="true">{primaryStat.icon}</span>
                     {typeof primaryStat.value === 'number'
                       ? primaryStat.value >= 1000
                         ? (primaryStat.value / 1000).toFixed(1) + 'k'

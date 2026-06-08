@@ -24,11 +24,19 @@ const HomeTagsSection: React.FC = () => {
     }).catch(() => {})
   }, [])
 
+  // 给 popularTags 数据回退到 SEASONAL_TAGS 时分配 icon（基于 tag 名匹配，否则用 '🏷️'）
+  const iconMap: Record<string, string> = SEASONAL_TAGS.reduce(
+    (acc, t) => ({ ...acc, [t.tag]: t.icon }),
+    {}
+  )
+
   const tagCloud = useMemo(() => {
     if (popularTags.length > 0) {
       return popularTags.slice(0, 8).map(item => ({
         label: `${item.tag} (${item.count})`,
         tag: item.tag,
+        icon: iconMap[item.tag] || '🏷️',
+        count: item.count,
       }))
     }
     return SEASONAL_TAGS
@@ -51,8 +59,17 @@ const HomeTagsSection: React.FC = () => {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/search?tag=${encodeURIComponent(item.tag)}`) }}
           >
+            {item.icon && <span className="home-tags-card__icon" aria-hidden="true">{item.icon}</span>}
             <span className="home-tags-card__label">{item.label}</span>
-            <span className="home-tags-card__arrow">→</span>
+            {popularTags.length > 0 && item.count != null && (
+              <span
+                className="home-tags-card__badge"
+                style={{ animationDelay: `${0.3 + idx * 0.05}s` }}
+                aria-label={`${item.count} 个食谱`}
+              >
+                {item.count}
+              </span>
+            )}
           </div>
         ))}
       </div>
