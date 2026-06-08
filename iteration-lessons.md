@@ -193,3 +193,26 @@
 3. **通知偏好存储**：存在 `User.preferences` JSON 字段中，无 DDL 变更，适合快速迭代
 4. **per-type per-channel 模型**：10 类型 × 2 通道（inApp/push），默认全开，推送通道受浏览器权限约束
 5. **sw.js 改造**：需同时处理 `push` 和 `notificationclick` 事件，后者负责点击跳转
+
+---
+
+## 2026-06-09 迭代#108 — 食谱互动数据填充 + 季节标签精细化
+
+### 关键陷阱
+- **SQL 多语句执行需要 multipleStatements:true**：mysql2 默认不允许一次执行多条 SQL，需在连接配置中显式开启 `multipleStatements: true`
+- **容器内无 mysql CLI**：生产容器基于 node 镜像，不含 mysql 客户端。执行 SQL 需通过 Node.js mysql2 库连接，或 pipe 注入
+- **seed.js UUID 随机生成**：seed.js 使用 `uuidv4()` 随机生成 UUID，无法通过 UUID 匹配生产 DB 数据。所有 seed.js 更新必须按 title 匹配
+- **同名食谱处理**：seed.js 中存在同名食谱（如"鱼香肉丝"×2、"提拉米苏"×2），需更新所有匹配项
+
+### 修复方法
+- **SQL 执行方式**：编写 Node.js 脚本通过 mysql2 连接生产 DB，开启 `multipleStatements: true` 一次执行完整 SQL 文件
+- **seed.js 匹配策略**：按 title 字符串匹配替代 UUID 匹配，确保所有同名食谱均被更新
+- **条件更新**：viewCount/favoriteCount 仅当当前=0 才覆盖，season 仅当='all' 才覆盖，避免覆盖已有数据
+
+### 自优化建议
+- **SQL 脚本测试**：在本地或 staging 环境先 dry-run 验证 affectedRows 与预期一致，再执行到生产
+- **容器工具预装**：考虑在 Dockerfile 中添加 mysql-client，便于后续运维
+- **seed.js 与生产 DB 同步**：本次更新后 seed.js 数据与生产 DB 一致，建议后续所有数据变更同时更新 seed.js
+
+### 遗留问题
+- 无 🔴 待修复
