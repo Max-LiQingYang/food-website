@@ -3,8 +3,14 @@
 /**
  * utils/notificationHelper.js
  * 创建通知 + 发送 Web Push 推送
+ *
  * 兼容对象参数 createNotification({ userId, type, message, link, actorId, targetId, targetType })
  * 以及旧式位置参数（向后兼容）
+ *
+ * Web Push 流程：
+ *   1. createNotification() 写入站内通知（按用户 inApp 偏好；若关闭则跳过）
+ *   2. 非阻塞调用 sendPushForNotification()：根据 push 偏好遍历 PushSubscription 发送
+ *   3. 失败时清理过期订阅（statusCode 410 / 404 自动删除 endpoint）
  */
 
 let NotificationModel
@@ -21,6 +27,56 @@ function getPushModel() {
     PushModel = require('../models').PushSubscription
   }
   return PushModel
+}
+
+// 单例 web-push 实例（避免每次调用都重新 setVapidDetails）
+let webPushReady = null
+function getWebPush() {
+  if (webPushReady !== null) return webPushReady
+  try {
+    const webPush = require('web-push')
+    const publicKey = process.env.VAPID_PUBLIC_KEY
+    const privateKey = process.env.VAPID_PRIVATE_KEY
+    const subject = process.env.VAPID_SUBJECT || 'mailto:admin@food-website.com'
+    if (!publicKey || !privateKey) {
+      webPushReady = false
+      return false
+    }
+    webPush.setVapidDetails(subject, publicKey, privateKey)
+    webPushReady = webPush
+    return webPush
+  } catch (err) {
+    console.error('[web-push init err]', err && err.message)
+    webPushReady = false
+    return false
+  }
+}
+
+/**
+ * 解析用户 preferences JSON
+ */
+function parsePreferences(rawPrefs) {
+  if (!rawPrefs) return {}
+  try {
+    if (typeof rawPrefs === 'string') return JSON.parse(rawPrefs)
+    if (typeof rawPrefs === 'object') return rawPrefs
+  } catch {
+    return {}
+  }
+  return {}
+}
+
+/**
+ * 从用户偏好中读取某类通知的 channel 开关（默认全开）
+ * 返回 { inApp: boolean, push: boolean }
+ */
+function getChannelPrefs(prefs, type) {
+  const npref = (prefs && prefs.notificationPreferences) || {}
+  const t = npref[type] || {}
+  return {
+    inApp: t.inApp !== false,
+    push: t.push !== false
+  }
 }
 
 /**
@@ -63,99 +119,95 @@ async function createNotification(...args) {
     opts.message = typeMessages[opts.type] || '新通知'
   }
 
-  const notif = await Notification.create({
-    userId: opts.userId,
-    actorId: opts.actorId || null,
-    type: opts.type || 'system',
-    message: opts.message,
-    link: opts.link || null,
-    targetId: opts.targetId || null,
-    targetType: opts.targetType || null,
-    isRead: false
-  })
+  // 查询用户偏好（决定是否写站内 + 是否推送）
+  let prefs = {}
+  try {
+    const User = require('../models').User
+    const user = await User.findByPk(opts.userId, { attributes: ['preferences'] })
+    if (user) prefs = parsePreferences(user.preferences)
+  } catch {
+    prefs = {}
+  }
+  const channels = getChannelPrefs(prefs, opts.type)
 
-  // 非阻塞发送 Web Push
-  sendPushForNotification(opts).catch(() => {})
+  let notif = null
+  if (channels.inApp) {
+    notif = await Notification.create({
+      userId: opts.userId,
+      actorId: opts.actorId || null,
+      type: opts.type || 'system',
+      message: opts.message,
+      link: opts.link || null,
+      targetId: opts.targetId || null,
+      targetType: opts.targetType || null,
+      isRead: false
+    })
+  }
+
+  // 非阻塞发送 Web Push（按 push 偏好）
+  if (channels.push) {
+    sendPushNotification(opts.userId, opts.message, opts.link, {
+      type: opts.type,
+      titleOverride: opts.pushTitle
+    }).catch(err => console.error('[push send err]', err && err.message))
+  }
 
   return notif
 }
 
 /**
- * 根据用户通知偏好发送 Web Push 推送
+ * 实际发送 Web Push（独立函数，便于外部调用）
+ * @param {string} userId
+ * @param {string} body — 通知正文
+ * @param {string} link — 跳转链接
+ * @param {object} options — { type, titleOverride }
  */
-async function sendPushForNotification(opts) {
-  try {
-    const User = require('../models').User
-    const PushSubscription = getPushModel()
+async function sendPushNotification(userId, body, link, options = {}) {
+  const webPush = getWebPush()
+  if (!webPush) return
 
-    // 获取用户偏好
-    const user = await User.findByPk(opts.userId, { attributes: ['preferences'] })
-    if (!user) return
+  const PushSubscription = getPushModel()
+  const subs = await PushSubscription.findAll({ where: { userId } })
+  if (!subs || subs.length === 0) return
 
-    let prefs = {}
-    try {
-      if (user.preferences && typeof user.preferences === 'string') {
-        prefs = JSON.parse(user.preferences)
-      } else if (user.preferences && typeof user.preferences === 'object') {
-        prefs = user.preferences
-      }
-    } catch {
-      prefs = {}
-    }
+  // 默认标题按通知类型
+  const defaultTitle = '美食食谱'
+  const title = options.titleOverride || defaultTitle
 
-    const notifPrefs = prefs.notificationPreferences || {}
-    const typePref = notifPrefs[opts.type]
-    // 默认启用推送，除非用户明确关闭
-    if (typePref && typePref.push === false) return
+  const payload = JSON.stringify({
+    title,
+    body: body || '',
+    icon: '/icon-192.png',
+    badge: '/badge-72.png',
+    url: link || '/notifications',
+    type: options.type || 'system'
+  })
 
-    // 获取用户所有推送订阅
-    const subs = await PushSubscription.findAll({ where: { userId: opts.userId } })
-    if (subs.length === 0) return
-
-    // 动态加载 web-push
-    let webPush
-    try {
-      webPush = require('web-push')
-    } catch {
-      return // web-push 未安装
-    }
-
-    const vapidPublicKey = process.env.VAPID_PUBLIC_KEY
-    const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
-
-    if (!vapidPublicKey || !vapidPrivateKey) return
-
-    webPush.setVapidDetails(
-      'mailto:' + (process.env.ADMIN_EMAIL || 'admin@food.com'),
-      vapidPublicKey,
-      vapidPrivateKey
-    )
-
-    const payload = JSON.stringify({
-      title: '美食食谱',
-      body: opts.message,
-      icon: '/icon.svg',
-      badge: '/icon.svg',
-      data: { url: opts.link || '/notifications' }
-    })
-
-    for (const sub of subs) {
+  await Promise.all(
+    subs.map(async (sub) => {
       try {
-        await webPush.sendNotification({
-          endpoint: sub.endpoint,
-          keys: { p256dh: sub.p256dh, auth: sub.auth }
-        }, payload)
+        await webPush.sendNotification(
+          {
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth }
+          },
+          payload
+        )
       } catch (err) {
-        // 410 Gone → 订阅过期，删除
-        if (err.statusCode === 410) {
+        const status = err && err.statusCode
+        // 410 Gone / 404 Not Found → 订阅已失效，清理
+        if (status === 410 || status === 404) {
           sub.destroy().catch(() => {})
+        } else {
+          // 其他错误：记录但不抛出
+          console.error('[push send] endpoint failed', status, err && err.message)
         }
-        // 其他错误静默处理
       }
-    }
-  } catch (err) {
-    console.error('[push error]', err.message)
-  }
+    })
+  )
 }
 
-module.exports = { createNotification }
+module.exports = {
+  createNotification,
+  sendPushNotification
+}

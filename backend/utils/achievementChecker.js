@@ -425,13 +425,15 @@ async function checkAndUnlockAchievement(userId, type, models) {
     icon: def.icon
   })
 
-  // 创建里程碑通知
+  // 创建成就解锁通知
   setImmediate(() => {
     createNotification({
       userId,
-      type: 'milestone',
+      type: 'achievement_unlock',
       message: `\uD83C\uDF89 解锁成就：${def.icon} ${def.title}`,
-      link: `/user/${userId}`
+      link: `/user/${userId}`,
+      targetId: achievement.id,
+      targetType: 'achievement'
     }).catch(err => console.error('[Achievement notification error]', err))
   })
 

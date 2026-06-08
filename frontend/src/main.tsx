@@ -8,9 +8,24 @@ import { ThemeProvider } from './context/ThemeContext'
 // ── Service Worker 注册 ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
-      // SW 注册失败不影响主功能
-    })
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then(async (reg) => {
+        // 检查是否已有推送订阅（供诊断使用）
+        try {
+          if (reg && reg.pushManager) {
+            const sub = await reg.pushManager.getSubscription()
+            if (sub) {
+              // 已有订阅：后续 UI 会通过 usePushSubscription 读取
+            }
+          }
+        } catch {
+          // ignore
+        }
+      })
+      .catch(() => {
+        // SW 注册失败不影响主功能
+      })
   })
 }
 

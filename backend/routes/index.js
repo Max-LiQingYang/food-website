@@ -76,6 +76,7 @@ router.use('/preferences', preferencesRoutes)
 
 // 通知系统（全部需认证）
 router.use('/notifications', require('./notification'))
+router.use('/notification-preferences', require('./notificationPreferences'))
 router.use('/push/subscription', require('./pushSubscription'))
 
 // 成就系统（按需处理 auth）

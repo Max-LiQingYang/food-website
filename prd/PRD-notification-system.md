@@ -1,15 +1,36 @@
 # PRD: 站内消息通知系统 + Web Push 浏览器推送
 
+> **版本**: v2.0 | **最后更新**: 2026-06-08 | **状态**: 评审完成，待实现
+
 ## 一、概述
 为美食食谱社区平台完善站内通知系统，覆盖所有用户交互场景（关注、评论、回复、收藏、成就、系统通知），并增加 Web Push 浏览器推送能力，利用已有 PWA Service Worker 实现离线推送。
 
-## 二、当前存量
-- Notification 模型: id(UUID), userId, type(ENUM: follow/comment/favorite/milestone), message(500), link(STRING), isRead(BOOLEAN), createdAt
-- Notification 路由: GET /, GET /unread-count, PUT /:id/read, PUT /read-all, DELETE /:id
-- notificationHelper.js: `createNotification({ userId, type, message, link })`
-- 已在 follows.js/comments.js/favorites.js 中调用 createNotification
-- Web Push: 无（需从零创建）
-- Service Worker: 已有基本缓存逻辑，无 push 事件处理
+## 二、当前存量（代码已实现部分）
+
+### 2.1 后端 ✅ 已完成
+- **Notification 模型**: id(UUID), userId, actorId, type(ENUM: follow/comment/reply/favorite/collection_add/meal_plan_reminder/cooking_log_reminder/achievement_unlock/challenge_update/system), message(500), link, targetId, targetType, isRead, createdAt
+- **PushSubscription 模型**: id(UUID), userId, endpoint, p256dh, auth, userAgent, createdAt
+- **Notification 路由**: GET /, GET /unread-count, PUT /:id/read, PUT /read-all, DELETE /:id
+- **PushSubscription 路由**: POST /, GET /my, PUT /:id, DELETE /:id
+- **notificationHelper.js**: `createNotification()` 已实现（含 Web Push 发送逻辑、用户偏好检查、过期订阅清理）
+- **已注入通知的路由**: follows.js, comments.js, favorites.js, challenges.js
+
+### 2.2 前端 ✅ 已完成
+- **NotificationBell.tsx**: 导航栏铃铛 + 下拉面板 + 未读计数轮询（30s）
+- **NotificationsPage.tsx**: 通知列表页（分页、筛选、标记已读、删除）
+- **SettingsPage.tsx**: 已有"通知设置"Tab（但为旧版 4 项布尔开关，需重构）
+- **api.ts**: 通知 CRUD、推送订阅、通知偏好 API 函数已定义
+- **main.tsx**: Service Worker 注册已实现
+
+### 2.3 ⚠️ 待实现
+- **sw.js**: 无 `push` 事件处理（需新增）
+- **VAPID 密钥**: 未生成/配置（需生成并写入 .env）
+- **`web-push` npm 包**: 已在 package.json 中声明但需确认安装
+- **前端推送订阅 UI**: 无触发订阅流程的 UI 组件
+- **SettingsPage 通知偏好**: 旧版 4 项布尔开关，未对齐 PRD 的 6 类型 per-channel 模型
+- **通知偏好后端路由**: GET/PUT /api/notification-preferences 未实现
+- **achievement.js**: 未注入 createNotification
+- **collection_add / meal_plan_reminder / cooking_log_reminder**: 类型已定义但无路由创建此类通知
 
 ## 三、数据库设计
 

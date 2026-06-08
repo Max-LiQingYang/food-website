@@ -6,9 +6,14 @@ import {
   updatePrivacySettings,
   updateSettingsProfile,
   exportUserData,
-  exportCsvFavorites
+  exportCsvFavorites,
+  getNotificationPreferences,
+  updateNotificationPreferences,
+  NotificationPreference
 } from '../api'
 import { useToast } from '../context/ToastContext'
+import { usePushSubscription } from '../hooks/usePushSubscription'
+import PushSubscriptionPrompt from '../components/PushSubscriptionPrompt'
 import './SettingsPage.css'
 import PageSkeleton from '../components/PageSkeleton'
 
@@ -23,14 +28,35 @@ interface Settings {
   allergies: string[]
 }
 
+const NOTIF_TYPES = [
+  { key: 'follow', label: '关注', desc: '当有人关注你时' },
+  { key: 'comment', label: '评论', desc: '当有人评论你的食谱时' },
+  { key: 'reply', label: '回复', desc: '当有人回复你的评论时' },
+  { key: 'favorite', label: '收藏', desc: '当有人收藏你的食谱时' },
+  { key: 'achievement_unlock', label: '成就解锁', desc: '当获得新成就时' },
+  { key: 'system', label: '系统通知', desc: '系统公告和更新信息' }
+]
+
+const NOTIF_ICONS: Record<string, string> = {
+  follow: '👤',
+  comment: '💬',
+  reply: '↩️',
+  favorite: '❤️',
+  achievement_unlock: '🏆',
+  system: '🔔'
+}
+
 export default function SettingsPage() {
   const navigate = useNavigate()
   const { showToast } = useToast()
+  const pushCtx = usePushSubscription()
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'privacy' | 'export'>('profile')
   const [settings, setSettings] = useState<Settings | null>(null)
   const [loading, setLoading] = useState(true)
   const [nickname, setNickname] = useState('')
   const [saving, setSaving] = useState(false)
+  const [notifPrefs, setNotifPrefs] = useState<Record<string, NotificationPreference> | null>(null)
+  const [notifPrefsLoading, setNotifPrefsLoading] = useState(false)
 
   useEffect(() => {
     loadSettings()
@@ -47,6 +73,18 @@ export default function SettingsPage() {
       showToast('加载设置失败', 'error')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadNotifPrefs() {
+    try {
+      setNotifPrefsLoading(true)
+      const prefs = await getNotificationPreferences()
+      setNotifPrefs(prefs)
+    } catch (err) {
+      console.error('Failed to load notification prefs:', err)
+    } finally {
+      setNotifPrefsLoading(false)
     }
   }
 
@@ -71,6 +109,23 @@ export default function SettingsPage() {
     try {
       await updateNotificationPrefs(updated)
       setSettings({ ...settings, notifications: updated })
+      showToast('通知偏好已更新', 'success')
+    } catch (err) {
+      showToast('保存失败', 'error')
+    }
+  }
+
+  async function handleNotifPrefToggle(type: string, channel: 'inApp' | 'push') {
+    if (!notifPrefs) return
+    const current = notifPrefs[type]
+    if (!current) return
+    const updated = {
+      ...notifPrefs,
+      [type]: { ...current, [channel]: !current[channel] }
+    }
+    try {
+      await updateNotificationPreferences(updated)
+      setNotifPrefs(updated)
       showToast('通知偏好已更新', 'success')
     } catch (err) {
       showToast('保存失败', 'error')
@@ -192,54 +247,91 @@ export default function SettingsPage() {
           {activeTab === 'notifications' && (
             <div className="settings-section fade-in">
               <h2>通知偏好</h2>
-              <div className="settings-field">
-                <label>评论回复通知</label>
-                <div className="settings-toggle">
-                  <span>当有人回复你的评论时通知</span>
-                  <button
-                    className={`toggle-btn ${settings?.notifications?.commentReply ? 'on' : 'off'}`}
-                    onClick={() => handleNotificationToggle('commentReply')}
-                  >
-                    {settings?.notifications?.commentReply ? '已开启' : '已关闭'}
-                  </button>
-                </div>
+
+              {/* 推送订阅提示 */}
+              <PushSubscriptionPrompt />
+
+              {/* 推送权限状态指示 */}
+              <div className="notif-prefs-status">
+                <span className="notif-prefs-status__label">浏览器推送权限：</span>
+                <span className={`notif-prefs-status__value notif-prefs-status__value--${pushCtx.permission}`}>
+                  {pushCtx.permission === 'granted' ? '✅ 已开启' :
+                   pushCtx.permission === 'denied' ? '❌ 已关闭' :
+                   pushCtx.permission === 'unsupported' ? '⚠️ 不支持' : '⏳ 未设置'}
+                </span>
               </div>
-              <div className="settings-field">
-                <label>关注动态通知</label>
-                <div className="settings-toggle">
-                  <span>当关注的人发布新食谱时通知</span>
-                  <button
-                    className={`toggle-btn ${settings?.notifications?.followUpdate ? 'on' : 'off'}`}
-                    onClick={() => handleNotificationToggle('followUpdate')}
-                  >
-                    {settings?.notifications?.followUpdate ? '已开启' : '已关闭'}
-                  </button>
-                </div>
-              </div>
-              <div className="settings-field">
-                <label>挑战赛通知</label>
-                <div className="settings-toggle">
-                  <span>当有新的烹饪挑战时通知</span>
-                  <button
-                    className={`toggle-btn ${settings?.notifications?.challenge ? 'on' : 'off'}`}
-                    onClick={() => handleNotificationToggle('challenge')}
-                  >
-                    {settings?.notifications?.challenge ? '已开启' : '已关闭'}
-                  </button>
-                </div>
-              </div>
-              <div className="settings-field">
-                <label>系统通知</label>
-                <div className="settings-toggle">
-                  <span>接收系统公告和更新信息</span>
-                  <button
-                    className={`toggle-btn ${settings?.notifications?.system ? 'on' : 'off'}`}
-                    onClick={() => handleNotificationToggle('system')}
-                  >
-                    {settings?.notifications?.system ? '已开启' : '已关闭'}
-                  </button>
-                </div>
-              </div>
+
+              {/* 加载状态 */}
+              {notifPrefsLoading && <div className="settings-loading">加载中...</div>}
+
+              {/* 通知类型表格 */}
+              {!notifPrefsLoading && notifPrefs && (
+                <>
+                  <div className="notif-prefs-table">
+                    <div className="notif-prefs-table__header">
+                      <span className="notif-prefs-table__col-type">通知类型</span>
+                      <span className="notif-prefs-table__col-channel">站内通知</span>
+                      <span className="notif-prefs-table__col-channel">推送通知</span>
+                    </div>
+                    {NOTIF_TYPES.map(({ key, label, desc }) => {
+                      const pref = notifPrefs[key]
+                      if (!pref) return null
+                      const pushDisabled = pushCtx.permission !== 'granted'
+                      return (
+                        <div key={key} className="notif-prefs-table__row">
+                          <span className="notif-prefs-table__col-type">
+                            <span className="notif-prefs-table__icon">{NOTIF_ICONS[key] || '🔔'}</span>
+                            <span className="notif-prefs-table__label">
+                              <strong>{label}</strong>
+                              <small>{desc}</small>
+                            </span>
+                          </span>
+                          <span className="notif-prefs-table__col-channel">
+                            <button
+                              className={`toggle-btn ${pref.inApp ? 'on' : 'off'}`}
+                              onClick={() => handleNotifPrefToggle(key, 'inApp')}
+                              aria-label={`${label}站内通知`}
+                            >
+                              {pref.inApp ? '已开启' : '已关闭'}
+                            </button>
+                          </span>
+                          <span className="notif-prefs-table__col-channel">
+                            <button
+                              className={`toggle-btn ${pref.push ? 'on' : 'off'} ${pushDisabled ? 'toggle-btn--disabled' : ''}`}
+                              onClick={() => !pushDisabled && handleNotifPrefToggle(key, 'push')}
+                              disabled={pushDisabled}
+                              aria-label={`${label}推送通知${pushDisabled ? '（需先开启浏览器推送权限）' : ''}`}
+                            >
+                              {pushDisabled ? '🔒' : (pref.push ? '已开启' : '已关闭')}
+                            </button>
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* 取消订阅按钮 */}
+                  {pushCtx.isSubscribed && (
+                    <div className="notif-prefs-unsubscribe">
+                      <button
+                        className="settings-save-btn notif-prefs-unsubscribe__btn"
+                        onClick={async () => {
+                          if (!window.confirm('确定要取消推送订阅吗？你将不再收到任何浏览器推送通知。')) return
+                          try {
+                            await pushCtx.unsubscribe()
+                            showToast('已取消推送订阅', 'success')
+                          } catch {
+                            showToast('取消失败', 'error')
+                          }
+                        }}
+                        disabled={pushCtx.subscribing}
+                      >
+                        {pushCtx.subscribing ? '处理中...' : '🔕 取消推送订阅'}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
 

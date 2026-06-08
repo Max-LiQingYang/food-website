@@ -2599,3 +2599,61 @@
 
 ### 遗留问题
 - 无 🔴 待修复
+
+---
+
+## 迭代 #104 — 🔴 Bugfix：RecipeDetailPage TDZ 修复 ✅
+**派发时间**: 2026-06-08
+**完成时间**: 2026-06-08
+**类型**: bugfix
+**基线 Commit**: `8059b79`
+**交付 Commit**: `c8cca77`
+**部署**: ✅ http://39.103.68.205/
+
+### 根因
+`RecipeDetailPage.tsx` 第 118 行的 `allImages` 引用了第 127 行才声明的 `normalizedSteps`，const 声明在 TDZ 内被访问 → 运行时 ReferenceError。
+
+### 修复
+交换 `normalizedSteps` 和 `allImages` 的声明顺序（被依赖项在前）。
+
+### 验证
+- `npm run build` 0 warnings 0 errors ✅
+- `npx tsc --noEmit` 无 TDZ 错误 ✅
+- 部署后首页 200 ✅
+
+### 关键经验
+- TDZ bug 反复出现（之前 router/index.tsx 也发生过），需在 PR 审查中重点检查 const/let 声明顺序
+- 子专家拆分有效：管家定位（30s）→ 全栈修复+验证（3min）→ 运维部署（1min）
+
+---
+
+## 迭代 #105 — 🔴 Bugfix：Unsplash 图片防盗链修复 ✅
+**派发时间**: 2026-06-08
+**完成时间**: 2026-06-08
+**类型**: bugfix
+**基线 Commit**: `c8cca77`
+**交付 Commit**: `a17ad33`
+**部署**: ✅ http://39.103.68.205/
+
+### 根因
+Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR_BLOCKED_BY_ORB`）。浏览器对跨域图片的 opaque response 进行安全拦截。
+
+### 修复方案
+后端代理 + 前端 URL 重写：
+1. 后端新增 `/api/image-proxy` 代理端点，转发 Unsplash 图片请求，设置 7 天强缓存
+2. 前端工具函数 `getProxiedImageUrl()`，自动将 Unsplash URL 转为代理路径
+3. `ImagePlaceholder.tsx`：`src` 走代理 + `referrerPolicy="no-referrer"`
+4. `HeroSection.tsx`：轮播图和预加载都走代理
+
+### 验证
+- `npm run build` 0 warnings 0 errors ✅
+- 后端代理端点 200 ✅
+- 公网图片代理端点 200 ✅
+- 首页 200 ✅
+
+### 关键经验
+- Unsplash 图片在 headless 浏览器中会被 ORB 拦截，同源代理是最彻底的解决方案
+- 本次涉及前后端双容器更新，先后端（新增路由）→ 再前端（构建 + docker cp）
+
+### 遗留问题
+- 无 🔴 待修复

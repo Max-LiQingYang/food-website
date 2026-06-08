@@ -1,0 +1,285 @@
+/* PushSubscriptionPrompt 推送订阅提示组件
+   设计语言：暖橙主色 var(--color-primary) #e8663e、米白底、暗色 body.dark
+*/
+
+.push-prompt {
+  position: relative;
+  background: linear-gradient(135deg, var(--color-primary-bg, #fff5ef), #ffffff);
+  border: 1px solid var(--color-border, #ece6df);
+  border-radius: 14px;
+  padding: 18px 20px 18px 24px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  animation: pushPromptEnter 0.3s ease;
+}
+
+.push-prompt::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--color-primary, #e8663e);
+}
+
+.push-prompt--granted {
+  background: linear-gradient(135deg, #f6ffed, #ffffff);
+}
+.push-prompt--granted::before {
+  background: var(--color-success, #52c41a);
+}
+
+.push-prompt--denied {
+  background: linear-gradient(135deg, #fff7e6, #ffffff);
+}
+.push-prompt--denied::before {
+  background: var(--color-warning, #faad14);
+}
+
+.push-prompt--unsupported {
+  background: var(--color-bg-secondary, #f7f4f0);
+}
+.push-prompt--unsupported::before {
+  background: var(--color-text-muted, #999);
+}
+
+.push-prompt--dismissing {
+  animation: pushPromptExit 0.25s ease forwards;
+}
+
+@keyframes pushPromptEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pushPromptExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 400px;
+    margin-bottom: 16px;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .push-prompt,
+  .push-prompt--dismissing {
+    animation: none;
+  }
+}
+
+.push-prompt__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--color-text-muted, #999);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.push-prompt__close:hover {
+  background: var(--color-bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--color-text, #333);
+}
+
+.push-prompt__row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.push-prompt__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary-bg, #fff5ef);
+  font-size: 1.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.push-prompt__icon--granted {
+  background: rgba(82, 196, 26, 0.12);
+}
+.push-prompt__icon--denied {
+  background: rgba(250, 173, 20, 0.14);
+}
+.push-prompt__icon--unsupported {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.push-prompt__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.push-prompt__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text, #2a2a2a);
+  margin-bottom: 6px;
+  padding-right: 32px; /* 给 close 让位 */
+}
+
+.push-prompt__desc {
+  font-size: 0.88rem;
+  color: var(--color-text-secondary, #666);
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+
+.push-prompt__endpoint {
+  font-size: 0.82rem;
+  color: var(--color-text-muted, #999);
+  margin: 0 0 12px;
+}
+
+.push-prompt__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.push-prompt__btn {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  min-width: 110px;
+  font-family: inherit;
+}
+
+.push-prompt__btn--primary {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+}
+.push-prompt__btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-dark, #cf5530);
+}
+.push-prompt__btn--primary:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.push-prompt__btn--secondary {
+  background: var(--color-card, #fff);
+  color: var(--color-text-secondary, #666);
+  border-color: var(--color-border, #ece6df);
+}
+.push-prompt__btn--secondary:hover:not(:disabled) {
+  color: var(--color-text, #2a2a2a);
+  border-color: var(--color-text-muted, #999);
+}
+.push-prompt__btn--secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.push-prompt__btn--danger {
+  background: var(--color-card, #fff);
+  color: var(--color-error, #d4380d);
+  border-color: var(--color-error, #d4380d);
+}
+.push-prompt__btn--danger:hover:not(:disabled) {
+  background: var(--color-error, #d4380d);
+  color: #fff;
+}
+.push-prompt__btn--danger:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 480px) {
+  .push-prompt {
+    padding: 16px 16px 16px 20px;
+    border-radius: 12px;
+  }
+  .push-prompt__icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+  }
+  .push-prompt__actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .push-prompt__btn {
+    width: 100%;
+    height: 44px;
+    min-width: 0;
+  }
+  .push-prompt__title {
+    font-size: 0.95rem;
+  }
+  .push-prompt__desc {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .push-prompt__close {
+    top: 8px;
+    right: 8px;
+  }
+}
+
+/* ─── Dark Mode ─── */
+body.dark .push-prompt {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-bg, rgba(232, 102, 62, 0.12)),
+    var(--color-card, #2a2a36)
+  );
+  border-color: var(--color-border, #3a3a48);
+}
+body.dark .push-prompt--granted {
+  background: linear-gradient(135deg, rgba(82, 196, 26, 0.14), var(--color-card, #2a2a36));
+}
+body.dark .push-prompt--denied {
+  background: linear-gradient(135deg, rgba(250, 173, 20, 0.12), var(--color-card, #2a2a36));
+}
+body.dark .push-prompt--unsupported {
+  background: var(--color-bg-secondary, #34343f);
+}
+body.dark .push-prompt__btn--secondary {
+  background: var(--color-bg-secondary, #34343f);
+  border-color: var(--color-border, #44445a);
+  color: var(--color-text-secondary, #b8b8c0);
+}
+body.dark .push-prompt__btn--secondary:hover:not(:disabled) {
+  color: var(--color-text, #f0f0f6);
+}
+body.dark .push-prompt__btn--danger {
+  background: transparent;
+}
+body.dark .push-prompt__close:hover {
+  background: var(--color-bg-hover, rgba(255, 255, 255, 0.05));
+}

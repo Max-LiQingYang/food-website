@@ -116,3 +116,63 @@ async function networkFirst(request, cacheName) {
     })
   }
 }
+
+// ── Web Push: 接收服务器推送 ──
+self.addEventListener('push', function (event) {
+  if (!event.data) return
+  let data = {}
+  try {
+    data = event.data.json()
+  } catch (e) {
+    try {
+      data = { title: '美食食谱', body: event.data.text() }
+    } catch {
+      data = {}
+    }
+  }
+  const title = data.title || '美食食谱'
+  const options = {
+    body: data.body || '',
+    icon: data.icon || '/icon-192.png',
+    badge: data.badge || '/badge-72.png',
+    tag: data.tag || data.type || 'food-notif',
+    renotify: false,
+    data: {
+      url: data.url || '/',
+      type: data.type || 'system'
+    }
+  }
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+// ── Web Push: 点击通知 ──
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close()
+  const targetUrl = (event.notification.data && event.notification.data.url) || '/'
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // 如已存在打开的同源窗口，聚焦并导航
+        for (const client of clientList) {
+          if ('focus' in client) {
+            try {
+              const u = new URL(client.url)
+              if (u.origin === self.location.origin) {
+                client.focus()
+                if ('navigate' in client) {
+                  client.navigate(targetUrl).catch(() => {})
+                }
+                return
+              }
+            } catch {
+              // ignore
+            }
+          }
+        }
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetUrl)
+        }
+      })
+  )
+})
