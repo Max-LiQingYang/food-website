@@ -259,18 +259,36 @@ export function searchRecipes(params: { q: string; page?: number; pageSize?: num
 }
 
 /**
- * 搜索建议（轻量级，返回标题+ID）
+ * 搜索建议（轻量级，返回标题+ID+封面+标签）
  * GET /api/recipes/suggestions?q=xxx
  */
-export function getSuggestions(q: string) {
+export interface SuggestionItem {
+  id: string
+  title: string
+  category?: string | null
+  coverImage?: string | null
+  tags?: Record<string, string> | null
+}
+export interface SuggestionsResponse {
+  list: SuggestionItem[]
+  total: number
+  matchedTags?: string[]
+  matchedCategories?: string[]
+}
+export function getSuggestions(q: string): Promise<{ data: SuggestionsResponse }> {
   return apiClient.get('/recipes/suggestions', { params: { q } })
 }
 
 /**
- * 获取热门搜索词 TOP 8
+ * 获取热门搜索词 TOP N（含 fallback 兑底，至少 10 条）
  * GET /api/recipes/hot-searches
  */
-export function getHotSearches(): Promise<{ data: { list: Array<{ text: string; count: number }> } }> {
+export interface HotSearchItem {
+  text: string
+  count: number
+  source?: 'search' | 'fallback'
+}
+export function getHotSearches(): Promise<{ data: { list: HotSearchItem[]; total?: number } }> {
   return apiClient.get('/recipes/hot-searches')
 }
 

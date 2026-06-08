@@ -216,3 +216,21 @@
 
 ### 遗留问题
 - 无 🔴 待修复
+
+---
+
+## 2026-06-09 迭代#109 — 食谱卡片微交互升级 + 季节性视觉元素强化
+
+### 关键陷阱
+- **emoji 与 CSS text-gradient 冲突**：`.rank-card__stat-value--primary` 使用 `-webkit-text-fill-color: transparent` 实现渐变文字，但 emoji 也会被透明化。需在 emoji 子元素上重置 `-webkit-text-fill-color: initial`
+- **CSS 区块截断**：全栈专家第一次编辑 RankingsPage.css 时误截断了 `background-clip: text` 并丢失了 `.rank-card__stat-label` 区块，需回读设计规范确认完整内容
+- **暗色模式选择器一致性**：HomeTagsSection.css 原有 `[data-theme="dark"]` 选择器，本次统一替换为 `body.dark` 以匹配项目规范
+
+### 修复方法
+- emoji 子元素添加 `background: none; -webkit-text-fill-color: initial;` 避开父级渐变
+- 设计规范作为唯一可信源，全栈专家实现后应逐行对照验收
+- 修改 CSS 文件前先 grep 确认现有选择器风格
+
+### 自优化建议
+- 本次 UI 升级全部为样式 + 少量 JSX 微调，零新依赖，回滚成本极低
+- 设计规范含完整验收清单（视觉/暗色/交互/可访问性/兼容性 5 大类），建议后续迭代参考此格式

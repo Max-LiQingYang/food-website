@@ -39,6 +39,53 @@ function resJSON(code, message, data) {
 const searchFrequency = new Map()
 const SEARCH_CACHE_TTL = 3600_000 // 1 小时
 
+// 分类中文映射（iter#110 search-enhance）
+const CATEGORY_LABELS = {
+  chinese: '中式', western: '西式', dessert: '甜点',
+  japanese: '日式', korean: '韩式', other: '其他',
+  thai: '泰式', 'quick-meal': '快手菜',
+}
+
+// 标签可读化映射（iter#110 search-enhance）
+const TAG_LABELS = {
+  'stir-fry': '炒', 'deep-fry': '炸', boil: '煮', steam: '蒸',
+  braise: '烧', 'pan-fry': '煎', spicy: '辣', mala: '麻辣',
+  sweet: '甜', sour: '酸', savory: '咸', numbing: '麻',
+  chicken: '鸡肉', pork: '猪肉', beef: '牛肉', fish: '鱼',
+  shrimp: '虾', egg: '鸡蛋', tofu: '豆腐', vegetable: '蔬菜',
+  chinese: '中式', japanese: '日式', korean: '韩式', thai: '泰式',
+  western: '西式', low: '实惠', medium: '中等', high: '高端',
+}
+
+// 兜底热门搜索词（iter#110 search-enhance）
+const FALLBACK_HOT_SEARCHES = ['番茄炒蛋', '红烧肉', '蛋糕', '牛肉', '汤']
+
+/** 安全解析 categoryTags JSON */
+function parseCategoryTags(raw) {
+  if (!raw) return {}
+  if (typeof raw === 'object') return raw
+  try {
+    const parsed = JSON.parse(raw)
+    return (parsed && typeof parsed === 'object') ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+/** 从单个食谱的 tags 对象中提取所有标签值 */
+function extractTagValues(tagsObj) {
+  const values = []
+  if (!tagsObj || typeof tagsObj !== 'object') return values
+  for (const v of Object.values(tagsObj)) {
+    if (typeof v === 'string') {
+      v.split(',').map(s => s.trim()).filter(Boolean).forEach(t => values.push(t))
+    } else if (Array.isArray(v)) {
+      v.forEach(s => { if (typeof s === 'string' && s.trim()) values.push(s.trim()) })
+    }
+  }
+  return values
+}
+
 /**
  * 修复疑似二次 URL 编码导致的 Mojibake
  * 当 UTF-8 字符串被双次 URL 编码并解码后，呈现为 Latin-1 解释的乱码。
@@ -758,7 +805,7 @@ router.get('/suggestions', async (req, res) => {
   try {
     const q = (req.query.q || '').trim()
     if (!q || q.length < 1) {
-      return res.status(200).json(resJSON(0, 'ok', { list: [], total: 0 }))
+      return res.status(200).json(resJSON(0, 'ok', { list: [], total: 0, matchedTags: [], matchedCategories: [] }))
     }
 
     const keyword = `%${q}%`
@@ -769,13 +816,45 @@ router.get('/suggestions', async (req, res) => {
           { description: { [Op.like]: keyword } },
         ],
       },
-      attributes: ['id', 'title', 'category'],
-      limit: 6,
+      attributes: ['id', 'title', 'category', 'coverImage', 'categoryTags'],
+      limit: 8,
       order: [['favoriteCount', 'DESC'], ['createdAt', 'DESC']],
       raw: true,
     })
 
-    return res.status(200).json(resJSON(0, 'ok', { list: rows, total: rows.length }))
+    // 解析 categoryTags + 提取 matchedTags（高频前 4）
+    const tagCounter = new Map()
+    const categorySet = new Set()
+    const qLower = q.toLowerCase()
+    const enrichedList = rows.map(r => {
+      const tags = parseCategoryTags(r.categoryTags)
+      extractTagValues(tags).forEach(tv => {
+        if (tv.toLowerCase() === qLower) return  // 过滤与搜索词完全相同的标签
+        tagCounter.set(tv, (tagCounter.get(tv) || 0) + 1)
+      })
+      if (r.category) categorySet.add(r.category)
+      return {
+        id: r.id,
+        title: r.title,
+        category: r.category,
+        coverImage: r.coverImage || null,
+        tags,
+      }
+    })
+
+    const matchedTags = [...tagCounter.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([t]) => t)
+
+    const matchedCategories = [...categorySet].slice(0, 4)
+
+    return res.status(200).json(resJSON(0, 'ok', {
+      list: enrichedList,
+      total: enrichedList.length,
+      matchedTags,
+      matchedCategories,
+    }))
   } catch (err) {
     console.error('[GET /recipes/suggestions] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
@@ -791,8 +870,77 @@ router.get('/hot-searches', async (req, res) => {
     Vary: 'Accept-Encoding',
   })
   try {
-    const list = getHotSearches(8)
-    return res.status(200).json(resJSON(0, 'ok', { list, total: list.length }))
+    const searchList = getHotSearches(10)
+    const out = searchList.map(it => ({ text: it.text, count: it.count, source: 'search' }))
+    const seen = new Set(out.map(it => it.text.toLowerCase()))
+    const TARGET = 10
+
+    const pushFallback = (text) => {
+      if (!text) return
+      const key = String(text).toLowerCase()
+      if (seen.has(key)) return
+      seen.add(key)
+      out.push({ text: String(text), count: 0, source: 'fallback' })
+    }
+
+    // ① fallback 来源：食谱分类去重（前 5）
+    if (out.length < TARGET) {
+      try {
+        const catRows = await Recipe.findAll({
+          attributes: [[fn('DISTINCT', col('category')), 'category']],
+          where: { category: { [Op.ne]: null } },
+          raw: true,
+          limit: 5,
+        })
+        for (const row of catRows) {
+          if (out.length >= TARGET) break
+          const c = row.category
+          if (c) pushFallback(CATEGORY_LABELS[c] || c)
+        }
+      } catch (e) {
+        console.warn('[hot-searches] fallback categories failed:', e?.message)
+      }
+    }
+
+    // ② fallback 来源：热门标签（前 5）
+    if (out.length < TARGET) {
+      try {
+        const tagRows = await Recipe.findAll({
+          attributes: ['categoryTags'],
+          where: { categoryTags: { [Op.ne]: null } },
+          raw: true,
+          limit: 200,
+        })
+        const tagFreq = new Map()
+        for (const row of tagRows) {
+          const tagObj = parseCategoryTags(row.categoryTags)
+          extractTagValues(tagObj).forEach(t => tagFreq.set(t, (tagFreq.get(t) || 0) + 1))
+        }
+        const topTags = [...tagFreq.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([t]) => TAG_LABELS[t] || t)
+        let added = 0
+        for (const t of topTags) {
+          if (out.length >= TARGET || added >= 5) break
+          const before = out.length
+          pushFallback(t)
+          if (out.length > before) added++
+        }
+      } catch (e) {
+        console.warn('[hot-searches] fallback tags failed:', e?.message)
+      }
+    }
+
+    // ③ fallback 来源：硬编码兜底
+    if (out.length < TARGET) {
+      for (const t of FALLBACK_HOT_SEARCHES) {
+        if (out.length >= TARGET) break
+        pushFallback(t)
+      }
+    }
+
+    return res.status(200).json(resJSON(0, 'ok', { list: out, total: out.length }))
   } catch (err) {
     console.error('[GET /recipes/hot-searches] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
