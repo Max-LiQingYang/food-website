@@ -664,3 +664,57 @@ body.dark .cooking-journal__recipe-title-preview.error {
 body.dark .cooking-journal__chart-bar {
   background: linear-gradient(180deg, var(--color-primary, inherit), #f0a080);
 }
+
+/* ── Card Photos ── */
+
+.cooking-journal__card-photos {
+  display: flex;
+  gap: 6px;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border, #eee);
+}
+
+.cooking-journal__card-photo {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cooking-journal__card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s;
+}
+
+.cooking-journal__card-photo:hover img {
+  transform: scale(1.05);
+}
+
+.cooking-journal__card-photo--more {
+  position: relative;
+}
+
+.cooking-journal__card-photo-badge {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+/* ── Card Photos Dark Mode ── */
+
+body.dark .cooking-journal__card-photos {
+  border-top-color: var(--color-border, #2e2e48);
+}

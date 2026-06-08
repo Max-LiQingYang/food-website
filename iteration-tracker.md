@@ -2546,3 +2546,29 @@
 
 ### 遗留问题
 - 容器内 `/usr/share/nginx/html/assets/` 堆积 200+ 旧 chunk 文件，建议清理
+
+---
+
+## 迭代 #102 — 🟡 UI/UX：全局加载状态骨架屏升级 ✅
+**派发时间**: 2026-06-08
+**完成时间**: 2026-06-08
+**类型**: ui-optimization
+**基线 Commit**: `b1a3662`
+**交付 Commit**: `b68cf8b`
+**部署**: ✅ http://39.103.68.205/
+
+### 实际成果
+1. ✅ **PageSkeleton 组件**：5 种布局类型（default/home/list/detail/profile），复用现有 Skeleton/RecipeCardSkeleton
+2. ✅ **Router Suspense fallback**：纯文本 → `<PageSkeleton type="default" />`
+3. ✅ **Toast 颜色变量化**：6 个新增 CSS 变量（--color-info 等），`[data-theme='dark']` → `body.dark`
+4. ✅ **PageTransition.css 去重**：删除重复定义，保留含 translateY 的完整版本（38行→28行）
+5. ✅ **pageEnter 补充**：13→37 个页面类名，`prefers-reduced-motion` 包裹
+6. ✅ **33 个页面 loading 替换**：自定义骨架屏/文本 → 统一 PageSkeleton
+
+### 关键经验
+- **子专家拆分策略**：UI 设计（ui-designer）→ 核心组件+一次性配置（fullstack）→ 33 页面替换（fullstack）→ 部署（devops），每步独立 600s 超时
+- **部署路径注意**：服务器前端项目路径为 `/root/food-website/`（非 `/root/food-frontend/`），以服务器实际为准
+- **部署后验证**：除 HTTP 200 外，还应 grep bundle 确认新组件已包含在构建产物中
+
+### 遗留问题
+- 无 🔴 待修复

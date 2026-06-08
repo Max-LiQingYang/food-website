@@ -21,8 +21,12 @@ const router = express.Router()
 
 // 确保上传目录存在
 const uploadDir = path.join(__dirname, '..', 'uploads', 'comments')
+const cookingLogUploadDir = path.join(__dirname, '..', 'uploads', 'cooking-logs')
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
+}
+if (!fs.existsSync(cookingLogUploadDir)) {
+  fs.mkdirSync(cookingLogUploadDir, { recursive: true })
 }
 
 // 文件存储配置
@@ -90,6 +94,68 @@ router.post('/upload/comment-images', auth, (req, res) => {
     }
 
     const urls = req.files.map(f => `/uploads/comments/${f.filename}`)
+    res.json({
+      code: 0,
+      message: 'ok',
+      data: { urls }
+    })
+  })
+})
+
+/**
+ * POST /upload/cooking-log-images
+ * 上传烹饪日志图片
+ */
+router.post('/upload/cooking-log-images', auth, (req, res) => {
+  // 独立的 multer 实例，存储到 cooking-logs 目录
+  const cookingLogStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, cookingLogUploadDir)
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase()
+      const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`
+      cb(null, uniqueName)
+    }
+  })
+
+  const cookingLogUpload = multer({
+    storage: cookingLogStorage,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }
+  })
+
+  cookingLogUpload.array('images', 3)(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({
+            code: 400,
+            message: '单张图片不能超过5MB',
+            data: null
+          })
+        }
+        if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+          return res.status(400).json({
+            code: 400,
+            message: '最多上传3张图片',
+            data: null
+          })
+        }
+        return res.status(400).json({ code: 400, message: err.message, data: null })
+      }
+      return res.status(400).json({ code: 400, message: err.message, data: null })
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        code: 400,
+        message: '请选择图片',
+        data: null
+      })
+    }
+
+    const urls = req.files.map(f => `/uploads/cooking-logs/${f.filename}`)
     res.json({
       code: 0,
       message: 'ok',

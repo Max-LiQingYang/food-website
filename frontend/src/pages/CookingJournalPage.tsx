@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { getCookingLogs, createCookingLog, updateCookingLog, deleteCookingLog, getCookingLogStats } from '../api'
+import { getCookingLogs, createCookingLog, updateCookingLog, deleteCookingLog, getCookingLogStats, parseCookingLogPhotoUrls } from '../api'
 import { getRecipeById } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { getEnhancedCookingStats, searchCookingLogs, getCookingLogDetail } from '../api'
 import { useToast } from '../context/ToastContext'
 import Pagination from '../components/Pagination'
+import CookingJournalPhotoPicker from '../components/CookingJournalPhotoPicker'
+import ImageLightbox from '../components/ImageLightbox'
 import type { CookingLog, CookingLogStats } from '../api'
 import './CookingJournalPage.css'
 import PageSkeleton from '../components/PageSkeleton'
@@ -43,6 +45,13 @@ export default function CookingJournalPage() {
   const [searchMinRating, setSearchMinRating] = useState(0)
   const [showSearch, setShowSearch] = useState(false)
   const [enhancedStats, setEnhancedStats] = useState<any>(null)
+
+  // 照片上传
+  const [formPhotoUrls, setFormPhotoUrls] = useState<string[]>([])
+
+  // Lightbox
+  const [lightboxImages, setLightboxImages] = useState<string[]>([])
+  const [lightboxIndex, setLightboxIndex] = useState(0)
 
   // 自动加载 stats
   useEffect(() => {
@@ -118,11 +127,10 @@ export default function CookingJournalPage() {
       duration: '',
       cookedAt: new Date().toISOString().slice(0, 10),
     })
+    setFormPhotoUrls([])
     setRecipeTitle('')
     setShowForm(true)
   }
-
-  // 打开编辑表单
   const openEditForm = (log: CookingLog) => {
     setEditingId(log.id)
     setFormData({
@@ -133,6 +141,7 @@ export default function CookingJournalPage() {
       duration: log.duration?.toString() || '',
       cookedAt: log.cookedAt,
     })
+    setFormPhotoUrls(parseCookingLogPhotoUrls(log.photoUrl))
     setRecipeTitle(log.recipeTitle)
     setShowForm(true)
   }
@@ -150,6 +159,7 @@ export default function CookingJournalPage() {
         notes: formData.notes || undefined,
         duration: formData.duration ? parseInt(formData.duration, 10) : undefined,
         cookedAt: formData.cookedAt || undefined,
+        photoUrl: formPhotoUrls.length > 0 ? JSON.stringify(formPhotoUrls) : undefined,
       }
       if (editingId) {
         await updateCookingLog(editingId, data)
@@ -387,7 +397,9 @@ export default function CookingJournalPage() {
             </div>
           ) : (
             <div className="cooking-journal__list">
-              {logs.map(log => (
+              {logs.map(log => {
+                const logPhotos = parseCookingLogPhotoUrls(log.photoUrl)
+                return (
                 <div key={log.id} className="cooking-journal__card">
                   <div className="cooking-journal__card-main">
                     <div className="cooking-journal__card-info">
@@ -405,8 +417,25 @@ export default function CookingJournalPage() {
                       <button className="cooking-journal__action-btn cooking-journal__action-btn--delete" onClick={() => handleDelete(log.id)}>🗑️</button>
                     </div>
                   </div>
+                  {logPhotos.length > 0 && (
+                    <div className="cooking-journal__card-photos">
+                      {logPhotos.slice(0, 3).map((url, i) => (
+                        <div
+                          key={url}
+                          className={`cooking-journal__card-photo ${i === 2 && logPhotos.length > 3 ? 'cooking-journal__card-photo--more' : ''}`}
+                          onClick={() => { setLightboxImages(logPhotos); setLightboxIndex(i) }}
+                        >
+                          <img src={url} alt={`照片 ${i + 1}`} />
+                          {i === 2 && logPhotos.length > 3 && (
+                            <span className="cooking-journal__card-photo-badge">+{logPhotos.length - 3}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
 
@@ -491,11 +520,30 @@ export default function CookingJournalPage() {
               />
             </div>
 
+            <div className="cooking-journal__form-group">
+              <label>照片</label>
+              <CookingJournalPhotoPicker
+                photoUrls={formPhotoUrls}
+                onChange={setFormPhotoUrls}
+              />
+            </div>
+
             <button className="cooking-journal__submit-btn" onClick={handleSubmit}>
               {editingId ? '💾 保存修改' : '📝 记录'}
             </button>
           </div>
         </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxImages.length > 0 && (
+        <ImageLightbox
+          images={lightboxImages}
+          currentIndex={lightboxIndex}
+          onClose={() => setLightboxImages([])}
+          onPrev={() => setLightboxIndex(i => (i - 1 + lightboxImages.length) % lightboxImages.length)}
+          onNext={() => setLightboxIndex(i => (i + 1) % lightboxImages.length)}
+        />
       )}
     </div>
   )

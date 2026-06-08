@@ -1141,6 +1141,17 @@ export interface CookingLog {
   updatedAt: string
 }
 
+/** 解析 CookingLog.photoUrl JSON 数组为 string[] */
+export function parseCookingLogPhotoUrls(photoUrl: string | null): string[] {
+  if (!photoUrl) return []
+  try {
+    const parsed = JSON.parse(photoUrl)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
 export interface CookingLogStats {
   totalCooked: number
   thisMonthCount: number
@@ -2346,6 +2357,13 @@ export function uploadCommentImages(files: File[]): Promise<{ urls: string[] }> 
   const fd = new FormData()
   files.forEach(f => fd.append('images', f))
   return apiClient.post('/upload/comment-images', fd).then(r => r.data?.data || r.data)
+}
+
+/** 上传烹饪日志图片 */
+export function uploadCookingLogImages(files: File[]): Promise<{ urls: string[] }> {
+  const fd = new FormData()
+  files.forEach(f => fd.append('images', f))
+  return apiClient.post('/upload/cooking-log-images', fd).then(r => r.data?.data || r.data)
 }
 
 // ─────────────────────────────────────────────────────────────
