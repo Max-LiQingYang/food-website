@@ -2705,3 +2705,23 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - API 验证：94 道食谱数据已更新 ✅
 - 首页 200 ✅
 
+
+## Iter#109 食谱卡片微交互升级 + 季节性视觉元素强化
+
+| 指标 | 状态 |
+|------|------|
+| 季节标签 4 套配色（春绿/夏橙/秋棕/冬蓝） | ✅ 已部署 |
+| 排行榜主统计值 emoji 锚点（👁️❤️⭐🔥） | ✅ 已部署 |
+| 热门标签 hover 渐变流动动画 | ✅ 已部署 |
+| 热门标签图标渲染 + 计数角标 | ✅ 已部署 |
+| npm run build | 0 warnings, 832ms ✅ |
+| 首页 200 / 排行榜 200 | ✅ |
+| Git commit | 159f6e2 |
+
+### 修改文件（6 个）
+- `frontend/src/components/RecipeCard.tsx` — 季节标签动态类名 + title tooltip
+- `frontend/src/components/RecipeCard.css` — 4 套季节配色 + 暗色模式
+- `frontend/src/pages/RankingsPage.tsx` — getPrimaryStat() 增加 icon 字段
+- `frontend/src/pages/RankingsPage.css` — 统计值图标样式
+- `frontend/src/components/HomeTagsSection.tsx` — 图标渲染 + 计数角标
+- `frontend/src/components/HomeTagsSection.css` — 渐变流动 + badgePopIn 动画
