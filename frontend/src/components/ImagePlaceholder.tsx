@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { generateColorFromString } from '../utils/imageColor'
+import { getProxiedImageUrl } from '../utils/imageProxy'
 
 interface ImagePlaceholderProps {
   src: string
@@ -72,9 +73,10 @@ export default function ImagePlaceholder({
     <>
       <img
         ref={imgRef}
-        src={src}
+        src={getProxiedImageUrl(src) || ''}
         alt={alt}
         loading="lazy"
+        referrerPolicy="no-referrer"
         className={className}
         style={{
           ...style,

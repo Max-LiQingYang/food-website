@@ -120,6 +120,9 @@ app.use((req, res, next) => {
 // ─────────────────────────────────────────────────────────────────
 // 7. 路由（API 入口统一前缀 /api）
 // ─────────────────────────────────────────────────────────────────
+const imageProxyRouter = require('./routes/imageProxy')
+app.use('/api', imageProxyRouter)
+
 app.use('/api', require('./routes'))
 
 app.get('/api/health', (req, res) => {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getProxiedImageUrl } from '../utils/imageProxy'
 import './HeroSection.css'
 
 interface HeroRecipe {
@@ -86,7 +87,7 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
     const imgs = items.map(item => {
       const img = new Image()
       img.onload = () => { /* individual load */ }
-      img.src = item.image
+      img.src = getProxiedImageUrl(item.image) || item.image
       return img
     })
     let loaded = 0
@@ -135,7 +136,7 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
             onClick={() => handleRecipeClick(recipe)}
           >
             <img
-              src={recipe.image}
+              src={getProxiedImageUrl(recipe.image)}
               alt={recipe.title}
               className="hero-slide__img"
               loading={idx === 0 ? 'eager' : 'lazy'}
