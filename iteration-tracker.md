@@ -2521,3 +2521,28 @@
 - 无 🔴 待修复
 
 **下一个方向**: A（UI/UX）
+
+---
+
+## 迭代 #101 — 🐛 Bugfix：HomePage DailyPickCard 未定义 ✅
+**派发时间**: 2026-06-08
+**完成时间**: 2026-06-08
+**类型**: bugfix
+**基线 Commit**: `3e2557b`
+**交付 Commit**: `b1a3662`
+**部署**: ✅ http://39.103.68.205/
+
+### 实际成果
+1. **问题定位**：`HomePage.tsx` 第 158 行使用 `<DailyPickCard />`，但 import 块中缺少对应导入语句 ✅
+2. **全栈专家修复**：添加 `import DailyPickCard from '../components/DailyPickCard'` ✅
+3. **构建验证**：`npm run build` 0 warnings 0 errors ✅
+4. **部署闭环**：tar-pipe dist → docker cp → nginx reload → 首页 200 ✅
+5. **Git commit + push**：`b1a3662` ✅
+
+### 关键经验
+- DailyPickCard 组件文件存在但 import 缺失，属典型的「文件存在未导入」类 ReferenceError
+- 新 chunk `HomePage-D_n9ApFw.js`（11211 bytes）已部署到容器内
+- 容器内 chunk 堆积严重（28 个 HomePage 历史版本），建议定期清理
+
+### 遗留问题
+- 容器内 `/usr/share/nginx/html/assets/` 堆积 200+ 旧 chunk 文件，建议清理

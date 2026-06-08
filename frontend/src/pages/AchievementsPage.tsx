@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { getUserAchievements, type AchievementItem } from '../api'
 import AchievementDetailModal from '../components/AchievementDetailModal'
 import './AchievementsPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 type FilterCategory = 'all' | 'publisher' | 'collector' | 'commenter' | 'cook' | 'explorer' | 'social'
 type FilterStatus = 'all' | 'unlocked' | 'locked'
@@ -152,18 +153,7 @@ export default function AchievementsPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="achievements-loading">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="achievements-skeleton">
-              <div className="skeleton-box" style={{ width: 48, height: 48, borderRadius: 12 }} />
-              <div style={{ flex: 1 }}>
-                <div className="skeleton-box" style={{ width: '40%', height: 16 }} />
-                <div className="skeleton-box" style={{ width: '70%', height: 12, marginTop: 8 }} />
-                <div className="skeleton-box" style={{ width: '100%', height: 8, marginTop: 8 }} />
-              </div>
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="profile" />
       ) : filtered.length === 0 ? (
         <div className="achievements-empty">
           <p>没有匹配的成就</p>

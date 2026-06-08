@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getDashboard, DashboardData } from '../api'
 import { useToast } from '../context/ToastContext'
 import './DashboardPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function DashboardPage() {
   const { showToast } = useToast()
@@ -17,9 +18,7 @@ export default function DashboardPage() {
 
   if (loading) return (
     <div className="dashboard-page">
-      <div className="dashboard-loading">
-        {[1,2,3,4].map(i => <div key={i} className="skeleton-box" style={{ height: 120, borderRadius: 12, marginBottom: 16 }} />)}
-      </div>
+      <PageSkeleton type="profile" />
     </div>
   )
 

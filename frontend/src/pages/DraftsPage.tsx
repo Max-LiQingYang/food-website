@@ -4,6 +4,7 @@ import { getDrafts, saveDraft, updateDraft, deleteDraft, publishDraft, Draft } f
 import { useToast } from '../context/ToastContext'
 import Pagination from '../components/Pagination'
 import './DraftsPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function DraftsPage() {
   const navigate = useNavigate()
@@ -93,9 +94,7 @@ export default function DraftsPage() {
         </div>
 
         {loading ? (
-          <div className="drafts-loading">
-            {[1,2,3].map(i => <div key={i} className="skeleton-box" style={{ height: 80, borderRadius: 12, marginBottom: 12 }} />)}
-          </div>
+          <PageSkeleton type="list" />
         ) : drafts.length === 0 ? (
           <div className="drafts-empty">
             <p>暂无草稿</p>

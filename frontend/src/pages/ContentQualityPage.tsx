@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getContentQualityReport, ContentQualityReport } from '../api'
 import './ContentQualityPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const FIELD_META: Record<string, { label: string; icon: string }> = {
   coverImage: { label: '封面', icon: '🖼️' },
@@ -148,7 +149,7 @@ export default function ContentQualityPage() {
       </div>
 
       {loading ? (
-        <SkeletonContent />
+        <PageSkeleton type="detail" />
       ) : error ? (
         <div className="cq-empty">
           <div className="cq-empty__icon">⚠️</div>

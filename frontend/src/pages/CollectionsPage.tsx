@@ -10,6 +10,7 @@ import {
 import { useToast } from '../context/ToastContext'
 import EmptyState from '../components/EmptyState'
 import './CollectionsPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function CollectionsPage() {
   const navigate = useNavigate()
@@ -107,15 +108,7 @@ export default function CollectionsPage() {
         <div className="collections-page__header">
           <h1 className="collections-page__title">我的收藏夹</h1>
         </div>
-        <div className="collections-page__grid">
-          {[1, 2, 3, 4].map(n => (
-            <div key={n} className="collection-card collection-card--skeleton">
-              <div className="skeleton-box" style={{ height: 20, width: '60%' }} />
-              <div className="skeleton-box" style={{ height: 14, width: '80%', marginTop: 8 }} />
-              <div className="skeleton-box" style={{ height: 14, width: '40%', marginTop: 6 }} />
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="list" />
       </div>
     )
   }

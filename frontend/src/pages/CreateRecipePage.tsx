@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import ImportFromUrl from '../components/ImportFromUrl'
 import type { CreateRecipeData, ImportedRecipe } from '../api'
 import './CreateRecipePage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const CATEGORIES = [
   { value: 'chinese', label: '中餐' },
@@ -394,11 +395,7 @@ export default function CreateRecipePage() {
   if (loading) {
     return (
       <div className="create-page">
-        <div className="create-skeleton">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="skeleton-box skeleton-line" style={{ marginBottom: 16 }} />
-          ))}
-        </div>
+        <PageSkeleton type="detail" />
       </div>
     )
   }

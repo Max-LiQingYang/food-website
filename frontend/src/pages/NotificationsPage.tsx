@@ -10,6 +10,7 @@ import {
 } from '../api'
 import { useAuth } from '../context/AuthContext'
 import './NotificationsPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const NOTIF_ICONS: Record<string, string> = {
   follow: '👤',
@@ -197,17 +198,7 @@ export default function NotificationsPage() {
 
       {/* 列表 */}
       {loading ? (
-        <div className="notif-page__loading">
-          {[1,2,3,4,5].map(i => (
-            <div key={i} className="notif-page__skeleton">
-              <div className="skeleton-box" style={{ width: 40, height: 40, borderRadius: '50%' }} />
-              <div style={{ flex: 1 }}>
-                <div className="skeleton-box" style={{ width: '80%', height: 14, marginBottom: 8 }} />
-                <div className="skeleton-box" style={{ width: '40%', height: 11 }} />
-              </div>
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="list" rows={4} />
       ) : items.length === 0 ? (
         <div className="notif-page__empty">
           <p>暂无通知</p>

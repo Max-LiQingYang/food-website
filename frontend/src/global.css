@@ -34,6 +34,12 @@ body {
   --color-skeleton-from: #f0e8e0;
   --color-skeleton-to: #f8f0ea;
   --color-scrollbar: #d0c8c0;
+  --color-info: #1890ff;
+  --color-info-dark: #1565c0;
+  --color-success-dark: #2e7d32;
+  --color-error-dark: #c62828;
+  --color-warning-dark: #f9a825;
+  --color-warning-text: #1a1a1a;
   --font-size-title: 24px;
   --font-size-body: 16px;
   --font-size-small: 14px;
@@ -179,50 +185,50 @@ body {
 
 /* Type-specific toast backgrounds */
 .qclaw-toast--success {
-  background: #52c41a;
+  background: var(--color-success);
 }
 
 .qclaw-toast--error {
-  background: #ff4d4f;
+  background: var(--color-error);
 }
 
 .qclaw-toast--warning {
-  background: #faad14;
-  color: #1a1a1a;
+  background: var(--color-warning);
+  color: var(--color-warning-text);
 }
 
 .qclaw-toast--warning .qclaw-toast__close {
-  color: #1a1a1a;
+  color: var(--color-warning-text);
   background: rgba(0, 0, 0, 0.15);
 }
 
 .qclaw-toast--info {
-  background: #1890ff;
+  background: var(--color-info);
 }
 
 /* 暗色模式 Toast */
-[data-theme='dark'] .qclaw-toast--success {
-  background: #2e7d32;
+body.dark .qclaw-toast--success {
+  background: var(--color-success-dark);
 }
 
-[data-theme='dark'] .qclaw-toast--error {
-  background: #c62828;
+body.dark .qclaw-toast--error {
+  background: var(--color-error-dark);
 }
 
-[data-theme='dark'] .qclaw-toast--warning {
-  background: #f9a825;
-  color: #1a1a1a;
+body.dark .qclaw-toast--warning {
+  background: var(--color-warning-dark);
+  color: var(--color-warning-text);
 }
 
-[data-theme='dark'] .qclaw-toast--info {
-  background: #1565c0;
+body.dark .qclaw-toast--info {
+  background: var(--color-info-dark);
 }
 
-[data-theme='dark'] .qclaw-toast__close {
+body.dark .qclaw-toast__close {
   background: rgba(255, 255, 255, 0.2);
 }
 
-[data-theme='dark'] .qclaw-toast__close:hover {
+body.dark .qclaw-toast__close:hover {
   background: rgba(255, 255, 255, 0.35);
 }
 
@@ -324,6 +330,7 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
 .home-page,
 .search-page,
 .detail-page,
@@ -331,16 +338,38 @@ body {
 .favorite-list,
 .create-page,
 .recommend-page,
-.user-profile-page {
-  animation: pageEnter 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
-}
-
+.user-profile-page,
 .collections-page,
 .coll-detail-page,
 .shop-page,
 .profile-page,
-.not-found-page {
+.not-found-page,
+.achievements-page,
+.pantry-page,
+.rankings-page,
+.notif-page,
+.notifications-page,
+.content-quality-page,
+.settings-page,
+.cooking-mode-page,
+.cooking-journal-page,
+.meal-planner-page,
+.nutrition-dashboard-page,
+.compare-page,
+.recipe-diff-page,
+.kitchen-tools-page,
+.my-tools-page,
+.tags-page,
+.challenges-page,
+.challenge-detail-page,
+.admin-review-page,
+.dashboard-page,
+.drafts-page,
+.ingredient-search-page,
+.preferences-page,
+.user-works-page {
   animation: pageEnter 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
+}
 }
 
 /* ── View Transitions API（渐进增强） ── */

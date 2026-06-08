@@ -10,6 +10,7 @@ import {
 } from '../api'
 import { useToast } from '../context/ToastContext'
 import './SettingsPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 interface Settings {
   profile: { nickname: string; username: string; email: string; role: string; joinedAt: string }
@@ -124,11 +125,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="settings-page">
-        <div className="settings-container">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="skeleton-block skeleton-box" style={{ height: 60, borderRadius: 12, marginBottom: 12 }} />
-          ))}
-        </div>
+        <PageSkeleton type="profile" />
       </div>
     )
   }

@@ -9,6 +9,7 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import type { FilterState } from '../components/FilterPanel'
 import type { Recipe } from '../api'
 import './AllRecipesPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const PAGE_SIZE = 24
 
@@ -186,11 +187,7 @@ export default function AllRecipesPage() {
 
       {/* 食谱网格 */}
       {loading ? (
-        <div className="all-recipes-page__grid">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <RecipeCardSkeleton key={i} />
-          ))}
-        </div>
+        <PageSkeleton type="list" />
       ) : allRecipes.length === 0 ? (
         <div className="all-recipes-page__empty">
           <span className="all-recipes-page__empty-icon">🔍</span>

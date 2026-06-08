@@ -26,6 +26,7 @@ import BrowsingHistory from '../components/BrowsingHistory'
 import ActivityHeatmap from '../components/ActivityHeatmap'
 import AchievementDetailModal from '../components/AchievementDetailModal'
 import './UserProfilePage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 type TabType = 'recipes' | 'favorites' | 'collections' | 'cooked'
 type TabTypeWithHistory = TabType | 'history' | 'forks'
@@ -136,13 +137,8 @@ function ForksTab({ userId }: { userId: string }) {
 
   if (loading) {
     return (
-      <div className="profile-grid">
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="profile-card-skeleton">
-            <div className="skeleton-box skeleton-cover" style={{ height: 160 }} />
-            <div className="skeleton-box skeleton-line" style={{ margin: '12px 14px' }} />
-          </div>
-        ))}
+      <div className="profile-page">
+        <PageSkeleton type="profile" />
       </div>
     )
   }

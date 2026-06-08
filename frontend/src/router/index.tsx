@@ -10,6 +10,7 @@ import PWAInstallPrompt from '../components/PWAInstallPrompt'
 import SkipLink from '../components/SkipLink'
 import KeyboardShortcutsProvider from '../components/KeyboardShortcuts'
 import WelcomeTour from '../components/WelcomeTour'
+import PageSkeleton from '../components/PageSkeleton'
 import Footer from '../components/Footer'
 import '../components/PageTransition.css'
 
@@ -53,7 +54,7 @@ const AchievementsPage = lazy(() => import('../pages/AchievementsPage'))
 const AllRecipesPage = lazy(() => import('../pages/AllRecipesPage'))
 const ContentQualityPage = lazy(() => import('../pages/ContentQualityPage'))
 
-const Fallback = () => <div style={{ padding: 20, textAlign: 'center' }}>加载中...</div>
+const Fallback = () => <PageSkeleton type="default" />
 
 /** 路由切换时自动滚动到顶部 */
 function ScrollToTop() {

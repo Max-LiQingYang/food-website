@@ -12,6 +12,7 @@ import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import type { Recipe } from '../api'
 import './HomePage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const CATEGORIES = ['全部', '中餐', '西餐', '甜点', '日韩', '其他'] as const
 const PAGE_SIZE = 12
@@ -196,9 +197,7 @@ export default function HomePage() {
         )}
 
         {loading && (
-          <div className="home-grid">
-            {Array.from({ length: 6 }).map((_, i) => <RecipeCardSkeleton key={i} />)}
-          </div>
+          <PageSkeleton type="home" />
         )}
 
         {!loading && recipes.length > 0 && (

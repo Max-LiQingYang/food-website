@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { getChallenges } from '../api'
 import type { Challenge } from '../api'
 import './ChallengesPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
@@ -41,24 +42,7 @@ export default function ChallengesPage() {
       </div>
 
       {loading ? (
-        <div className="challenges-grid">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="challenge-card">
-              <div className="card-cover">
-                <div className="skeleton-box" style={{ width: '100%', height: 140, borderRadius: '12px 12px 0 0' }} />
-              </div>
-              <div className="card-body">
-                <div className="skeleton-box" style={{ width: '70%', height: 18, borderRadius: 6 }} />
-                <div className="skeleton-box" style={{ width: '50%', height: 14, marginTop: 8, borderRadius: 6 }} />
-                <div className="skeleton-box" style={{ width: '90%', height: 14, marginTop: 6, borderRadius: 6 }} />
-                <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
-                  <div className="skeleton-box" style={{ width: 60, height: 14, borderRadius: 6 }} />
-                  <div className="skeleton-box" style={{ width: 60, height: 14, borderRadius: 6 }} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="profile" />
       ) : challenges.length === 0 ? (
         <div className="empty">
           <span className="empty-icon">🏆</span>

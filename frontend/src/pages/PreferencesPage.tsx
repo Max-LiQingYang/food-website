@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getPreferences, updatePreferences, type UserPreferences } from '../api'
 import { useToast } from '../context/ToastContext'
 import './PreferencesPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const DIET_OPTIONS = [
   { value: '', label: '无限制' },
@@ -114,11 +115,7 @@ export default function PreferencesPage() {
   if (loading) {
     return (
       <div className="pref-page">
-        <div className="pref-skeleton">
-          <div className="skeleton-box" style={{ height: 28, width: '40%' }} />
-          <div className="skeleton-box" style={{ height: 50, width: '100%', marginTop: 20 }} />
-          <div className="skeleton-box" style={{ height: 50, width: '100%', marginTop: 12 }} />
-        </div>
+        <PageSkeleton type="default" />
       </div>
     )
   }

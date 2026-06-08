@@ -10,6 +10,7 @@ import { useToast } from '../context/ToastContext'
 import { CATEGORIES as CATEGORIES_SHARED } from '../constants/categories'
 import type { Recipe } from '../api'
 import './SearchPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const PAGE_SIZE = 12
 
@@ -391,11 +392,7 @@ export default function SearchPage() {
 
       {/* 加载态 - 骨架屏 */}
       {loading && (
-        <div className="search-grid">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <RecipeCardSkeleton key={i} />
-          ))}
-        </div>
+        <PageSkeleton type="list" />
       )}
 
       {/* 结果列表 */}

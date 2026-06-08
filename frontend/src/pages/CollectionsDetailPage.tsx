@@ -10,6 +10,7 @@ import {
 import { useToast } from '../context/ToastContext'
 import EmptyState from '../components/EmptyState'
 import './CollectionsDetailPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function CollectionsDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -91,21 +92,7 @@ export default function CollectionsDetailPage() {
   if (loading) {
     return (
       <div className="coll-detail-page">
-        <div className="coll-detail-page__skeleton">
-          <div className="skeleton-box" style={{ height: 28, width: '40%' }} />
-          <div className="skeleton-box" style={{ height: 16, width: '25%', marginTop: 8 }} />
-          <div className="coll-detail-page__grid">
-            {[1, 2, 3].map(n => (
-              <div key={n} className="recipe-card recipe-card--skeleton">
-                <div className="recipe-card__cover skeleton-box" style={{ height: 140 }} />
-                <div className="recipe-card__info">
-                  <div className="skeleton-box" style={{ height: 18, width: '70%' }} />
-                  <div className="skeleton-box" style={{ height: 14, width: '50%', marginTop: 6 }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <PageSkeleton type="detail" />
       </div>
     )
   }

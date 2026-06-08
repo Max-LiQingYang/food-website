@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { getChallenge, getChallengeSubmissions, getChallengeRanking, voteChallenge } from '../api'
 import type { Challenge, ChallengeSubmission, ChallengeRanking } from '../api'
 import './ChallengeDetailPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function ChallengeDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -43,7 +44,11 @@ export default function ChallengeDetailPage() {
     } finally { setVoting(false) }
   }
 
-  if (loading) return <div className="loading">加载中...</div>
+  if (loading) return (
+    <div className="challenge-detail-page">
+      <PageSkeleton type="detail" />
+    </div>
+  )
   if (!challenge) return <div className="not-found">挑战不存在</div>
 
   const statusLabel: Record<string, string> = {

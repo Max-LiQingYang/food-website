@@ -12,6 +12,7 @@ import {
 import { useToast } from '../context/ToastContext'
 import EmptyState from '../components/EmptyState'
 import './ShoppingListPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const CATEGORY_CONFIG = [
   { key: 'all', label: '全部' },
@@ -294,14 +295,7 @@ export default function ShoppingListPage() {
           <div className="shop-page__header">
             <h1 className="shop-page__title">购物清单</h1>
           </div>
-          <div className="shop-page__grid">
-            {[1, 2, 3].map(n => (
-              <div key={n} className="shop-card shop-card--skeleton">
-                <div className="skeleton-box" style={{ height: 20, width: '60%' }} />
-                <div className="skeleton-box" style={{ height: 14, width: '40%', marginTop: 8 }} />
-              </div>
-            ))}
-          </div>
+          <PageSkeleton type="list" />
         </div>
       )
     }

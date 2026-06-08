@@ -5,6 +5,7 @@ import type { RecommendRecipe } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import './RecommendPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 /* ─── 常量 ─── */
 
@@ -261,16 +262,8 @@ export default function RecommendPage() {
         </div>
 
         {personalizedLoading ? (
-          <div className="recommend-grid" style={{ marginBottom: 24 }}>
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="recommend-card recommend-card--skeleton">
-                <div className="recommend-card__cover skeleton-box" />
-                <div className="recommend-card__body">
-                  <div className="skeleton-box skeleton-box--title" style={{ width: '80%' }} />
-                  <div className="skeleton-box skeleton-box--desc" style={{ width: '60%' }} />
-                </div>
-              </div>
-            ))}
+          <div style={{ marginBottom: 24 }}>
+            <PageSkeleton type="list" />
           </div>
         ) : (
           <>
@@ -366,29 +359,7 @@ export default function RecommendPage() {
       <div className="recommend-results" ref={resultRef}>
         {/* 加载态 — 带进度的骨架屏 */}
         {loading && (
-          <>
-            <h2 className="recommend-section-title recommend-section-title--loading">
-              <span className="skeleton-title-pulse" />
-            </h2>
-            <div className="recommend-grid">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="recommend-card recommend-card--skeleton">
-                  <div className="recommend-card__cover skeleton-box" />
-                  <div className="recommend-card__body">
-                    <div className="skeleton-box skeleton-box--badge" />
-                    <div className="skeleton-box skeleton-box--title" />
-                    <div className="skeleton-box skeleton-box--desc" />
-                    <div className="skeleton-box skeleton-box--meta" />
-                    <div className="skeleton-box skeleton-box--tags" />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="recommend-loading-bar">
-              <div className="recommend-loading-bar__inner" />
-            </div>
-            <p className="recommend-loading-text">🧪 AI 正在分析食材搭配...</p>
-          </>
+          <PageSkeleton type="list" />
         )}
 
         {/* ─── 数据库匹配结果 ─── */}

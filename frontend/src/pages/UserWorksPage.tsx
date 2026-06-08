@@ -6,6 +6,7 @@ import Pagination from '../components/Pagination'
 import type { WorkItem } from '../api'
 import { usePageTitle } from '../hooks/useSEO'
 import './UserWorksPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const PAGE_SIZE = 12
 
@@ -57,13 +58,7 @@ export default function UserWorksPage() {
     return (
       <div className="works-page">
         <h1 className="works-page__title">我的作品</h1>
-        <div className="works-grid">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="works-card works-card--skeleton">
-              <div className="skeleton-box" style={{ height: 180 }} />
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="list" />
       </div>
     )
   }

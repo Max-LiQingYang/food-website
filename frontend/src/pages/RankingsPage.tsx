@@ -5,6 +5,7 @@ import type { RankedRecipe } from '../api'
 import { useToast } from '../context/ToastContext'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import './RankingsPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const PERIODS = [
   { key: 'weekly', label: '📅 周榜' },
@@ -157,19 +158,7 @@ export default function RankingsPage() {
 
       {/* 加载骨架 */}
       {loading && (
-        <div className="rankings-page__loading">
-          {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="rank-card-skeleton--enhanced">
-              <div className="skeleton-badge" />
-              <div className="skeleton-img" />
-              <div className="skeleton-info">
-                <div className="skeleton-line w-70" />
-                <div className="skeleton-line w-50" />
-                <div className="skeleton-line w-30" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="list" />
       )}
 
       {/* 空状态 */}

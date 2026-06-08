@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getReviewQueue, submitReviewBatch, getReviewHistory, ReviewQueueItem } from '../api'
 import { useToast } from '../context/ToastContext'
 import './AdminReviewPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function AdminReviewPage() {
   const { showToast } = useToast()
@@ -75,9 +76,7 @@ export default function AdminReviewPage() {
 
   if (loading) return (
     <div className="admin-review-page">
-      <div className="review-loading">
-        {[1,2,3,4].map(i => <div key={i} className="skeleton-box" style={{ height: 60, borderRadius: 8, marginBottom: 10 }} />)}
-      </div>
+      <PageSkeleton type="profile" />
     </div>
   )
 

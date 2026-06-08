@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import StepTimer from '../components/StepTimer'
 import './CookingModePage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 export default function CookingModePage() {
   const { id } = useParams<{ id: string }>()
@@ -186,10 +187,7 @@ export default function CookingModePage() {
   if (loading) {
     return (
       <div className="cook-page" role="main" aria-label="加载中">
-        <div className="cook-page__loading">
-          <div className="cook-page__spinner" />
-          <p>加载食谱中...</p>
-        </div>
+        <PageSkeleton type="default" />
       </div>
     )
   }

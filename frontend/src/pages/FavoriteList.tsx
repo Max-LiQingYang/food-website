@@ -5,6 +5,7 @@ import EmptyState from '../components/EmptyState'
 import Pagination from '../components/Pagination'
 import FavoriteNoteModal from '../components/FavoriteNoteModal'
 import './FavoriteList.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 // ── 类型定义 ──────────────────────────────────────────────────────────────────
 
@@ -109,17 +110,7 @@ export default function FavoriteList() {
           <h2 className="favorite-list__title">我的收藏</h2>
           <span className="favorite-list__count">加载中…</span>
         </div>
-        <div className="favorite-list__grid">
-          {Array.from({ length: 6 }).map((_, n) => (
-            <div key={n} className="recipe-card recipe-card--skeleton">
-              <div className="recipe-card__cover skeleton-box" />
-              <div className="recipe-card__info">
-                <div className="skeleton-box skeleton-box--title" />
-                <div className="skeleton-box skeleton-box--meta" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="list" />
       </div>
     )
   }

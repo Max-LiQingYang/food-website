@@ -4,6 +4,7 @@ import { CATEGORIES, getCategoryInfo } from '../constants/categories'
 import { getRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import './CategoryDetailPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const PAGE_SIZE = 12
 
@@ -90,15 +91,7 @@ export default function CategoryDetailPage() {
 
       {/* 内容区 */}
       {loading && recipes.length === 0 ? (
-        <div className="category-detail__skeleton">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="category-detail__skeleton-card">
-              <div className="category-detail__skeleton-img" />
-              <div className="category-detail__skeleton-line" />
-              <div className="category-detail__skeleton-line short" />
-            </div>
-          ))}
-        </div>
+        <PageSkeleton type="list" />
       ) : error ? (
         <div className="category-detail__empty">
           <span className="category-detail__empty-icon">⚠️</span>

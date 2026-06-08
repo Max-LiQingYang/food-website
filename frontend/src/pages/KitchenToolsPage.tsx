@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getKitchenTools, addMyTool } from '../api'
 import type { KitchenTool } from '../api'
 import './KitchenToolsPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const categoryLabels: Record<string, string> = {
   basic: '基础工具', cutting: '切割工具', cooking: '烹饪工具',
@@ -56,7 +57,7 @@ export default function KitchenToolsPage() {
       </div>
 
       {loading ? (
-        <div className="loading">加载中...</div>
+        <PageSkeleton type="profile" />
       ) : Object.keys(grouped).length === 0 ? (
         <div className="empty">
           <span className="empty-icon">🍳</span>

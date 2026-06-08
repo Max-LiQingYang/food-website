@@ -6,6 +6,7 @@ import {
 } from '../api';
 import { useToast } from '../context/ToastContext';
 import './PantryPage.css';
+import PageSkeleton from '../components/PageSkeleton'
 
 const CATEGORIES = ['全部', '蔬菜', '水果', '肉类', '海鲜', '蛋奶', '调味料', '主食', '干货', '饮料', '其他'];
 const UNITS = ['个', '克', '千克', '毫升', '升', '汤匙', '茶匙', '根', '片', '块', '包', '盒', '瓶', '袋', '条'];
@@ -247,26 +248,11 @@ const PantryPage: React.FC = () => {
         </aside>
 
         <main className="pantry-content">
-          {loading && <div className="pantry-loading">
-            <div className="pantry-loading__skeleton">
-              <div className="pantry-header-skeleton">
-                <div className="skeleton-box" style={{ width: 140, height: 28, borderRadius: 6 }} />
-                <div className="skeleton-box" style={{ width: 100, height: 36, borderRadius: 18 }} />
-              </div>
-              <div className="pantry-grid">
-                {[1, 2, 3, 4, 5, 6].map(i => (
-                  <div key={i} className="pantry-card-skeleton">
-                    <div className="pantry-card-skeleton__header">
-                      <div className="skeleton-box" style={{ width: 40, height: 16, borderRadius: 4 }} />
-                    </div>
-                    <div className="skeleton-box" style={{ width: '65%', height: 18, borderRadius: 4, marginTop: 8 }} />
-                    <div className="skeleton-box" style={{ width: '40%', height: 14, borderRadius: 4, marginTop: 6 }} />
-                    <div className="skeleton-box" style={{ width: '50%', height: 12, borderRadius: 4, marginTop: 8 }} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>}
+          {loading && (
+          <div className="pantry-loading">
+            <PageSkeleton type="list" />
+          </div>
+        )}
           {error && <div className="pantry-error">{error}</div>}
           {!loading && !error && sorted.length === 0 && (
             <div className="pantry-empty">

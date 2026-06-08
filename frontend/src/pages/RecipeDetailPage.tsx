@@ -31,6 +31,7 @@ import type { NutritionData } from '../components/NutritionCard'
 import { useRecipeStructuredData, useMetaTags, usePageTitle } from '../hooks/useSEO'
 import './RecipeDetailPage.css'
 import '../components/PrintView.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 /** 分类中文映射 */
 const CATEGORY_NAMES: Record<string, string> = {
@@ -485,45 +486,7 @@ export default function RecipeDetailPage() {
   if (loading) {
     return (
       <div className="detail-page">
-        <div className="detail-skeleton">
-          {/* 封面图骨架 */}
-          <div className="skeleton-cover skeleton-box" style={{ height: 320, borderRadius: 'var(--radius-lg, 16px)' }}>
-            <div className="skeleton-cover__shine" />
-          </div>
-          <div className="skeleton-body">
-            {/* 标题 + 元信息 */}
-            <div className="skeleton-box skeleton-heading" style={{ width: '60%', height: 28 }} />
-            <div className="skeleton-box skeleton-line" style={{ width: '40%', height: 14, marginTop: 8 }} />
-            <div className="skeleton-box skeleton-line" style={{ width: '25%', height: 14 }} />
-            
-            {/* 操作按钮区 */}
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-              <div className="skeleton-box" style={{ width: 80, height: 36, borderRadius: 8 }} />
-              <div className="skeleton-box" style={{ width: 80, height: 36, borderRadius: 8 }} />
-              <div className="skeleton-box" style={{ width: 80, height: 36, borderRadius: 8 }} />
-            </div>
-
-            {/* 食材区域骨架 */}
-            <div style={{ marginTop: 28 }}>
-              <div className="skeleton-box skeleton-heading" style={{ width: '30%', height: 22 }} />
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="skeleton-box skeleton-line" style={{ width: `${50 + i * 10}%`, height: 14, marginTop: 8 }} />
-              ))}
-            </div>
-
-            {/* 步骤区域骨架 */}
-            <div style={{ marginTop: 28 }}>
-              <div className="skeleton-box skeleton-heading" style={{ width: '20%', height: 22 }} />
-              {[1, 2, 3].map(i => (
-                <div key={i} style={{ marginTop: 16 }}>
-                  <div className="skeleton-box" style={{ width: '100%', height: 160, borderRadius: 12 }} />
-                  <div className="skeleton-box skeleton-line" style={{ width: '90%', marginTop: 8 }} />
-                  <div className="skeleton-box skeleton-line short" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PageSkeleton type="detail" />
       </div>
     )
   }

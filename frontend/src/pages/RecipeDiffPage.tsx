@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { getRecipeVersionsList, getRecipeVersionDiff, type VersionDiffResponse } from '../api'
 import './RecipeDiffPage.css'
+import PageSkeleton from '../components/PageSkeleton'
 
 const FIELD_LABELS: Record<string, string> = {
   title: '标题',
@@ -167,7 +168,7 @@ export default function RecipeDiffPage() {
   if (loading) {
     return (
       <div className="recipe-diff-page">
-        <div className="recipe-diff-page__loading">加载版本列表...</div>
+        <PageSkeleton type="detail" />
       </div>
     )
   }

@@ -10,6 +10,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import './NutritionDashboard.css';
+import PageSkeleton from '../components/PageSkeleton'
 
 const MEAL_TYPES = [
   { key: 'breakfast', label: '早餐', icon: '🌅' },
@@ -188,33 +189,11 @@ const NutritionDashboard: React.FC = () => {
         <button className="nutrition-action-btn small" onClick={() => setShowGoals(true)}>设置目标</button>
       </div>
 
-      {loading && <div className="nutrition-loading">
-        <div className="nutrition-loading__skeleton">
-          {/* 日期控件骨架 */}
-          <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-            <div className="skeleton-box" style={{ width: 180, height: 40, borderRadius: 8 }} />
-            <div className="skeleton-box" style={{ width: 60, height: 32, borderRadius: 6 }} />
-            <div className="skeleton-box" style={{ width: 80, height: 32, borderRadius: 6 }} />
-          </div>
-          {/* 环形进度骨架 */}
-          <div className="nutrition-summary-card" style={{ marginBottom: 20 }}>
-            <div className="nutrition-ring-section">
-              <div className="skeleton-box" style={{ width: 130, height: 130, borderRadius: '50%' }} />
-              <div style={{ flex: 1, marginLeft: 20 }}>
-                <div className="skeleton-box" style={{ width: '60%', height: 20, borderRadius: 6 }} />
-                <div className="skeleton-box" style={{ width: '80%', height: 14, borderRadius: 6, marginTop: 8 }} />
-                <div className="skeleton-box" style={{ width: '40%', height: 14, borderRadius: 6, marginTop: 6 }} />
-              </div>
-            </div>
-          </div>
-          {/* 营养元素骨架 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="skeleton-box" style={{ height: 80, borderRadius: 10 }} />
-            ))}
-          </div>
+      {loading && (
+        <div className="nutrition-loading">
+          <PageSkeleton type="profile" />
         </div>
-      </div>}
+      )}
       {error && <div className="nutrition-error">{error}</div>}
 
       {!loading && !error && (
