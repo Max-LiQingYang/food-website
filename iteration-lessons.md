@@ -162,3 +162,25 @@
 ### 自优化建议
 - **新模型部署前检查外键兼容性**：新增含外键的模型时，先在本地 SQLite 验证通过后再部署到 MySQL；或默认使用 `constraints: false`
 - **部署后第一时间验证容器状态**：后端 docker restart 后必须 `docker ps` 确认状态为 healthy，再执行 nginx reload
+
+---
+
+## 2026-06-08 迭代#100 — 内容质量：seed.js 同步 + 质量巡检
+
+### 关键陷阱
+- **SSH Warning 污染 JS 文件**：`ssh ... 2>&1 | grep -v WARNING` 的管道组合中，若 `cat` 命令与 SSH 在同一管道链中，`grep -v WARNING` 会连同 `cat` 的输出一起过滤，导致 JS 文件内容被截断损坏
+- **生产 DB 数据已完美，seed.js 严重滞后**：生产 DB 94 道食谱已 100% 覆盖，但 seed.js 仅 34 道（自 Iter#72 批量视频注入后从未同步）
+- **单个 `package.json` 中的 `bin` 字段解析错误**：`npx` 解析 `@antfu/ni` 的 bin 配置时遇到文本污染，删除 node_modules 后 npm install 可恢复
+
+### 修复方法
+- **SSH 警告清理改用 `2>/dev/null`**：`ssh root@host "cmd" 2>/dev/null` 直接丢弃非关键日志，避免污染 STDOUT
+- **tar-pipe 替代 docker cp 跨主机复制**：本地 `tar czf - dist/ | ssh ... tar xzf -` 避免路径混淆和静默失败
+- **export-recipes.js 从生产 DB 全量导出**：编写 Node.js 脚本连接生产 MariaDB，查询所有字段后输出为 JS 格式的常量定义，直接替换 seed.js 的 recipes 数组
+
+### 遗留问题
+- 无 🔴 待修复
+
+### 自优化建议
+- **Seed.js 同步应作为内容迭代的最后一步**：任何生产 DB 数据变更后立即回写 seed.js，避免数据漂移累积
+- **质量巡检脚本应作为 CI 步骤**：`quality-check.js` 可在部署后自动运行，作为生产健康检查的一部分
+- **export-recipes.js 通用化**：当前脚本硬编码了导出逻辑，可抽象为 `--export-seed / --export-fixtures / --export-backup` 三种模式

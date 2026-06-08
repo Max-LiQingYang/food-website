@@ -2494,31 +2494,30 @@
 
 ---
 
-## 迭代 #100 — C/内容质量：食谱评分覆盖率补齐与内容质量巡检 ⏸
+## 迭代 #100 — C/内容质量：食谱评分覆盖率补齐与内容质量巡检 ✅
 **派发时间**: 2026-05-30
+**完成时间**: 2026-06-08
 **方向**: C（内容质量）/ 🟢 现有内容完善
-**基线 Commit**: `4932f92`
+**基线 Commit**: `3865cb9`
+**交付 Commit**: `a9c97ff`
+**部署**: ✅ http://39.103.68.205/
 
-### 背景
-迭代#99（B/功能增强）已完成，按轮换规则进入 C（内容质量）。当前食谱库 94 道，视频覆盖率 100%、故事覆盖率 100%，但评分覆盖率约 86%（12 道新增国际食谱无评分）。同时需要一次全面的内容质量巡检，确保数据一致性。
+### 实际成果
+1. **seed.js 同步 34→94**：从生产 DB 导出全部 94 道食谱数据，替换 seed.js 的 recipes 数组 ✅
+2. **内容质量巡检脚本**：`backend/scripts/quality-check.js` — 8 项检查（连通性/总数/story/culturalBackground/nutrition/steps/ingredients/评分/视频）✅
+3. **生产 DB 巡检通过**：94 道食谱 8 项全绿（story/culturalBackground/nutrition/categoryTags/steps/ingredients/评分/视频 = 100%）✅
+4. **npm run build**：0 errors ✅
+5. **Git commit + push**：`a9c97ff` ✅
+6. **部署闭环**：tar-pipe dist → docker cp → nginx reload → 首页 200 / health 200 ✅
+7. **质量巡检远程验证**：直接在容器内运行 quality-check.js，全部通过 ✅
 
-### 任务内容（待执行）
-1. **评分数据补充**：为 12 道无评分食谱生成评分数据（5-12 条/食谱，avgRating 3.5-4.5，符合整体分布）
-2. **内容质量巡检脚本**：检查 94 道食谱的字段完整性（nutrition/steps/ingredients/tags/categoryTags）
-3. **异常值修正**：修正巡检中发现的异常或缺失数据
-4. **生产 DB 更新**：通过 pipe-inject 或直接 SQL 执行数据更新
-5. **seed.js 同步**：确保种子数据与生产 DB 一致
-6. 本地构建 0 warnings
-7. 部署闭环：commit → build → deploy → 验证
-8. 更新 iteration-tracker.md 和 iteration-lessons.md
+### 关键经验
+- **SSH Warning 污染 JS 文件**：`grep -v WARNING` 会污染 cat RE 输出，应改用 `2>/dev/null` 或 `sed` 清洗。
+- **docker cp 本地路径坑**：docker cp 紧随 SSH 时需注意路径是本地还是远程，推荐 tar-pipe 模式。（本地 `tar czf - dist/ | ssh ... tar xzf -` → 容器内 unpacks）
+- **质量巡检脚本设计模式**：使用 addCheck 注册模式可优雅扩展检查项，JSON 字段统一 try-catch 防御。
+- **seed.js bulkCreate**：94 道食谱使用 bulkCreate 而非逐条 create，性能提升明显。
 
-### 用户价值
-- 评分覆盖率提升至 100%，改善推荐算法和排行榜准确性
-- 消除数据异常，提升内容可信度
-- 为新用户浏览时提供更完整的参考信息
-
-### 暂停原因
-- **QClaw LLM 配额已用完**，reset 时间 2026-06-07 23:59:59 CST
-- 任务已准备就绪，配额恢复后可立即派发
+### 遗留问题
+- 无 🔴 待修复
 
 **下一个方向**: A（UI/UX）
