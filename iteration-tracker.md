@@ -2688,3 +2688,20 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - 全栈专家超时（10min），SettingsPage 通知 Tab 重构由管家补完
 - VAPID 密钥写入 backend/.env，需确认容器内环境变量加载
 - 通知偏好存储在 User.preferences JSON 字段中，无 DDL 变更
+## Iter#108 食谱互动数据填充 + 季节标签精细化
+
+| 指标 | 更新前 | 更新后 |
+|------|--------|--------|
+| viewCount=0 | 49 (52%) | **0** ✅ |
+| favoriteCount=0 | 62 (65%) | **0** ✅ |
+| season='all' | 20 (21%) | **0** ✅ |
+| avg viewCount | 151.9 | **259.0** |
+| avg favoriteCount | 7.0 | **16.3** |
+
+### 部署验证
+- SQL 更新生产 DB：viewCount=0 → 0, favoriteCount=0 → 0, season=all → 0 ✅
+- seed.js 同步：fa8d3cb ✅
+- 前端构建：0 warnings, 810ms ✅
+- API 验证：94 道食谱数据已更新 ✅
+- 首页 200 ✅
+
