@@ -74,6 +74,9 @@ router.use('/collections', collectionRoutes)
 // 用户偏好（需认证）
 router.use('/preferences', preferencesRoutes)
 
+// VAPID 公钥（公开端点，无需认证）
+router.use('/vapid-public-key', require('./vapid'))
+
 // 通知系统（全部需认证）
 router.use('/notifications', require('./notification'))
 router.use('/notification-preferences', require('./notificationPreferences'))

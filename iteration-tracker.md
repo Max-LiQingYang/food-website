@@ -2657,3 +2657,34 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 
 ### 遗留问题
 - 无 🔴 待修复
+
+---
+
+## Iter#106 — Web Push 推送通知系统 ✅
+
+**时间**: 2026-06-08 21:28 → 21:56
+**Commit**: `26e0d40`
+**类型**: feature
+**部署**: ✅ http://39.103.68.205/
+
+### 变更
+- **后端**: VAPID 密钥生成配置、notificationHelper.js 实际 Web Push 发送（web-push 包 + 过期订阅清理）
+- **后端**: notificationPreferences 路由（GET/PUT per-type per-channel 10 类型）
+- **后端**: achievement.js 注入 createNotification
+- **前端**: sw.js push/notificationclick 事件处理
+- **前端**: usePushSubscription hook（4 态权限管理 + subscribe/unsubscribe）
+- **前端**: PushSubscriptionPrompt 组件（undecided/granted/denied/unsupported）
+- **前端**: SettingsPage 通知 Tab 重构（6 类型 per-channel 模型 + 推送状态指示 + 取消订阅按钮）
+- **前端**: NotificationBell 图标补全（10 类型全覆盖）
+- **文档**: PRD v2.0（prd/PRD-notification-system.md）、UI 规范 930 行（iter106-webpush/UI-webpush.md）
+
+### 部署验证
+- 首页 200 ✅
+- 通知偏好端点 401（需认证，正确）✅
+- 推送订阅端点 401（需认证，正确）✅
+- 前端构建 0 warnings ✅
+
+### 经验
+- 全栈专家超时（10min），SettingsPage 通知 Tab 重构由管家补完
+- VAPID 密钥写入 backend/.env，需确认容器内环境变量加载
+- 通知偏好存储在 User.preferences JSON 字段中，无 DDL 变更

@@ -1,20 +1,22 @@
 /**
  * usePushSubscription
- * \u7ba1\u7406\u6d4f\u89c8\u5668 Web Push \u8ba2\u9605\u72b6\u6001\u4e0e\u8ba2\u9605/\u53d6\u6d88\u8ba2\u9605\u52a8\u4f5c
+ * 管理浏览器 Web Push 订阅状态与订阅/取消订阅动作
  *
- * \u66b4\u9732\u72b6\u6001\uff1a
- *   - permission   \u6d4f\u89c8\u5668\u539f\u751f\u6743\u9650 'default'|'granted'|'denied'|'unsupported'
- *   - isSubscribed \u662f\u5426\u5df2\u6709\u6709\u6548\u8ba2\u9605
- *   - subscribing  \u8ba2\u9605/\u53d6\u6d88\u4e2d\uff08\u6309\u94ae loading\uff09
- *   - subscriptions \u540e\u7aef\u8bb0\u5f55\u7684\u8ba2\u9605\u5217\u8868\uff08\u7528\u4e8e\u591a\u8bbe\u5907\u5c55\u793a\uff09
- *   - subscribe()  \u8bf7\u6c42\u6743\u9650 + \u521b\u5efa\u8ba2\u9605 + \u540e\u7aef\u6ce8\u518c\n *   - unsubscribe() \u53d6\u6d88\u5f53\u524d\u8bbe\u5907\u8ba2\u9605 + \u540e\u7aef\u5220\u9664
- *   - refresh()    \u91cd\u62c9\u8ba2\u9605\u5217\u8868
+ * 暴露状态：
+ *   - permission   浏览器原生权限 'default'|'granted'|'denied'|'unsupported'
+ *   - isSubscribed 是否已有有效订阅
+ *   - subscribing  订阅/取消中（按钮 loading）
+ *   - subscriptions 后端记录的订阅列表（用于多设备展示）
+ *   - subscribe()  请求权限 + 创建订阅 + 后端注册
+ *   - unsubscribe() 取消当前设备订阅 + 后端删除
+ *   - refresh()    重拉订阅列表
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getPushSubscriptions,
   registerPushSubscription,
   unregisterPushSubscription,
+  getVapidPublicKey,
   PushSubscriptionInfo
 } from '../api'
 
@@ -67,7 +69,7 @@ export function usePushSubscription(): UsePushSubscriptionResult {
   const [subscriptions, setSubscriptions] = useState<PushSubscriptionInfo[]>([])
   const mounted = useRef(true)
 
-  // \u521d\u59cb\u5316\u68c0\u67e5
+  // 初始化检查
   useEffect(() => {
     mounted.current = true
     if (!isPushSupported()) {
@@ -78,7 +80,7 @@ export function usePushSubscription(): UsePushSubscriptionResult {
     }
     setPermission(Notification.permission as PushPermissionState)
 
-    // \u68c0\u67e5\u662f\u5426\u5df2\u6709\u6d4f\u89c8\u5668\u7aef\u8ba2\u9605
+    // 检查是否已有浏览器端订阅
     ;(async () => {
       try {
         const reg = await navigator.serviceWorker.ready
@@ -89,7 +91,7 @@ export function usePushSubscription(): UsePushSubscriptionResult {
       }
     })()
 
-    // \u62c9\u53d6\u540e\u7aef\u8bb0\u5f55\u7684\u8ba2\u9605
+    // 拉取后端记录的订阅
     refreshInner()
 
     return () => {
@@ -116,7 +118,7 @@ export function usePushSubscription(): UsePushSubscriptionResult {
     if (subscribing) return
     setSubscribing(true)
     try {
-      // \u7533\u8bf7\u6743\u9650
+      // 申请权限
       let perm: NotificationPermission = Notification.permission
       if (perm === 'default') {
         perm = await Notification.requestPermission()
@@ -128,14 +130,22 @@ export function usePushSubscription(): UsePushSubscriptionResult {
 
       const reg = await navigator.serviceWorker.ready
 
-      // \u83b7\u53d6 VAPID \u516c\u94a5
-      const vapidKey = (import.meta as any).env?.VITE_VAPID_PUBLIC_KEY as string | undefined
+      // 获取 VAPID 公钥（优先 API 运行时获取，备用编译时 env）
+      let vapidKey = ''
+      try {
+        vapidKey = await getVapidPublicKey()
+      } catch {
+        // API 失败时回退到编译时变量
+      }
       if (!vapidKey) {
-        console.error('[push] VITE_VAPID_PUBLIC_KEY \u672a\u914d\u7f6e')
+        vapidKey = (import.meta as any).env?.VITE_VAPID_PUBLIC_KEY as string | undefined
+      }
+      if (!vapidKey) {
+        console.error('[push] VAPID 公钥未配置（API 和 env 均无效）')
         return
       }
 
-      // \u590d\u7528\u73b0\u6709\u8ba2\u9605\uff0c\u5426\u5219\u521b\u5efa\u65b0\u8ba2\u9605
+      // 复用现有订阅，否则创建新订阅
       let sub = await reg.pushManager.getSubscription()
       if (!sub) {
         sub = await reg.pushManager.subscribe({
@@ -171,7 +181,7 @@ export function usePushSubscription(): UsePushSubscriptionResult {
       const sub = await reg.pushManager.getSubscription()
       const currentEndpoint = sub?.endpoint || ''
 
-      // \u53d6\u6d88\u6d4f\u89c8\u5668\u7aef\u8ba2\u9605
+      // 取消浏览器端订阅
       if (sub) {
         try {
           await sub.unsubscribe()
@@ -180,7 +190,7 @@ export function usePushSubscription(): UsePushSubscriptionResult {
         }
       }
 
-      // \u540e\u7aef\u5220\u9664\uff1a\u4f18\u5148\u5220\u9664\u5f53\u524d\u8bbe\u5907\u7aef\u70b9\uff0c\u5176\u4f59\u4fdd\u7559
+      // 后端删除：优先删除当前设备端点，其余保留
       const list = subscriptions
       const target =
         list.find((s) => s.endpoint === currentEndpoint) || null

@@ -2273,6 +2273,14 @@ export function unregisterPushSubscription(id: string): Promise<void> {
   return apiClient.delete('/push/subscription/' + id).then(r => r.data?.data || r.data)
 }
 
+// 获取 VAPID 公钥（运行时获取，替代编译时 env）
+export function getVapidPublicKey(): Promise<string> {
+  return apiClient.get('/vapid-public-key').then(r => {
+    const data = r.data?.data || r.data
+    return data?.publicKey || ''
+  })
+}
+
 // 获取通知偏好
 export function getNotificationPreferences(): Promise<Record<string, NotificationPreference>> {
   return apiClient.get('/notification-preferences').then(r => r.data?.data || r.data)

@@ -184,3 +184,12 @@
 - **Seed.js 同步应作为内容迭代的最后一步**：任何生产 DB 数据变更后立即回写 seed.js，避免数据漂移累积
 - **质量巡检脚本应作为 CI 步骤**：`quality-check.js` 可在部署后自动运行，作为生产健康检查的一部分
 - **export-recipes.js 通用化**：当前脚本硬编码了导出逻辑，可抽象为 `--export-seed / --export-fixtures / --export-backup` 三种模式
+
+## 2026-06-08 Iter#106 — Web Push 推送通知系统
+
+### 经验教训
+1. **全栈专家超时处理**：SettingsPage 通知 Tab 重构未完成（10min 超时），管家需预留补完时间
+2. **VAPID 密钥配置**：生成后写入 `backend/.env`，需确认容器内环境变量已加载（`docker exec food-backend env | grep VAPID`）
+3. **通知偏好存储**：存在 `User.preferences` JSON 字段中，无 DDL 变更，适合快速迭代
+4. **per-type per-channel 模型**：10 类型 × 2 通道（inApp/push），默认全开，推送通道受浏览器权限约束
+5. **sw.js 改造**：需同时处理 `push` 和 `notificationclick` 事件，后者负责点击跳转
