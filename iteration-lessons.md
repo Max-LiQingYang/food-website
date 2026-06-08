@@ -234,3 +234,22 @@
 ### 自优化建议
 - 本次 UI 升级全部为样式 + 少量 JSX 微调，零新依赖，回滚成本极低
 - 设计规范含完整验收清单（视觉/暗色/交互/可访问性/兼容性 5 大类），建议后续迭代参考此格式
+
+---
+
+## 2026-06-09 迭代#110 — 搜索体验增强
+
+### 关键陷阱
+- **现有基础设施比预期完善**：SearchAutocomplete 组件已有 debounce、键盘导航、搜索历史、API 建议等完整功能，但热门词硬编码、无缩略图/标签分组。代码审计发现后端 suggestions 端点已存在但字段不足。
+- **子专家超时风险**：全栈专家 8 分 35 秒完成（接近 600s 上限），后续迭代需考虑拆分更细
+- **CSS 文件完全替换**：SearchAutocomplete.css 从增量追加改为整文件替换，需确保不遗漏现有样式
+
+### 修复方法
+- 代码审计先行：派发子专家前先 grep 确认现有 API 端点和组件功能，避免重复造轮
+- 扁平化 NavItem 键盘导航：chip 和列表项混合导航时，用 `kind` 标记 + `isNavActive()` 工具函数统一索引
+- 模块级缓存：`_hotSearchesCache` 5 分钟 TTL 减少重复 API 请求
+
+### 自优化建议
+- 搜索建议 API 新增字段为纯增量，向后兼容，回滚只需恢复 attributes 和 limit
+- 热门搜索 fallback 逻辑为纯增量，回滚只需移除 fallback 代码块
+- 前端通过 5 个可选 props（showThumbnails/showTagGroups/useApiHotSearches/minQueryLength/dropdownMaxHeight）控制新功能开关，灰度发布友好

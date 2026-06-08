@@ -2725,3 +2725,28 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - `frontend/src/pages/RankingsPage.css` — 统计值图标样式
 - `frontend/src/components/HomeTagsSection.tsx` — 图标渲染 + 计数角标
 - `frontend/src/components/HomeTagsSection.css` — 渐变流动 + badgePopIn 动画
+
+## Iter#110 搜索体验增强
+
+| 指标 | 状态 |
+|------|------|
+| 搜索建议 API 返回 coverImage + matchedTags + matchedCategories | ✅ 已部署 |
+| 搜索建议 limit 6→8 | ✅ 已部署 |
+| 热门搜索 API 3 级 fallback 保证 ≥10 条 | ✅ 已部署 |
+| 封面缩略图 40×30px + 🍽️ fallback | ✅ 已部署 |
+| 匹配标签 chip（橙色系）+ 匹配分类 chip（蓝色系） | ✅ 已部署 |
+| 热门搜索词 API 预填充（移除硬编码） | ✅ 已部署 |
+| 1 字触发 API 建议 | ✅ 已部署 |
+| 键盘导航支持 chip | ✅ 已部署 |
+| 暗色模式 + 响应式（≤480px/≤360px） | ✅ 已部署 |
+| npm run build | 0 warnings ✅ |
+| 首页 200 / 搜索页 200 / API 验证全绿 | ✅ |
+| Git commit | 0bb84f2 |
+
+### 修改文件（6 个）
+- `backend/routes/recipes.js` — suggestions 增强 + hot-searches fallback
+- `frontend/src/api.ts` — 导出新类型
+- `frontend/src/components/SearchAutocomplete.tsx` — 缩略图+chip+骨架屏+API 热门词
+- `frontend/src/components/SearchAutocomplete.css` — 完整新样式
+- `iter110-search/PRD-search-enhance.md` — 产品 PRD
+- `iter110-search/UI-search-autocomplete.md` — UI 设计规范
