@@ -114,6 +114,13 @@ export default function RecipeDetailPage() {
   // ── 语音播报 ──
   const { speak, pause, resume, stop: stopSpeech, speaking, paused, supported: speechSupported } = useSpeechSynthesis()
 
+  // 兼容 steps 字符串数组格式
+  const normalizedSteps = recipe?.steps?.map((step, index) =>
+    typeof step === 'string'
+      ? { stepNumber: index + 1, content: step, image: null }
+      : step
+  ) ?? []
+
   // 收集所有可查看的图片（封面 + 步骤图片）
   const allImages = [
     ...(recipe?.coverImage ? [{ src: recipe.coverImage, alt: recipe.title }] : []),
@@ -122,13 +129,6 @@ export default function RecipeDetailPage() {
       .map(s => ({ src: s.image || '', alt: `步骤 ${s.stepNumber}: ${s.content || ''}` }))
     ),
   ]
-
-  // 兼容 steps 字符串数组格式
-  const normalizedSteps = recipe?.steps?.map((step, index) =>
-    typeof step === 'string'
-      ? { stepNumber: index + 1, content: step, image: null }
-      : step
-  ) ?? []
 
   // ── 份量缩放 ──
   const scaleKey = id ? `serving_scale_${id}` : ''

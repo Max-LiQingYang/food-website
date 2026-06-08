@@ -2572,3 +2572,30 @@
 
 ### 遗留问题
 - 无 🔴 待修复
+
+---
+
+## 迭代 #103 — 🟢 功能增强：烹饪日志照片上传 ✅
+**派发时间**: 2026-06-08
+**完成时间**: 2026-06-08
+**类型**: feature
+**基线 Commit**: `b68cf8b`
+**交付 Commit**: `8059b79`
+**部署**: ✅ http://39.103.68.205/
+
+### 实际成果
+1. ✅ **后端上传端点**：`POST /api/upload/cooking-log-images`（multer，3 张，5MB，存放到 cooking-logs/）
+2. ✅ **CookingJournalPhotoPicker 组件**：拖拽/点击上传 + 进度条 + 80×80 缩略图预览 + 删除按钮 + 暗色模式
+3. ✅ **表单集成**：弹窗表单中照片上传区域（笔记下方，提交时 JSON.stringify 写入 photoUrl）
+4. ✅ **列表缩略图**：日志卡片显示最多 3 张 80×80 缩略图，超过显示 +N 徽章
+5. ✅ **ImageLightbox 集成**：点击缩略图全屏查看，支持 ← → 切换和 ESC 关闭
+6. ✅ **api.ts 扩展**：`uploadCookingLogImages` + `parseCookingLogPhotoUrls` 工具函数
+
+### 关键经验
+- **ImageLightbox 实际 API**：`images: string[]` + `currentIndex`（非 `{src, alt}[]` + `initialIndex`）
+- **ToastContext API**：`{ success, error, warning, info }` 方法对象（非 `showToast` 函数）
+- **子专家拆分策略有效**：产品（3 分钟）→ UI（3 分钟）→ 全栈（超时但代码完整）→ 运维（1 分钟）
+- 全栈专家超时后管家需手动验证构建
+
+### 遗留问题
+- 无 🔴 待修复
