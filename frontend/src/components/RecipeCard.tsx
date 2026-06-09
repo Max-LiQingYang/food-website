@@ -10,6 +10,9 @@ import AuthorLevelBadge from './AuthorLevelBadge'
 import { useLongPress } from '../hooks/useLongPress'
 import { getCategoryInfo } from '../constants/categories'
 import { getCookTimeInfo } from '../utils/cookTimeLabel'
+import { useToast } from '../context/ToastContext'
+import QuickPreviewModal from './recipe/QuickPreviewModal'
+import RecipeActionMenu from './recipe/RecipeActionMenu'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -83,10 +86,23 @@ function getCalories(recipe: Recipe): number | null {
 
 export default function RecipeCard({ recipe, highlightQuery, animationDelay, authorLevel }: RecipeCardProps) {
   const navigate = useNavigate()
+  const toast = useToast()
   const [imgLoaded, setImgLoaded] = useState(false)
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [contextMenuPos, setContextMenuPos] = useState<{ x: number; y: number } | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [showActionMenu, setShowActionMenu] = useState(false)
+  const [actionMenuAnchor, setActionMenuAnchor] = useState<{ x: number; y: number; width: number; height: number } | null>(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   const menuRef = useRef<HTMLDivElement>(null)
+  const kebabRef = useRef<HTMLButtonElement>(null)
+
+  // Track mobile state
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const handleClick = useCallback(
     (e: React.TouchEvent | React.MouseEvent) => {
@@ -129,7 +145,6 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
 
       switch (action) {
         case 'favorite':
-          // 触发收藏按钮的点击 - 找到 card 内的收藏按钮
           const favBtn = document.querySelector(`[data-recipe-id="${recipe.id}"] .favorite-button`)
           favBtn?.click()
           break
@@ -150,6 +165,54 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
     },
     [navigate, recipe.id, recipe.title]
   )
+
+  // ── Quick Preview ──
+  const handleQuickPreview = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowPreview(true)
+  }, [])
+
+  // ── Action Menu ──
+  const handleKebabClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (kebabRef.current) {
+      const rect = kebabRef.current.getBoundingClientRect()
+      setActionMenuAnchor({ x: rect.left, y: rect.top, width: rect.width, height: rect.height })
+    }
+    setShowActionMenu(true)
+  }, [])
+
+  const handleActionMenuClose = useCallback(() => {
+    setShowActionMenu(false)
+    setActionMenuAnchor(null)
+  }, [])
+
+  const handleActionFavorite = useCallback(() => {
+    const favBtn = document.querySelector(`[data-recipe-id="${recipe.id}"] .favorite-button`)
+    favBtn?.click()
+  }, [recipe.id])
+
+  const handleActionShopping = useCallback(() => {
+    navigate(`/recipe/${recipe.id}?addToShopping=1`)
+  }, [navigate, recipe.id])
+
+  const handleActionMealPlan = useCallback(() => {
+    navigate(`/recipe/${recipe.id}?addToMealPlan=1`)
+  }, [navigate, recipe.id])
+
+  const handleActionShare = useCallback(() => {
+    const shareUrl = `${window.location.origin}/recipe/${recipe.id}`
+    if (navigator.share) {
+      navigator.share({ title: recipe.title, url: shareUrl }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(shareUrl).catch(() => {})
+    }
+    toast.success('链接已复制')
+  }, [recipe.id, recipe.title, toast])
+
+  const handleActionCollection = useCallback(() => {
+    navigate(`/recipe/${recipe.id}?addToCollection=1`)
+  }, [navigate, recipe.id])
 
   // 点击外部关闭菜单
   useEffect(() => {
@@ -242,6 +305,27 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
         <div className="recipe-card__fav" onPointerDown={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); tapFeedback() }}>
           <FavoriteButton recipeId={recipe.id} inline />
         </div>
+
+        {/* 快速预览按钮 - 收藏按钮下方 */}
+        <button
+          className="recipe-card__preview-btn"
+          onClick={handleQuickPreview}
+          aria-label="快速预览"
+          title="快速预览"
+        >
+          👁
+        </button>
+
+        {/* Kebab 菜单按钮 */}
+        <button
+          ref={kebabRef}
+          className="recipe-card__kebab"
+          onClick={handleKebabClick}
+          aria-label="更多操作"
+          title="更多操作"
+        >
+          ⋮
+        </button>
 
         {/* NutriScore 评级徽章 - 浮在图片左上角 */}
         {recipe.nutriScore && (
@@ -418,6 +502,26 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
             <span>分享</span>
           </button>
         </div>
+      )}
+
+      {/* ── QuickPreviewModal ── */}
+      {showPreview && (
+        <QuickPreviewModal recipe={recipe} onClose={() => setShowPreview(false)} />
+      )}
+
+      {/* ── RecipeActionMenu ── */}
+      {showActionMenu && (
+        <RecipeActionMenu
+          recipe={recipe}
+          anchorRect={actionMenuAnchor}
+          isMobile={isMobile}
+          onClose={handleActionMenuClose}
+          onFavorite={handleActionFavorite}
+          onShopping={handleActionShopping}
+          onMealPlan={handleActionMealPlan}
+          onShare={handleActionShare}
+          onCollection={handleActionCollection}
+        />
       )}
     </div>
   )

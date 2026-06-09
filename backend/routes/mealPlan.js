@@ -206,4 +206,49 @@ router.post('/:id/generate-shopping-list', auth, async (req, res) => {
   }
 })
 
+// ─────────────────────────────────────────────────────────────────
+// POST /add-recipe — 将食谱添加到餐单计划
+// ─────────────────────────────────────────────────────────────────
+router.post('/add-recipe', auth, async (req, res) => {
+  try {
+    const { recipeId, date, mealType } = req.body
+    if (!recipeId || !date || !mealType) {
+      return res.status(400).json(resJSON(400, '缺少必填参数', null))
+    }
+    if (!['breakfast', 'lunch', 'dinner', 'snack'].includes(mealType)) {
+      return res.status(400).json(resJSON(400, '无效的餐别类型', null))
+    }
+
+    // 查询该周的餐单（以周一为基准）
+    const d = new Date(date)
+    const dayOfWeek = d.getDay()
+    const monday = new Date(d)
+    monday.setDate(d.getDate() - ((dayOfWeek + 6) % 7))
+    const weekStart = monday.toISOString().slice(0, 10)
+
+    let plan = await MealPlan.findOne({
+      where: { userId: req.userId, weekStart }
+    })
+
+    if (!plan) {
+      // 创建新餐单
+      plan = await MealPlan.create({
+        userId: req.userId,
+        weekStart,
+        meals: JSON.stringify([{ date, mealType, recipeId }])
+      })
+    } else {
+      const meals = parseJSON(plan.meals)
+      meals.push({ date, mealType, recipeId })
+      plan.meals = JSON.stringify(meals)
+      await plan.save()
+    }
+
+    return res.status(200).json(resJSON(0, '已添加到餐单计划', { id: plan.id, weekStart }))
+  } catch (err) {
+    console.error('[mealPlan] add-recipe error:', err.message)
+    return res.status(500).json(resJSON(500, '服务器错误', null))
+  }
+})
+
 module.exports = router

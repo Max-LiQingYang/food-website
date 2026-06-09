@@ -312,6 +312,22 @@ export function getDailyPick(random?: boolean): Promise<any> {
 }
 
 /**
+ * 获取个性化每日推荐（需登录）
+ * GET /api/recipes/daily-pick/personalized
+ */
+export function getPersonalizedDailyPick(): Promise<{ data: { list: Recipe[] } }> {
+  return apiClient.get('/recipes/daily-pick/personalized')
+}
+
+/**
+ * 将食谱添加到餐单计划
+ * POST /api/meal-plans/add-recipe
+ */
+export function addRecipeToMealPlan(data: { recipeId: string; date: string; mealType: string }): Promise<{ code: number; message: string; data: { id: string; weekStart: string } }> {
+  return apiClient.post('/meal-plans/add-recipe', data)
+}
+
+/**
  * 获取相似食谱推荐（含 Jaccard 相似度）
  * GET /api/recipes/:id/similar
  */

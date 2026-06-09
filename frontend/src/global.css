@@ -197,6 +197,32 @@ body {
   --search-sticky-z:      50;
   --search-drawer-z:      80;
   --search-overlay-z:     70;
+
+  /* ── 快速预览 Token (--preview-*) ── */
+  --preview-overlay:        rgba(0, 0, 0, 0.6);
+  --preview-bg:             var(--color-card, #ffffff);
+  --preview-text:           var(--color-text, #2d2d2d);
+  --preview-text-secondary: var(--color-text-secondary, #666666);
+  --preview-section-bg:     var(--color-bg-secondary, #f5f0eb);
+  --preview-border:         var(--color-border, #e8e0d8);
+  --preview-close-btn:      #666;
+  --preview-radius:         12px;
+  --preview-max-width:      520px;
+  --preview-z:              10000;
+  --preview-transition:     0.3s cubic-bezier(0.21, 1.02, 0.73, 1);
+
+  /* ── 操作菜单 Token (--action-menu-*) ── */
+  --action-menu-bg:             var(--color-card, #ffffff);
+  --action-menu-border:         var(--color-border, #e8e0d8);
+  --action-menu-shadow:         0 4px 16px rgba(0,0,0,0.12);
+  --action-menu-item-hover:     var(--color-primary-bg, #fff3ed);
+  --action-menu-item-text:      var(--color-text, #2d2d2d);
+  --action-menu-icon-color:     var(--color-text-secondary, #666);
+  --action-menu-z:              10001;
+  --action-menu-radius:         10px;
+  --action-menu-item-min-height: 44px;
+  --action-menu-kebab-bg:       rgba(255,255,255,0.85);
+  --action-menu-kebab-color:    #666;
 }
 
 /* ── 暗色模式 ── */
@@ -296,6 +322,25 @@ body.dark {
   --search-list-border:   #2e2e48;
   --search-list-shadow:   0 1px 4px rgba(0, 0, 0, 0.3);
   --search-list-shadow-hover: 0 4px 14px rgba(255, 140, 90, 0.15);
+
+  /* ── 快速预览暗色 ── */
+  --preview-overlay:        rgba(0, 0, 0, 0.8);
+  --preview-bg:             #1a1a2e;
+  --preview-text:           #e0e0ee;
+  --preview-text-secondary: #9898b0;
+  --preview-section-bg:     #2a2520;
+  --preview-border:         #333;
+  --preview-close-btn:      #aaa;
+
+  /* ── 操作菜单暗色 ── */
+  --action-menu-bg:             #1e1e32;
+  --action-menu-border:         #2e2e48;
+  --action-menu-shadow:         0 8px 32px rgba(0,0,0,0.5);
+  --action-menu-item-hover:     rgba(232, 102, 62, 0.15);
+  --action-menu-item-text:      #e0e0ee;
+  --action-menu-icon-color:     #9898b0;
+  --action-menu-kebab-bg:       rgba(30,30,50,0.85);
+  --action-menu-kebab-color:    #aaa;
 }
 
 body {
