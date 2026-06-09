@@ -82,20 +82,15 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
     return () => clearInterval(timer)
   }, [goNext])
 
-  // Preload images to detect loaded state
+  // Preload first image with high priority; rest lazy via <img loading="lazy">
   useEffect(() => {
-    const imgs = items.map(item => {
-      const img = new Image()
-      img.onload = () => { /* individual load */ }
-      img.src = getProxiedImageUrl(item.image) || item.image
-      return img
-    })
-    let loaded = 0
-    const onLoad = () => {
-      loaded++
-      if (loaded >= items.length) setImagesLoaded(true)
-    }
-    imgs.forEach(img => { img.onload = onLoad; img.onerror = onLoad })
+    if (items.length === 0) return
+    const firstImg = new Image()
+    ;(firstImg as any).fetchPriority = 'high'
+    firstImg.onload = () => setImagesLoaded(true)
+    firstImg.onerror = () => setImagesLoaded(true)
+    firstImg.src = getProxiedImageUrl(items[0].image) || items[0].image
+    // 其余图片靠 <img loading="lazy"> 处理，不再循环预加载
   }, [items])
 
   const handleRecipeClick = (recipe: HeroRecipe) => {
@@ -140,6 +135,8 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
               alt={recipe.title}
               className="hero-slide__img"
               loading={idx === 0 ? 'eager' : 'lazy'}
+              {...({ fetchpriority: idx === 0 ? 'high' : 'auto' } as any)}
+              decoding={idx === 0 ? 'sync' : 'async'}
             />
             <div className="hero-slide__overlay" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 35%, ${seasonCfg.overlayColor} 100%)` }} />
             <div className="hero-slide__content">

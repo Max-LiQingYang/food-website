@@ -166,7 +166,7 @@ body.dark .daily-pick-skeleton__img {
 .shimmer {
   background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
+  animation: shimmer 1.6s ease-in-out infinite;
   border-radius: 4px;
 }
 body.dark .shimmer {

@@ -17,5 +17,26 @@ export default defineConfig({
         changeOrigin: true
       }
     }
-  }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // 第三方库分离
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-utils': ['axios'],
+          // 首页内部组件按需懒加载（仅生产构建时）
+          'home-hero': [
+            './src/components/HeroSection.tsx',
+            './src/components/DailyPickCard.tsx',
+          ],
+          'home-cards': [
+            './src/components/RecipeCard.tsx',
+            './src/components/RecipeCardSkeleton.tsx',
+          ],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
+  },
 })

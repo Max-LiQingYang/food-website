@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import type React from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { getRecipes } from '../api'
+import { getRecipes, getFeaturedRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import SearchAutocomplete from '../components/SearchAutocomplete'
@@ -10,13 +11,46 @@ import DailyPickCard from '../components/DailyPickCard'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { useDeferredMount } from '../hooks/useDeferredMount'
 import type { Recipe } from '../api'
 import './HomePage.css'
 import PageSkeleton from '../components/PageSkeleton'
 
 const CATEGORIES = ['全部', '中餐', '西餐', '甜点', '日韩', '其他'] as const
 const PAGE_SIZE = 12
-const FEATURED_TITLES = ['宫保鸡丁', '提拉米苏', '西红柿炒鸡蛋']
+
+interface HeroRecipe {
+  id: string
+  title: string
+  image: string
+  category?: string
+}
+
+function makeRippleHandler() {
+  return (e: React.MouseEvent<HTMLElement>) => {
+    const target = e.currentTarget
+    const rect = target.getBoundingClientRect()
+    target.style.setProperty('--ripple-x', `${e.clientX - rect.left}px`)
+    target.style.setProperty('--ripple-y', `${e.clientY - rect.top}px`)
+  }
+}
+
+function DailyPickSkeletonPlaceholder() {
+  return (
+    <div className="deferred-section__placeholder" aria-hidden="true">
+      正在加载今日推荐…
+    </div>
+  )
+}
+
+function DeferredSection({ children }: { children: React.ReactNode }) {
+  const { ref, shouldMount } = useDeferredMount<HTMLDivElement>()
+  return (
+    <div ref={ref} className="deferred-section">
+      {shouldMount ? children : <DailyPickSkeletonPlaceholder />}
+    </div>
+  )
+}
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -30,7 +64,7 @@ export default function HomePage() {
   const [category, setCategory] = useState(initialCategory)
   const [page, setPage] = useState(1)
   const [recipes, setRecipes] = useState<Recipe[]>([])
-  const [allRecipes, setAllRecipes] = useState<Recipe[]>([])
+  const [featuredRecipes, setFeaturedRecipes] = useState<HeroRecipe[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [searchInput, setSearchInput] = useState('')
@@ -87,15 +121,26 @@ export default function HomePage() {
     }
   }, [category, page, filters])
 
-  // Load hero data (full list for featured titles matching)
+  // Load hero data — 直接拉精选 3 条，零浪费
   useEffect(() => {
-    getRecipes({ page: 1, pageSize: 100 })
-      .then(res => {
-        const data = res.data || res
-        setAllRecipes(data.list || [])
+    let cancelled = false
+    getFeaturedRecipes()
+      .then((res: any) => {
+        if (cancelled) return
+        const data = res.data?.data || res.data || res
+        const list: Recipe[] = Array.isArray(data) ? data : data.list || []
+        setFeaturedRecipes(
+          list.map(r => ({
+            id: r.id,
+            title: r.title,
+            image: r.coverImage || '',
+            category: r.category,
+          }))
+        )
       })
       .catch(() => {})
-      .finally(() => setHeroLoaded(true))
+      .finally(() => { if (!cancelled) setHeroLoaded(true) })
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -120,13 +165,8 @@ export default function HomePage() {
   }
 
   // Build featured recipes for hero from fetched data
-  const heroRecipes = heroLoaded && allRecipes.length > 0
-    ? FEATURED_TITLES.map(title => allRecipes.find(r => r.title === title)).filter(Boolean).map(r => ({
-        id: r!.id,
-        title: r!.title,
-        image: r!.coverImage || '',
-        category: r!.category,
-      }))
+  const heroRecipes = heroLoaded && featuredRecipes.length > 0
+    ? featuredRecipes
     : undefined
 
   // SEO meta
@@ -156,8 +196,12 @@ export default function HomePage() {
       {/* ── 精选轮播 ── */}
       {showFullLayout && <HeroSection recipes={heroRecipes} />}
 
-      {/* ── 今日推荐 ── */}
-      {showFullLayout && <DailyPickCard />}
+      {/* ── 今日推荐（视口内才挂载） ── */}
+      {showFullLayout && (
+        <DeferredSection>
+          <DailyPickCard />
+        </DeferredSection>
+      )}
 
       {/* ── 搜索栏 ── */}
       <form className="home-search" onSubmit={e => { e.preventDefault(); handleSearchSubmit(searchInput) }}>
@@ -168,7 +212,7 @@ export default function HomePage() {
           placeholder="搜索食谱..."
           inputClassName="home-search__input"
         />
-        <button type="submit" className="home-search__btn">搜索</button>
+        <button type="submit" className="home-search__btn ripple-host" onMouseDown={makeRippleHandler()}>搜索</button>
       </form>
 
       {/* ── 分类标签 ── */}
@@ -176,7 +220,8 @@ export default function HomePage() {
         {CATEGORIES.map(cat => (
           <button
             key={cat}
-            className={`home-category ${category === cat ? 'active' : ''}`}
+            className={`home-category ripple-host ${category === cat ? 'active' : ''}`}
+            onMouseDown={makeRippleHandler()}
             onClick={() => handleCategoryChange(cat)}
           >
             {cat}

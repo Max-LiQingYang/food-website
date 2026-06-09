@@ -239,33 +239,33 @@
 }
 
 /* ── 暗色模式 ── */
-.dark .home-page {
+body.dark .home-page {
   color: var(--color-text, #e0d8d0);
 }
 
-.dark .home-search__input {
+body.dark .home-search__input {
   background: var(--color-input-bg, #2a2520);
   color: var(--color-text, #e0d8d0);
   border-color: var(--color-border, #3a3530);
 }
 
-.dark .home-category {
+body.dark .home-category {
   background: var(--color-card, #2a2520);
   border-color: var(--color-border, #3a3530);
   color: var(--color-text, #e0d8d0);
 }
 
-.dark .pagination-btn {
+body.dark .pagination-btn {
   background: var(--color-card, #2a2520);
   border-color: var(--color-border, #3a3530);
   color: var(--color-text, #e0d8d0);
 }
 
-.dark .home-section__title {
+body.dark .home-section__title {
   border-bottom-color: var(--color-border, #3a3530);
 }
 
-.dark .home-section__title::after {
+body.dark .home-section__title::after {
   background: var(--color-primary-light, #f0946e);
 }
 
@@ -395,5 +395,121 @@ body.dark .rankings-entry__sub {
   .home-tab {
     padding: 8px 14px;
     font-size: 13px;
+  }
+  .home-page {
+    padding: 12px 12px 32px;
+  }
+  .home-search {
+    flex-direction: row;
+    gap: 6px;
+  }
+  .home-search__input {
+    font-size: 13px;
+    padding: 7px 12px;
+  }
+  .home-search__btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+  .home-categories {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .home-category {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+  .home-grid {
+    gap: 6px;
+  }
+  .home-section__title {
+    font-size: 16px;
+  }
+  .home-section__icon {
+    font-size: 20px;
+  }
+  .home-empty {
+    padding: 32px 16px;
+  }
+  .home-empty__icon {
+    font-size: 40px;
+  }
+  .home-pagination {
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .pagination-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .pagination-info {
+    font-size: 12px;
+  }
+}
+
+/* ── 延迟挂载占位（DailyPickCard） ── */
+.deferred-section {
+  min-height: 240px;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.deferred-section__placeholder {
+  width: 100%;
+  min-height: 240px;
+  border-radius: 16px;
+  background: var(--color-card, #fff);
+  box-shadow: 0 4px 20px rgba(232, 102, 62, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted, #999);
+  font-size: 13px;
+}
+
+body.dark .deferred-section__placeholder {
+  background: var(--color-card, #1e1e32);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--color-text-muted, #888);
+}
+
+/* ── Ripple 点击效果（纯 CSS，零依赖） ── */
+.ripple-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ripple-host::before {
+  content: '';
+  position: absolute;
+  top: var(--ripple-y, 50%);
+  left: var(--ripple-x, 50%);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.18;
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.6s ease-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ripple-host:active::before {
+  width: 240px;
+  height: 240px;
+  opacity: 0;
+  transition: width 0s, height 0s, opacity 0s;
+}
+
+.home-search__btn.ripple-host::before {
+  background: #fff;
+  opacity: 0.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ripple-host::before {
+    display: none;
   }
 }

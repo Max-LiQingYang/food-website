@@ -34,3 +34,20 @@ main#main-content {
   }
 }
 
+/* ── 页面落定（加载完成时）── */
+@keyframes pageSettle {
+  0% {
+    transform: scale(0.995);
+    filter: blur(2px);
+  }
+  100% {
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+main#main-content[data-loaded="true"] {
+  animation: mainFadeIn 0.35s ease both,
+    pageSettle 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+

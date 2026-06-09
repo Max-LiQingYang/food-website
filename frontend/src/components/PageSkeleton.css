@@ -192,3 +192,46 @@ body.dark .ps-profile__tabs {
     animation: none !important;
   }
 }
+
+/* ── 分类卡片骨架（Home） ── */
+.ps-home__categories {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 14px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ps-home__categories::-webkit-scrollbar {
+  display: none;
+}
+
+.ps-home__categories > .skeleton {
+  flex-shrink: 0;
+}
+
+/* ── 全量暗色模式兌底 ── */
+body.dark .page-skeleton {
+  background: var(--color-bg, #12121e);
+}
+
+body.dark .ps-home__hero-bg,
+body.dark .ps-detail__cover,
+body.dark .ps-profile__heatmap > .skeleton {
+  background: var(--color-card, #1e1e32);
+  box-shadow: var(--shadow-sm);
+}
+
+body.dark .ps-list__searchbar > .skeleton,
+body.dark .ps-list__filters > .skeleton,
+body.dark .ps-home__categories > .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #262640) 0%,
+    var(--color-skeleton-to, #303050) 50%,
+    var(--color-skeleton-from, #262640) 100%
+  );
+  background-size: 200% 100%;
+}

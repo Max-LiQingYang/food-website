@@ -35,6 +35,11 @@ export default function PageSkeleton({
               </div>
             </div>
           </div>
+          <div className="ps-home__categories" aria-hidden="true">
+            {[120, 100, 90, 110, 80].map((w, i) => (
+              <Skeleton key={i} width={w} height={32} rounded={16} />
+            ))}
+          </div>
           <Skeleton width="40%" height={28} className="ps-home__section-title" />
           <div className="ps-grid" style={{ '--cols': columns } as React.CSSProperties}>
             {Array.from({ length: columns * rows }).map((_, i) => (
