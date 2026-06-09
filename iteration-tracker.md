@@ -2750,3 +2750,41 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - `frontend/src/components/SearchAutocomplete.css` — 完整新样式
 - `iter110-search/PRD-search-enhance.md` — 产品 PRD
 - `iter110-search/UI-search-autocomplete.md` — UI 设计规范
+
+## Iter#111 首页加载体验优化
+
+| 指标 | 状态 |
+|------|------|
+| getFeaturedRecipes 替代 pageSize:100 请求 | ✅ 已部署 |
+| 骨架屏分类卡片 (ps-home__categories) | ✅ 已部署 |
+| shimmer 1.4s→1.6s 脉冲动画优化 | ✅ 已部署 |
+| ripple-host 纯 CSS 点击效果 | ✅ 已部署 |
+| body.dark 选择器替换 5 处 | ✅ 已部署 |
+| manualChunks 代码分割 (home-hero + home-cards) | ✅ 已部署 |
+| useDeferredMount IntersectionObserver 延迟挂载 | ✅ 已部署 |
+| preconnect 资源预连接 | ✅ 已部署 |
+| pageSettle 页面落定动画 | ✅ 已部署 |
+| 主入口 chunk 12.90 KB gzipped | ✅ 远低于 220 KB 目标 |
+| npm run build | 0 warnings ✅ |
+| 首页 200 / 搜索页 200 | ✅ |
+| 旧 chunk 清理 (1430→54) | ✅ |
+| Git commit | 2085bd1 |
+
+### 修改文件（12 个）
+- `frontend/src/pages/HomePage.tsx` — getFeaturedRecipes 替代 100 条请求 + ripple + useDeferredMount
+- `frontend/src/pages/HomePage.css` — 5 处 .dark→body.dark + ripple-host + 响应式扩展
+- `frontend/src/components/HeroSection.tsx` — fetchPriority/decoding 预加载优化
+- `frontend/src/components/PageSkeleton.tsx` — home 类型插入分类骨架
+- `frontend/src/components/PageSkeleton.css` — .ps-home__categories + 暗色兜底
+- `frontend/src/components/Skeleton.css` — shimmer 1.6s + will-change + reduced-motion
+- `frontend/src/components/DailyPickCard.css` — shimmer 同步 1.6s
+- `frontend/src/components/PageTransition.css` — pageSettle 动画
+- `frontend/src/hooks/useDeferredMount.ts` — 新增 IntersectionObserver hook
+- `frontend/vite.config.ts` — manualChunks 代码分割
+- `frontend/index.html` — preconnect 预连接
+- `frontend/src/components/HeroSection.css` — 可选图片 fade-in（跳过，已有过渡）
+
+### 与设计稿偏差
+1. vendor-utils 移除 dayjs（package.json 未安装）
+2. HeroSection §4.4 fade-in 跳过（可选+已有过渡）
+3. fetchPriority 用 spread + as any 绕过 React 18.3 类型

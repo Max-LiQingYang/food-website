@@ -53,7 +53,17 @@ export default function DailyPickCard() {
     )
   }
 
-  if (!recipe) return null
+  if (!recipe) {
+    return (
+      <div className="daily-pick-card">
+        <div className="daily-pick-card__inner" style={{ justifyContent: 'center', minHeight: 160 }}>
+          <div className="daily-pick-card__content" style={{ width: '100%', textAlign: 'center' }}>
+            <p className="daily-pick-card__desc">暂无可推荐的食谱，去添加一些吧~</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const seasonLabel = SEASON_LABELS[recipe.season as string] || '🌟 今日推荐 · 美味时刻'
 
