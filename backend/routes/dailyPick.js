@@ -145,6 +145,7 @@ router.get('/daily-pick/personalized', auth, async (req, res) => {
       where: { userId },
       include: [{
         model: Recipe,
+        as: 'recipe',
         attributes: ['id', 'category', 'categoryTags', 'season', 'favoriteCount', 'viewCount']
       }],
       limit: 50,
@@ -161,8 +162,8 @@ router.get('/daily-pick/personalized', auth, async (req, res) => {
     }
 
     for (const fav of favorites) {
-      if (!fav.Recipe) continue
-      const tags = safeParse(fav.Recipe.categoryTags)
+      if (!fav.recipe) continue
+      const tags = safeParse(fav.recipe.categoryTags)
       if (!tags) continue
 
       for (const dim of ['ingredient', 'cuisine', 'flavor', 'method', 'price']) {
