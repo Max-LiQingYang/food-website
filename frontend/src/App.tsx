@@ -1,7 +1,18 @@
 import Router from './router'
+import { useStaggerReveal } from './hooks/useStaggerReveal'
+import { useParallax } from './hooks/useParallax'
+import { useEffect } from 'react'
 import './global.css'
 
 export default function App() {
+  useStaggerReveal()
+  useParallax()
+
+  useEffect(() => {
+    document.body.classList.add('has-bottom-nav')
+    return () => document.body.classList.remove('has-bottom-nav')
+  }, [])
+
   return <Router />
 }
 

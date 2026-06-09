@@ -29,10 +29,10 @@ function getSeasonConfig(): { season: string; tagline: string; gradient: string;
   if (month >= 5 && month <= 7) {
     return {
       season: 'summer',
-      tagline: '☀️ 炎炎夏日 — 橙粉暖阳，清爽消暑，缤纷一夏',
-      gradient: 'linear-gradient(135deg, #FF6B35 0%, #FF8E53 20%, #FF6B9D 50%, #C084FC 80%, #7C3AED 100%)',
+      tagline: '☀️ 炎炎夏日 — 清爽蓝绿，消暑一夏，食光无限',
+      gradient: 'linear-gradient(135deg, #00B4D8 0%, #0077B6 50%, #52B788 100%)',
       emoji: '☀️',
-      overlayColor: 'rgba(255, 107, 53, 0.15)',
+      overlayColor: 'rgba(0, 119, 182, 0.15)',
     }
   }
   if (month >= 8 && month <= 10) {

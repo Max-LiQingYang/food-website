@@ -1,0 +1,140 @@
+/* ===== 移动端底部导航 ===== */
+.bottom-nav {
+  display: none; /* 默认桌面隐藏 */
+}
+
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--color-card);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    align-items: stretch;
+    justify-content: space-around;
+    /* 防止 iOS Safari 底部工具栏遮挡 */
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    background-color: color-mix(in srgb, var(--color-card) 92%, transparent);
+  }
+
+  .bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 4px;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1;
+    transition: color var(--duration-fast) var(--ease-out-soft);
+    position: relative;
+    /* 移动端禁用复杂 hover 反馈 */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bottom-nav__item:active {
+    transform: scale(0.94);
+  }
+
+  .bottom-nav__icon {
+    font-size: 22px;
+    line-height: 1;
+    transition: transform var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .bottom-nav__label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  /* 激活态 */
+  .bottom-nav__item--active {
+    color: var(--color-summer-mid);
+  }
+
+  .bottom-nav__item--active .bottom-nav__icon {
+    transform: translateY(-2px);
+  }
+
+  /* 激活态顶部小圆点指示 */
+  .bottom-nav__item--active::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-summer-mid);
+  }
+
+  /* 创建 Tab — FAB 风格 */
+  .bottom-nav__item--fab {
+    position: relative;
+  }
+
+  .bottom-nav__item--fab .bottom-nav__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-summer-mid), var(--color-summer-deep));
+    color: #fff;
+    font-size: 26px;
+    box-shadow: 0 4px 12px rgba(0, 119, 182, 0.4);
+    margin-top: -16px;
+    transition: transform var(--duration-fast) var(--ease-out-soft),
+                box-shadow var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .bottom-nav__item--fab:active .bottom-nav__icon {
+    transform: scale(0.92);
+    box-shadow: 0 2px 6px rgba(0, 119, 182, 0.5);
+  }
+
+  .bottom-nav__item--fab .bottom-nav__label {
+    margin-top: 2px;
+  }
+
+  /* 键盘焦点样式 */
+  .bottom-nav__item:focus-visible {
+    outline: 2px solid var(--color-summer-mid);
+    outline-offset: -2px;
+    border-radius: 8px;
+  }
+
+  /* 暗色模式 */
+  body.dark .bottom-nav {
+    background-color: color-mix(in srgb, var(--color-card) 88%, transparent);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark .bottom-nav__item--active {
+    color: var(--color-summer-mid);
+  }
+
+  body.dark .bottom-nav__item--fab .bottom-nav__icon {
+    box-shadow: 0 4px 12px rgba(72, 202, 228, 0.35);
+  }
+}
+
+/* 桌面端完全隐藏 */
+@media (min-width: 769px) {
+  .bottom-nav {
+    display: none !important;
+  }
+}

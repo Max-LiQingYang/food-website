@@ -287,3 +287,250 @@ body.dark .hero-skeleton__title,
 body.dark .hero-skeleton__tag {
   background: var(--color-border, #3a3530);
 }
+
+/* ===== 夏季 Hero 增强 ===== */
+
+/* 季节性角标 */
+.hero-seasonal__badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* 装饰气泡 — 夏日氛围 */
+.hero-section .hero-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-section .hero-bubble--1 {
+  width: 80px; height: 80px;
+  top: 20px; right: 30px;
+  animation: summerFloat 6s ease-in-out infinite;
+}
+
+.hero-section .hero-bubble--2 {
+  width: 50px; height: 50px;
+  top: 80px; right: 100px;
+  animation: summerFloat 8s ease-in-out infinite 1s;
+}
+
+.hero-section .hero-bubble--3 {
+  width: 30px; height: 30px;
+  top: 200px; right: 60px;
+  background: rgba(82, 183, 136, 0.4);
+  animation: summerFloat 5s ease-in-out infinite 0.5s;
+}
+
+@keyframes summerFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-section .hero-bubble {
+    animation: none !important;
+  }
+}
+
+/* 夏季 Hero 暗色模式 */
+body.dark .hero-section {
+  box-shadow: 0 4px 20px rgba(2, 62, 138, 0.4);
+}
+
+body.dark .hero-bubble {
+  background: rgba(255, 255, 255, 0.08);
+}
+/* ===== 夏季装饰气泡 ===== */
+.hero-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-bubble--1 {
+  width: 80px; height: 80px;
+  top: 20px; right: 30px;
+  animation: summerFloat 6s ease-in-out infinite;
+}
+
+.hero-bubble--2 {
+  width: 50px; height: 50px;
+  top: 80px; right: 100px;
+  animation: summerFloat 8s ease-in-out infinite 1s;
+}
+
+.hero-bubble--3 {
+  width: 30px; height: 30px;
+  top: 200px; right: 60px;
+  background: rgba(82, 183, 136, 0.4);
+  animation: summerFloat 5s ease-in-out infinite 0.5s;
+}
+
+/* ===== 夏季季节角标 ===== */
+.hero-season-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* ===== 暗色模式夏季 Hero 增强 ===== */
+body.dark .hero-section {
+  box-shadow: 0 4px 20px rgba(2, 62, 138, 0.4);
+}
+
+body.dark .hero-bubble {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark .hero-bubble--3 {
+  background: rgba(116, 198, 157, 0.25);
+}
+
+body.dark .hero-season-badge {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bubble {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-bubble--1 {
+    width: 50px; height: 50px;
+    top: 50px; right: 20px;
+  }
+  .hero-bubble--2 {
+    width: 30px; height: 30px;
+    top: 90px; right: 70px;
+  }
+  .hero-bubble--3 {
+    display: none;
+  }
+  .hero-season-badge {
+    top: 12px;
+    left: 12px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
+/* ── 夏季装饰气泡 ── */
+.hero-section .hero-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-section .hero-bubble--1 {
+  width: 80px;
+  height: 80px;
+  top: 20px;
+  right: 30px;
+  animation: summerFloat 6s ease-in-out infinite;
+}
+
+.hero-section .hero-bubble--2 {
+  width: 50px;
+  height: 50px;
+  top: 80px;
+  right: 100px;
+  animation: summerFloat 8s ease-in-out infinite 1s;
+}
+
+.hero-section .hero-bubble--3 {
+  width: 30px;
+  height: 30px;
+  top: 200px;
+  right: 60px;
+  background: rgba(82, 183, 136, 0.4);
+  animation: summerFloat 5s ease-in-out infinite 0.5s;
+}
+
+@keyframes summerFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(8deg); }
+}
+
+/* ── 夏季季节角标 ── */
+.hero-season-badge {
+  position: absolute;
+  top: 52px;
+  left: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* ── 暗色模式夏季配色增强 ── */
+body.dark .hero-seasonal {
+  color: var(--color-summer-light);
+  background: rgba(2, 62, 138, 0.7);
+  border-bottom-color: rgba(0, 180, 216, 0.15);
+}
+
+body.dark .hero-section .hero-bubble {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark .hero-section .hero-bubble--3 {
+  background: rgba(116, 198, 157, 0.25);
+}
+
+body.dark .hero-season-badge {
+  background: rgba(0, 180, 216, 0.2);
+  border-color: rgba(0, 180, 216, 0.3);
+  color: var(--color-summer-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-section .hero-bubble {
+    animation: none !important;
+  }
+}

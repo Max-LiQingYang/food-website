@@ -2802,3 +2802,36 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 ### 修改文件（2 个）
 - `frontend/src/hooks/useDeferredMount.ts` — options 默认值改为 stable 引用
 - `frontend/src/components/DailyPickCard.tsx` — 空数据返回 fallback 提示替代 null
+
+## Iter#C1 — 内容质量提升（方向 C）
+
+| 指标 | 状态 |
+|------|------|
+| 修复前平均分 | 85.8 |
+| 修复后平均分 | **92.4** |
+| ⭐⭐⭐⭐⭐ (90-100分) | 24 → **80** 道 |
+| ⭐⭐⭐⭐ (75-89分) | 69 → **14** 道 |
+| ⭐⭐⭐ (60-74分) | 1 → **0** 道 |
+| 首页 200 | ✅ |
+| 搜索页 200 | ✅ |
+| Git commit | fe11482 |
+
+### 交付物
+- `iter-content-quality/PRD-content-quality.md` — 内容质量标准 v1.0（13.7 KB）
+- `iter-content-quality/quality-check-plan.md` — 脚本执行计划
+- `backend/scripts/content-quality-check.js` — 8 维度质量诊断（只读）
+- `backend/scripts/data-consistency-check.js` — 数据一致性检查（只读）
+- `backend/scripts/content-quality-fix.js` — AI 自动修复（写入 DB）
+- `backend/scripts/optimize-content.js` — 热门食谱内容丰富化（写入 DB）
+
+### 执行情况
+- 修复前：平均分 85.8，24 道⭐⭐⭐⭐⭐，69 道⭐⭐⭐⭐，1 道⭐⭐⭐
+- 修复后：平均分 92.4，80 道⭐⭐⭐⭐⭐，14 道⭐⭐⭐⭐，0 道⭐⭐⭐
+- AI 修复：description 扩写 94 道，tips 补全 20+ 道，nutrition 验证通过
+- 手动修复：韩式拌饭 season="NULL" → "all"
+- 服务器 .env 补充 AI_API_KEY 配置
+
+### 已知剩余问题
+- 14 道食谱因食材无分组结构（ingredients 无 category/group 字段）扣 5 分
+- 部分食谱步骤描述偏短（均 < 15 字）需后续手动优化
+- 数据一致性 126 条 🟡 警告（cuisine 分类不一致等）未修复

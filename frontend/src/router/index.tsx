@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-rou
 import { lazy, Suspense, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import MobileBottomNav from '../components/MobileBottomNav'
+import BottomNav from '../components/BottomNav'
 import BackToTop from '../components/BackToTop'
 import Breadcrumb from '../components/Breadcrumb'
 import ErrorBoundary from '../components/ErrorBoundary'
@@ -81,7 +81,7 @@ function Layout() {
           </Suspense>
         </main>
         <Footer />
-        <MobileBottomNav />
+        <BottomNav />
         <BackToTop />
         <PWAInstallPrompt />
       <WelcomeTour />

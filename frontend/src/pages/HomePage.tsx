@@ -246,7 +246,7 @@ export default function HomePage() {
         )}
 
         {!loading && recipes.length > 0 && (
-          <div className="home-grid">
+          <div className="home-grid list-stagger">
             {recipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
           </div>
         )}

@@ -40,6 +40,24 @@ body {
   --color-error-dark: #c62828;
   --color-warning-dark: #f9a825;
   --color-warning-text: #1a1a1a;
+
+  /* === 夏季主题 === */
+  --color-summer-light: #CAF0F8;
+  --color-summer-mid: #00B4D8;
+  --color-summer-deep: #0077B6;
+  --color-summer-accent: #52B788;
+  --color-summer-soft: #e6f7fb;
+
+  /* === 动画 Token === */
+  --ease-out-soft: cubic-bezier(0.21, 1.02, 0.73, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.2s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.5s;
+
+  /* === Hero 渐变 === */
+  --hero-gradient: linear-gradient(135deg, #00B4D8 0%, #0077B6 50%, #52B788 100%);
+  --hero-gradient-soft: linear-gradient(180deg, rgba(202, 240, 248, 0) 0%, rgba(0, 119, 182, 0.08) 100%);
   --font-size-title: 24px;
   --font-size-body: 16px;
   --font-size-small: 14px;
@@ -72,6 +90,14 @@ body.dark {
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* === 夏季主题暗色 === */
+  --color-summer-light: rgba(0, 180, 216, 0.18);
+  --color-summer-mid: #48cae4;
+  --color-summer-deep: #023e8a;
+  --color-summer-accent: #74c69d;
+  --color-summer-soft: #1a2a3a;
+  --hero-gradient: linear-gradient(135deg, #023e8a 0%, #03045e 60%, #0077B6 100%);
 }
 
 body {
@@ -1020,4 +1046,616 @@ body.dark .back-to-top {
   width: 16px;
   height: 16px;
   animation: btn-spin 0.7s linear infinite;
+}
+
+/* ===================================================================
+   iter112: 全站交互体验打磨
+   =================================================================== */
+
+/* ===== 全局按钮微交互 ===== */
+button:not(:disabled),
+a.btn,
+.btn,
+[class*="button"]:not(:disabled) {
+  transition: transform var(--duration-fast) var(--ease-out-soft),
+              box-shadow var(--duration-fast) var(--ease-out-soft),
+              background-color var(--duration-fast) var(--ease-out-soft),
+              color var(--duration-fast) var(--ease-out-soft);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  button:not(:disabled):hover,
+  a.btn:hover,
+  .btn:hover,
+  [class*="button"]:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+button:not(:disabled):active,
+a.btn:active,
+.btn:active,
+[class*="button"]:not(:disabled):active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
+  transition-duration: 0.1s;
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled),
+  a.btn,
+  .btn,
+  [class*="button"]:not(:disabled) {
+    transition: none !important;
+  }
+  button:not(:disabled):hover,
+  button:not(:disabled):active {
+    transform: none !important;
+  }
+}
+
+/* ===== 卡片 Hover 增强 ===== */
+.recipe-card,
+.season-card,
+.ranking-card,
+[class*="-card"] {
+  transition: transform var(--duration-normal) var(--ease-out-soft),
+              box-shadow var(--duration-normal) var(--ease-out-soft);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .recipe-card:hover,
+  .season-card:hover,
+  .ranking-card:hover,
+  [class*="-card"]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* 暗色模式 hover 阴影更深 */
+body.dark .recipe-card:hover,
+body.dark .season-card:hover,
+body.dark .ranking-card:hover,
+body.dark [class*="-card"]:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card:hover,
+  .season-card:hover,
+  .ranking-card:hover,
+  [class*="-card"]:hover {
+    transform: none !important;
+  }
+}
+
+/* ===== 列表项 Stagger 入场动画 ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 容器进入视口时，子项依次入场 */
+.list-stagger > * {
+  opacity: 0;
+  animation: fadeInUp 0.4s var(--ease-out-soft) forwards;
+}
+
+/* 间隔 50ms，最多覆盖 10 项 */
+.list-stagger > *:nth-child(1)  { animation-delay: 0ms;   }
+.list-stagger > *:nth-child(2)  { animation-delay: 50ms;  }
+.list-stagger > *:nth-child(3)  { animation-delay: 100ms; }
+.list-stagger > *:nth-child(4)  { animation-delay: 150ms; }
+.list-stagger > *:nth-child(5)  { animation-delay: 200ms; }
+.list-stagger > *:nth-child(6)  { animation-delay: 250ms; }
+.list-stagger > *:nth-child(7)  { animation-delay: 300ms; }
+.list-stagger > *:nth-child(8)  { animation-delay: 350ms; }
+.list-stagger > *:nth-child(9)  { animation-delay: 400ms; }
+.list-stagger > *:nth-child(10) { animation-delay: 450ms; }
+/* 超过 10 项的剩余子项统一 500ms 延迟 */
+.list-stagger > *:nth-child(n+11) { animation-delay: 500ms; }
+
+/* 视口外时暂停（IntersectionObserver 移除 .is-visible 时） */
+.list-stagger:not(.is-visible) > * {
+  animation-play-state: paused;
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .list-stagger > *,
+  .list-stagger.is-visible > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ===== Hero 视差 ===== */
+.hero-parallax {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-parallax__bg {
+  position: absolute;
+  inset: -10% 0 -10% 0; /* 留出 10% 缓冲区 */
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+
+  /* 方式 1：CSS view-timeline（Chrome 115+ / Edge 115+） */
+  animation: heroParallax linear both;
+  animation-timeline: view();
+  animation-range: cover 0% cover 100%;
+}
+
+@keyframes heroParallax {
+  from { transform: translateY(-5%); }
+  to   { transform: translateY(5%); }
+}
+
+.hero-parallax__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* 移动端降级：禁用视差 */
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  .hero-parallax__bg {
+    animation: none !important;
+    transform: none !important;
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/* 不支持 view-timeline 时的 JS 降级 */
+.hero-parallax-js .hero-parallax__bg {
+  animation: none;
+  transform: translate3d(0, var(--parallax-y, 0px), 0);
+  transition: transform 0.05s linear;
+}
+
+/* 暗色模式视差遮罩 */
+body.dark .hero-parallax::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.dark .hero-parallax__content {
+  z-index: 2;
+}
+
+/* ===== 页面内容 padding 适配（BottomNav） ===== */
+@media (max-width: 768px) {
+  body.has-bottom-nav main,
+  body.has-bottom-nav .page-container,
+  body.has-bottom-nav #root > div {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 16px);
+  }
+}
+
+/* ===== 全局按钮微交互 ===== */
+button:not(:disabled),
+a.btn,
+.btn,
+[class*="button"]:not(:disabled) {
+  transition: transform var(--duration-fast) var(--ease-out-soft),
+              box-shadow var(--duration-fast) var(--ease-out-soft),
+              background-color var(--duration-fast) var(--ease-out-soft),
+              color var(--duration-fast) var(--ease-out-soft);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  button:not(:disabled):hover,
+  a.btn:hover,
+  .btn:hover,
+  [class*="button"]:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+button:not(:disabled):active,
+a.btn:active,
+.btn:active,
+[class*="button"]:not(:disabled):active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
+  transition-duration: 0.1s;
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled),
+  a.btn,
+  .btn,
+  [class*="button"]:not(:disabled) {
+    transition: none !important;
+  }
+  button:not(:disabled):hover,
+  button:not(:disabled):active {
+    transform: none !important;
+  }
+}
+
+/* ===== 卡片 Hover 增强 ===== */
+.recipe-card,
+.season-card,
+.ranking-card,
+[class*="-card"] {
+  transition: transform var(--duration-normal) var(--ease-out-soft),
+              box-shadow var(--duration-normal) var(--ease-out-soft);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .recipe-card:hover,
+  .season-card:hover,
+  .ranking-card:hover,
+  [class*="-card"]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* 暗色模式 hover 阴影更深 */
+body.dark .recipe-card:hover,
+body.dark .season-card:hover,
+body.dark .ranking-card:hover,
+body.dark [class*="-card"]:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card:hover,
+  .season-card:hover,
+  .ranking-card:hover,
+  [class*="-card"]:hover {
+    transform: none !important;
+  }
+}
+
+/* ===== 列表项 Stagger 入场动画 ===== */
+@keyframes fadeInUpStagger {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 容器进入视口时，子项依次入场 */
+.list-stagger > * {
+  opacity: 0;
+  animation: fadeInUpStagger 0.4s var(--ease-out-soft) forwards;
+}
+
+/* 间隔 50ms，最多覆盖 10 项 */
+.list-stagger > *:nth-child(1)  { animation-delay: 0ms;   }
+.list-stagger > *:nth-child(2)  { animation-delay: 50ms;  }
+.list-stagger > *:nth-child(3)  { animation-delay: 100ms; }
+.list-stagger > *:nth-child(4)  { animation-delay: 150ms; }
+.list-stagger > *:nth-child(5)  { animation-delay: 200ms; }
+.list-stagger > *:nth-child(6)  { animation-delay: 250ms; }
+.list-stagger > *:nth-child(7)  { animation-delay: 300ms; }
+.list-stagger > *:nth-child(8)  { animation-delay: 350ms; }
+.list-stagger > *:nth-child(9)  { animation-delay: 400ms; }
+.list-stagger > *:nth-child(10) { animation-delay: 450ms; }
+/* 超过 10 项的剩余子项统一 500ms 延迟 */
+.list-stagger > *:nth-child(n+11) { animation-delay: 500ms; }
+
+/* 视口外时暂停（IntersectionObserver 移除 .is-visible 时） */
+.list-stagger:not(.is-visible) > * {
+  animation-play-state: paused;
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .list-stagger > *,
+  .list-stagger.is-visible > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ===== Hero 视差 ===== */
+.hero-parallax {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-parallax__bg {
+  position: absolute;
+  inset: -10% 0 -10% 0; /* 留出 10% 缓冲区 */
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+
+  /* 方式 1：CSS view-timeline（Chrome 115+ / Edge 115+） */
+  animation: heroParallax linear both;
+  animation-timeline: view();
+  animation-range: cover 0% cover 100%;
+}
+
+@keyframes heroParallax {
+  from { transform: translateY(-5%); }
+  to   { transform: translateY(5%); }
+}
+
+.hero-parallax__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* 移动端降级：禁用视差 */
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  .hero-parallax__bg {
+    animation: none !important;
+    transform: none !important;
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/* 不支持 view-timeline 时的 JS 降级 */
+.hero-parallax-js .hero-parallax__bg {
+  animation: none;
+  transform: translate3d(0, var(--parallax-y, 0px), 0);
+  transition: transform 0.05s linear;
+}
+
+/* 暗色模式视差遮罩 */
+body.dark .hero-parallax::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.dark .hero-parallax__content {
+  z-index: 2; /* 高于遮罩 */
+}
+
+/* ===== 移动端 BottomNav padding 适配 ===== */
+@media (max-width: 768px) {
+  body.has-bottom-nav main,
+  body.has-bottom-nav .page-container,
+  body.has-bottom-nav #root > div {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 16px);
+  }
+}
+
+/* ===== 全局按钮微交互 ===== */
+button:not(:disabled),
+a.btn,
+.btn,
+[class*="button"]:not(:disabled) {
+  transition: transform var(--duration-fast) var(--ease-out-soft),
+              box-shadow var(--duration-fast) var(--ease-out-soft),
+              background-color var(--duration-fast) var(--ease-out-soft),
+              color var(--duration-fast) var(--ease-out-soft);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  button:not(:disabled):hover,
+  a.btn:hover,
+  .btn:hover,
+  [class*="button"]:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+button:not(:disabled):active,
+a.btn:active,
+.btn:active,
+[class*="button"]:not(:disabled):active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
+  transition-duration: 0.1s;
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled),
+  a.btn,
+  .btn,
+  [class*="button"]:not(:disabled) {
+    transition: none !important;
+  }
+  button:not(:disabled):hover,
+  button:not(:disabled):active {
+    transform: none !important;
+  }
+}
+
+/* ===== 列表项 Stagger 入场动画 ===== */
+@keyframes fadeInUp-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.list-stagger > * {
+  opacity: 0;
+  animation: fadeInUp-stagger 0.4s var(--ease-out-soft) forwards;
+}
+
+.list-stagger > *:nth-child(1)  { animation-delay: 0ms;   }
+.list-stagger > *:nth-child(2)  { animation-delay: 50ms;  }
+.list-stagger > *:nth-child(3)  { animation-delay: 100ms; }
+.list-stagger > *:nth-child(4)  { animation-delay: 150ms; }
+.list-stagger > *:nth-child(5)  { animation-delay: 200ms; }
+.list-stagger > *:nth-child(6)  { animation-delay: 250ms; }
+.list-stagger > *:nth-child(7)  { animation-delay: 300ms; }
+.list-stagger > *:nth-child(8)  { animation-delay: 350ms; }
+.list-stagger > *:nth-child(9)  { animation-delay: 400ms; }
+.list-stagger > *:nth-child(10) { animation-delay: 450ms; }
+.list-stagger > *:nth-child(n+11) { animation-delay: 500ms; }
+
+.list-stagger:not(.is-visible) > * {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-stagger > *,
+  .list-stagger.is-visible > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ===== 卡片 Hover 增强 ===== */
+.recipe-card,
+.season-card,
+.ranking-card,
+[class*="-card"] {
+  transition: transform var(--duration-normal) var(--ease-out-soft),
+              box-shadow var(--duration-normal) var(--ease-out-soft);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .recipe-card:hover,
+  .season-card:hover,
+  .ranking-card:hover,
+  [class*="-card"]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* 暗色模式 hover 阴影更深 */
+body.dark .recipe-card:hover,
+body.dark .season-card:hover,
+body.dark .ranking-card:hover,
+body.dark [class*="-card"]:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card:hover,
+  .season-card:hover,
+  .ranking-card:hover,
+  [class*="-card"]:hover {
+    transform: none !important;
+  }
+}
+
+/* ===== Hero 视差 ===== */
+.hero-parallax {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-parallax__bg {
+  position: absolute;
+  inset: -10% 0 -10% 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+
+  /* CSS view-timeline（Chrome 115+ / Edge 115+） */
+  animation: heroParallax linear both;
+  animation-timeline: view();
+  animation-range: cover 0% cover 100%;
+}
+
+@keyframes heroParallax {
+  from { transform: translateY(-5%); }
+  to   { transform: translateY(5%); }
+}
+
+.hero-parallax__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* 移动端降级：禁用视差 */
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  .hero-parallax__bg {
+    animation: none !important;
+    transform: none !important;
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/* 不支持 view-timeline 时的 JS 降级 */
+.hero-parallax-js .hero-parallax__bg {
+  animation: none;
+  transform: translate3d(0, var(--parallax-y, 0px), 0);
+  transition: transform 0.05s linear;
+}
+
+/* 暗色模式 Hero 视差遮罩 */
+body.dark .hero-parallax::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.dark .hero-parallax__content {
+  z-index: 2;
+}
+
+/* ===== 页面内容 padding 适配（BottomNav） ===== */
+@media (max-width: 768px) {
+  body.has-bottom-nav main,
+  body.has-bottom-nav .page-container,
+  body.has-bottom-nav #root > div {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 16px);
+  }
+}
+
+/* ===== 夏季装饰动画 ===== */
+@keyframes summerFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__bubble,
+  [class*="bubble"] {
+    animation: none !important;
+  }
 }
