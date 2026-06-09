@@ -29,6 +29,7 @@ import { trackBehavior, trackBehaviorAnonymous } from '../api'
 import type { RecipeDetail } from '../api'
 import type { NutritionData } from '../components/NutritionCard'
 import { useRecipeStructuredData, useMetaTags, usePageTitle } from '../hooks/useSEO'
+import CookingTimeBar from '../components/CookingTimeBar'
 import './RecipeDetailPage.css'
 import '../components/PrintView.css'
 import PageSkeleton from '../components/PageSkeleton'
@@ -704,7 +705,7 @@ export default function RecipeDetailPage() {
               </div>
             )}
             {recipe.cookTime != null && (
-              <span className="detail-tag">⏱ {recipe.cookTime} 分钟</span>
+              <CookingTimeBar cookTime={recipe.cookTime} difficulty={recipe.difficulty} maxTime={180} />
             )}
             {/* 质量标签 */}
             {recipe.qualityLabel && (

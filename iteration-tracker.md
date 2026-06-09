@@ -2835,3 +2835,42 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - 14 道食谱因食材无分组结构（ingredients 无 category/group 字段）扣 5 分
 - 部分食谱步骤描述偏短（均 < 15 字）需后续手动优化
 - 数据一致性 126 条 🟡 警告（cuisine 分类不一致等）未修复
+
+## Iter#112 — UI/UX 交互体验打磨（方向 A）
+
+| 指标 | 状态 |
+|------|------|
+| 首页 200 | ✅ |
+| 搜索页 200 | ✅ |
+| 创建页 200 | ✅ |
+| 个人页 200 | ✅ |
+| npm run build | 0 warnings ✅ |
+| Git commit | a5bdcf5 |
+
+### 交付物
+- `iter112-ui-ux/UI-interaction-enhance.md` — 设计规范（1442 行）
+
+### 新增文件（4 个）
+- `frontend/src/components/BottomNav.tsx` — 移动端底部导航（4 Tab：首页/搜索/创建/我的）
+- `frontend/src/components/BottomNav.css` — 底部导航样式（FAB 创建按钮、safe-area、暗色模式）
+- `frontend/src/hooks/useStaggerReveal.ts` — IntersectionObserver 触发列表项 stagger 入场动画
+- `frontend/src/hooks/useParallax.ts` — Hero 视差降级（CSS view-timeline 优先，JS 降级）
+
+### 修改文件（5 个）
+- `frontend/src/global.css` — 夏季配色 CSS 变量、动画 token、按钮微交互、卡片 hover、stagger 关键帧、视差 CSS、BottomNav CSS（+638 行）
+- `frontend/src/App.tsx` — 引入 useStaggerReveal/useParallax，添加 BottomNav 组件
+- `frontend/src/components/HeroSection.css` — 夏季蓝绿渐变配色（+249 行）
+- `frontend/src/components/HeroSection.tsx` — 装饰气泡、季节性角标
+- `frontend/src/pages/HomePage.tsx` — 时令食材列表加 .list-stagger 类
+
+### 实现内容
+1. **移动端底部导航**（≤768px）：4 Tab 等宽，FAB 创建按钮（48×48 圆形蓝色渐变），iOS safe-area 适配，桌面端隐藏
+2. **按钮微交互**：hover translateY(-1px)+阴影，active scale(0.97)，@media (hover:hover) 排除触屏
+3. **卡片 hover 增强**：translateY(-4px) + box-shadow: 0 8px 24px，暗色模式阴影更深
+4. **Stagger 入场动画**：CSS @keyframes fadeInUp + animation-delay 50ms 递增，IntersectionObserver 触发
+5. **Hero 视差**：CSS view-timeline 优先，JS scroll 降级，移动端禁用
+6. **夏季视觉刷新**：Hero 暖橙→蓝绿渐变，装饰气泡 float 动画，时令食材卡片优化
+
+### 部署验证
+- 首页 200 ✅ 搜索页 200 ✅ 创建页 200 ✅ 个人页 200 ✅
+- 服务器构建 3.61s，旧 chunk 已清理

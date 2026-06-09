@@ -2178,6 +2178,16 @@ const recipes = [
   }
 ]
 
+// ── 数据完整性自检 ──
+;(function validateSeed() {
+  const missing = recipes.filter(r => r.cookTime == null || r.cookTime === 0)
+  if (missing.length > 0) {
+    console.error(`❌ ${missing.length} recipes missing cookTime:`, missing.map(r => r.title))
+    process.exit(1)
+  }
+  console.log(`✅ All ${recipes.length} recipes have valid cookTime`)
+})()
+
 
 
 // ── 视频数据映射 ──────────────────────────────────────────────

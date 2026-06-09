@@ -1,0 +1,63 @@
+.cooking-time-bar {
+  margin: 12px 0;
+  padding: 16px;
+  background: var(--color-bg-secondary, #faf7f2);
+  border-radius: var(--radius-md, 12px);
+}
+
+.cooking-time-bar__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.cooking-time-bar__icon { font-size: 18px; }
+.cooking-time-bar__title { font-size: 14px; font-weight: 600; color: var(--color-text); }
+
+.cooking-time-bar__track {
+  height: 8px;
+  background: #f0ebe5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cooking-time-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.cooking-time-bar__fill--quick { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.cooking-time-bar__fill--normal { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.cooking-time-bar__fill--slow { background: linear-gradient(90deg, #e8663e, #f5a885); }
+
+.cooking-time-bar__info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.cooking-time-bar__value { font-weight: 600; color: var(--color-text); }
+.cooking-time-bar__difficulty { font-size: 13px; color: var(--color-text-secondary); }
+
+.cooking-time-bar__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* 暗色模式 */
+body.dark .cooking-time-bar {
+  background: var(--color-bg-secondary-dark, #2a2a2a);
+}
+body.dark .cooking-time-bar__track {
+  background: #444;
+}
+body.dark .cooking-time-bar__fill--quick { background: linear-gradient(90deg, #166534, #22c55e); }
+body.dark .cooking-time-bar__fill--normal { background: linear-gradient(90deg, #92400e, #f59e0b); }
+body.dark .cooking-time-bar__fill--slow { background: linear-gradient(90deg, #9a3412, #e8663e); }

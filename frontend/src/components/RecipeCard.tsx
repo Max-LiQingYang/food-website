@@ -9,6 +9,7 @@ import ImagePlaceholder from './ImagePlaceholder'
 import AuthorLevelBadge from './AuthorLevelBadge'
 import { useLongPress } from '../hooks/useLongPress'
 import { getCategoryInfo } from '../constants/categories'
+import { getCookTimeInfo } from '../utils/cookTimeLabel'
 import './RecipeCard.css'
 
 interface RecipeCardProps {
@@ -307,9 +308,14 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
           )}
 
           {/* 烹饪时间 */}
-          {recipe.cookTime != null && (
-            <span className="recipe-card__tag recipe-card__tag--time">⏱ {recipe.cookTime}分钟</span>
-          )}
+          {recipe.cookTime != null && (() => {
+            const timeInfo = getCookTimeInfo(recipe.cookTime)
+            return (
+              <span className={`recipe-card__tag recipe-card__tag--time ${timeInfo.cssClass}`}>
+                {timeInfo.icon} {recipe.cookTime}分钟
+              </span>
+            )
+          })()}
 
           {/* 季节标签 */}
           {recipe.season && recipe.season !== 'all' && SEASON_LABELS[recipe.season] && (
