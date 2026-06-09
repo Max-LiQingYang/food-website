@@ -2159,14 +2159,66 @@ export function publishDraft(id: string): Promise<{ recipe: any; draft: Draft }>
   return apiClient.post('/drafts/' + id + '/publish').then(r => r.data?.data || r.data)
 }
 
-// ═══ 迭代#43: 作者统计仪表板 ═══
-export interface DashboardData {
-  basic: { totalRecipes: number; totalViews: number; totalFavorites: number; totalComments: number; totalPoints: number }
+// ═══ 迭代#44: 个性化烹饪仪表板 ═══
+export interface DashboardOverview {
+  totalCooks: number
+  totalFavorites: number
+  totalComments: number
+  totalRecipes: number
+  streak: number
+  weekCookCount: number
+  lastWeekCookCount: number
+  weekChangePct: number
+  weekAvgRating: number
+}
+
+export interface DashboardNutritionRadar {
+  actual: { calories: number; protein: number; fat: number; carbs: number; fiber: number; sodium: number }
+  goal: { calories: number; protein: number; fat: number; carbs: number; fiber: number; sodium: number }
+}
+
+export interface DashboardNutrientGap {
+  nutrient: string
+  nutrientLabel: string
+  currentPct: number
+  recommendedRecipe: { id: string; title: string; coverImage: string; nutrition: Record<string, number> } | null
+}
+
+export interface DashboardSuggestions {
+  untriedCuisines: { name: string; recipeCount: number; link: string }[]
+  nutrientGap: DashboardNutrientGap | null
+  notCookedFavorites: { id: string; title: string; coverImage: string; category: string }[]
+}
+
+export interface DashboardAchievements {
+  recent: { type: string; title: string; icon: string; unlockedAt: string }[]
+  nextMilestone: {
+    type: string; title: string; icon: string; description: string; progress: number; maxProgress: number
+  } | null
+}
+
+export interface DashboardAuthorStats {
+  totalRecipes: number
+  totalViews: number
+  totalFavorites: number
+  totalComments: number
+  totalPoints: number
   viewTrend: { date: string; views: number }[]
   favTrend: { date: string; favorites: number }[]
   ratingDistribution: { 1: number; 2: number; 3: number; 4: number; 5: number }
   wordCloud: { text: string; value: number }[]
   topRecipes: { id: string; title: string; views: number; favorites: number; qualityScore: number; points: number }[]
+}
+
+export interface DashboardData {
+  overview: DashboardOverview
+  cookingTrend: { date: string; count: number }[]
+  nutritionRadar: DashboardNutritionRadar
+  flavorDistribution: { name: string; value: number }[]
+  cuisineDistribution: { name: string; value: number }[]
+  suggestions: DashboardSuggestions
+  achievements: DashboardAchievements
+  authorStats: DashboardAuthorStats
 }
 
 export function getDashboard(): Promise<DashboardData> {

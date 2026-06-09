@@ -25,6 +25,7 @@ export default defineConfig({
           // 第三方库分离
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-utils': ['axios'],
+          'vendor-charts': ['recharts'],
           // 首页内部组件按需懒加载（仅生产构建时）
           'home-hero': [
             './src/components/HeroSection.tsx',
@@ -33,6 +34,15 @@ export default defineConfig({
           'home-cards': [
             './src/components/RecipeCard.tsx',
             './src/components/RecipeCardSkeleton.tsx',
+          ],
+          'dashboard': [
+            './src/components/dashboard/OverviewCards.tsx',
+            './src/components/dashboard/CookingTrendChart.tsx',
+            './src/components/dashboard/NutritionRadarChart.tsx',
+            './src/components/dashboard/DistributionChart.tsx',
+            './src/components/dashboard/Suggestions.tsx',
+            './src/components/dashboard/QuickActions.tsx',
+            './src/components/dashboard/AchievementOverview.tsx',
           ],
         },
       },

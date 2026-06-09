@@ -41,6 +41,26 @@ body {
   --color-warning-dark: #f9a825;
   --color-warning-text: #1a1a1a;
 
+  /* === 仪表板专用 === */
+  --color-streak: #ff6b35;
+  --color-up: #2e7d32;
+  --color-down: #c62828;
+  --color-flat: #9e9e9e;
+  --color-chart-grid: #f0e8e0;
+  --color-chart-axis: #999999;
+  --color-chart-tooltip-bg: rgba(45, 45, 45, 0.95);
+  --color-chart-tooltip-text: #ffffff;
+
+  /* === 图表 8 色调色板 === */
+  --chart-c1: #e8663e;
+  --chart-c2: #52c41a;
+  --chart-c3: #1890ff;
+  --chart-c4: #faad14;
+  --chart-c5: #722ed1;
+  --chart-c6: #13c2c2;
+  --chart-c7: #eb2f96;
+  --chart-c8: #8c8c8c;
+
   /* === 夏季主题 === */
   --color-summer-light: #CAF0F8;
   --color-summer-mid: #00B4D8;
@@ -54,6 +74,45 @@ body {
   --duration-fast: 0.2s;
   --duration-normal: 0.3s;
   --duration-slow: 0.5s;
+
+  /* === 仪表板专用 === */
+  --color-streak: #ff6b35;
+  --color-up: #2e7d32;
+  --color-down: #c62828;
+  --color-flat: #9e9e9e;
+  --color-chart-grid: #f0e8e0;
+  --color-chart-axis: #999999;
+  --color-chart-tooltip-bg: rgba(45, 45, 45, 0.95);
+  --color-chart-tooltip-text: #ffffff;
+  --chart-c1: #e8663e;
+  --chart-c2: #52c41a;
+  --chart-c3: #1890ff;
+  --chart-c4: #faad14;
+  --chart-c5: #722ed1;
+  --chart-c6: #13c2c2;
+  --chart-c7: #eb2f96;
+  --chart-c8: #8c8c8c;
+  --radius-xl: 16px;
+
+  /* === 仪表板专用 === */
+  --color-streak: #ff6b35;
+  --color-up: #2e7d32;
+  --color-down: #c62828;
+  --color-flat: #9e9e9e;
+  --color-chart-grid: #f0e8e0;
+  --color-chart-axis: #999999;
+  --color-chart-tooltip-bg: rgba(45, 45, 45, 0.95);
+  --color-chart-tooltip-text: #ffffff;
+
+  /* === 图表 8 色调色板 === */
+  --chart-c1: #e8663e;
+  --chart-c2: #52c41a;
+  --chart-c3: #1890ff;
+  --chart-c4: #faad14;
+  --chart-c5: #722ed1;
+  --chart-c6: #13c2c2;
+  --chart-c7: #eb2f96;
+  --chart-c8: #8c8c8c;
 
   /* === Hero 渐变 === */
   --hero-gradient: linear-gradient(135deg, #00B4D8 0%, #0077B6 50%, #52B788 100%);
@@ -98,6 +157,24 @@ body.dark {
   --color-summer-accent: #74c69d;
   --color-summer-soft: #1a2a3a;
   --hero-gradient: linear-gradient(135deg, #023e8a 0%, #03045e 60%, #0077B6 100%);
+
+  /* === 仪表板专用暗色 === */
+  --chart-c1: #ff8c5a;
+  --chart-c2: #73d13d;
+  --chart-c3: #40a9ff;
+  --chart-c4: #ffc53d;
+  --chart-c5: #b37feb;
+  --chart-c6: #36cfc9;
+  --chart-c7: #f759ab;
+  --chart-c8: #bfbfbf;
+  --color-chart-grid: #2e2e48;
+  --color-chart-axis: #9898b0;
+  --color-chart-tooltip-bg: rgba(232, 232, 240, 0.95);
+  --color-chart-tooltip-text: #1a1a2e;
+  --color-streak: #ff8c5a;
+  --color-up: #73d13d;
+  --color-down: #ff7875;
+  --color-flat: #686880;
 }
 
 body {
