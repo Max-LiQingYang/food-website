@@ -2788,3 +2788,17 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 1. vendor-utils 移除 dayjs（package.json 未安装）
 2. HeroSection §4.4 fade-in 跳过（可选+已有过渡）
 3. fetchPriority 用 spread + as any 绕过 React 18.3 类型
+
+## Hotfix — 首页 deferred-section 空白修复
+
+| 指标 | 状态 |
+|------|------|
+| useDeferredMount options 默认值引用不稳定 → IntersectionObserver 反复重建 | ✅ 已修复 |
+| DailyPickCard 无数据返回 null 导致 240px 空白 → fallback 提示 | ✅ 已修复 |
+| 首页 200 | ✅ |
+| 搜索页 200 | ✅ |
+| Git commit | 7f799f8 |
+
+### 修改文件（2 个）
+- `frontend/src/hooks/useDeferredMount.ts` — options 默认值改为 stable 引用
+- `frontend/src/components/DailyPickCard.tsx` — 空数据返回 fallback 提示替代 null
