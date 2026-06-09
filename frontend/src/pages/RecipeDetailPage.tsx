@@ -989,7 +989,23 @@ export default function RecipeDetailPage() {
           <section className="detail-section detail-section--tips">
             <h2 className="detail-section__title">💡 烹饪小贴士</h2>
             <div className="tips-content">
-              <p>{recipe.tips}</p>
+              {(() => {
+                // 按 • 或换行分割，生成列表
+                const lines = recipe.tips
+                  .split(/[•·]|\n/)
+                  .map(l => l.trim())
+                  .filter(Boolean)
+                if (lines.length > 1) {
+                  return (
+                    <ul className="tips-list">
+                      {lines.map((line, i) => (
+                        <li key={i} className="tips-list__item">{line}</li>
+                      ))}
+                    </ul>
+                  )
+                }
+                return <p>{recipe.tips}</p>
+              })()}
             </div>
           </section>
         )}

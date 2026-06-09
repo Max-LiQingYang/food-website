@@ -357,11 +357,21 @@ body.dark .note-button--has-note::after {
 /* ── 描述 ── */
 .detail-desc {
   font-size: 15px;
-  line-height: 1.75;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
   color: var(--color-text-secondary, #555);
   margin: 0 0 28px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--color-border, #eee);
+}
+
+.detail-desc::first-letter {
+  font-size: 1.8em;
+  font-weight: 700;
+  float: left;
+  padding-right: 6px;
+  line-height: 1;
+  color: var(--color-primary, #e8663e);
 }
 
 /* ── 区块 ── */
@@ -377,23 +387,6 @@ body.dark .note-button--has-note::after {
 
 .detail-section--tips {
   margin-top: 4px;
-}
-
-.tips-content {
-  background: #fef8e8;
-  border-left: 4px solid #f59e0b;
-  border-radius: 0 10px 10px 0;
-  padding: 16px 20px;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: #6b5a2e;
-  margin: 0 28px;
-}
-
-[data-theme='dark'] .tips-content {
-  background: #2a2418;
-  color: #c8b88a;
-  border-left-color: #b8860b;
 }
 
 .detail-section__title {
@@ -1459,27 +1452,257 @@ body.dark .serving-scaler__value {
   transform: rotate(90deg);
 }
 
-/* 故事/文化背景内容样式 */
-.story-content,
-.cultural-content {
-  background: var(--color-bg-secondary, #f9f9f9);
-  border-radius: 8px;
-  padding: 16px 20px;
+/* ═══════════════════════════════════════════════════════════════
+   迭代#114: 内容展示优化
+   Story / CulturalBackground / Tips / 描述区
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Story 区块 — 引用样式（左侧竖线 + 大引号 + 纸张质感）── */
+.detail-section--story .story-content {
+  position: relative;
+  background: linear-gradient(135deg, #fef9ee 0%, #fdf3e0 100%);
+  border-radius: 10px;
+  padding: 24px 28px 24px 40px;
   margin-top: 8px;
-  line-height: 1.7;
-  color: var(--color-text, #333);
-  font-size: 14px;
+  font-style: italic;
+  line-height: 1.85;
+  color: #5a4a30;
+  font-size: 14.5px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 3px rgba(160,120,70,0.08);
 }
 
-.story-content p,
-.cultural-content p {
+/* 左侧装饰竖线 */
+.detail-section--story .story-content::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  background: linear-gradient(180deg, #d4a574 0%, #c98a4b 100%);
+  border-radius: 2px;
+}
+
+/* 大号引号装饰 */
+.detail-section--story .story-content::after {
+  content: '\201C';
+  position: absolute;
+  top: -6px;
+  left: 8px;
+  font-size: 56px;
+  line-height: 1;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: normal;
+  color: #c98a4b;
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+}
+
+.detail-section--story .story-content p {
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+body.dark .detail-section--story .story-content {
+  background: linear-gradient(135deg, #2a2418 0%, #3a301c 100%);
+  color: #e6dcc6;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark .detail-section--story .story-content::before {
+  background: linear-gradient(180deg, #b8895a 0%, #d4a574 100%);
+}
+
+body.dark .detail-section--story .story-content::after {
+  color: #d4a574;
+  opacity: 0.5;
+}
+
+/* ── CulturalBackground 区块 — 卡片样式（左侧紫色竖线 + 图标）── */
+.detail-section--cultural .cultural-content {
+  position: relative;
+  background: linear-gradient(135deg, #f3eeff 0%, #e7ddff 100%);
+  border-radius: 10px;
+  padding: 20px 24px 20px 40px;
+  margin-top: 8px;
+  line-height: 1.8;
+  color: #3d2a7a;
+  font-size: 14.5px;
+  box-shadow: 0 1px 3px rgba(60,40,120,0.06);
+}
+
+/* 左侧彩色竖线 */
+.detail-section--cultural .cultural-content::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  background: linear-gradient(180deg, #7c5fcc 0%, #6d4ec0 100%);
+  border-radius: 2px;
+}
+
+/* 文化背景图标装饰 */
+.detail-section--cultural .cultural-content::after {
+  content: '\1F30D';
+  position: absolute;
+  top: -4px;
+  right: 12px;
+  font-size: 28px;
+  opacity: 0.2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.detail-section--cultural .cultural-content p {
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+body.dark .detail-section--cultural .cultural-content {
+  background: linear-gradient(135deg, #1e1a30 0%, #261f44 100%);
+  color: #d4c5f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+body.dark .detail-section--cultural .cultural-content::before {
+  background: linear-gradient(180deg, #9b7fe0 0%, #7d5fd1 100%);
+}
+
+body.dark .detail-section--cultural .cultural-content::after {
+  opacity: 0.3;
+}
+
+/* ── Tips 区块 — 圆角卡片 + 列表展示 ── */
+.detail-section--tips .tips-content {
+  background: #fef8e8;
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #6b5a2e;
+  margin: 0;
+  position: relative;
+}
+
+/* 💡 图标装饰 */
+.detail-section--tips .tips-content::before {
+  content: '\1F4A1';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  font-size: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+}
+
+/* 列表样式 */
+.tips-list {
+  list-style: none;
+  padding: 0;
   margin: 0;
 }
 
-body.dark .story-content,
-body.dark .cultural-content {
-  background: var(--color-card-dark, #2a2a2a);
-  color: var(--color-text-dark, #ccc);
+.tips-list__item {
+  position: relative;
+  padding: 6px 0 6px 20px;
+  line-height: 1.7;
+}
+
+.tips-list__item::before {
+  content: '\2022';
+  position: absolute;
+  left: 4px;
+  color: #f59e0b;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.tips-list__item + .tips-list__item {
+  border-top: 1px dashed rgba(245, 158, 11, 0.2);
+  margin-top: 2px;
+  padding-top: 8px;
+}
+
+body.dark .detail-section--tips .tips-content {
+  background: #2a2418;
+  color: #c8b88a;
+  border-left-color: #b8860b;
+}
+
+body.dark .tips-list__item::before {
+  color: #b8860b;
+}
+
+body.dark .tips-list__item + .tips-list__item {
+  border-top-color: rgba(184, 134, 11, 0.2);
+}
+
+/* ── 响应式适配 ── */
+@media (max-width: 768px) {
+  .detail-section--story .story-content {
+    padding: 18px 20px 18px 34px;
+    font-size: 14px;
+  }
+
+  .detail-section--story .story-content::before {
+    left: 10px;
+  }
+
+  .detail-section--story .story-content::after {
+    font-size: 44px;
+    left: 4px;
+  }
+
+  .detail-section--cultural .cultural-content {
+    padding: 16px 18px 16px 34px;
+    font-size: 14px;
+  }
+
+  .detail-section--cultural .cultural-content::before {
+    left: 10px;
+  }
+
+  .detail-section--cultural .cultural-content::after {
+    font-size: 22px;
+  }
+
+  .detail-section--tips .tips-content {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-section--story .story-content {
+    padding: 16px 16px 16px 30px;
+    font-size: 13.5px;
+  }
+
+  .detail-section--story .story-content::before {
+    left: 8px;
+  }
+
+  .detail-section--story .story-content::after {
+    font-size: 36px;
+  }
+
+  .detail-section--cultural .cultural-content {
+    padding: 14px 14px 14px 30px;
+    font-size: 13.5px;
+  }
+
+  .detail-section--cultural .cultural-content::before {
+    left: 8px;
+  }
+
+  .detail-section--tips .tips-content {
+    padding: 12px 14px;
+  }
 }
 
 /* ── 烹饪模式启动按钮 ── */

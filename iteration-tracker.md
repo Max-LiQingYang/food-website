@@ -2874,3 +2874,35 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 ### 部署验证
 - 首页 200 ✅ 搜索页 200 ✅ 创建页 200 ✅ 个人页 200 ✅
 - 服务器构建 3.61s，旧 chunk 已清理
+
+## Iter#113 — 食谱数据完整性增强（cookTime 补齐 + 展示优化）
+
+| 指标 | 状态 |
+|------|------|
+| 首页 200 | ✅ |
+| 搜索页 200 | ✅ |
+| 详情页 200 | ✅ |
+| npm run build | 0 warnings ✅ |
+| Git commit | 82633e9 |
+
+### 交付物
+- `iter113-data-completeness/PRD-data-completeness.md` — 产品 PRD（548 行）
+
+### 新增文件（3 个）
+- `frontend/src/components/CookingTimeBar.tsx` — 烹饪时间进度条组件（三区间着色 + 难度关联）
+- `frontend/src/components/CookingTimeBar.css` — 进度条样式（含 body.dark 暗色模式）
+- `frontend/src/utils/cookTimeLabel.ts` — 时间分类工具函数（快速⚡/普通⏱/慢炖🍲）
+
+### 修改文件（3 个）
+- `frontend/src/pages/RecipeDetailPage.tsx` — 集成 CookingTimeBar 替换纯文本标签
+- `frontend/src/components/RecipeCard.tsx` — 时间标签按分类着色
+- `frontend/src/components/RecipeCard.css` — 三套配色 + body.dark 暗色模式
+- `backend/seeds/seed.js` — 末尾添加 validateSeed() 自检 IIFE
+
+### 实现内容
+1. **P0 数据完整性**：生产 DB 94 道食谱全部已有 cookTime（0 缺失），seed.js 末尾加自检
+2. **P1 CookingTimeBar**：进度条（maxTime=180 基准）+ 三区间着色（快速绿/普通琥珀/慢炖暖橙）+ 难度关联标签 + 暗色模式适配
+3. **P2 卡片标签分类**：≤15min ⚡绿、16-45min ⏱琥珀、46+min 🍲暖橙，hover brightness 微交互
+
+### 构建验证
+- `npm run build` 872ms, 0 warnings, 0 errors ✅
