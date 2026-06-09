@@ -1511,12 +1511,21 @@ router.get('/:id/similar', async (req, res) => {
       const dimensionScores = {}
       const coveredDims = []
 
-      // Normalize cuisine from string to array (DB stores single values as strings)
-      if (sourceTags && typeof sourceTags.cuisine === 'string') sourceTags.cuisine = [sourceTags.cuisine]
-      if (candidateTags && typeof candidateTags.cuisine === 'string') candidateTags.cuisine = [candidateTags.cuisine]
+      // Normalize all dimension values from string to array (DB stores single values as strings)
+      const DIMENSIONS = ['ingredient', 'method', 'cuisine', 'flavor', 'price']
+      if (sourceTags && typeof sourceTags === 'object') {
+        for (const dim of DIMENSIONS) {
+          if (sourceTags[dim] && typeof sourceTags[dim] === 'string') sourceTags[dim] = [sourceTags[dim]]
+        }
+      }
+      if (candidateTags && typeof candidateTags === 'object') {
+        for (const dim of DIMENSIONS) {
+          if (candidateTags[dim] && typeof candidateTags[dim] === 'string') candidateTags[dim] = [candidateTags[dim]]
+        }
+      }
 
       if (sourceTags && candidateTags && typeof sourceTags === 'object' && typeof candidateTags === 'object') {
-        const dimensions = ['ingredient', 'method', 'cuisine', 'flavor', 'price']
+        const dimensions = DIMENSIONS
         let totalScore = 0
         let validDims = 0
         let coveredCount = 0
