@@ -230,7 +230,7 @@ export function getMe() {
  * 获取食谱列表（分页、分类）
  * GET /api/recipes?page=1&pageSize=20&category=中餐
  */
-export function getRecipes(params: { page?: number; pageSize?: number; category?: string }) {
+export function getRecipes(params: { page?: number; pageSize?: number; category?: string; sortBy?: string; difficulty?: string }) {
   return apiClient.get('/recipes', { params: { page: 1, pageSize: 20, ...params } })
 }
 
