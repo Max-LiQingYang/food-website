@@ -1,0 +1,198 @@
+/* ── PersonalizedDailyPick ── */
+
+.personalized-pick {
+  margin-bottom: 24px;
+}
+
+/* ── Header ── */
+.personalized-pick__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.personalized-pick__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0;
+}
+body.dark .personalized-pick__title {
+  color: var(--color-text-dark, #e0e0e0);
+}
+.personalized-pick__shuffle-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--color-primary, #e8663e);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-primary, #e8663e);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.personalized-pick__shuffle-btn:hover {
+  background: rgba(232, 102, 62, 0.08);
+}
+.personalized-pick__shuffle-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Grid ── */
+.personalized-pick__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ── Card ── */
+.personalized-pick__card {
+  background: var(--color-card-bg, #fff);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.personalized-pick__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+body.dark .personalized-pick__card {
+  background: var(--color-card-bg-dark, #2a2a2a);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+body.dark .personalized-pick__card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Card Image ── */
+.personalized-pick__card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.personalized-pick__card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.personalized-pick__card:hover .personalized-pick__card-img {
+  transform: scale(1.05);
+}
+
+/* ── Reason Badge ── */
+.personalized-pick__card-reason {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #fff;
+  border-radius: 0 0 8px 0;
+  white-space: nowrap;
+  z-index: 1;
+  font-weight: 500;
+}
+
+/* ── Card Body ── */
+.personalized-pick__card-body {
+  padding: 14px;
+}
+.personalized-pick__card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text, #333);
+  margin: 0 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body.dark .personalized-pick__card-title {
+  color: var(--color-text-dark, #e0e0e0);
+}
+.personalized-pick__card-desc {
+  font-size: 13px;
+  color: var(--color-text-secondary, #666);
+  line-height: 1.5;
+  margin: 0 0 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+body.dark .personalized-pick__card-desc {
+  color: var(--color-text-secondary-dark, #aaa);
+}
+.personalized-pick__card-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--color-text-tertiary, #999);
+  margin-bottom: 10px;
+}
+body.dark .personalized-pick__card-meta {
+  color: var(--color-text-tertiary-dark, #888);
+}
+
+/* ── Card Actions ── */
+.personalized-pick__card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.personalized-pick__card-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.personalized-pick__card-btn--primary {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+}
+.personalized-pick__card-btn--primary:hover {
+  background: var(--color-primary-hover, #d55a32);
+}
+
+/* ── Skeleton ── */
+.personalized-pick__skeleton-card {
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--color-card-bg, #fff);
+}
+body.dark .personalized-pick__skeleton-card {
+  background: var(--color-card-bg-dark, #2a2a2a);
+}
+.personalized-pick__skeleton-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #eee;
+}
+body.dark .personalized-pick__skeleton-img {
+  background: #333;
+}
+.personalized-pick__skeleton-body {
+  padding: 14px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .personalized-pick__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .personalized-pick__grid {
+    grid-template-columns: 1fr;
+  }
+  .personalized-pick__header {
+    flex-direction: row;
+  }
+}

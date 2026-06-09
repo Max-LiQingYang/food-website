@@ -1395,12 +1395,12 @@ router.get('/:id/versions', async (req, res) => {
 })
 
 // ─────────────────────────────────────────────────────────────────
-// GET /:id/similar — 相似食谱推荐（基于 categoryTags Jaccard 相似度）
+// GET /:id/similar — 相似食谱推荐（基于 categoryTags Jaccard 相似度 + 用户偏好加权 + 季节加权）
 // ─────────────────────────────────────────────────────────────────
 router.get('/:id/similar', async (req, res) => {
   res.set({
     'Cache-Control': 'public, max-age=300, s-maxage=600',
-    Vary: 'Accept-Encoding',
+    Vary: 'Accept-Encoding, Authorization',
   })
   try {
     const { id } = req.params
@@ -1411,6 +1411,81 @@ router.get('/:id/similar', async (req, res) => {
       return res.status(404).json(resJSON(404, '食谱不存在', null))
     }
 
+    // ── 可选认证：尝试从 Authorization 头解析 userId（失败不拒绝请求） ──
+    let userId = null
+    const authHeader = req.headers.authorization
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const jwt = require('jsonwebtoken')
+        const secret = process.env.JWT_SECRET
+        if (secret) {
+          const decoded = jwt.verify(authHeader.slice(7), secret)
+          if (decoded.userId) userId = decoded.userId
+        }
+      } catch {
+        // JWT 解析失败，视为未登录，不影响请求
+      }
+    }
+
+    // ── 用户偏好提取（仅登录用户） ──
+    // 从用户收藏的食谱中统计各维度 tag 频次，算出维度偏好权重
+    let userPrefDims = null // e.g. { cuisine: 0.85, flavor: 0.6, ... }
+    if (userId) {
+      try {
+        const { Favorite } = require('../models')
+        const userFavorites = await Favorite.findAll({
+          where: { userId, isDeleted: false },
+          attributes: ['recipeId'],
+          limit: 50,
+          order: [['createdAt', 'DESC']],
+        })
+        if (userFavorites.length > 0) {
+          const favRecipeIds = userFavorites.map(f => f.recipeId)
+          const favRecipes = await Recipe.findAll({
+            where: { id: { [Op.in]: favRecipeIds } },
+            attributes: ['categoryTags'],
+          })
+          // 统计各维度 tag 频次
+          const dimTagFreq = { ingredient: {}, method: {}, cuisine: {}, flavor: {}, price: {} }
+          let totalFavCount = 0
+          for (const fr of favRecipes) {
+            let tags = null
+            try { tags = JSON.parse(fr.categoryTags) } catch { tags = null }
+            if (tags && typeof tags === 'object') {
+              for (const dim of Object.keys(dimTagFreq)) {
+                if (Array.isArray(tags[dim])) {
+                  for (const t of tags[dim]) {
+                    dimTagFreq[dim][t] = (dimTagFreq[dim][t] || 0) + 1
+                  }
+                  totalFavCount++
+                }
+              }
+            }
+          }
+          // 计算各维度权重：该维度出现频次 / 总收藏数 → 偏好强度
+          if (totalFavCount > 0) {
+            userPrefDims = {}
+            for (const dim of Object.keys(dimTagFreq)) {
+              const dimTotal = Object.values(dimTagFreq[dim]).reduce((a, b) => a + b, 0)
+              if (dimTotal > 0) {
+                userPrefDims[dim] = dimTotal / totalFavCount
+              }
+            }
+          }
+        }
+      } catch (prefErr) {
+        console.warn('[GET /recipes/:id/similar] User pref extraction failed:', prefErr.message)
+      }
+    }
+
+    // ── 季节计算 ──
+    const currentMonth = new Date().getMonth() + 1 // 1-12
+    let currentSeason = null
+    if (currentMonth >= 3 && currentMonth <= 5) currentSeason = 'spring'
+    else if (currentMonth >= 6 && currentMonth <= 8) currentSeason = 'summer'
+    else if (currentMonth >= 9 && currentMonth <= 11) currentSeason = 'autumn'
+    else currentSeason = 'winter'
+
     const data = recipe.toJSON()
     let sourceTags = null
     if (data.categoryTags) {
@@ -1420,7 +1495,7 @@ router.get('/:id/similar', async (req, res) => {
     // 获取候选食谱（扩大到 80 条以增加多样性）
     const candidates = await Recipe.findAll({
       where: { id: { [Op.ne]: id } },
-      attributes: LIST_ATTRIBUTES.concat(['ingredients']),
+      attributes: LIST_ATTRIBUTES.concat(['ingredients', 'season']),
       limit: 80,
     })
 
@@ -1494,6 +1569,31 @@ router.get('/:id/similar', async (req, res) => {
         coveredDims.push('category')
       }
 
+      // ── 用户偏好加权（仅登录用户） ──
+      // 用户偏好的维度在候选食谱中有匹配时，提升相似度
+      if (userPrefDims && similarity > 0 && candidateTags && typeof candidateTags === 'object') {
+        const dimensions = ['ingredient', 'method', 'cuisine', 'flavor', 'price']
+        let prefBoost = 0
+        for (const dim of dimensions) {
+          if (userPrefDims[dim] && Array.isArray(candidateTags[dim]) && candidateTags[dim].length > 0) {
+            // 维度偏好强度 × 维度 Jaccard 匹配度 → 加权提升
+            const dimMatch = dimensionScores[dim] || 0
+            prefBoost += userPrefDims[dim] * dimMatch * 0.15
+          }
+        }
+        if (prefBoost > 0) {
+          similarity = Math.min(1, similarity + prefBoost)
+        }
+      }
+
+      // ── 季节加权：当前季节匹配的食谱额外 +0.05 ──
+      if (currentSeason && c.season) {
+        const recipeSeasons = String(c.season).split(',').map(s => s.trim().toLowerCase())
+        if (recipeSeasons.includes(currentSeason) || recipeSeasons.includes('all')) {
+          similarity = Math.min(1, similarity + 0.05)
+        }
+      }
+
       return {
         recipe: c,
         similarity: Math.round(similarity * 100) / 100,
@@ -1507,7 +1607,7 @@ router.get('/:id/similar', async (req, res) => {
       .filter(s => s.similarity > 0)
       .sort((a, b) => b.similarity - a.similarity)
 
-    // 多样性控制：最多 2 条同 category 食谱进入 Top 5
+    // 多样性控制：最多 2 条同 category 食谱进入 Top 6
     const catCount = {}
     const diversified = []
     const sourceCategory = data.category
@@ -1518,33 +1618,33 @@ router.get('/:id/similar', async (req, res) => {
         diversified.push(s)
         catCount[cat] = (catCount[cat] || 0) + 1
       }
-      if (diversified.length >= 5) break
+      if (diversified.length >= 6) break
     }
 
     scored = diversified
 
-    // 如果不足 5 条，按 category 补充（但仍受多样性限）
-    if (scored.length < 5 && data.category) {
+    // 如果不足 6 条，按 category 补充（但仍受多样性限）
+    if (scored.length < 6 && data.category) {
       const existingIds = scored.map(s => s.recipe.id).concat(id)
       const fillRecipes = await Recipe.findAll({
         where: { id: { [Op.notIn]: existingIds }, category: data.category },
         attributes: LIST_ATTRIBUTES,
         order: [['favoriteCount', 'DESC']],
-        limit: 5 - scored.length,
+        limit: 6 - scored.length,
       })
       for (const fr of fillRecipes) {
         scored.push({ recipe: fr.toJSON(), similarity: 0, coveredDimensions: ['category'] })
       }
     }
 
-    // 如果仍不足 5 条，补充热门食谱
-    if (scored.length < 5) {
+    // 如果仍不足 6 条，补充热门食谱
+    if (scored.length < 6) {
       const existingIds = scored.map(s => s.recipe.id).concat(id)
       const hotRecipes = await Recipe.findAll({
         where: { id: { [Op.notIn]: existingIds } },
         attributes: LIST_ATTRIBUTES,
         order: [['favoriteCount', 'DESC']],
-        limit: 5 - scored.length,
+        limit: 6 - scored.length,
       })
       for (const hr of hotRecipes) {
         scored.push({ recipe: hr.toJSON(), similarity: 0, coveredDimensions: [] })

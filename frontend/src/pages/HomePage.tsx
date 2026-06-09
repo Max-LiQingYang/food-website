@@ -7,7 +7,7 @@ import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import SearchAutocomplete from '../components/SearchAutocomplete'
 import FilterPanel from '../components/FilterPanel'
 import HeroSection from '../components/HeroSection'
-import DailyPickCard from '../components/DailyPickCard'
+import PersonalizedDailyPick from '../components/PersonalizedDailyPick'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import type { FilterState } from '../components/FilterPanel'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -199,7 +199,7 @@ export default function HomePage() {
       {/* ── 今日推荐（视口内才挂载） ── */}
       {showFullLayout && (
         <DeferredSection>
-          <DailyPickCard />
+          <PersonalizedDailyPick />
         </DeferredSection>
       )}
 
