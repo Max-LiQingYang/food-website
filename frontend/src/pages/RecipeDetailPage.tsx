@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getRecipeById, deleteRecipe } from '../api'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
@@ -71,6 +71,29 @@ const SEASON_LABELS: Record<string, string> = {
   autumn: '🍂 秋季',
   winter: '❄️ 冬季',
   all: '🔄 四季皆宜',
+}
+
+/** 食材自动分类(基于中文名关键词启发式) */
+type IngredientCategory = 'main' | 'auxiliary' | 'seasoning'
+
+const INGREDIENT_CATEGORY_META: Record<IngredientCategory, { label: string; icon: string; cls: string }> = {
+  main:       { label: '主料', icon: '🥩', cls: 'ingredient-group--main' },
+  auxiliary:  { label: '辅料', icon: '🌿', cls: 'ingredient-group--auxiliary' },
+  seasoning:  { label: '调料', icon: '🧂', cls: 'ingredient-group--seasoning' },
+}
+
+const MAIN_KEYWORDS = ['肉', '鸡', '鸭', '鹅', '鱼', '虾', '蟹', '蛋', '豆', '腐', '菜', '菇', '菌',
+  '米', '面', '饭', '馒', '饼', '蔬', '瓜', '果', '牛', '羊', '猪', '排', '里脊', '五花', '肉末', '肉丝',
+  '肉片', '肉馅', '肉排', '鸡翅', '鸡腿', '鸡胸', '五花肉', '排骨', '里脊肉']
+const SEASONING_KEYWORDS = ['盐', '糖', '醋', '酱油', '生抽', '老抽', '蚝油', '料酒', '油', '花椒',
+  '八角', '桂皮', '香叶', '辣椒', '胡椒', '味精', '鸡精', '淀粉', '粉', '酱', '豆瓣', '甜面酱',
+  '番茄酱', '沙拉酱', '芝麻酱', '黄油', '奶油', '奶酪', '芝士', '孜然', '茴香', '白芷', '丁香',
+  '陈皮', '草果', '麻油', '香油', '橄榄油', '豆豉', '辣酱', '椒盐', '芥末', '蜂蜜']
+
+function classifyIngredient(name: string): IngredientCategory {
+  for (const kw of MAIN_KEYWORDS) { if (name.includes(kw)) return 'main' }
+  for (const kw of SEASONING_KEYWORDS) { if (name.includes(kw)) return 'seasoning' }
+  return 'auxiliary'
 }
 
 export default function RecipeDetailPage() {
@@ -186,6 +209,87 @@ export default function RecipeDetailPage() {
       return next
     })
   }
+
+  // ── 食材分组折叠
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<IngredientCategory>>(() => {
+    try {
+      const saved = localStorage.getItem(`ingredient_groups_collapsed_${id}`)
+      return saved ? new Set(JSON.parse(saved) as IngredientCategory[]) : new Set()
+    } catch { return new Set() }
+  })
+
+  useEffect(() => {
+    if (id) localStorage.setItem(`ingredient_groups_collapsed_${id}`, JSON.stringify([...collapsedGroups]))
+  }, [collapsedGroups, id])
+
+  const toggleGroup = (cat: IngredientCategory) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(cat)) next.delete(cat); else next.add(cat)
+      return next
+    })
+  }
+
+  const groupedIngredients = useMemo(() => {
+    const groups: Record<IngredientCategory, typeof scaledIngredients> = { main: [], auxiliary: [], seasoning: [] }
+    scaledIngredients.forEach(ing => {
+      if (typeof ing === 'string') return
+      groups[classifyIngredient(ing.name || '')].push(ing)
+    })
+    return groups
+  }, [scaledIngredients])
+
+  // ── 返回顶部按钮状态
+  const [showBackToTop, setShowBackToTop] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setShowBackToTop(window.scrollY > 500)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+
+  // ── 章节导航锚点
+  const [activeSection, setActiveSection] = useState<string>('section-ingredients')
+
+  useEffect(() => {
+    if (!recipe) return
+    const sectionIds = ['section-video', 'section-ingredients', 'section-steps', 'section-story', 'section-comments']
+    const sections = sectionIds
+      .map(id => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null)
+    if (sections.length === 0) return
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+        if (visible[0]) setActiveSection(visible[0].target.id)
+      },
+      { rootMargin: '-100px 0px -60% 0px', threshold: 0 }
+    )
+    sections.forEach(s => observer.observe(s))
+    return () => observer.disconnect()
+  }, [recipe])
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) {
+      const offset = 110
+      const top = el.getBoundingClientRect().top + window.scrollY - offset
+      window.scrollTo({ top, behavior: 'smooth' })
+    }
+  }
+
+  const SECTIONS = [
+    { id: 'section-ingredients', label: '食材', icon: '🥬' },
+    { id: 'section-steps',       label: '步骤', icon: '📝' },
+    { id: 'section-video',       label: '视频', icon: '🎬' },
+    { id: 'section-story',       label: '故事', icon: '📖' },
+    { id: 'section-comments',    label: '评论', icon: '💬' },
+  ]
 
   // ── SEO: 食谱结构化数据 + OG meta ──
   const seoRecipe = recipe
@@ -614,6 +718,25 @@ export default function RecipeDetailPage() {
         <div className="detail-header">
           <h1 className="detail-title">{recipe.title}</h1>
 
+          {/* 章节快速导航 */}
+          <nav className="section-nav" aria-label="章节导航">
+            <ul className="section-nav__list">
+              {SECTIONS.map(s => (
+                <li key={s.id} className="section-nav__item">
+                  <button
+                    type="button"
+                    className={`section-nav__btn ${activeSection === s.id ? 'section-nav__btn--active' : ''}`}
+                    onClick={() => scrollToSection(s.id)}
+                    aria-current={activeSection === s.id ? 'true' : undefined}
+                  >
+                    <span className="section-nav__icon">{s.icon}</span>
+                    <span>{s.label}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
           {/* 分享按钮 — 仅桌面端可见 */}
           <div className="detail-header-actions">
             <button className="detail-share-btn" onClick={handleShare} title="分享食谱">
@@ -774,11 +897,15 @@ export default function RecipeDetailPage() {
         )}
 
         {/* 视频教程 */}
-        {id && <VideoPlayer recipeId={id} />}
+        {id && (
+          <div id="section-video" className="detail-container__section">
+            <VideoPlayer recipeId={id} />
+          </div>
+        )}
 
         {/* 食材清单 */}
         {recipe.ingredients && recipe.ingredients.length > 0 && (
-          <section className="detail-section">
+          <section id="section-ingredients" className="detail-section">
             <h2 className="detail-section__title">
               🥬 食材清单
               <span className="section-count">{recipe.ingredients.length} 种</span>
@@ -796,20 +923,42 @@ export default function RecipeDetailPage() {
                 原 {recipe.servings} 人份 → 当前 {Math.round(recipe.servings * servingScale)} 人份（{servingScale === 1 ? '×1' : `×${servingScale}`}）
               </p>
             )}
-            <ul className="detail-ingredients">
-              {scaledIngredients.map((ing, i) => (
-                <li key={i} className="detail-ingredient">
-                  <span className="ingredient-name">{ing.name}</span>
-                  <span className="ingredient-divider" />
-                  <span className="ingredient-amount">
-                    {ing.displayAmount % 1 === 0
-                      ? ing.displayAmount
-                      : ing.displayAmount.toFixed(1)}
-                    {' '}{ing.unit}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {/* 食材分组展示 */}
+            <div className="ingredient-groups">
+              {(['main', 'auxiliary', 'seasoning'] as IngredientCategory[]).map(cat => {
+                const items = groupedIngredients[cat]
+                if (items.length === 0) return null
+                const meta = INGREDIENT_CATEGORY_META[cat]
+                const collapsed = collapsedGroups.has(cat)
+                return (
+                  <div key={cat} className={`ingredient-group ${meta.cls} ${collapsed ? 'ingredient-group--collapsed' : ''}`}>
+                    <div className="ingredient-group__header" onClick={() => toggleGroup(cat)} role="button" tabIndex={0}
+                      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGroup(cat) } }}>
+                      <span className="ingredient-group__title">
+                        <span className="ingredient-group__icon">{meta.icon}</span>
+                        <span className="ingredient-group__label">{meta.label}</span>
+                        <span className="ingredient-group__count">{items.length}</span>
+                      </span>
+                      <button className="ingredient-group__toggle" type="button" aria-label={collapsed ? '展开' : '折叠'}
+                        aria-expanded={!collapsed} tabIndex={-1}>
+                        <span className="ingredient-group__toggle-icon">▼</span>
+                      </button>
+                    </div>
+                    <div className="ingredient-group__body" role="list">
+                      {items.map((ing, i) => (
+                        <div key={`${cat}-${i}`} className="detail-ingredient" role="listitem">
+                          <span className="ingredient-name">{ing.name}</span>
+                          <span className="ingredient-divider" />
+                          <span className="ingredient-amount">
+                            {ing.displayAmount % 1 === 0 ? ing.displayAmount : ing.displayAmount.toFixed(1)}{' '}{ing.unit}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
             {/* 食材替换建议 */}
             <button
               className="substitution-toggle"
@@ -832,6 +981,7 @@ export default function RecipeDetailPage() {
         {/* 制作步骤 */}
         {normalizedSteps.length > 0 && (
           <section
+            id="section-steps"
             className="detail-section"
             onTouchStart={handleStepSwipeStart}
             onTouchEnd={handleStepSwipeEnd}
@@ -840,6 +990,43 @@ export default function RecipeDetailPage() {
               📝 制作步骤
               <span className="section-count">{recipe?.steps?.length || 0} 步</span>
             </h2>
+            {/* 步骤进度指示器 */}
+            {(() => {
+              const total = normalizedSteps.length
+              const done = completedSteps.size
+              const percent = total > 0 ? Math.round((done / total) * 100) : 0
+              const fillCls = percent === 100 ? 'step-progress__fill--done'
+                : percent >= 70 ? 'step-progress__fill--late'
+                : percent >= 30 ? 'step-progress__fill--mid'
+                : 'step-progress__fill--early'
+              return (
+                <div className="step-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
+                  <div className="step-progress__header">
+                    <span className="step-progress__label">
+                      <span className="step-progress__label-icon">📊</span>
+                      <span>烹饪进度</span>
+                    </span>
+                    <span className="step-progress__stats">
+                      <span className="step-progress__count-current">{done}</span>
+                      <span className="step-progress__count-total">/ {total} 步</span>
+                      <span className="step-progress__percent">{percent}%</span>
+                    </span>
+                  </div>
+                  <div className="step-progress__bar">
+                    <div className={`step-progress__fill ${fillCls}`} style={{ width: `${percent}%` }} />
+                  </div>
+                  {done > 0 && (
+                    <div className="step-progress__dones" aria-label="已完成步骤">
+                      {[...completedSteps].sort((a, b) => a - b).map(n => (
+                        <span key={n} className="step-progress__check" title={`步骤 ${n}`}>
+                          <span className="step-progress__check-icon">✓</span>{n}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
             <ol className="detail-steps">
               {normalizedSteps.map(step => {
                 const isActive = activeStep === step.stepNumber
@@ -944,7 +1131,7 @@ export default function RecipeDetailPage() {
 
         {/* 食谱故事（折叠式） */}
         {recipe.story && (
-          <section className="detail-section detail-section--story">
+          <section id="section-story" className="detail-section detail-section--story">
             <h2
               className="detail-section__title detail-section__title--toggle"
               onClick={() => setShowStory(!showStory)}
@@ -1026,7 +1213,7 @@ export default function RecipeDetailPage() {
 
         {/* 评论区 */}
         {id && (
-          <section className="detail-section detail-section--comments">
+          <section id="section-comments" className="detail-section detail-section--comments">
             <h2 className="detail-section__title">💬 评价与留言</h2>
             {/* 评分空状态引导 */}
             {recipe.avgRating != null && recipe.ratingCount === 0 && (
@@ -1189,6 +1376,16 @@ export default function RecipeDetailPage() {
         initialNote={favoriteNote}
         onSaved={(newNote) => setFavoriteNote(newNote)}
       />
+
+      {/* 返回顶部 */}
+      <button
+        className={`back-to-top ${showBackToTop ? 'back-to-top--visible' : 'back-to-top--hidden'}`}
+        onClick={scrollToTop}
+        aria-label="返回顶部"
+        title="返回顶部"
+      >
+        ↑
+      </button>
 
     </div>
   )
