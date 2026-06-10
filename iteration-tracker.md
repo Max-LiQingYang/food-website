@@ -2983,3 +2983,11 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 ### 验证
 - 构建: 0 warnings 0 errors ✅
 - 首页: 200 ✅
+
+## useDeferredMount 超时 fallback 修复 ✅
+**修复时间**: 2026-06-10
+**Commit**: 0d20312
+**部署**: ✅ 已部署
+**问题**: DeferredSection 永久显示骨架屏，因 useDeferredMount 仅依赖 IntersectionObserver，observer 不触发时无 fallback
+**修复**: 3 秒超时后自动 setShouldMount(true)；observer 先触发则取消超时
+**测试**: 5 个单元测试全部通过
