@@ -121,8 +121,8 @@ router.get('/user/:userId/grouped', async (req, res) => {
 
     // 菜系通吃：统计不重复的 recipe category
     const distinctCategories = await CookingLog.findAll({
-      include: [{ model: Recipe, attributes: ['category'], where: { userId: userId } }],
-      group: ['Recipe.category'],
+      include: [{ model: Recipe, as: 'recipe', attributes: ['category'], where: { userId: userId } }],
+      group: ['recipe.category'],
       raw: true
     })
     const cuisineCount = distinctCategories.length
@@ -130,7 +130,7 @@ router.get('/user/:userId/grouped', async (req, res) => {
     // 最受欢迎的食谱收藏数
     const maxFavs = await Favorite.findAll({
       attributes: [[sequelize.fn('COUNT', '*'), 'cnt']],
-      include: [{ model: Recipe, attributes: [], where: { userId: userId } }],
+      include: [{ model: Recipe, as: 'recipe', attributes: [], where: { userId: userId } }],
       group: ['recipeId'],
       order: [[sequelize.fn('COUNT', '*'), 'DESC']],
       limit: 1,
