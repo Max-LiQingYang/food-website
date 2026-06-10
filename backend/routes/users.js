@@ -9,7 +9,7 @@
  */
 
 const express = require('express')
-const { User, Recipe, Comment, Favorite, Collection, ShoppingList, Activity, Follow } = require('../models')
+const { User, Recipe, Comment, Favorite, Collection, ShoppingList, Activity, Follow, CookingLog, sequelize } = require('../models')
 const { Op } = require('sequelize')
 
 const router = express.Router()
@@ -120,6 +120,73 @@ router.get('/:id/stats', async (req, res) => {
   } catch (err) {
     console.error('[GET /users/:id/stats] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/stats-trends — 用户收藏与烹饪趋势
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/stats-trends', async (req, res) => {
+  try {
+    const { id } = req.params
+    const days = parseInt(req.query.days) || 30
+    
+    const since = new Date()
+    since.setDate(since.getDate() - days)
+    
+    // 收藏趋势：查询 favorites 表，按天 GROUP BY
+    const favRows = await Favorite.findAll({
+      attributes: [
+        [sequelize.fn('DATE', sequelize.col('createdAt')), 'date'],
+        [sequelize.fn('COUNT', '*'), 'dailyNew']
+      ],
+      where: {
+        userId: id,
+        createdAt: { [Op.gte]: since }
+      },
+      group: [sequelize.fn('DATE', sequelize.col('createdAt'))],
+      order: [[sequelize.fn('DATE', sequelize.col('createdAt')), 'ASC']],
+      raw: true
+    })
+    
+    // 计算累计值（需要查全部历史）
+    // 获取 days 区间开始时的累计值
+    const beforeCount = await Favorite.count({
+      where: { userId: id, createdAt: { [Op.lt]: since } }
+    })
+    
+    let cumulative = beforeCount
+    const favorites = favRows.map(row => {
+      cumulative += Number(row.dailyNew)
+      return { date: row.date, dailyNew: Number(row.dailyNew), cumulative }
+    })
+    
+    // 烹饪频率：按 cookedAt 天 GROUP BY
+    const cookRows = await CookingLog.findAll({
+      attributes: [
+        'cookedAt',
+        [sequelize.fn('COUNT', '*'), 'count'],
+        [sequelize.fn('AVG', sequelize.col('rating')), 'avgRating']
+      ],
+      where: {
+        userId: id,
+        cookedAt: { [Op.gte]: since.toISOString().slice(0, 10) }
+      },
+      group: ['cookedAt'],
+      order: [['cookedAt', 'ASC']],
+      raw: true
+    })
+    
+    const cooking = cookRows.map(row => ({
+      date: row.cookedAt,
+      count: Number(row.count),
+      avgRating: row.avgRating ? Math.round(Number(row.avgRating) * 10) / 10 : 0
+    }))
+    
+    res.json({ userId: id, days, favorites, cooking })
+  } catch (err) {
+    console.error('stats-trends error:', err)
+    res.status(500).json({ error: 'Failed to load stats trends' })
   }
 })
 
@@ -440,6 +507,63 @@ router.get('/:id/cooked-recipes', async (req, res) => {
   } catch (err) {
     console.error('[GET /users/:id/cooked-recipes] Error:', err)
     return res.status(500).json(resJSON(500, '服务器内部错误', null))
+  }
+})
+
+// ─────────────────────────────────────────────────────────────────
+// GET /:id/skill-profile — 六维雷达图数据
+// ─────────────────────────────────────────────────────────────────
+router.get('/:id/skill-profile', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const logs = await CookingLog.findAll({
+      where: { userId: id },
+      include: [{ model: Recipe, attributes: ['category', 'categoryTags'] }],
+      raw: true
+    })
+
+    if (logs.length === 0) {
+      return res.json({ userId: id, totalCooked: 0, dimensions: [] })
+    }
+
+    const dims = {
+      '中式烹饪': 0,
+      '西式料理': 0,
+      '甜点烘焙': 0,
+      '日韩料理': 0,
+      '辛辣口味': 0,
+      '清淡口味': 0,
+    }
+
+    for (const log of logs) {
+      const cat = log['Recipe.category']
+      const tagsRaw = log['Recipe.categoryTags']
+      let tags = {}
+      if (tagsRaw) {
+        try { tags = typeof tagsRaw === 'string' ? JSON.parse(tagsRaw) : tagsRaw } catch {}
+      }
+
+      if (cat === 'chinese' || tags.cuisine === '中式') dims['中式烹饪']++
+      if (cat === 'western' || tags.cuisine === '西式') dims['西式料理']++
+      if (cat === 'dessert') dims['甜点烘焙']++
+      if (cat === 'japanese' || cat === 'korean') dims['日韩料理']++
+      if (tags.flavor && (typeof tags.flavor === 'string' ? tags.flavor.includes('辣') : false)) dims['辛辣口味']++
+      if (tags.flavor && (typeof tags.flavor === 'string' ? tags.flavor.includes('清淡') || tags.flavor.includes('鲜') : false)) dims['清淡口味']++
+    }
+
+    const maxRaw = Math.max(...Object.values(dims), 1)
+
+    const dimensions = Object.entries(dims).map(([name, rawCount]) => ({
+      name,
+      value: Math.round((rawCount / maxRaw) * 100),
+      rawCount
+    }))
+
+    res.json({ userId: id, totalCooked: logs.length, dimensions })
+  } catch (err) {
+    console.error('skill-profile error:', err)
+    res.status(500).json({ error: 'Failed to load skill profile' })
   }
 })
 

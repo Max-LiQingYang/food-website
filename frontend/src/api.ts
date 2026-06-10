@@ -448,6 +448,11 @@ export function getUserAchievements(userId: string): Promise<AchievementItem[]> 
   return apiClient.get(`/achievements/user/${userId}`).then(r => r.data?.data || r.data || [])
 }
 
+// 获取用户全部成就（按分类分组）
+export async function getUserAchievementsGrouped(userId: string | number) {
+  return apiClient.get(`/achievements/user/${userId}/grouped`)
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Comments API
 // ─────────────────────────────────────────────────────────────────
@@ -2528,5 +2533,10 @@ export function getActivityFeed(page = 1, pageSize = 20): Promise<FeedResponse> 
     const data = r.data || r
     return data.data || { list: [], total: 0, page: 1, pageSize: 20, hasMore: false }
   })
+}
+
+// 获取用户统计趋势数据
+export async function getStatsTrends(userId: string | number, days = 30) {
+  return apiClient.get(`/users/${userId}/stats-trends`, { params: { days } })
 }
 

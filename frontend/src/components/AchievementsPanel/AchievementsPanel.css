@@ -1,0 +1,270 @@
+/* ── AchievementsPanel 成就面板 ── */
+
+.achievements-panel {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+body.dark .achievements-panel {
+  box-shadow: var(--shadow-sm);
+}
+
+.achievements-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.achievements-panel__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.achievements-panel__highlight {
+  color: var(--color-primary);
+}
+
+/* -- Pills -- */
+.achievement-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.achievement-pill {
+  padding: 6px 14px;
+  border: 1.5px solid var(--color-border);
+  background: none;
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+}
+
+.achievement-pill--active {
+  border-color: var(--pill-color, var(--color-primary));
+  background: color-mix(in srgb, var(--pill-color, var(--color-primary)) 10%, transparent);
+  color: var(--pill-color, var(--color-primary));
+  font-weight: 500;
+}
+
+.achievement-pill__count {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* -- Grid -- */
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.achievement-grid__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  opacity: 0;
+  transform: translateY(12px);
+  text-align: center;
+  position: relative;
+  min-height: 100px;
+}
+
+.achievement-grid__item--visible {
+  animation: badgeStagger 0.4s ease forwards;
+}
+
+@keyframes badgeStagger {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.achievement-grid__item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.achievement-grid__item--unlocked {
+  border-color: var(--color-primary);
+}
+
+body.dark .achievement-grid__item {
+  background: var(--color-card);
+  border-color: var(--color-border);
+}
+
+body.dark .achievement-grid__item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+body.dark .achievement-grid__item--unlocked {
+  border-color: var(--color-primary);
+}
+
+.achievement-grid__icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.achievement-grid__name {
+  font-size: 12px;
+  color: var(--color-text);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.achievement-grid__check {
+  font-size: 14px;
+  position: absolute;
+  top: 4px;
+  right: 6px;
+}
+
+.achievement-grid__progress-bar {
+  width: 80%;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.achievement-grid__progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.achievement-grid__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 24px;
+  font-size: 14px;
+}
+
+/* -- Progress Ring -- */
+.progress-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.progress-ring__text {
+  position: absolute;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* -- Skeleton -- */
+.achievements-panel__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.achievements-panel__skeleton-title {
+  width: 200px;
+  height: 24px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  animation: shimmer 1.6s infinite;
+}
+
+.achievements-panel__skeleton-pills {
+  width: 60%;
+  height: 32px;
+  background: var(--color-bg);
+  border-radius: 16px;
+  animation: shimmer 1.6s infinite;
+}
+
+.achievements-panel__skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.achievements-panel__skeleton-badge {
+  height: 100px;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  animation: shimmer 1.6s infinite;
+}
+
+/* -- Reduced motion -- */
+@media (prefers-reduced-motion: reduce) {
+  .achievement-grid__item,
+  .achievement-grid__item--visible {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .achievements-panel__skeleton-title,
+  .achievements-panel__skeleton-pills,
+  .achievements-panel__skeleton-badge {
+    animation: none !important;
+  }
+}
+
+/* -- Responsive -- */
+@media (max-width: 480px) {
+  .achievements-panel {
+    padding: 16px;
+  }
+
+  .achievements-panel__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .achievement-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .achievement-grid__item {
+    padding: 10px 6px;
+    min-height: 90px;
+  }
+
+  .achievement-grid__icon {
+    font-size: 24px;
+  }
+
+  .achievement-grid__name {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .achievement-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

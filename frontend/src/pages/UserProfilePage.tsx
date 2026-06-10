@@ -27,6 +27,8 @@ import ActivityHeatmap from '../components/ActivityHeatmap'
 import AchievementDetailModal from '../components/AchievementDetailModal'
 import './UserProfilePage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import StatsCharts from '../components/StatsCharts/StatsCharts'
+import AchievementsPanel from '../components/AchievementsPanel/AchievementsPanel'
 
 type TabType = 'recipes' | 'favorites' | 'collections' | 'cooked'
 type TabTypeWithHistory = TabType | 'history' | 'forks'
@@ -557,6 +559,12 @@ export default function UserProfilePage() {
 
       {/* 烹饪热力图 */}
       {id && <ActivityHeatmap userId={id} />}
+
+      {/* 成就面板 */}
+      <AchievementsPanel userId={id!} />
+
+      {/* 数据趋势图 */}
+      <StatsCharts userId={id!} />
 
       {/* Tabs */}
       <div className="profile-tabs">
