@@ -116,7 +116,7 @@ router.get('/user/:userId/grouped', async (req, res) => {
     const favoriteCount = await Favorite.count({ where: { userId } })
     const commentCount = await Comment.count({ where: { userId } })
     const cookCount = await CookingLog.count({ where: { userId } })
-    const followerCount = await Follow.count({ where: { followeeId: userId } })
+    const followerCount = await Follow.count({ where: { followingId: userId } })
     const followingCount = await Follow.count({ where: { followingId: userId } })
 
     // 菜系通吃：统计不重复的 recipe category
