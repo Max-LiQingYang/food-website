@@ -148,6 +148,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
         comment: '浏览量（每次 GET /:id 自动 +1）'
       },
+      qualityScore: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+        defaultValue: 0,
+        comment: '质量评分（物化字段，由脚本同步）'
+      },
       userId: {
         type: DataTypes.STRING,
         allowNull: true,
