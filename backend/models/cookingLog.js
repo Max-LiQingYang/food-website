@@ -89,6 +89,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'userId',
       as: 'cookingLogs'
     })
+    CookingLog.belongsTo(models.Recipe, {
+      foreignKey: 'recipeId',
+      as: 'recipe'
+    })
   }
 
   return CookingLog

@@ -112,7 +112,7 @@ router.get('/user/:userId/grouped', async (req, res) => {
     }
 
     // 计算各类 progress
-    const recipeCount = await Recipe.count({ where: { authorId: userId } })
+    const recipeCount = await Recipe.count({ where: { userId: userId } })
     const favoriteCount = await Favorite.count({ where: { userId } })
     const commentCount = await Comment.count({ where: { userId } })
     const cookCount = await CookingLog.count({ where: { userId } })
@@ -121,7 +121,7 @@ router.get('/user/:userId/grouped', async (req, res) => {
 
     // 菜系通吃：统计不重复的 recipe category
     const distinctCategories = await CookingLog.findAll({
-      include: [{ model: Recipe, attributes: ['category'], where: { authorId: userId } }],
+      include: [{ model: Recipe, attributes: ['category'], where: { userId: userId } }],
       group: ['Recipe.category'],
       raw: true
     })
@@ -130,7 +130,7 @@ router.get('/user/:userId/grouped', async (req, res) => {
     // 最受欢迎的食谱收藏数
     const maxFavs = await Favorite.findAll({
       attributes: [[sequelize.fn('COUNT', '*'), 'cnt']],
-      include: [{ model: Recipe, attributes: [], where: { authorId: userId } }],
+      include: [{ model: Recipe, attributes: [], where: { userId: userId } }],
       group: ['recipeId'],
       order: [[sequelize.fn('COUNT', '*'), 'DESC']],
       limit: 1,

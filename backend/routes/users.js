@@ -519,7 +519,7 @@ router.get('/:id/skill-profile', async (req, res) => {
 
     const logs = await CookingLog.findAll({
       where: { userId: id },
-      include: [{ model: Recipe, attributes: ['category', 'categoryTags'] }],
+      include: [{ model: Recipe, as: 'recipe', attributes: ['category', 'categoryTags'] }],
       raw: true
     })
 
@@ -537,8 +537,8 @@ router.get('/:id/skill-profile', async (req, res) => {
     }
 
     for (const log of logs) {
-      const cat = log['Recipe.category']
-      const tagsRaw = log['Recipe.categoryTags']
+      const cat = log['recipe.category']
+      const tagsRaw = log['recipe.categoryTags']
       let tags = {}
       if (tagsRaw) {
         try { tags = typeof tagsRaw === 'string' ? JSON.parse(tagsRaw) : tagsRaw } catch {}
