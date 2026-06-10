@@ -2991,3 +2991,12 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 **问题**: DeferredSection 永久显示骨架屏，因 useDeferredMount 仅依赖 IntersectionObserver，observer 不触发时无 fallback
 **修复**: 3 秒超时后自动 setShouldMount(true)；observer 先触发则取消超时
 **测试**: 5 个单元测试全部通过
+
+## Iter#121 — 内容质量徽章系统 (ContentBadges) ✅
+**时间**: 2026-06-10
+**Commits**: ff11853（实现）, 487fa84（部署）
+**部署**: ✅ 已部署
+**目标**: RecipeCard 新增四大内容丰富度徽章（📖故事/🌏文化/💡贴士/🎬视频）
+**流程**: 产品专家 PRD → UI 专家 CSS → 全栈专家 TSX → 运维专家部署
+**关键决策**: 全无时 return null 零 DOM 残留；4 套独立色系暗色模式；移动端 ≥32px 触摸目标
+**验收**: 构建 0 warnings，首页 200，bundle 含 ContentBadges

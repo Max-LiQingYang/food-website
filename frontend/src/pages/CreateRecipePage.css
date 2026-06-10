@@ -90,6 +90,114 @@
   color: var(--color-text-muted, #999);
 }
 
+/* ── 封面图输入容器：URL + 预览 ── */
+.cover-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cover-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.cover-input-row .form-input { flex: 1; }
+
+/* ── 缩略图预览框 ── */
+.cover-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+.cover-preview--has-image {
+  border-style: solid;
+  border-color: var(--color-border);
+}
+.cover-preview__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-preview__placeholder {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+.cover-preview__placeholder-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 6px;
+  opacity: 0.5;
+}
+.cover-preview__remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s;
+}
+.cover-preview__remove:hover { background: rgba(0, 0, 0, 0.85); }
+
+/* ── 拖拽上传激活态 ── */
+.cover-preview--drag-over {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+  transform: scale(1.01);
+}
+
+/* ── 加载占位（shimmer）── 复用 global.css 的 .image-placeholder-shimmer */
+.cover-preview__loading {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from) 25%,
+    var(--color-skeleton-to) 37%,
+    var(--color-skeleton-from) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ── URL 无效时整组红框 ── */
+.cover-input-group--error .form-input {
+  border-color: var(--color-error) !important;
+}
+.cover-input-group--error .cover-preview {
+  border-color: var(--color-error);
+}
+
+/* ── 步骤图片（未来扩展，预留样式）── */
+.step-image-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
 /* ── 双栏 ── */
 .form-row {
   display: grid;
@@ -469,6 +577,167 @@ body.dark .preview-tips p {
   color: #d4a72c;
 }
 
+/* ── 桌面端预览增强 ── */
+.preview-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.preview-card.is-live .preview-live-dot {
+  opacity: 1;
+  animation: livePulse 0.6s ease;
+}
+@keyframes livePulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.8); opacity: 0.4; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* ── 预览空态（无任何输入时）── */
+.preview-empty {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.preview-empty__icon {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.4;
+  animation: floatY 3s ease-in-out infinite;
+}
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.preview-empty__text {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── 移动端预览抽屉 ── */
+.preview-fab {
+  display: none;                             /* 桌面隐藏 */
+}
+@media (max-width: 1023px) {
+  .preview-fab {
+    display: flex;
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));  /* 浮在吸底操作栏上方 */
+    right: 16px;
+    z-index: 40;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 16px rgba(232, 102, 62, 0.4);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: transform 0.2s var(--ease-out-back);
+  }
+  .preview-fab:active { transform: scale(0.92); }
+  .preview-fab__badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.preview-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.preview-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.preview-drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  max-height: 80vh;
+  background: var(--color-card);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(100%);
+  transition: transform 0.3s var(--ease-out-soft);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.preview-drawer.is-open { transform: translateY(0); }
+body.dark .preview-drawer {
+  background: var(--color-card-dark);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+}
+.preview-drawer__handle {
+  width: 36px;
+  height: 4px;
+  background: var(--color-text-muted);
+  border-radius: 2px;
+  margin: 8px auto;
+  opacity: 0.4;
+}
+.preview-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 20px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.preview-drawer__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.preview-drawer__close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.preview-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* ── 骨架屏 ── */
 .create-skeleton {
   padding: 24px 16px;
@@ -534,39 +803,144 @@ body.dark .toolbar-btn {
 }
 
 /* ── 响应式 ── */
-@media (max-width: 900px) {
+@media (max-width: 1023px) {
   .create-layout {
     grid-template-columns: 1fr;
   }
   .create-preview {
-    position: static;
-  }
-  .preview-sticky {
-    position: static;
+    display: none;                          /* 移动/平板不显示右侧预览（改用抽屉，见 §5） */
   }
 }
 
-@media (max-width: 480px) {
+/* ── 手机 (<768) ── */
+@media (max-width: 768px) {
+  .create-page {
+    padding: 16px 0 calc(80px + env(safe-area-inset-bottom, 0px));  /* 给吸底操作栏留位 */
+    min-height: 100dvh;                     /* 适配虚拟键盘 */
+  }
+  .create-title {
+    font-size: 20px;
+    padding: 0 16px;
+  }
+
+  /* ── 表单卡片：去掉圆角阴影，更原生 ── */
   .create-form-wrap {
-    padding: 20px 16px;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 16px 16px 24px;
+    background: transparent;                /* 让背景透出 body 色 */
   }
-  .form-row {
-    grid-template-columns: 1fr;
-  }
+  body.dark .create-form-wrap { background: transparent; }
+
+  /* ── 食材行重排 ── */
   .form-ingredient-row {
     flex-wrap: wrap;
+    padding: 10px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
   }
   .form-ingredient-name {
-    flex: 1 0 100%;
+    flex: 1 0 100%;                          /* 名称独占第一行 */
+    order: 1;
   }
-  .form-ingredient-amount,
+  .form-ingredient-amount {
+    flex: 1 1 60%;
+    order: 2;
+  }
   .form-ingredient-unit {
-    flex: 1;
+    flex: 0 0 35%;
+    order: 3;
   }
-  .btn {
-    padding: 10px 20px;
+  .form-drag-handle {
+    order: 0;                                /* 手柄放最前 */
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+  }
+  .form-btn-remove {
+    order: 4;                                /* 删除放最末 */
+    width: 36px;                             /* ≥32px 触摸目标 */
+    height: 36px;
+  }
+
+  /* ── 步骤行重排 ── */
+  .form-step-row {
+    flex-wrap: wrap;
+    padding: 10px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 10px;
+  }
+  .form-step-number {
+    order: 1;
+    width: 28px;
+    height: 28px;
     font-size: 14px;
   }
+  .form-step-editor {
+    flex: 1 0 100%;
+    order: 3;
+    margin-top: 4px;
+  }
+  .form-step-toolbar {
+    order: 2;
+    margin-left: auto;                        /* 工具栏放右上 */
+  }
+  .form-btn-remove {
+    order: 4;
+    width: 36px;
+    height: 36px;
+  }
+
+  /* ── 吸底操作栏 ── */
+  .form-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--color-card);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    margin-top: 0;
+    border-radius: 0;
+  }
+  body.dark .form-actions {
+    background: rgba(30, 30, 50, 0.92);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.4);
+  }
+  .form-actions .btn {
+    flex: 1;
+    padding: 12px 16px;
+    min-height: 44px;                        /* iOS 友好 */
+  }
+  .form-actions .btn--ghost {
+    flex: 0 0 auto;                           /* 取消按钮不拉伸 */
+    padding: 12px 16px;
+  }
+
+  /* ── 输入框 16px 防止 iOS 缩放（已有 global.css rule，加强声明） ── */
+  .form-input, .form-textarea, .form-select {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+  .form-textarea { min-height: 88px; }
+}
+
+/* ── 超小屏 (<380) ── */
+@media (max-width: 380px) {
+  .form-ingredient-amount { flex: 1 1 55%; }
+  .form-ingredient-unit   { flex: 0 0 40%; }
+  .form-step-toolbar .toolbar-btn { width: 32px; height: 32px; }
 }
 /* ── Multi-step Wizard ── */
 .create-wizard {
@@ -669,11 +1043,97 @@ body.dark .toolbar-btn {
   box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.1);
 }
 
+/* ── 错误图标 + 抖动 + 更醒目 ── */
 .form-error {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--color-error);
+  margin-top: 6px;
+  font-weight: 500;
+  animation: fadeInUp 0.2s var(--ease-out-soft);
+}
+.form-error::before {
+  content: '⚠';
+  font-size: 14px;
+  flex-shrink: 0;
+}
+/* 错误首次出现时抖动 */
+.form-input--error,
+.form-ingredient-row--error,
+.form-step-row--error {
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+body.dark .form-input--error {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.3) !important;
+}
+
+/* ── 顶部错误摘要条 ── */
+.form-error-summary {
+  position: sticky;
+  top: 60px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: var(--color-error);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+  animation: fadeInUp 0.3s var(--ease-out-soft);
+}
+.form-error-summary__icon { font-size: 18px; }
+.form-error-summary__close {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+}
+.form-error-summary__close:hover { background: rgba(255, 255, 255, 0.35); }
+
+/* ── 提交按钮禁用 tooltip ── */
+.btn--primary[disabled][data-tooltip] {
+  position: relative;
+}
+.btn--primary[disabled][data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  padding: 6px 10px;
+  background: var(--color-text);
+  color: var(--color-bg);
   font-size: 12px;
-  color: var(--color-error, #ff4d4f);
-  margin-top: 4px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fadeInUp 0.15s ease;
+}
+
+/* ── 步骤切换的进入动画 ── */
+.create-step {
+  animation: stepSlideIn 0.3s var(--ease-out-soft);
+}
+@keyframes stepSlideIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .create-step { animation: none; }
 }
 
 .form-ingredient-row--error {
@@ -720,6 +1180,95 @@ body.dark .wizard-step.active .wizard-step-icon {
 body.dark .wizard-step.done .wizard-step-icon {
   background: var(--color-success, #52c41a);
   color: #fff;
+}
+
+/* ── 进度条（wizard 下方 4px 进度线） ── */
+.create-wizard-progress {
+  position: relative;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  margin: -12px 0 24px;
+  overflow: hidden;
+}
+.create-wizard-progress__bar {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+  border-radius: 2px;
+  transform-origin: left center;
+  transition: transform var(--duration-normal) var(--ease-out-soft);
+}
+
+/* ── 已完成步骤计数徽标 ── */
+.wizard-step-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-success);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px var(--color-card);
+}
+body.dark .wizard-step-badge {
+  box-shadow: 0 0 0 2px var(--color-card-dark);
+}
+
+/* ── 自由跳转：所有已完成步骤可点 ── */
+.wizard-step.clickable {
+  cursor: pointer;
+  opacity: 1;
+}
+.wizard-step.clickable:hover .wizard-step-icon {
+  transform: scale(1.08);
+}
+
+/* ── 当前步脉冲（强化“在哪儿”） ── */
+@keyframes wizardPulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(232, 102, 62, 0.35); }
+  50%      { box-shadow: 0 2px 16px rgba(232, 102, 62, 0.6); }
+}
+.wizard-step.active .wizard-step-icon {
+  animation: wizardPulse 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wizard-step.active .wizard-step-icon { animation: none; }
+}
+
+/* ── 未做过的步骤明确灰显 ── */
+.wizard-step.future {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── 移动端 wizard：横向可滑动 + 紧凑 ── */
+@media (max-width: 768px) {
+  .create-wizard {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .create-wizard::-webkit-scrollbar { display: none; }
+  .wizard-step-label { display: none; }      /* 移动端只显示图标 */
+  .wizard-step-line { width: 20px; }
+  .create-form-wrap { padding: 20px 16px; }
+}
+
+@media (max-width: 480px) {
+  .wizard-step-icon { width: 28px; height: 28px; font-size: 13px; }
 }
 
 /* ═══ #63: 食谱改编模式提示条 ═══ */
@@ -773,4 +1322,166 @@ body.dark .changes-note-input {
 body.dark .changes-note-input:focus {
   border-color: #f59e0b !important;
   box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* ── 草稿恢复提示条 ── */
+.draft-restore-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-primary-bg);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  animation: fadeInUp 0.3s var(--ease-out-soft);
+}
+.draft-restore-bar__icon { font-size: 20px; flex-shrink: 0; }
+.draft-restore-bar__text {
+  flex: 1;
+  font-size: 13.5px;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+.draft-restore-bar__text strong { color: var(--color-primary); }
+.draft-restore-bar__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.draft-restore-bar__btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-primary);
+  background: var(--color-card);
+  color: var(--color-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 32px;
+}
+.draft-restore-bar__btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+.draft-restore-bar__btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.draft-restore-bar__btn--primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+body.dark .draft-restore-bar {
+  background: rgba(232, 102, 62, 0.1);
+  border-color: var(--color-primary);
+}
+body.dark .draft-restore-bar__text { color: var(--color-text-dark); }
+
+/* ── “已自动保存” 微提示 ── */
+.draft-saved-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.draft-saved-indicator--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.draft-saved-indicator--hidden {
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+.draft-saved-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: livePulse 0.6s ease;
+}
+@media (max-width: 480px) {
+  .draft-saved-indicator { display: none; }
+  .draft-restore-bar { flex-wrap: wrap; }
+  .draft-restore-bar__actions { width: 100%; }
+  .draft-restore-bar__btn { flex: 1; }
+}
+
+/* ===================================================================
+   §7 全局体验微调
+   =================================================================== */
+
+/* ── 字号节奏 ── */
+.create-step-title {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.create-step-desc {
+  font-size: 13px;
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+@media (max-width: 480px) {
+  .create-step-title { font-size: 16px; }
+  .create-step-desc  { font-size: 12.5px; }
+}
+
+/* ── 工具栏按钮可访问性 ── */
+.toolbar-btn {
+  min-width: 32px;
+  min-height: 32px;
+  position: relative;
+}
+.toolbar-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── 暗色模式补充 ── */
+.form-btn-remove:hover:not(:disabled) {
+  background: var(--color-primary-bg);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+.preview-cover--placeholder {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light),
+    var(--color-primary)
+  );
+}
+
+/* ── 步骤行 hover 状态（桌面） ── */
+@media (hover: hover) {
+  .form-ingredient-row:hover,
+  .form-step-row:hover {
+    background: var(--color-primary-bg);
+  }
+  body.dark .form-ingredient-row:hover,
+  body.dark .form-step-row:hover {
+    background: rgba(232, 102, 62, 0.08);
+  }
+}
+
+/* ── 减少动画偏好 ── */
+@media (prefers-reduced-motion: reduce) {
+  .preview-fab,
+  .preview-drawer,
+  .preview-live-dot,
+  .wizard-step.active .wizard-step-icon,
+  .form-error,
+  .form-error-summary {
+    animation: none !important;
+    transition: none !important;
+  }
 }

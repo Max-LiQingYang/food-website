@@ -56,6 +56,9 @@ export default function CreateRecipePage() {
   const [steps, setSteps] = useState<Array<{ stepNumber: number; content: string; image?: string }>>([{ ...EMPTY_STEP }])
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(isEdit)
+  const [draftAvailable, setDraftAvailable] = useState(false)
+  const [draftRestored, setDraftRestored] = useState(false)
+  const [showSaved, setShowSaved] = useState(false)
 
   // ═══ #63: 食谱改编模式 ──
   const [searchParams] = useSearchParams()
@@ -110,6 +113,7 @@ export default function CreateRecipePage() {
     { key: 'advanced', label: '更多设置', icon: '⚙️' },
   ]
   const [currentStep, setCurrentStep] = useState(0)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   // ── Validation state ──
   interface ValidationErrors {
@@ -124,7 +128,14 @@ export default function CreateRecipePage() {
 
   // Load draft
   useEffect(() => {
-    if (isEdit) return // Don't load draft in edit mode
+    if (isEdit) return
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY)
+      if (saved) setDraftAvailable(true)
+    } catch { /* ignore */ }
+  }, [])
+
+  const handleRestoreDraft = () => {
     try {
       const saved = localStorage.getItem(DRAFT_KEY)
       if (saved) {
@@ -143,7 +154,16 @@ export default function CreateRecipePage() {
         if (draft.steps?.length) setSteps(draft.steps)
       }
     } catch { /* ignore */ }
-  }, [])
+    setDraftAvailable(false)
+    setDraftRestored(true)
+  }
+
+  const handleDiscardDraft = () => {
+    try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+    setDraftAvailable(false)
+  }
+
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout>>()
 
   // Auto-save effect (debounced, creation mode only)
   useEffect(() => {
@@ -151,6 +171,9 @@ export default function CreateRecipePage() {
     const timer = setTimeout(() => {
       const draft = { title, description, category, coverImage, servings, difficulty, cookTime, tips, story, culturalBackground, ingredients, steps, savedAt: Date.now() }
       localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+      setShowSaved(true)
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+      savedTimerRef.current = setTimeout(() => setShowSaved(false), 2000)
     }, 10000) // Save 10s after last change
     return () => clearTimeout(timer)
   }, [title, description, category, coverImage, servings, difficulty, cookTime, tips, story, culturalBackground, ingredients, steps, submitting])
@@ -211,6 +234,21 @@ export default function CreateRecipePage() {
       navigate('/login')
     }
   }, [isAuthenticated])
+
+  // beforeunload 保护
+  const hasContent = () => {
+    return title.trim() || ingredients.some(i => i.name.trim()) || steps.some(s => s.content.trim())
+  }
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (hasContent()) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [title, ingredients, steps])
 
   // ── 食材操作 ──
   const addIngredient = () => {
@@ -416,7 +454,7 @@ export default function CreateRecipePage() {
             {STEPS.map((s, i) => (
               <div
                 key={s.key}
-                className={`wizard-step ${i === currentStep ? 'active' : ''} ${i < currentStep ? 'done' : ''}`}
+                className={`wizard-step ${i < currentStep ? 'completed clickable' : i === currentStep ? 'active' : 'future'}`}
                 onClick={() => { if (i < currentStep) { setCurrentStep(i) } }}
               >
                 <div className="wizard-step-icon">
@@ -427,6 +465,39 @@ export default function CreateRecipePage() {
               </div>
             ))}
           </div>
+          {/* 步骤进度条 */}
+          <div className="create-wizard-progress">
+            <div className="create-wizard-progress__bar"
+              style={{ transform: `scaleX(${currentStep / (STEPS.length - 1) * 100}%)` }} />
+          </div>
+
+          {/* 草稿恢复提示 */}
+          {draftAvailable && !draftRestored && (
+            <div className="draft-notice">
+              <span>📝 检测到未完成的草稿，是否继续编辑？</span>
+              <div className="draft-notice__actions">
+                <button className="form-btn" onClick={handleRestoreDraft}>恢复</button>
+                <button className="form-btn form-btn--ghost" onClick={handleDiscardDraft}>放弃</button>
+              </div>
+            </div>
+          )}
+
+          {/* 错误摘要 */}
+          {Object.keys(errors).length > 0 && (
+            <div className="form-error-summary" role="alert">
+              <span className="form-error-summary__title">⚠️ 请完成以下步骤：</span>
+              <ul className="form-error-summary__list">
+                {STEPS.filter(s => {
+                  if (s.key === 'basic' && !title.trim()) return true
+                  if (s.key === 'ingredients' && !ingredients.some(i => i.name.trim())) return true
+                  if (s.key === 'steps' && !steps.some(s2 => s2.content.trim())) return true
+                  return false
+                }).map(s => (
+                  <li key={s.key}>{s.label}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <form ref={formRef} className="create-form" onSubmit={handleSubmit}>
             {/* ═══ #63: 改编模式提示 ═══ */}
@@ -501,7 +572,49 @@ export default function CreateRecipePage() {
 
               <div className="form-group">
                 <label className="form-label">封面图 URL</label>
-                <input type="url" className="form-input" value={coverImage} onChange={e => setCoverImage(e.target.value)} placeholder="https://example.com/image.jpg（可选）" />
+                <div className="cover-input-group">
+                  <div className="cover-input-row">
+                    <input
+                      type="url"
+                      className="form-input"
+                      value={coverImage}
+                      onChange={e => setCoverImage(e.target.value)}
+                      onPaste={(e: React.ClipboardEvent) => {
+                        const text = e.clipboardData.getData('text')
+                        if (/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)/i.test(text)) {
+                          e.preventDefault()
+                          setCoverImage(text)
+                        }
+                      }}
+                      placeholder="封面图片链接（可选）"
+                    />
+                  </div>
+                  {coverImage ? (
+                    <div className="cover-preview cover-preview--has-image">
+                      <img
+                        src={coverImage}
+                        alt="封面预览"
+                        className="cover-preview__img"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="cover-preview"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault()
+                        const url = e.dataTransfer.getData('text/plain')
+                        if (url.startsWith('http')) setCoverImage(url)
+                      }}
+                    >
+                      <span className="cover-preview__placeholder">
+                        <span className="cover-preview__placeholder-icon">🖼️</span>
+                        粘贴或拖入图片链接
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -611,7 +724,8 @@ export default function CreateRecipePage() {
             </div>
 
             {/* Step Navigation */}
-            <div className="form-actions">
+            <div className="create-actions">
+              {showSaved && <span className="draft-saved-indicator">已保存 ✓</span>}
               {currentStep > 0 && (
                 <button type="button" className="btn btn--outline" onClick={goPrevStep}>
                   ← 上一步
@@ -622,7 +736,7 @@ export default function CreateRecipePage() {
                   下一步 →
                 </button>
               ) : (
-                <button type="submit" className="btn btn--primary" disabled={submitting}>
+                <button type="submit" className="btn btn--primary" disabled={submitting || !title.trim() || !ingredients.some(i => i.name.trim()) || !steps.some(s => s.content.trim())}>
                   {submitting ? '提交中…' : isEdit ? '保存修改' : forkFrom ? '🍴 发布改编' : '✨ 发布食谱'}
                 </button>
               )}
@@ -631,6 +745,69 @@ export default function CreateRecipePage() {
               )}
             </div>
           </form>
+          {/* 移动端预览 FAB */}
+          {currentStep < STEPS.length - 1 && (
+            <>
+              <button className="preview-fab" onClick={() => setPreviewOpen(true)} aria-label="预览食谱">
+                👁
+              </button>
+              {previewOpen && (
+                <>
+                  <div className="preview-drawer-overlay" onClick={() => setPreviewOpen(false)} />
+                  <div className="preview-drawer">
+                    <div className="preview-drawer__handle" />
+                    <div className="preview-drawer__header">
+                      <h3>📋 食谱预览</h3>
+                      <button className="preview-drawer__close" onClick={() => setPreviewOpen(false)}>✕</button>
+                    </div>
+                    <div className="preview-drawer__body">
+                      <div className="preview-card">
+                        {previewData.coverImage ? (
+                          <div className="preview-cover">
+                            <img src={previewData.coverImage} alt={previewData.title || '预览'} />
+                          </div>
+                        ) : (
+                          <div className="preview-cover preview-cover--placeholder">
+                            <span>📸</span>
+                          </div>
+                        )}
+                        <div className="preview-body">
+                          <h2 className="preview-name">{previewData.title || '未命名食谱'}</h2>
+                          <div className="preview-tags">
+                            {previewData.category && <span className="preview-tag">{CATEGORY_LABELS[previewData.category] || previewData.category}</span>}
+                            {previewData.difficulty && <span className="preview-tag">{DIFFICULTY_LABELS[previewData.difficulty] || previewData.difficulty}</span>}
+                            {previewData.servings && <span className="preview-tag">{previewData.servings} 人份</span>}
+                            {previewData.cookTime && <span className="preview-tag">⏱ {previewData.cookTime} 分钟</span>}
+                          </div>
+                          {previewData.description && <p className="preview-desc">{previewData.description}</p>}
+                          {previewData.ingredients.length > 0 && (
+                            <div className="preview-section">
+                              <h4>食材</h4>
+                              <ul className="preview-ingredients">
+                                {previewData.ingredients.map((ing: any, i: number) => (
+                                  <li key={i}>{ing.amount > 0 ? `${ing.amount}${ing.unit} ` : ''}{ing.name}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {previewData.steps.length > 0 && (
+                            <div className="preview-section">
+                              <h4>步骤</h4>
+                              <ol className="preview-steps">
+                                {previewData.steps.map((step: any, i: number) => (
+                                  <li key={i}>{step.content}</li>
+                                ))}
+                              </ol>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
 
         {/* Right: Preview */}
