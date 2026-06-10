@@ -2962,3 +2962,24 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - 首页 200 ✅
 - /shopping-list 200 ✅
 - /collections 200 ✅
+
+## Navbar 对齐 Bug 修复 ✅
+**修复时间**: 2026-06-10
+**Commit**: e2eb07f
+**部署**: http://39.103.68.205/ ✅
+
+### 问题
+.navbar__links 缺少 `align-items: center`，导致普通链接和按钮垂直位置不一致
+
+### 修复
+- Navbar.css: `.navbar__links` 添加 `align-items: center`
+- Navbar.test.tsx: 新增对齐测试用例（验证 CSS 源文件含 align-items: center）
+
+### 参与专家
+- **全栈**: 修复 + 测试
+- **运维**: 部署
+- **管家**: 协调
+
+### 验证
+- 构建: 0 warnings 0 errors ✅
+- 首页: 200 ✅
