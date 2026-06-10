@@ -8,6 +8,7 @@ import FavoriteButton from './FavoriteButton'
 import ImagePlaceholder from './ImagePlaceholder'
 import AuthorLevelBadge from './AuthorLevelBadge'
 import { useLongPress } from '../hooks/useLongPress'
+import ContentBadges, { getActiveBadges } from './ContentBadges'
 import { getCategoryInfo } from '../constants/categories'
 import { getCookTimeInfo } from '../utils/cookTimeLabel'
 import { useToast } from '../context/ToastContext'
@@ -418,6 +419,9 @@ export default function RecipeCard({ recipe, highlightQuery, animationDelay, aut
             </span>
           )}
         </div>
+
+        {/* 内容丰富度徽章 */}
+        <ContentBadges badges={getActiveBadges(recipe)} />
 
         <div className="recipe-card__meta">
           {/* 作者 */}

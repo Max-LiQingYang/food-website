@@ -1,0 +1,159 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ContentBadges.css — 食谱内容丰富度徽章
+ *
+ * 设计目标：
+ *   - 16px 小巧徽章，仅图标 + 文字（无背景 pill 容器，由徽章自身携带半透明背景）
+ *   - 暗色模式下图标可见、文字可读
+ *   - 移动端触摸目标 ≥32px
+ *   - 全无时由父组件返回 null，不渲染任何节点
+ *   - 使用 --badge-* 变量统一管理颜色
+ *   - 响应式：≤768px 收紧间距 / 缩小字号
+ *   - 无动画，纯静态信息展示
+ *
+ * 父类上下文：
+ *   挂在 .recipe-card__info 内，位于 .recipe-card__tags 之后、
+ *   .recipe-card__meta 之前。
+ *
+ * 暗色模式：使用 body.dark 选择器（项目内统一约定）。
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 颜色变量（亮色 / 默认） ──────────────────────────────────────────── */
+:root {
+  /* 故事 (📖) — 靛蓝紫调，与「故事/叙事」语义匹配 */
+  --badge-story-bg: rgba(99, 102, 241, 0.08);
+  --badge-story-fg: #6366f1;
+
+  /* 文化 (🌏) — 翠绿调，呼应「地域/自然」语义 */
+  --badge-culture-bg: rgba(34, 197, 94, 0.08);
+  --badge-culture-fg: #16a34a;
+
+  /* 贴士 (💡) — 琥珀调，对应「灵感/启发」语义 */
+  --badge-tips-bg: rgba(245, 158, 11, 0.08);
+  --badge-tips-fg: #d97706;
+
+  /* 视频 (🎬) — 品牌主色（暖橙），与 .recipe-card__stat--video 视觉统一 */
+  --badge-video-bg: rgba(232, 102, 62, 0.08);
+  --badge-video-fg: #e8663e;
+
+  /* 文字 / 字号 token */
+  --badge-font-size: 11px;
+  --badge-font-weight: 500;
+  --badge-line-height: 1.5;
+  --badge-min-height: 22px;
+  --badge-padding-y: 2px;
+  --badge-padding-x: 8px;
+  --badge-radius: 10px;
+  --badge-icon-size: 12px;
+  --badge-gap: 3px;          /* 单徽章内 icon 与 label 间距 */
+  --badge-row-gap: 6px;      /* 徽章与徽章之间 */
+  --badge-row-margin-top: 6px;
+}
+
+/* ── 容器 ─────────────────────────────────────────────────────────────── */
+.recipe-card__content-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--badge-row-gap);
+  margin-top: var(--badge-row-margin-top);
+  margin-bottom: 0; /* 紧跟其后 .recipe-card__meta 自带 6px 顶部间距 */
+}
+
+/* ── 单个徽章 ─────────────────────────────────────────────────────────── */
+.recipe-card__content-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--badge-gap);
+  padding: var(--badge-padding-y) var(--badge-padding-x);
+  border-radius: var(--badge-radius);
+  font-size: var(--badge-font-size);
+  font-weight: var(--badge-font-weight);
+  line-height: var(--badge-line-height);
+  min-height: var(--badge-min-height);
+  user-select: none;
+  /* 关键：徽章为信息展示，无 hover 反馈、无 transition、不响应点击 */
+}
+
+/* ── 图标 ─────────────────────────────────────────────────────────────── */
+.recipe-card__content-badge-icon {
+  font-size: var(--badge-icon-size);
+  line-height: 1;
+  /* 不渲染为可点击 */
+  pointer-events: none;
+}
+
+/* ── 标签文字 ─────────────────────────────────────────────────────────── */
+.recipe-card__content-badge-label {
+  line-height: 1.3;
+  white-space: nowrap; /* 防止中文被拆字换行 */
+}
+
+/* ── 各徽章颜色（亮色） ──────────────────────────────────────────────── */
+.recipe-card__content-badge--story {
+  background: var(--badge-story-bg);
+  color: var(--badge-story-fg);
+}
+
+.recipe-card__content-badge--culture {
+  background: var(--badge-culture-bg);
+  color: var(--badge-culture-fg);
+}
+
+.recipe-card__content-badge--tips {
+  background: var(--badge-tips-bg);
+  color: var(--badge-tips-fg);
+}
+
+.recipe-card__content-badge--video {
+  background: var(--badge-video-bg);
+  color: var(--badge-video-fg);
+}
+
+/* ── 暗色模式：仅调整背景透明度与文字色（保持色相一致） ──────────────── */
+body.dark .recipe-card__content-badge--story {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+}
+
+body.dark .recipe-card__content-badge--culture {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+}
+
+body.dark .recipe-card__content-badge--tips {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+}
+
+body.dark .recipe-card__content-badge--video {
+  background: rgba(232, 102, 62, 0.15);
+  color: #fb923c;
+}
+
+/* ── 移动端：保证触摸目标 ≥32px，字号微调 ───────────────────────────── */
+@media (max-width: 768px) {
+  .recipe-card__content-badge {
+    /* 触摸目标 ≥32px（高），左右宽度由内容自然撑开 */
+    min-height: 32px;
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .recipe-card__content-badge-icon {
+    font-size: 13px;
+  }
+  .recipe-card__content-badges {
+    /* 移动端适当收紧外间距，避免拥挤 */
+    margin-top: 4px;
+    gap: 5px;
+  }
+}
+
+/* ── 极小屏（≤360px）：单行 4 徽章可能溢出，启用更紧凑间距 ────────── */
+@media (max-width: 360px) {
+  .recipe-card__content-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .recipe-card__content-badges {
+    gap: 4px;
+  }
+}

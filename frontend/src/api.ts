@@ -106,6 +106,7 @@ export interface Recipe {
     sodium?: number
   }
   tips?: string
+  videoCount?: number
 }
 
 export interface RecipeDetail extends Recipe {
