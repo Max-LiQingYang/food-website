@@ -2929,3 +2929,36 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - 构建: 0 errors, 0 warnings ✅
 - 首页 200 ✅
 - 详情页 200 ✅
+
+## 迭代 #119/#120 — 购物清单 & 收藏集移动端体验优化 ✅
+**派发时间**: 2026-06-10
+**完成时间**: 2026-06-10
+**方向**: 🎨 UI 优化
+**Commit**: 2135798 (CSS) + c97c9b2 (tracker)
+**部署**: http://39.103.68.205/ ✅
+
+### 完成内容
+1. **ShoppingListPage 移动端适配** — 768px/480px 断点：
+   - 列表卡片全宽堆叠（≤480px 1fr）
+   - 按钮触摸区域 ≥44px（export-btn 44px, clear-btn 44px）
+   - 勾选框放大至 22-24px
+   - 分类标签横滑（-webkit-overflow-scrolling: touch）
+   - 创建/编辑表单纵向堆叠
+   - 暗色模式 body.dark 样式覆盖
+
+2. **CollectionsPage 移动端适配** — 768px/480px 断点：
+   - 收藏集卡片单列布局（≤480px 1fr）
+   - 操作按钮常驻可见（opacity: 1, position: static）
+   - 模态框底部滑入（align-items: flex-end）
+   - 按钮堆叠全宽（flex-direction: column）
+   - 暗色模式 body.dark 样式覆盖
+
+### 参与专家
+- **UI 设计**: ui-designer（ShoppingListPage +223 行, CollectionsPage +185 行）
+- **管家**: 构建 + 部署
+
+### 验证
+- 构建: 0 errors, 0 warnings ✅
+- 首页 200 ✅
+- /shopping-list 200 ✅
+- /collections 200 ✅

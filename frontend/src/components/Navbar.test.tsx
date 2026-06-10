@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import fs from 'fs'
+import path from 'path'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BrowserRouter, MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from '../context/ThemeContext'
@@ -141,5 +143,17 @@ describe('Navbar 新链接', () => {
   it('包含食材推荐链接', () => {
     renderWithProviders(<Navbar />)
     expect(screen.getByText(/食材推荐/)).toBeDefined()
+  })
+})
+
+describe('Navbar 对齐', () => {
+  it('导航链接容器垂直居中对齐', () => {
+    const { container } = renderWithProviders(<Navbar />)
+    const linksEl = container.querySelector('.navbar__links')
+    expect(linksEl).not.toBeNull()
+    // jsdom 不加载外部 CSS 文件，getComputedStyle 无法获取样式表规则
+    // 改为直接验证 CSS 源文件包含 align-items: center 规则
+    const css = fs.readFileSync(path.join(__dirname, 'Navbar.css'), 'utf-8')
+    expect(css).toMatch(/\.navbar__links\s*\{[^}]*align-items\s*:\s*center/)
   })
 })
