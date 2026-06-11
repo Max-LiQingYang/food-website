@@ -2559,3 +2559,19 @@ export function getCategoryStats(): Promise<CategoryStat[]> {
   })
 }
 
+// GET /api/tags/stats — 标签分类统计数据
+export async function getTagsStats(): Promise<CategoryStat[]> {
+  return apiClient.get('/tags/stats').then(r => r.data?.data?.categories || [])
+}
+
+export interface RelatedTag {
+  tag: string
+  count: number
+  cooccurrence: number
+}
+
+// GET /api/tags/related?tag=xxx — 关联标签
+export async function getRelatedTags(tag: string, limit = 10): Promise<RelatedTag[]> {
+  return apiClient.get('/tags/related', { params: { tag, limit } }).then(r => r.data?.data?.related || [])
+}
+

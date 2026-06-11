@@ -175,4 +175,163 @@ router.post('/tags/suggest', auth, async (req, res) => {
   }
 })
 
+// ── 标签统计 ──────────────────────────────────────────────────────────────
+
+// GET /api/tags/stats — 返回每个分类的统计数据
+router.get('/tags/stats', async (req, res) => {
+  try {
+    const labelMap = {
+      cuisine: '菜系',
+      flavor: '口味',
+      cooking: '烹饪方式',
+      ingredient: '食材',
+      meal: '餐点类型',
+      difficulty: '难度',
+      season: '季节',
+    }
+
+    // 汇总查询：按 category 分组聚合
+    const rows = await TagSuggestion.sequelize.query(
+      `SELECT category, COUNT(*) AS tagCount, SUM(count) AS countSum
+       FROM tag_suggestions
+       WHERE category IS NOT NULL
+       GROUP BY category
+       ORDER BY SUM(count) DESC`,
+      { type: TagSuggestion.sequelize.QueryTypes.SELECT }
+    )
+
+    // 对每个分类取 top 5 标签
+    const categories = await Promise.all(
+      rows.map(async (row) => {
+        const topTags = await TagSuggestion.findAll({
+          where: { category: row.category },
+          order: [['count', 'DESC']],
+          limit: 5,
+          attributes: ['tag'],
+          raw: true,
+        })
+
+        return {
+          category: row.category,
+          label: labelMap[row.category] || row.category,
+          tagCount: parseInt(row.tagCount, 10) || 0,
+          countSum: parseInt(row.countSum, 10) || 0,
+          topTags: topTags.map(t => t.tag),
+        }
+      })
+    )
+
+    res.json({ code: 0, data: { categories } })
+  } catch (err) {
+    console.error('[GET /tags/stats] error:', err.message)
+    res.status(500).json({ code: 500, message: '获取标签统计失败' })
+  }
+})
+
+// GET /api/tags/related — 基于食谱共现关系返回关联标签
+router.get('/tags/related', async (req, res) => {
+  try {
+    const { tag, limit = 10 } = req.query
+    if (!tag || !tag.trim()) {
+      return res.status(400).json({ code: 400, message: 'tag 参数必填' })
+    }
+
+    const tagText = tag.trim()
+    const limitNum = Math.min(parseInt(limit, 10) || 10, 50)
+
+    // 搜索所有 categoryTags 包含该 tag 的食谱
+    const recipes = await Recipe.findAll({
+      where: {
+        categoryTags: { [Op.like]: `%${tagText}%` },
+      },
+      attributes: ['id', 'categoryTags'],
+      raw: true,
+    })
+
+    if (recipes.length === 0) {
+      return res.json({ code: 0, data: { tag: tagText, related: [] } })
+    }
+
+    // 统计共现频率
+    const cooccurrenceMap = new Map() // tag -> { cooccurrence, count }
+    const tagCountMap = new Map()     // tag -> total recipe count
+
+    recipes.forEach(r => {
+      let tags = r.categoryTags
+      let tagObj = {}
+      if (typeof tags === 'string') {
+        try { tagObj = JSON.parse(tags) } catch { tagObj = {} }
+      } else if (typeof tags === 'object') {
+        tagObj = tags
+      }
+
+      // 归一化后的 categoryTags 是对象结构：{ ingredient, method, cuisine, flavor, price }
+      // 提取所有字符串值为标签
+      const tagValues = new Set()
+      Object.values(tagObj).forEach(val => {
+        if (val && typeof val === 'string') {
+          // 多值格式用 / 分隔，也加入
+          val.split('/').forEach(v => {
+            const trimmed = v.trim()
+            if (trimmed && trimmed !== tagText) {
+              tagValues.add(trimmed)
+            }
+          })
+        }
+      })
+
+      // 检查当前食谱是否包含目标 tag
+      // 在对象所有值和 tagText 之间做子串匹配
+      const allValues = Object.values(tagObj).filter(v => typeof v === 'string').join('/')
+      const hasTarget = allValues.includes(tagText)
+      if (hasTarget) {
+        tagValues.forEach(v => {
+          const entry = cooccurrenceMap.get(v) || { cooccurrence: 0, count: 0 }
+          entry.cooccurrence += 1
+          cooccurrenceMap.set(v, entry)
+        })
+      }
+
+      // 同时累计每个 tag 的总出现次数（count）
+      tagValues.forEach(v => {
+        const entry = cooccurrenceMap.get(v) || { cooccurrence: 0, count: 0 }
+        entry.count += 1
+        cooccurrenceMap.set(v, entry)
+      })
+    })
+
+    // 同时从 TagSuggestion 表中补充 count（热点数据）
+    const allRelatedTags = Array.from(cooccurrenceMap.keys())
+    if (allRelatedTags.length > 0) {
+      const suggestions = await TagSuggestion.findAll({
+        where: { tag: { [Op.in]: allRelatedTags } },
+        attributes: ['tag', 'count'],
+        raw: true,
+      })
+      suggestions.forEach(s => {
+        if (cooccurrenceMap.has(s.tag)) {
+          const entry = cooccurrenceMap.get(s.tag)
+          // 优先使用 TagSuggestion 中的 count（更权威），否则用计算结果
+          entry.count = parseInt(s.count, 10) || entry.count
+        }
+      })
+    }
+
+    // 排序并返回
+    const related = Array.from(cooccurrenceMap.entries())
+      .map(([tag, data]) => ({
+        tag,
+        count: parseInt(data.count, 10) || 0,
+        cooccurrence: parseInt(data.cooccurrence, 10) || 0,
+      }))
+      .sort((a, b) => b.cooccurrence - a.cooccurrence || b.count - a.count)
+      .slice(0, limitNum)
+
+    res.json({ code: 0, data: { tag: tagText, related } })
+  } catch (err) {
+    console.error('[GET /tags/related] error:', err.message)
+    res.status(500).json({ code: 500, message: '获取关联标签失败' })
+  }
+})
+
 module.exports = router
