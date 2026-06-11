@@ -573,7 +573,15 @@ router.get('/', async (req, res) => {
       total = count
       list = raw.map(r => r.toJSON())
     } else {
-      order = [['createdAt', 'DESC']]
+      if (sortBy === 'newest') {
+        order = [['createdAt', 'DESC']]
+      } else if (sortBy === 'favorites') {
+        order = [['favoriteCount', 'DESC'], ['createdAt', 'DESC']]
+      } else if (sortBy === 'views') {
+        order = [['viewCount', 'DESC'], ['createdAt', 'DESC']]
+      } else {
+        order = [['createdAt', 'DESC']]
+      }
       const { count, rows: raw } = await Recipe.findAndCountAll({
         where, order, offset, limit: pageSize, attributes: LIST_ATTRIBUTES,
       })
