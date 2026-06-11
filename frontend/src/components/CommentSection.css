@@ -58,25 +58,25 @@
   background: var(--bg-secondary, #faf6f1);
 }
 
-[data-theme='dark'] .comment-sort-tabs {
+body.dark .comment-sort-tabs {
   border-color: #3a3028;
 }
 
-[data-theme='dark'] .comment-sort-tab {
+body.dark .comment-sort-tab {
   background: #1e1812;
   color: #a09080;
 }
 
-[data-theme='dark'] .comment-sort-tab:first-child {
+body.dark .comment-sort-tab:first-child {
   border-color: #3a3028;
 }
 
-[data-theme='dark'] .comment-sort-tab.is-active {
+body.dark .comment-sort-tab.is-active {
   background: #d4532b;
   color: white;
 }
 
-[data-theme='dark'] .comment-sort-tab:hover:not(.is-active) {
+body.dark .comment-sort-tab:hover:not(.is-active) {
   background: #2a2118;
 }
 
@@ -122,17 +122,17 @@
   font-weight: 500;
 }
 
-[data-theme='dark'] .comment-like-btn:hover {
+body.dark .comment-like-btn:hover {
   background: #2a2118;
 }
 
 /* ── 暗色模式覆盖 ──────────────────────────────────────────── */
 
-[data-theme='dark'] .comment-item__actions .comment-like-btn {
+body.dark .comment-item__actions .comment-like-btn {
   color: #a09080;
 }
 
-[data-theme='dark'] .comment-like-btn.is-liked {
+body.dark .comment-like-btn.is-liked {
   color: #e84393;
 }
 
@@ -536,12 +536,12 @@
   margin: 0;
 }
 
-[data-theme='dark'] .comment-empty {
+body.dark .comment-empty {
   border-color: #333;
   background: var(--bg-secondary-dark, #252525);
 }
 
-[data-theme='dark'] .comment-empty__text {
+body.dark .comment-empty__text {
   color: var(--text-primary-dark, #e0e0e0);
 }
 
@@ -761,40 +761,40 @@
 
 /* ── 暗色模式 ──────────────────────────────────────────────── */
 
-[data-theme='dark'] .comment-section {
+body.dark .comment-section {
   border-top-color: #3a3028;
 }
 
-[data-theme='dark'] .comment-stats {
+body.dark .comment-stats {
   background: #2a2118;
 }
 
-[data-theme='dark'] .comment-form {
+body.dark .comment-form {
   background: #2a2118;
 }
 
-[data-theme='dark'] .comment-form__textarea {
+body.dark .comment-form__textarea {
   background: #1e1812;
   border-color: #3a3028;
   color: #e8ddd0;
 }
 
-[data-theme='dark'] .comment-item {
+body.dark .comment-item {
   background: #1e1812;
   border-color: #3a3028;
 }
 
-[data-theme='dark'] .comment-form__toggle {
+body.dark .comment-form__toggle {
   background: #2a2118;
   border-color: #3a3028;
   color: #a09080;
 }
 
-[data-theme='dark'] .comment-form__toggle:hover {
+body.dark .comment-form__toggle:hover {
   background: #1e1812;
 }
 
-[data-theme='dark'] .rating-bar {
+body.dark .rating-bar {
   background: #3a3028;
 }
 

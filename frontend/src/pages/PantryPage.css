@@ -435,37 +435,37 @@
 }
 
 /* ── Dark Mode ── */
-[data-theme="dark"] .pantry-page {
+body.dark .pantry-page {
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .pantry-card {
+body.dark .pantry-card {
   background: #2a2a2a;
   border-color: #444;
 }
 
-[data-theme="dark"] .pantry-alert.expired { background: #3d1f1f; }
-[data-theme="dark"] .pantry-alert.soon { background: #3d3515; }
-[data-theme="dark"] .pantry-search,
-[data-theme="dark"] .pantry-sort,
-[data-theme="dark"] .pantry-sort-order,
-[data-theme="dark"] .pantry-modal,
-[data-theme="dark"] .pantry-modal label input,
-[data-theme="dark"] .pantry-modal label select,
-[data-theme="dark"] .pantry-quick-row input,
-[data-theme="dark"] .pantry-quick-row select {
-  background: #2a2a2a;
-  border-color: #444;
-  color: #e0e0e0;
-}
-
-[data-theme="dark"] .pantry-action-btn.secondary {
+body.dark .pantry-alert.expired { background: #3d1f1f; }
+body.dark .pantry-alert.soon { background: #3d3515; }
+body.dark .pantry-search,
+body.dark .pantry-sort,
+body.dark .pantry-sort-order,
+body.dark .pantry-modal,
+body.dark .pantry-modal label input,
+body.dark .pantry-modal label select,
+body.dark .pantry-quick-row input,
+body.dark .pantry-quick-row select {
   background: #2a2a2a;
   border-color: #444;
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .pantry-modal-actions button:not(.primary) {
+body.dark .pantry-action-btn.secondary {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark .pantry-modal-actions button:not(.primary) {
   background: #2a2a2a;
   border-color: #444;
   color: #e0e0e0;

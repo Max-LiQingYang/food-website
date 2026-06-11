@@ -54,19 +54,19 @@
 }
 
 /* 暗色模式 */
-[data-theme='dark'] .breadcrumb__link {
+body.dark .breadcrumb__link {
   color: #999;
 }
 
-[data-theme='dark'] .breadcrumb__link:hover {
+body.dark .breadcrumb__link:hover {
   color: var(--color-primary, #e8663e);
 }
 
-[data-theme='dark'] .breadcrumb__current {
+body.dark .breadcrumb__current {
   color: #e0e0e0;
 }
 
-[data-theme='dark'] .breadcrumb__item + .breadcrumb__item::before {
+body.dark .breadcrumb__item + .breadcrumb__item::before {
   color: #666;
 }
 

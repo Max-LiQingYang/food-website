@@ -396,17 +396,17 @@
 }
 
 /* Dark mode */
-[data-theme='dark'] .meal-planner__slot--drag-over {
+body.dark .meal-planner__slot--drag-over {
   background: #1a3a5c;
 }
-[data-theme='dark'] .meal-planner__btn--clear {
+body.dark .meal-planner__btn--clear {
   background: #444;
   color: #ccc;
 }
-[data-theme='dark'] .meal-planner__meal-card {
+body.dark .meal-planner__meal-card {
   background: #333;
 }
-[data-theme='dark'] .meal-planner__week-nav {
+body.dark .meal-planner__week-nav {
   background: #2a2a2a;
 }
 

@@ -113,38 +113,38 @@
 }
 
 /* 暗色模式 */
-[data-theme='dark'] .error-boundary {
+body.dark .error-boundary {
   background: #1a1a2e;
 }
 
-[data-theme='dark'] .error-boundary__card {
+body.dark .error-boundary__card {
   background: #16213e;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme='dark'] .error-boundary__title {
+body.dark .error-boundary__title {
   color: #e0e0e0;
 }
 
-[data-theme='dark'] .error-boundary__desc {
+body.dark .error-boundary__desc {
   color: #999;
 }
 
-[data-theme='dark'] .error-boundary__details {
+body.dark .error-boundary__details {
   border-color: #333;
   background: #1a1a2e;
 }
 
-[data-theme='dark'] .error-boundary__details pre {
+body.dark .error-boundary__details pre {
   color: #ff6b6b;
 }
 
-[data-theme='dark'] .error-boundary__btn--home {
+body.dark .error-boundary__btn--home {
   background: #333;
   color: #ccc;
 }
 
-[data-theme='dark'] .error-boundary__btn--home:hover {
+body.dark .error-boundary__btn--home:hover {
   background: #555;
   color: #fff;
 }

@@ -281,15 +281,15 @@
 }
 
 /* Dark mode */
-[data-theme=dark] .cmp-th-label {
+body.dark .cmp-th-label {
   background: #2a2118;
 }
-[data-theme=dark] .cmp-th--0 { background: #3a1e14; }
-[data-theme=dark] .cmp-th--1 { background: #1a2e1a; }
-[data-theme=dark] .cmp-th--2 { background: #14263a; }
-[data-theme=dark] .cmp-row-even td { background: #1a1815; }
-[data-theme=dark] .cmp-td-label { background: #1e1812; }
-[data-theme=dark] .cmp-ingredient-item { background: #2a2a2a; color: #aaa; }
+body.dark .cmp-th--0 { background: #3a1e14; }
+body.dark .cmp-th--1 { background: #1a2e1a; }
+body.dark .cmp-th--2 { background: #14263a; }
+body.dark .cmp-row-even td { background: #1a1815; }
+body.dark .cmp-td-label { background: #1e1812; }
+body.dark .cmp-ingredient-item { background: #2a2a2a; color: #aaa; }
 
 /* ── body.dark 暗色模式 ── */
 

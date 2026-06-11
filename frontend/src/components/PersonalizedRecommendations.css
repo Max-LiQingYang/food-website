@@ -80,11 +80,11 @@
 }
 
 /* Dark mode */
-[data-theme="dark"] .personalized-rec__tabs {
+body.dark .personalized-rec__tabs {
   background: var(--color-bg-secondary-dark, #2a2a2a);
 }
 
-[data-theme="dark"] .personalized-rec__tab:hover {
+body.dark .personalized-rec__tab:hover {
   background: var(--color-bg-hover-dark, rgba(255,255,255,0.08));
 }
 

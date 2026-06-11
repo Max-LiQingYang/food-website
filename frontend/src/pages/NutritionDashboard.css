@@ -507,42 +507,42 @@
 }
 
 /* ── Dark Mode ── */
-[data-theme="dark"] .nutrition-summary-card,
-[data-theme="dark"] .nutrition-monthly-item,
-[data-theme="dark"] .nutrition-modal {
+body.dark .nutrition-summary-card,
+body.dark .nutrition-monthly-item,
+body.dark .nutrition-modal {
   background: #2a2a2a;
   border-color: #444;
 }
 
-[data-theme="dark"] .nutrition-log-item {
+body.dark .nutrition-log-item {
   background: #222;
 }
 
-[data-theme="dark"] .nutrition-date-input,
-[data-theme="dark"] .nutrition-action-btn.small,
-[data-theme="dark"] .nutrition-meal-tab,
-[data-theme="dark"] .nutrition-modal label input,
-[data-theme="dark"] .nutrition-modal label select {
+body.dark .nutrition-date-input,
+body.dark .nutrition-action-btn.small,
+body.dark .nutrition-meal-tab,
+body.dark .nutrition-modal label input,
+body.dark .nutrition-modal label select {
   background: #2a2a2a;
   border-color: #444;
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .nutrition-suggestion.warning { background: #3d3515; }
-[data-theme="dark"] .nutrition-suggestion.info { background: #1a2940; }
-[data-theme="dark"] .nutrition-suggestion.success { background: #1a3a1a; }
+body.dark .nutrition-suggestion.warning { background: #3d3515; }
+body.dark .nutrition-suggestion.info { background: #1a2940; }
+body.dark .nutrition-suggestion.success { background: #1a3a1a; }
 
-[data-theme="dark"] .nutrition-modal-actions button:not(.primary) {
+body.dark .nutrition-modal-actions button:not(.primary) {
   background: #2a2a2a;
   border-color: #444;
   color: #e0e0e0;
 }
 
-[data-theme="dark"] .nutrition-bar-track {
+body.dark .nutrition-bar-track {
   background: #333;
 }
 
-[data-theme="dark"] .nutrition-bar-chart {
+body.dark .nutrition-bar-chart {
   border-bottom-color: #444;
 }
 

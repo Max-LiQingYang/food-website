@@ -146,11 +146,11 @@
 
 /* ── 暗色模式 ── */
 
-[data-theme='dark'] .not-found-title {
+body.dark .not-found-title {
   color: var(--dark-text, #e8e8e8);
 }
 
-[data-theme='dark'] .not-found-desc {
+body.dark .not-found-desc {
   color: var(--dark-text-secondary, #999);
 }
 

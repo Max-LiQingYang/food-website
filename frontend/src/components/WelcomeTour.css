@@ -132,16 +132,16 @@
 }
 
 /* Dark mode */
-[data-theme="dark"] .tour-tooltip {
+body.dark .tour-tooltip {
   background: #2d2d2d;
   color: #eee;
 }
 
-[data-theme="dark"] .tour-tooltip__skip {
+body.dark .tour-tooltip__skip {
   color: #999;
 }
 
-[data-theme="dark"] .tour-tooltip__counter {
+body.dark .tour-tooltip__counter {
   color: #777;
 }
 

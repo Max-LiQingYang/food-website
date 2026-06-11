@@ -294,7 +294,7 @@ body.dark .note-button--has-note::after {
   opacity: 0.8;
 }
 
-[data-theme='dark'] .detail-tag--unrated {
+body.dark .detail-tag--unrated {
   background: var(--bg-secondary-dark, #2a2a2a);
   color: var(--color-text-muted-dark, #999);
 }
@@ -304,7 +304,7 @@ body.dark .note-button--has-note::after {
   color: #92400e;
 }
 
-[data-theme='dark'] .detail-tag--rating {
+body.dark .detail-tag--rating {
   background: #78350f;
   color: #fde68a;
 }
@@ -314,12 +314,12 @@ body.dark .note-button--has-note::after {
   color: #075985;
 }
 
-[data-theme='dark'] .detail-tag--views {
+body.dark .detail-tag--views {
   background: #0c4a6e;
   color: #bae6fd;
 }
 
-[data-theme='dark'] .detail-tag--season {
+body.dark .detail-tag--season {
   background: #1b5e20;
   color: #c8e6c9;
 }
@@ -535,13 +535,13 @@ body.dark .note-button--has-note::after {
   border-color: var(--color-primary, #e8663e);
 }
 
-[data-theme='dark'] .ingredient-copy-btn {
+body.dark .ingredient-copy-btn {
   background: #2a2a2a;
   border-color: #444;
   color: #aaa;
 }
 
-[data-theme='dark'] .ingredient-copy-btn:hover {
+body.dark .ingredient-copy-btn:hover {
   background: #e8663e;
   color: white;
   border-color: #e8663e;
@@ -648,16 +648,16 @@ body.dark .substitution-toggle:hover {
   background: var(--color-text-muted, #999);
 }
 
-[data-theme='dark'] .step-checkbox__box {
+body.dark .step-checkbox__box {
   border-color: #555;
 }
 
-[data-theme='dark'] .step-checkbox__box.is-checked {
+body.dark .step-checkbox__box.is-checked {
   background: #e8663e;
   border-color: #e8663e;
 }
 
-[data-theme='dark'] .detail-step.is-completed {
+body.dark .detail-step.is-completed {
   opacity: 0.6;
 }
 
@@ -716,7 +716,7 @@ body.dark .substitution-toggle:hover {
 }
 
 /* ── 暗色模式 ── */
-[data-theme='dark'] .step-image {
+body.dark .step-image {
   background: #1a1a1a;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
@@ -1128,7 +1128,7 @@ body.dark .substitution-toggle:hover {
   margin: 0 28px 28px;
 }
 
-[data-theme='dark'] .nutrition-enhanced {
+body.dark .nutrition-enhanced {
   background: linear-gradient(135deg, #1e1e1e 0%, #222 100%);
   border-color: #333;
 }
@@ -1148,7 +1148,7 @@ body.dark .substitution-toggle:hover {
   transition: background 0.2s;
 }
 
-[data-theme='dark'] .nutrition-item {
+body.dark .nutrition-item {
   background: #2a2a2a;
 }
 
@@ -1387,16 +1387,16 @@ body.dark .substitution-toggle:hover {
   margin: 0;
 }
 
-[data-theme='dark'] .rating-prompt {
+body.dark .rating-prompt {
   border-color: #333;
   background: var(--bg-secondary-dark, #252525);
 }
 
-[data-theme='dark'] .rating-prompt__text {
+body.dark .rating-prompt__text {
   color: var(--text-primary-dark, #e0e0e0);
 }
 
-[data-theme='dark'] .rating-prompt__stars {
+body.dark .rating-prompt__stars {
   filter: grayscale(0.4) brightness(0.8);
 }
 

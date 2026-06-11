@@ -180,16 +180,16 @@
 }
 
 /* Dark mode */
-[data-theme=dark] .pref-toggle:has(input:checked) {
+body.dark .pref-toggle:has(input:checked) {
   background: #422006;
   border-color: #f59e0b;
   color: #fde68a;
 }
-[data-theme=dark] .pref-tag {
+body.dark .pref-tag {
   background: #422006;
   color: #fde68a;
 }
-[data-theme=dark] .pref-tag-remove { color: #fde68a; }
+body.dark .pref-tag-remove { color: #fde68a; }
 /* Recommendation Grid */
 .pref-recommend-grid {
   display: grid;
@@ -297,7 +297,7 @@
   }
 }
 
-[data-theme=dark] .pref-recipe-tag--normal {
+body.dark .pref-recipe-tag--normal {
   background: #333;
   color: #aaa;
 }

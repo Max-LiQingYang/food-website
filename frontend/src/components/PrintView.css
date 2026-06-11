@@ -291,12 +291,12 @@
   color: #fff;
 }
 
-[data-theme='dark'] .detail__print-btn {
+body.dark .detail__print-btn {
   background: #333;
   color: #ccc;
 }
 
-[data-theme='dark'] .detail__print-btn:hover {
+body.dark .detail__print-btn:hover {
   background: #555;
   color: #fff;
 }

@@ -546,11 +546,11 @@ body.dark .shop-detail__item-price {
 }
 
 /* Dark mode */
-[data-theme=dark] .shop-category-header {
+body.dark .shop-category-header {
   background: #2a2118;
   border-color: #3a3028;
 }
-[data-theme=dark] .shop-category-group {
+body.dark .shop-category-group {
   background: #1e1812;
 }
 

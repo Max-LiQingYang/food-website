@@ -103,16 +103,16 @@
 }
 
 /* Dark mode support */
-[data-theme="dark"] .shortcuts-panel {
+body.dark .shortcuts-panel {
   background: #2d2d2d;
   color: #eee;
 }
 
-[data-theme="dark"] .shortcuts-panel__item {
+body.dark .shortcuts-panel__item {
   background: #3a3a3a;
 }
 
-[data-theme="dark"] .shortcuts-panel__key {
+body.dark .shortcuts-panel__key {
   background: #444;
   border-color: #555;
   color: #eee;

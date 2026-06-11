@@ -479,19 +479,19 @@
 }
 
 /* Dark mode */
-[data-theme='dark'] .cooking-journal__stat-card {
+body.dark .cooking-journal__stat-card {
   background: #2a2a2a;
 }
-[data-theme='dark'] .cooking-journal__chart {
+body.dark .cooking-journal__chart {
   background: #1e1e1e;
 }
-[data-theme='dark'] .cooking-journal__card {
+body.dark .cooking-journal__card {
   background: #1e1e1e;
 }
-[data-theme='dark'] .cooking-journal__modal {
+body.dark .cooking-journal__modal {
   background: #1e1e1e;
 }
-[data-theme='dark'] .cooking-journal__category-bar-bg {
+body.dark .cooking-journal__category-bar-bg {
   background: #333;
 }
 
