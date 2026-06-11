@@ -49,6 +49,7 @@ const PantryPage = lazy(() => import('../pages/PantryPage'))
 const NutritionDashboard = lazy(() => import('../pages/NutritionDashboard'))
 const RecipeDiffPage = lazy(() => import('../pages/RecipeDiffPage'))
 const CookingAnalyticsPage = lazy(() => import('../pages/CookingAnalyticsPage'))
+const CategoriesPage = lazy(() => import('../pages/CategoriesPage'))
 const CategoryDetailPage = lazy(() => import('../pages/CategoryDetailPage'))
 const AchievementsPage = lazy(() => import('../pages/AchievementsPage'))
 const AllRecipesPage = lazy(() => import('../pages/AllRecipesPage'))
@@ -133,6 +134,7 @@ const router = createBrowserRouter([
       { path: '/nutrition', element: <NutritionDashboard /> },
       { path: '/recipe/:id/versions', element: <RecipeDiffPage /> },
       { path: '/cooking/analytics', element: <CookingAnalyticsPage /> },
+      { path: '/categories', element: <CategoriesPage /> },
       { path: '/category/:name', element: <CategoryDetailPage /> },
       { path: '/content-quality', element: <ContentQualityPage /> },
       { path: '*', element: <NotFoundPage /> },

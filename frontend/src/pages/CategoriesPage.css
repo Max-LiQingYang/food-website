@@ -1,0 +1,343 @@
+/* ═══════════════════════════════════════════
+   CategoriesPage — 沉浸式分类浏览
+   ═══════════════════════════════════════════ */
+
+.categories-page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+/* ── Hero ── */
+.categories-page__hero {
+  text-align: center;
+  padding: 32px 16px 24px;
+}
+
+.categories-page__title {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text, #333);
+  letter-spacing: -0.5px;
+}
+
+.categories-page__subtitle {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-secondary, #888);
+}
+
+/* ── 卡片网格 ── */
+.categories-page__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* ── 单个分类卡片 ── */
+.categories-page__card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--color-card, #fff);
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,0.06));
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: categories-fade-up 0.5s ease both;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes categories-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.categories-page__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.categories-page__card:active {
+  transform: scale(0.98);
+}
+
+/* ── 大背景区域 ── */
+.categories-page__card-bg {
+  position: relative;
+  height: 120px;
+  background: color-mix(in srgb, var(--cat-color, #e8663e) 20%, #f5f2ed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.categories-page__card-bg-glow {
+  position: absolute;
+  top: -40px;
+  right: -30px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cat-color, #e8663e) 12%, transparent);
+  pointer-events: none;
+}
+
+.categories-page__card-bg-icon {
+  position: relative;
+  font-size: 56px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  transition: transform 0.35s ease;
+}
+
+.categories-page__card:hover .categories-page__card-bg-icon {
+  transform: scale(1.15);
+}
+
+/* ── 卡片正文 ── */
+.categories-page__card-body {
+  padding: 18px 20px 20px;
+}
+
+.categories-page__card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.categories-page__card-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.categories-page__card-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex: 1;
+}
+
+.categories-page__card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+}
+
+.categories-page__card-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cat-color, #e8663e);
+  background: color-mix(in srgb, var(--cat-color, #e8663e) 12%, transparent);
+  padding: 2px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.categories-page__card-desc {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--color-text-secondary, #888);
+  line-height: 1.5;
+}
+
+/* ── 难度分布条 ── */
+.categories-page__difficulty {
+  margin-bottom: 14px;
+}
+
+.categories-page__difficulty-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--color-bg, #eee);
+  margin-bottom: 8px;
+}
+
+.categories-page__difficulty-segment {
+  transition: width 0.5s ease;
+}
+
+.categories-page__difficulty-segment--easy {
+  background: #27ae60;
+}
+
+.categories-page__difficulty-segment--medium {
+  background: #f39c12;
+}
+
+.categories-page__difficulty-segment--hard {
+  background: #e74c3c;
+}
+
+.categories-page__difficulty-labels {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--color-text-secondary, #aaa);
+}
+
+.categories-page__difficulty-label {
+  white-space: nowrap;
+}
+
+/* ── 统计行 ── */
+.categories-page__stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.categories-page__stat {
+  font-size: 12px;
+  color: var(--color-text-secondary, #999);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ── 标签 ── */
+.categories-page__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.categories-page__tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cat-color, #e8663e) 8%, transparent);
+  color: var(--cat-color, #e8663e);
+}
+
+/* ── 骨架屏 ── */
+.categories-page__card-skeleton {
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--color-card, #fff);
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,0.06));
+}
+
+.categories-page__card-skeleton-bg {
+  height: 120px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: categories-shimmer 1.5s infinite;
+}
+
+.categories-page__card-skeleton-line {
+  height: 14px;
+  margin: 16px 20px 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: categories-shimmer 1.5s infinite;
+}
+
+.categories-page__card-skeleton-line.short {
+  width: 55%;
+  margin-bottom: 18px;
+}
+
+@keyframes categories-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ═══════════════════════════════════════════
+   暗色模式
+   ═══════════════════════════════════════════ */
+
+body.dark .categories-page__title {
+  color: var(--color-text, #eee);
+}
+
+body.dark .categories-page__card {
+  background: var(--color-card, #1e1e32);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+body.dark .categories-page__card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+body.dark .categories-page__card-bg {
+  background: color-mix(in srgb, var(--cat-color, #e8663e) 15%, #1a1a2e);
+}
+
+body.dark .categories-page__card-title {
+  color: var(--color-text, #eee);
+}
+
+body.dark .categories-page__card-skeleton {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .categories-page__card-skeleton-bg,
+body.dark .categories-page__card-skeleton-line {
+  background: linear-gradient(90deg, #2a2a40 25%, #333350 50%, #2a2a40 75%);
+  background-size: 200% 100%;
+}
+
+body.dark .categories-page__difficulty-bar {
+  background: #2a2a40;
+}
+
+/* ═══════════════════════════════════════════
+   响应式
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 1023px) {
+  .categories-page__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .categories-page__card-bg {
+    height: 100px;
+  }
+  .categories-page__card-bg-icon {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .categories-page {
+    padding: 16px 12px 40px;
+  }
+  .categories-page__hero {
+    padding: 20px 12px 16px;
+  }
+  .categories-page__title {
+    font-size: 24px;
+  }
+  .categories-page__subtitle {
+    font-size: 14px;
+  }
+  .categories-page__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .categories-page__card-bg {
+    height: 90px;
+  }
+  .categories-page__card-bg-icon {
+    font-size: 40px;
+  }
+  .categories-page__card-body {
+    padding: 14px 16px 16px;
+  }
+}

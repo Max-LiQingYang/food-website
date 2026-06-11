@@ -2540,3 +2540,22 @@ export async function getStatsTrends(userId: string | number, days = 30) {
   return apiClient.get(`/users/${userId}/stats-trends`, { params: { days } })
 }
 
+/** 分类统计数据 */
+export interface CategoryStat {
+  category: string
+  recipeCount: number
+  difficulty: { easy: number; medium: number; hard: number }
+  avgCookTime: number
+  avgServings: number
+  avgRating: number
+  topTags: string[]
+}
+
+/** 获取全部分类统计数据 */
+export function getCategoryStats(): Promise<CategoryStat[]> {
+  return apiClient.get('/categories/stats').then(r => {
+    const data = r.data || r
+    return data.data || []
+  })
+}
+

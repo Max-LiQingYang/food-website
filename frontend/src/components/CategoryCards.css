@@ -33,7 +33,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 20px 8px 18px;
   border: 1.5px solid transparent;
   border-radius: var(--radius-md, 12px);
@@ -51,20 +51,11 @@
   overflow: hidden;
 }
 
-.category-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity var(--transition-normal, 0.3s ease);
-}
-
 .category-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
   border-color: var(--cat-color);
-  background: color-mix(in srgb, var(--cat-color) 4%, var(--color-card, #fff));
+  background: color-mix(in srgb, var(--cat-color) 6%, var(--color-card, #fff));
 }
 
 .category-card:active {
@@ -93,9 +84,36 @@
   color: var(--cat-color);
 }
 
-/* 全部分类按钮 */
+/* ── 食谱计数 badge ── */
+.category-card__count {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+  color: #fff;
+  background: var(--cat-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+/* ── 全部分类按钮 ── */
 .category-cards__all {
   display: none;
+}
+
+.category-cards__all-arrow {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.category-cards__all:hover .category-cards__all-arrow {
+  transform: translateX(3px);
 }
 
 @media (min-width: 481px) {
@@ -103,24 +121,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     margin-top: 14px;
-    padding: 10px;
-    border: 1.5px dashed var(--color-border, #ddd);
+    padding: 12px;
+    border: none;
     border-radius: var(--radius-md, 12px);
-    background: transparent;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary, #e8663e) 8%, transparent), color-mix(in srgb, var(--color-secondary, #f0906a) 8%, transparent));
     cursor: pointer;
     font-family: inherit;
     font-size: 14px;
-    color: var(--color-text-secondary, #888);
+    font-weight: 600;
+    color: var(--color-primary, #e8663e);
     transition: all var(--transition-normal, 0.3s ease);
   }
 
   .category-cards__all:hover {
-    border-color: var(--color-primary, #e8663e);
-    color: var(--color-primary, #e8663e);
-    background: color-mix(in srgb, var(--color-primary, #e8663e) 4%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary, #e8663e) 15%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary, #e8663e) 14%, transparent), color-mix(in srgb, var(--color-secondary, #f0906a) 14%, transparent));
   }
 }
 
@@ -135,6 +154,14 @@
   .category-card__label {
     font-size: 12px;
   }
+  .category-card__count {
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
+    line-height: 18px;
+  }
 }
 
 body.dark .category-card {
@@ -143,15 +170,14 @@ body.dark .category-card {
 }
 
 body.dark .category-card:hover {
-  background: color-mix(in srgb, var(--cat-color) 8%, var(--color-card, #1e1e32));
+  background: color-mix(in srgb, var(--cat-color) 10%, var(--color-card, #1e1e32));
 }
 
 body.dark .category-cards__all {
-  border-color: var(--color-border, #444);
-  color: var(--color-text-secondary, #999);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary, #e8663e) 12%, transparent), color-mix(in srgb, var(--color-secondary, #f0906a) 12%, transparent));
+  color: var(--color-primary, #f0906a);
 }
 
 body.dark .category-cards__all:hover {
-  border-color: var(--color-primary, #e8663e);
-  color: var(--color-primary, #f0906a);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary, #e8663e) 20%, transparent), color-mix(in srgb, var(--color-secondary, #f0906a) 20%, transparent));
 }

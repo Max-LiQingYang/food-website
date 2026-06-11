@@ -22,6 +22,7 @@ const followRoutes = require('./follows')
 const feedRoutes = require('./feed')
 const favoriteRoutes = require('./favorites')
 const commentRoutes = require('./comments')
+const categoriesRoutes = require('./categories')
 const collectionRoutes = require('./collections')
 const shoppingListRoutes = require('./shoppingList')
 const importRoutes = require('./import')
@@ -41,6 +42,9 @@ router.use('/', require('./admin'))
 
 // 不需要 auth 的路由
 router.use('/auth', authRoutes)
+
+// 分类统计（无需认证，必须在 recipeRoutes 之前）
+router.use('/categories', categoriesRoutes)
 
 // 评论路由必须在食谱路由之前，确保 /recipes/:recipeId/comments 不被 /recipes/:id 拦截
 router.use('/', commentRoutes)
