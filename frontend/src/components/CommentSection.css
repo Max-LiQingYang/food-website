@@ -211,6 +211,41 @@
   transition: width 0.3s ease;
 }
 
+/* ── 雷达图统计区 ──────────────────────────────────────────── */
+
+.comment-stats__radar {
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dimension-radar-container {
+  position: relative;
+}
+
+.dimension-radar-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px dashed var(--border-color, #d4c8b8);
+  border-radius: 12px;
+  background: var(--bg-primary, #fffdf9);
+}
+
+.dimension-radar-empty__icon {
+  font-size: 1.5rem;
+}
+
+.dimension-radar-empty__text {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #8b7355);
+  text-align: center;
+}
+
 /* ── 星级评分 ──────────────────────────────────────────────── */
 
 .star-rating {
@@ -323,6 +358,136 @@
   margin-right: auto;
 }
 
+/* ── 展开详细评分 ──────────────────────────────────────────── */
+
+.comment-form__dimensions-toggle {
+  width: 100%;
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 1rem;
+  background: var(--bg-primary, #fffdf9);
+  border: 1px dashed var(--border-color, #d4c8b8);
+  border-radius: 8px;
+  color: var(--text-secondary, #8b7355);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.comment-form__dimensions-toggle:hover {
+  border-color: var(--accent-warm, #d4532b);
+  color: var(--accent-warm, #d4532b);
+}
+
+.comment-form__dimensions-toggle.is-expanded {
+  color: var(--accent-warm, #d4532b);
+  border-color: var(--accent-warm, #d4532b);
+}
+
+.comment-form__dimensions {
+  margin: 0;
+  padding: 0 1rem;
+  background: var(--bg-primary, #fffdf9);
+  border-radius: 0 0 8px 8px;
+  border: 1px solid var(--border-color, #d4c8b8);
+  border-top: none;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+}
+
+.comment-form__dimensions.is-expanded {
+  max-height: 350px;
+  opacity: 1;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.dimension-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.375rem 0;
+}
+
+.dimension-label {
+  width: 80px;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #8b7355);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.dimension-value-text {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.dimension-hint {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border-color, #d4c8b8);
+  font-size: 0.75rem;
+  color: var(--text-secondary, #8b7355);
+  font-style: italic;
+}
+
+/* ── 维度徽章（评论卡片） ──────────────────────────────────── */
+
+.dimension-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-left: 0.25rem;
+}
+
+.dimension-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.dimension-badge__emoji {
+  font-size: 0.75rem;
+}
+
+/* 口味 — 红色系 */
+.dimension-badge--taste {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* 难度 — 橙色系 */
+.dimension-badge--difficulty {
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+/* 卖相 — 紫色系 */
+.dimension-badge--presentation {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* 性价比 — 绿色系 */
+.dimension-badge--value {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
 /* ── 登录提示 ──────────────────────────────────────────────── */
 
 .comment-login-hint {
@@ -426,6 +591,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .comment-item__name {
@@ -535,6 +701,22 @@
 
 /* ── 响应式 ────────────────────────────────────────────────── */
 
+@media (max-width: 768px) {
+  .comment-stats {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .comment-stats__radar {
+    margin-left: 0;
+  }
+
+  .dimension-label {
+    width: 70px;
+    font-size: 0.8rem;
+  }
+}
+
 @media (max-width: 600px) {
   .comment-stats {
     flex-direction: column;
@@ -545,10 +727,35 @@
     min-width: auto;
   }
 
+  .comment-stats__radar {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .dimension-radar-container {
+    margin: 0 auto;
+  }
+
   .comment-item__content,
   .comment-item__delete {
     padding-left: 0;
     margin-left: 0;
+  }
+
+  .dimension-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .dimension-label {
+    width: auto;
+  }
+
+  .dimension-badges {
+    margin-left: 0;
+    margin-top: 0.25rem;
+    width: 100%;
   }
 }
 
@@ -820,4 +1027,66 @@ body.dark .comment-item__photo-hint {
 body.dark .comment-item__photo-hint:hover {
   color: var(--color-primary, inherit);
   background: var(--color-primary-bg, #2e1a14);
+}
+
+/* ── 暗色模式：维度评分面板 ── */
+body.dark .comment-form__dimensions-toggle {
+  background: var(--color-bg-secondary, #1a1a2e);
+  border-color: var(--color-border, #2e2e48);
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .comment-form__dimensions-toggle:hover,
+body.dark .comment-form__dimensions-toggle.is-expanded {
+  border-color: var(--color-primary, inherit);
+  color: var(--color-primary, inherit);
+}
+
+body.dark .comment-form__dimensions {
+  background: var(--color-bg-secondary, #1a1a2e);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .dimension-label {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .dimension-hint {
+  border-top-color: var(--color-border, #2e2e48);
+  color: var(--color-text-muted, #686880);
+}
+
+/* ── 暗色模式：雷达图 ── */
+body.dark .dimension-radar-empty {
+  background: var(--color-card, #1e1e32);
+  border-color: var(--color-border, #2e2e48);
+}
+
+body.dark .dimension-radar-empty__text {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+/* ── 暗色模式：维度徽章 ── */
+body.dark .dimension-badge--taste {
+  background: rgba(248, 113, 113, 0.18);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+body.dark .dimension-badge--difficulty {
+  background: rgba(251, 146, 60, 0.18);
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+body.dark .dimension-badge--presentation {
+  background: rgba(167, 139, 250, 0.18);
+  color: #a78bfa;
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+body.dark .dimension-badge--value {
+  background: rgba(74, 222, 128, 0.18);
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.3);
 }

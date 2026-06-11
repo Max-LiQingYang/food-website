@@ -7,6 +7,7 @@ import EmptyState from './EmptyState'
 import CommentImagePicker from './CommentImagePicker'
 import ImageLightbox from './ImageLightbox'
 import Pagination from './Pagination'
+import DimensionRadar from './DimensionRadar'
 import type { Comment, CommentStats } from '../api'
 import './CommentSection.css'
 
@@ -16,6 +17,16 @@ interface Props {
 }
 
 type SortMode = 'latest' | 'hot'
+
+/** 四维评分维度配置 */
+const DIMENSION_CONFIG = {
+  taste: { label: '口味', emoji: '😋', cssClass: 'dimension-badge--taste' },
+  difficulty: { label: '难度', emoji: '🔥', cssClass: 'dimension-badge--difficulty' },
+  presentation: { label: '卖相', emoji: '👀', cssClass: 'dimension-badge--presentation' },
+  value: { label: '性价比', emoji: '💰', cssClass: 'dimension-badge--value' }
+} as const
+
+type DimensionKey = keyof typeof DIMENSION_CONFIG
 
 function StarRating({
   value,
@@ -89,6 +100,15 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
   const [showForm, setShowForm] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
 
+  // 四维评分状态
+  const [dimensionsExpanded, setDimensionsExpanded] = useState(false)
+  const [dimRating, setDimRating] = useState<Record<DimensionKey, number>>({
+    taste: 0,
+    difficulty: 0,
+    presentation: 0,
+    value: 0
+  })
+
   const [lbImages, setLbImages] = useState<string[]>([])
   const [lbIndex, setLbIndex] = useState(0)
 
@@ -124,6 +144,15 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
     }
   }
 
+  const resetForm = () => {
+    setContent('')
+    setRating(0)
+    setSelectedFiles([])
+    setDimRating({ taste: 0, difficulty: 0, presentation: 0, value: 0 })
+    setDimensionsExpanded(false)
+    setShowForm(false)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!content.trim()) {
@@ -140,12 +169,13 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
       await createComment(recipeId, {
         content: content.trim(),
         rating: rating || undefined,
-        imageUrls: imageUrls.length > 0 ? imageUrls : undefined
+        imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+        taste: dimRating.taste > 0 ? dimRating.taste : undefined,
+        difficulty: dimRating.difficulty > 0 ? dimRating.difficulty : undefined,
+        presentation: dimRating.presentation > 0 ? dimRating.presentation : undefined,
+        value: dimRating.value > 0 ? dimRating.value : undefined
       })
-      setContent('')
-      setRating(0)
-      setSelectedFiles([])
-      setShowForm(false)
+      resetForm()
       toast.success('评论发表成功')
       setPage(1)
       await fetchData()
@@ -209,6 +239,30 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
     setLbIndex(0)
   }
 
+  /** 渲染评论卡片的四维维度徽章 */
+  const renderDimensionBadges = (comment: Comment) => {
+    const badges: Array<{ key: DimensionKey; value: number }> = []
+    for (const key of Object.keys(DIMENSION_CONFIG) as DimensionKey[]) {
+      if (comment[key] != null) {
+        badges.push({ key, value: comment[key] })
+      }
+    }
+    if (badges.length === 0) return null
+    return (
+      <div className="dimension-badges">
+        {badges.map(({ key, value }) => {
+          const cfg = DIMENSION_CONFIG[key]
+          return (
+            <span key={key} className={`dimension-badge ${cfg.cssClass}`}>
+              <span className="dimension-badge__emoji">{cfg.emoji}</span>
+              {cfg.label} {value}
+            </span>
+          )
+        })}
+      </div>
+    )
+  }
+
   const totalPages = Math.ceil(total / pageSize)
 
   if (loading) {
@@ -259,6 +313,12 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
               </div>
             ))}
           </div>
+          {/* 四维雷达图 */}
+          {stats.dimensionAverages && (
+            <div className="comment-stats__radar">
+              <DimensionRadar data={stats.dimensionAverages} size="md" />
+            </div>
+          )}
         </div>
       )}
 
@@ -274,6 +334,45 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
               <StarRating value={rating} onChange={setRating} />
               {rating > 0 && <span className="comment-form__rating-text">{rating} 分</span>}
             </div>
+
+            {/* 展开详细评分 */}
+            <button
+              type="button"
+              className={`comment-form__dimensions-toggle ${dimensionsExpanded ? 'is-expanded' : ''}`}
+              onClick={() => setDimensionsExpanded(v => !v)}
+              aria-expanded={dimensionsExpanded}
+              aria-controls="dimensions-panel"
+            >
+              {dimensionsExpanded ? '▲' : '▼'} 展开详细评分
+            </button>
+
+            <div
+              id="dimensions-panel"
+              className={`comment-form__dimensions ${dimensionsExpanded ? 'is-expanded' : ''}`}
+            >
+              {(Object.keys(DIMENSION_CONFIG) as DimensionKey[]).map(key => {
+                const cfg = DIMENSION_CONFIG[key]
+                return (
+                  <div key={key} className="dimension-row">
+                    <span className="dimension-label">
+                      {cfg.emoji} {cfg.label}
+                    </span>
+                    <StarRating
+                      value={dimRating[key]}
+                      onChange={v => setDimRating(prev => ({ ...prev, [key]: v }))}
+                      size="sm"
+                    />
+                    {dimRating[key] > 0 && (
+                      <span className="dimension-value-text">{dimRating[key]} 分</span>
+                    )}
+                  </div>
+                )
+              })}
+              <div className="dimension-hint">
+                💡 维度评分为可选项，帮助你更精准地表达感受
+              </div>
+            </div>
+
             <textarea
               className="comment-form__textarea"
               placeholder="分享你对这道菜的看法..."
@@ -288,7 +387,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
               <button
                 type="button"
                 className="btn btn--ghost"
-                onClick={() => { setShowForm(false); setContent(''); setRating(0); setSelectedFiles([]) }}
+                onClick={resetForm}
               >
                 取消
               </button>
@@ -331,6 +430,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
                     {comment.user?.nickname || comment.user?.username || '匿名用户'}
                   </span>
                   {comment.rating && <StarRating value={comment.rating} readonly size="sm" />}
+                  {renderDimensionBadges(comment)}
                 </div>
                 <span className="comment-item__time">{formatTime(comment.createdAt)}</span>
               </div>

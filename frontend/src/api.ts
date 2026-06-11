@@ -463,10 +463,20 @@ export interface CommentUser {
   nickname?: string
 }
 
+/** 单维度平均数据 */
+export interface DimensionAverage {
+  average: number
+  count: number
+}
+
 export interface Comment {
   id: number
   content: string
   rating: number | null
+  taste: number | null
+  difficulty: number | null
+  presentation: number | null
+  value: number | null
   userId: string
   recipeId: string
   createdAt: string
@@ -481,6 +491,12 @@ export interface CommentStats {
   ratedCount: number
   averageRating: number
   distribution: Record<number, number>
+  dimensionAverages: {
+    taste: DimensionAverage
+    difficulty: DimensionAverage
+    presentation: DimensionAverage
+    value: DimensionAverage
+  }
 }
 
 export interface CommentListResponse {
@@ -519,7 +535,7 @@ export function getCommentStats(recipeId: string): Promise<{ data: CommentStats 
  */
 export function createComment(
   recipeId: string,
-  data: { content: string; rating?: number; imageUrls?: string[] }
+  data: { content: string; rating?: number; imageUrls?: string[]; taste?: number; difficulty?: number; presentation?: number; value?: number }
 ): Promise<{ data: Comment }> {
   return apiClient.post(`/recipes/${recipeId}/comments`, data)
 }
@@ -2574,4 +2590,3 @@ export interface RelatedTag {
 export async function getRelatedTags(tag: string, limit = 10): Promise<RelatedTag[]> {
   return apiClient.get('/tags/related', { params: { tag, limit } }).then(r => r.data?.data?.related || [])
 }
-

@@ -5,9 +5,9 @@
  * 评论相关路由
  *
  * GET    /recipes/:recipeId/comments            — 获取食谱评论列表（分页，支持 sort=latest|hot）
- * GET    /recipes/:recipeId/comments/stats       — 获取评分统计
+ * GET    /recipes/:recipeId/comments/stats       — 获取评分统计（含四维维度统计）
  * GET    /recipes/:recipeId/ratings/trends       — 获取评分趋势（按月/周）
- * POST   /recipes/:recipeId/comments             — 发表评论（需认证）
+ * POST   /recipes/:recipeId/comments             — 发表评论（需认证，支持四维评分）
  * POST   /comments/:id/like                      — 点赞评论（需认证）
  * DELETE /comments/:id/like                      — 取消点赞（需认证）
  * POST   /comments/:id/reply                     — 回复评论（需认证）
@@ -24,8 +24,22 @@ const { checkAllAchievements } = require('../utils/achievementChecker')
 
 const router = express.Router()
 
+/** 四维评分字段名 */
+const DIMENSION_FIELDS = ['taste', 'difficulty', 'presentation', 'value']
+
 function resJSON(code, message, data) {
   return { code, message, data }
+}
+
+/** 校验维度评分：可选，但若提供则必须是 1-5 整数 */
+function validateDimensionRating(body, field) {
+  const val = body[field]
+  if (val == null) return null // 未提供，合法
+  const num = Number(val)
+  if (!Number.isInteger(num) || num < 1 || num > 5) {
+    return field + '评分必须是 1-5 的整数'
+  }
+  return null
 }
 
 /**
@@ -142,15 +156,16 @@ router.get('/recipes/:recipeId/comments', async (req, res) => {
 
 /**
  * GET /recipes/:recipeId/comments/stats
- * 获取评分统计：平均分、评分数量、各星级分布
+ * 获取评分统计：平均分、评分数量、各星级分布 + 四维维度平均分
  */
 router.get('/recipes/:recipeId/comments/stats', async (req, res) => {
   try {
     const { recipeId } = req.params
 
+    // 查询包含综合评分和四维维度字段
     const comments = await Comment.findAll({
       where: { recipeId },
-      attributes: ['rating']
+      attributes: ['rating', 'taste', 'difficulty', 'presentation', 'value']
     })
 
     const total = comments.length
@@ -169,12 +184,28 @@ router.get('/recipes/:recipeId/comments/stats', async (req, res) => {
       averageRating = Math.round((sum / ratedCount) * 10) / 10
     }
 
+    // 计算四维维度平均分（忽略 NULL）
+    const dimensionAverages = {}
+    for (const dim of DIMENSION_FIELDS) {
+      const validComments = comments.filter(c => c[dim] != null)
+      if (validComments.length > 0) {
+        const sum = validComments.reduce((s, c) => s + c[dim], 0)
+        dimensionAverages[dim] = {
+          average: Math.round((sum / validComments.length) * 10) / 10,
+          count: validComments.length
+        }
+      } else {
+        dimensionAverages[dim] = { average: 0, count: 0 }
+      }
+    }
+
     return res.status(200).json(
       resJSON(0, 'ok', {
         total,
         ratedCount,
         averageRating,
-        distribution
+        distribution,
+        dimensionAverages
       })
     )
   } catch (err) {
@@ -227,7 +258,7 @@ router.get('/recipes/:recipeId/ratings/trends', async (req, res) => {
 
 /**
  * POST /recipes/:recipeId/comments
- * 发表评论（需认证）
+ * 发表评论（需认证），支持可选的四维评分
  */
 router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
   try {
@@ -244,6 +275,14 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
 
     if (rating != null && (rating < 1 || rating > 5 || !Number.isInteger(rating))) {
       return res.status(400).json(resJSON(400, '评分必须是 1-5 的整数', null))
+    }
+
+    // 校验四维评分（可选，但若提供则必须 1-5 整数）
+    for (const dim of DIMENSION_FIELDS) {
+      const errMsg = validateDimensionRating(req.body, dim)
+      if (errMsg) {
+        return res.status(400).json(resJSON(400, errMsg, null))
+      }
     }
 
     // 检查食谱是否存在
@@ -264,9 +303,17 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
       parsedImageUrls = imageUrls
     }
 
+    // 提取四维评分值（null 或 整数）
+    const dimValues = {}
+    for (const dim of DIMENSION_FIELDS) {
+      const raw = req.body[dim]
+      dimValues[dim] = raw != null ? Number(raw) : null
+    }
+
     const comment = await Comment.create({
       content: content.trim(),
       rating: rating || null,
+      ...dimValues,
       userId: req.userId,
       recipeId,
       likesCount: 0,

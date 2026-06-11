@@ -3,7 +3,7 @@
 /**
  * models/comment.js
  * 评论模型
- * 字段：id(主键), content, rating(1-5), userId, recipeId, createdAt, updatedAt
+ * 字段：id(主键), content, rating(1-5), taste(1-5), difficulty(1-5), presentation(1-5), value(1-5), userId, recipeId, createdAt, updatedAt
  * tableName: 'comments', timestamps: false
  *
  * 注意：userId/recipeId 使用 DataTypes.UUID 匹配 users.id/recipes.id 的 CHAR(36)
@@ -37,7 +37,31 @@ module.exports = (sequelize, DataTypes) => {
           min: 1,
           max: 5
         },
-        comment: '评分(1-5)，可选'
+        comment: '综合评分(1-5)，可选'
+      },
+      taste: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: { min: 1, max: 5 },
+        comment: '口味评分(1-5)'
+      },
+      difficulty: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: { min: 1, max: 5 },
+        comment: '难度评分(1-5)'
+      },
+      presentation: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: { min: 1, max: 5 },
+        comment: '卖相评分(1-5)'
+      },
+      value: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: { min: 1, max: 5 },
+        comment: '性价比评分(1-5)'
       },
       likesCount: {
         type: DataTypes.INTEGER,
