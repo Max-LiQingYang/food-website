@@ -53,9 +53,9 @@ router.get('/stats', async (req, res) => {
           // 提取 categoryTags JSON 中的 taste/method 标签
           try {
             const ct = typeof r.categoryTags === 'string' ? JSON.parse(r.categoryTags) : (r.categoryTags || {})
-            const tasteTags = (ct.taste || []).slice(0, 2)
-            const methodTags = (ct.method || []).slice(0, 1)
-            return [...tasteTags, ...methodTags].filter(Boolean).slice(0, 3)
+            const tasteTags = (ct.taste || []).filter((t) => t && t.length > 1).slice(0, 2)
+            const methodTags = (ct.method || []).filter((t) => t && t.length > 1).slice(0, 1)
+            return [...tasteTags, ...methodTags].slice(0, 3)
           } catch {
             return []
           }
@@ -69,16 +69,16 @@ router.get('/stats', async (req, res) => {
 
     const stats = rows.map(row => ({
       category: row.category,
-      recipeCount: row.recipeCount,
+      recipeCount: parseInt(row.recipeCount, 10) || 0,
       difficulty: {
-        easy: row.easyCount,
-        medium: row.mediumCount,
-        hard: row.hardCount,
+        easy: parseInt(row.easyCount, 10) || 0,
+        medium: parseInt(row.mediumCount, 10) || 0,
+        hard: parseInt(row.hardCount, 10) || 0,
       },
-      avgCookTime: row.avgCookTime || 0,
-      avgServings: row.avgServings || 0,
+      avgCookTime: parseInt(row.avgCookTime, 10) || 0,
+      avgServings: parseInt(row.avgServings, 10) || 0,
       avgRating: ratingMap[row.category] || 0,
-      topTags: tagMap[row.category] || [],
+      topTags: (tagMap[row.category] || []).filter(t => t && t.length > 1),
     }))
 
     res.json({ code: 0, data: stats })
