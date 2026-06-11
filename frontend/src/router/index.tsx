@@ -16,6 +16,7 @@ import '../components/PageTransition.css'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const FavoriteList = lazy(() => import('../pages/FavoriteList'))
+const FeedPage = lazy(() => import('../pages/FeedPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const RecipeDetailPage = lazy(() => import('../pages/RecipeDetailPage'))
 const CookingModePage = lazy(() => import('../pages/CookingModePage'))
@@ -96,8 +97,9 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/login', element: <LoginPage /> },
       { path: '/favorites', element: <FavoriteList /> },
+      { path: '/feed', element: <FeedPage /> },
+      { path: '/login', element: <LoginPage /> },
       { path: '/recipes', element: <AllRecipesPage /> },
       { path: '/recipe/:id', element: <RecipeDetailPage /> },
       { path: '/recipe/:id/edit', element: <CreateRecipePage /> },
