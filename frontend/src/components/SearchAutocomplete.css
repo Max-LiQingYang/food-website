@@ -383,8 +383,8 @@ body.dark .search-autocomplete__skeleton-row {
   }
 }
 
-/* 超小屏（≤360px）— 完全隐藏缩略图 */
-@media (max-width: 360px) {
+/* 超小屏（≤480px）— 完全隐藏缩略图 */
+@media (max-width: 480px) {
   .search-autocomplete__thumb { display: none; }
   .search-autocomplete__icon { width: auto; height: auto; }
 }

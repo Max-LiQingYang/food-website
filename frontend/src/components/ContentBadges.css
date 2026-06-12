@@ -147,8 +147,8 @@ body.dark .recipe-card__content-badge--video {
   }
 }
 
-/* ── 极小屏（≤360px）：单行 4 徽章可能溢出，启用更紧凑间距 ────────── */
-@media (max-width: 360px) {
+/* ── 极小屏（≤480px）：单行 4 徽章可能溢出，启用更紧凑间距 ────────── */
+@media (max-width: 480px) {
   .recipe-card__content-badge {
     padding: 4px 8px;
     font-size: 11px;

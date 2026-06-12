@@ -798,7 +798,7 @@ body.dark .recipe-card__content-badge--video   { background: rgba(232, 102, 62, 
   .recipe-card__content-badges { margin-top: 4px; gap: 5px; }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .recipe-card__content-badge { padding: 4px 8px; font-size: 11px; }
   .recipe-card__content-badges { gap: 4px; }
 }
