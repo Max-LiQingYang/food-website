@@ -434,13 +434,18 @@ run_deploy() {
      docker-compose -f ${COMPOSE_FILE} up -d --force-recreate --no-deps ${SERVICE_NAME} 2>&1)" \
     || warn "compose up failed (continuing — verify will catch issues)"
 
+  # B2 修复: 全程用一次转义后的容器名,避免重复
+  local escaped_cname_deploy escaped_nginx_deploy
+  escaped_cname_deploy=$(printf '%q' "$CONTAINER_NAME")
+  escaped_nginx_deploy=$(printf '%q' "$NGINX_CONTAINER")
+
   # ── 4.2 wait for container healthy ──
   log "waiting for ${CONTAINER_NAME} to be healthy..."
   local retries=0
   local max_retries=20
   while [[ $retries -lt $max_retries ]]; do
     local status
-    status=$(ssh_cmd "docker inspect --format='{{.State.Health.Status}}' ${CONTAINER_NAME} 2>/dev/null || echo unknown" 2>/dev/null | tail -1 | tr -d "'")
+    status=$(ssh_cmd "docker inspect --format='{{.State.Health.Status}}' ${escaped_cname_deploy} 2>/dev/null || echo unknown" 2>/dev/null | tail -1 | tr -d "'")
     if [[ "$status" == "healthy" ]]; then
       ok "${CONTAINER_NAME} is healthy"
       break
@@ -454,10 +459,7 @@ run_deploy() {
   fi
 
   # ── 4.3 docker cp 覆盖容器内文件 ──
-  # B2 修复: CONTAINER_NAME printf '%q' 转义
   log "docker cp backend overlay → ${CONTAINER_NAME}..."
-  local escaped_cname_deploy
-  escaped_cname_deploy=$(printf '%q' "$CONTAINER_NAME")
   ssh_cmd "docker cp /tmp/backend-overlay/. ${escaped_cname_deploy}:/app/ 2>&1" \
     || warn "docker cp backend failed"
 
@@ -469,15 +471,13 @@ run_deploy() {
   # ── 4.5 docker cp 前端（如果有）──
   if ssh_cmd "test -d /tmp/frontend-overlay" 2>/dev/null; then
     log "docker cp frontend overlay → ${NGINX_CONTAINER}..."
-    local escaped_nginx_deploy
-    escaped_nginx_deploy=$(printf '%q' "$NGINX_CONTAINER")
     ssh_cmd "docker cp /tmp/frontend-overlay/. ${escaped_nginx_deploy}:${NGINX_HTML_PATH}/ 2>&1" \
       || warn "docker cp frontend failed"
   fi
 
   # ── 4.6 restart 容器 ──
   log "restarting ${CONTAINER_NAME}..."
-  ssh_cmd "docker restart ${CONTAINER_NAME} 2>&1" \
+  ssh_cmd "docker restart ${escaped_cname_deploy} 2>&1" \
     || warn "docker restart failed"
 
   # ── 4.7 wait for healthy after restart ──
@@ -485,7 +485,7 @@ run_deploy() {
   retries=0
   while [[ $retries -lt 20 ]]; do
     local status
-    status=$(ssh_cmd "docker inspect --format='{{.State.Health.Status}}' ${CONTAINER_NAME} 2>/dev/null || echo unknown" 2>/dev/null | tail -1 | tr -d "'")
+    status=$(ssh_cmd "docker inspect --format='{{.State.Health.Status}}' ${escaped_cname_deploy} 2>/dev/null || echo unknown" 2>/dev/null | tail -1 | tr -d "'")
     if [[ "$status" == "healthy" ]]; then
       ok "${CONTAINER_NAME} recovered healthy"
       break
