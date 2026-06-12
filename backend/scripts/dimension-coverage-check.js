@@ -1,0 +1,709 @@
+#!/usr/bin/env node
+'use strict'
+
+/**
+ * dimension-coverage-check.js — 4 维评分闭环内容质量巡检脚本
+ *
+ * 用法:
+ *   node scripts/dimension-coverage-check.js               # 生产 MariaDB
+ *   node scripts/dimension-coverage-check.js --local       # 本地 SQLite
+ *   node scripts/dimension-coverage-check.js --json        # 仅输出 JSON（生产）
+ *   node scripts/dimension-coverage-check.js --explain     # EXPLAIN 预检
+ *   node scripts/dimension-coverage-check.js --ci          # CI 模式（去颜色 + 无 API verify）
+ *
+ * 设计原则: 永远只读，不执行任何 UPDATE/INSERT/DELETE
+ * 修复请使用独立的 fix-dimension-orphans.js
+ */
+
+const { Sequelize } = require('sequelize')
+const fs = require('fs')
+const path = require('path')
+
+// ── CLI flags ──
+const args = process.argv.slice(2)
+const isLocal = args.includes('--local')
+const isJson = args.includes('--json')
+const isExplain = args.includes('--explain')
+const isCi = args.includes('--ci')
+
+// ── 阈值常量（可按需调整） ──
+const JACCARD_THRESHOLD = 0.7
+const DICE_THRESHOLD = 0.85
+const DELTA_THRESHOLD = 5
+const AUTHOR_THRESHOLD = 0.8
+const SEASON_ALL_MAX_RATIO = 0.80
+
+// ── DB 连接工厂（惰性创建，避免 require 时产生闲置连接）──
+const dbName = isLocal ? '本地 SQLite' : 'MariaDB (172.17.0.1)'
+let _seq = null
+function getSeq() {
+  if (_seq) return _seq
+  _seq = isLocal
+    ? new Sequelize({ dialect: 'sqlite', storage: './data/food.db', logging: false })
+    : new Sequelize({
+        host: process.env.DB_HOST || '172.17.0.1',
+        port: parseInt(process.env.DB_PORT || '3306', 10),
+        database: process.env.DB_NAME || 'food_website',
+        username: process.env.DB_USER || 'food_user',
+        password: process.env.DB_PASS || process.env.DB_PASSWORD || 'food_password',
+        dialect: 'mysql',
+        dialectModule: require('mysql2'),
+        logging: false,
+      })
+  return _seq
+}
+
+// ══════════════════════════════════════════════════════════
+// 工具函数
+// ══════════════════════════════════════════════════════════
+
+/** 中文标题相似度（bigram Jaccard） */
+function chineseSimilarity(a, b) {
+  const bigrams = s => {
+    const chars = [...s]
+    const set = new Set()
+    for (let i = 0; i < chars.length - 1; i++) {
+      set.add(chars.slice(i, i + 2).join(''))
+    }
+    return set
+  }
+  const setA = bigrams(a)
+  const setB = bigrams(b)
+  const intersection = [...setA].filter(x => setB.has(x)).length
+  return intersection / (setA.size + setB.size - intersection)
+}
+
+/** 英文/混合标题相似度（Dice Coefficient） */
+function diceSimilarity(a, b) {
+  const bigrams = s => {
+    const g = new Set()
+    const normalized = s.toLowerCase().replace(/[^\w]/g, '')
+    for (let i = 0; i < normalized.length - 1; i++) {
+      g.add(normalized.slice(i, i + 2))
+    }
+    return g
+  }
+  const ga = bigrams(a)
+  const gb = bigrams(b)
+  const intersection = new Set([...ga].filter(x => gb.has(x)))
+  return (2 * intersection.size) / (ga.size + gb.size)
+}
+
+/** 预处理标题：去除全角/半角标点符号 */
+function cleanTitle(s) {
+  return s.replace(/[\s\u3000「」『』《》（）【】""''、，。：；？！—…·\-•··\.\,\;\:\!\?\"\'\(\)\[\]\{\}\<\>\/\\\|@#\$%\^&\*\+=\~`]/g, '')
+}
+
+/** 统计中文字符数量 */
+function cjkCount(s) {
+  return [...s].filter(c => c.charCodeAt(0) >= 0x4e00 && c.charCodeAt(0) <= 0x9fff).length
+}
+
+/** 综合标题相似度 */
+function titleSimilarity(a, b) {
+  const ca = cleanTitle(a), cb = cleanTitle(b)
+  if (ca.length < 3 || cb.length < 3) return 0
+  if (cjkCount(ca) >= 3 && cjkCount(cb) >= 3) {
+    const sim = chineseSimilarity(ca, cb)
+    return sim >= JACCARD_THRESHOLD ? sim : 0
+  }
+  const sim = diceSimilarity(ca, cb)
+  return sim >= DICE_THRESHOLD ? sim : 0
+}
+
+/** 精度处理：保留 2 位小数 */
+function r2(n) {
+  return Math.round(n * 100) / 100
+}
+
+/** #127: MySQL raw query COUNT 返回字符串，显式 parseInt */
+function toInt(v) {
+  return typeof v === 'string' ? parseInt(v, 10) : (v || 0)
+}
+
+function toFloat(v) {
+  return typeof v === 'string' ? parseFloat(v) : (v || 0)
+}
+
+// ══════════════════════════════════════════════════════════
+// 导出函数：quality-check.js 复用
+// ══════════════════════════════════════════════════════════
+
+/**
+ * 4 维评分覆盖统计（独立函数，全 try-catch 异常隔离）
+ * 供 quality-check.js require 使用
+ */
+async function check4DimensionalCoverage(seqInstance) {
+  try {
+    const rows = await seqInstance.query(`
+      SELECT
+        r.id,
+        COALESCE(SUM(CASE WHEN c.taste IS NOT NULL AND c.taste > 0 THEN 1 ELSE 0 END), 0) AS taste_cnt,
+        COALESCE(SUM(CASE WHEN c.difficulty IS NOT NULL AND c.difficulty > 0 THEN 1 ELSE 0 END), 0) AS difficulty_cnt,
+        COALESCE(SUM(CASE WHEN c.presentation IS NOT NULL AND c.presentation > 0 THEN 1 ELSE 0 END), 0) AS presentation_cnt,
+        COALESCE(SUM(CASE WHEN c.value IS NOT NULL AND c.value > 0 THEN 1 ELSE 0 END), 0) AS value_cnt
+      FROM recipes r
+      LEFT JOIN comments c ON c.recipeId = r.id
+      GROUP BY r.id
+    `, { type: seqInstance.QueryTypes.SELECT })
+
+    const total = rows.length
+    const tasteCov = rows.filter(r => toInt(r.taste_cnt) > 0).length
+    const difficultyCov = rows.filter(r => toInt(r.difficulty_cnt) > 0).length
+    const presentationCov = rows.filter(r => toInt(r.presentation_cnt) > 0).length
+    const valueCov = rows.filter(r => toInt(r.value_cnt) > 0).length
+    const orphanCount = rows.filter(r =>
+      toInt(r.taste_cnt) === 0 && toInt(r.difficulty_cnt) === 0 &&
+      toInt(r.presentation_cnt) === 0 && toInt(r.value_cnt) === 0
+    ).length
+
+    return {
+      skipped: false,
+      coverage: {
+        taste:        { covered: tasteCov, total },
+        difficulty:   { covered: difficultyCov, total },
+        presentation: { covered: presentationCov, total },
+        value:        { covered: valueCov, total },
+      },
+      orphanCount,
+    }
+  } catch (err) {
+    console.warn(`⚠ 4 维评分覆盖统计跳过（DB 错误）: ${err.message}`)
+    return { skipped: true, reason: err.message }
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// 子分析函数
+// ══════════════════════════════════════════════════════════
+
+/** ① coverageMatrix：从 result set 构建覆盖矩阵 */
+function buildCoverageMatrix(rows) {
+  return rows.map(r => ({
+    id: r.id,
+    title: r.title,
+    taste:        { count: toInt(r.taste_cnt), avg: r2(toFloat(r.taste_avg)) },
+    difficulty:   { count: toInt(r.difficulty_cnt), avg: r2(toFloat(r.difficulty_avg)) },
+    presentation: { count: toInt(r.presentation_cnt), avg: r2(toFloat(r.presentation_avg)) },
+    value:        { count: toInt(r.value_cnt), avg: r2(toFloat(r.value_avg)) },
+    dimensionsWithData: [
+      toInt(r.taste_cnt), toInt(r.difficulty_cnt),
+      toInt(r.presentation_cnt), toInt(r.value_cnt)
+    ].filter(c => c > 0).length,
+  }))
+}
+
+/** ② orphanDetection：从 result set 过滤全 0 孤儿 */
+function detectOrphans(rows, top20Ids) {
+  return rows
+    .filter(r =>
+      toInt(r.taste_cnt) === 0 && toInt(r.difficulty_cnt) === 0 &&
+      toInt(r.presentation_cnt) === 0 && toInt(r.value_cnt) === 0
+    )
+    .map(r => ({
+      id: r.id,
+      title: r.title,
+      isFeatured: !!(r.isFeatured),
+      isTop20: top20Ids.has(r.id),
+      qualityScore: toFloat(r.qualityScore),
+      viewCount: toInt(r.viewCount),
+      favoriteCount: toInt(r.favoriteCount),
+      commentCount: toInt(r.commentCount),
+    }))
+}
+
+/** ③ dynamicVsStaticScore：动态分 vs 静态分偏差 */
+function computeDeviations(rows) {
+  return rows
+    .map(r => {
+      const ta = toFloat(r.taste_avg), da = toFloat(r.difficulty_avg)
+      const pa = toFloat(r.presentation_avg), va = toFloat(r.value_avg)
+      // 4 维均值 × 20 映射到 0-100
+      const dynamicScore = r2((ta + da + pa + va) / 4 * 20)
+      const dbScore = toFloat(r.qualityScore)
+      const delta = r2(Math.abs(dynamicScore - dbScore))
+      return {
+        id: r.id, title: r.title,
+        dbQualityScore: dbScore, dynamicScore, delta,
+        taste_avg: ta, difficulty_avg: da, presentation_avg: pa, value_avg: va,
+      }
+    })
+    .filter(r => r.delta > DELTA_THRESHOLD)
+    .sort((a, b) => b.delta - a.delta)
+}
+
+/** ④ duplicateScan：中英文双轨模糊匹配 */
+function findDuplicates(rows) {
+  const candidates = rows.filter(r => cleanTitle(r.title).length >= 3)
+  const groups = []
+  const visited = new Set()
+
+  for (let i = 0; i < candidates.length; i++) {
+    if (visited.has(i)) continue
+    const group = [candidates[i]]
+    for (let j = i + 1; j < candidates.length; j++) {
+      if (visited.has(j)) continue
+      const tSim = titleSimilarity(candidates[i].title, candidates[j].title)
+      const aSim = diceSimilarity(
+        (candidates[i].author || '').toLowerCase(),
+        (candidates[j].author || '').toLowerCase()
+      )
+      if (tSim > 0 && aSim >= AUTHOR_THRESHOLD) {
+        group.push(candidates[j])
+        visited.add(j)
+      }
+    }
+    if (group.length > 1) {
+      visited.add(i)
+      const maxFav = Math.max(...group.map(r => toInt(r.favoriteCount)))
+      const algorithm = cjkCount(cleanTitle(group[0].title)) >= 3
+        ? 'bigramJaccard' : 'diceCoefficient'
+      const maxSim = Math.max(...group.slice(1).map(r =>
+        titleSimilarity(group[0].title, r.title)
+      ))
+      groups.push({
+        similarity: r2(maxSim),
+        algorithm,
+        recipes: group.map(r => ({
+          id: r.id, title: r.title, author: r.author || '',
+          createdAt: r.createdAt, viewCount: toInt(r.viewCount),
+          commentCount: toInt(r.commentCount), favoriteCount: toInt(r.favoriteCount),
+          recommended: toInt(r.favoriteCount) === maxFav,
+        })),
+      })
+    }
+  }
+  return groups
+}
+
+/** ⑤ seasonDistribution：季节分布统计 */
+function computeSeasonDistribution(seasonRows) {
+  const total = seasonRows.length
+  const dist = { spring: 0, summer: 0, autumn: 0, winter: 0, all: 0, nullSeason: 0 }
+  for (const r of seasonRows) {
+    const s = r.season
+    if (s === null || s === undefined || s === '') { dist.nullSeason++ }
+    else if (dist.hasOwnProperty(s)) { dist[s]++ }
+    else { dist.nullSeason++ }
+  }
+  return {
+    spring:     { count: dist.spring, ratio: r2(dist.spring / total) },
+    summer:     { count: dist.summer, ratio: r2(dist.summer / total) },
+    autumn:     { count: dist.autumn, ratio: r2(dist.autumn / total) },
+    winter:     { count: dist.winter, ratio: r2(dist.winter / total) },
+    all:        { count: dist.all, ratio: r2(dist.all / total) },
+    nullSeason: { count: dist.nullSeason, ratio: r2(dist.nullSeason / total) },
+    total,
+    allRatioExceedsThreshold: (dist.all / total) > SEASON_ALL_MAX_RATIO,
+    threshold: SEASON_ALL_MAX_RATIO,
+  }
+}
+
+/** ⑥ topNHealthCheck：Top N 排行榜 4 维完整性 */
+function computeTopNHealth(rows, topN) {
+  return rows
+    .sort((a, b) => toFloat(b.qualityScore) - toFloat(a.qualityScore))
+    .slice(0, topN)
+    .map((r, idx) => {
+      const missingFields = []
+      if (!r.coverImage) missingFields.push('coverImage')
+      if (!r.title) missingFields.push('title')
+      if (!r.category) missingFields.push('category')
+      if (toFloat(r.qualityScore) === 0 && !r.qualityScore) missingFields.push('qualityScore')
+      if (toInt(r.favoriteCount) === 0) missingFields.push('favoriteCount')
+
+      if (toInt(r.taste_cnt) < 1) missingFields.push('taste(count=0)')
+      else if (toFloat(r.taste_avg) < 1.0) missingFields.push('taste(avg<1.0)')
+
+      if (toInt(r.difficulty_cnt) < 1) missingFields.push('difficulty(count=0)')
+      else if (toFloat(r.difficulty_avg) < 1.0) missingFields.push('difficulty(avg<1.0)')
+
+      if (toInt(r.presentation_cnt) < 1) missingFields.push('presentation(count=0)')
+      else if (toFloat(r.presentation_avg) < 1.0) missingFields.push('presentation(avg<1.0)')
+
+      if (toInt(r.value_cnt) < 1) missingFields.push('value(count=0)')
+      else if (toFloat(r.value_avg) < 1.0) missingFields.push('value(avg<1.0)')
+
+      return {
+        rank: idx + 1, id: r.id, title: r.title,
+        qualityScore: toFloat(r.qualityScore),
+        missingFields,
+        allDimensionsOk: missingFields.length === 0,
+      }
+    })
+}
+
+/** categoryTags 格式扫描 */
+function scanCategoryTags(rows) {
+  return rows
+    .map(r => {
+      let parsed
+      try {
+        parsed = typeof r.categoryTags === 'string'
+          ? JSON.parse(r.categoryTags)
+          : r.categoryTags
+      } catch { return { id: r.id, title: r.title, issue: 'PARSE_ERROR', detail: 'JSON.parse failed' } }
+      if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return { id: r.id, title: r.title, issue: 'NOT_OBJECT', detail: String(typeof parsed) }
+      }
+      if (Object.keys(parsed).length === 0) {
+        return { id: r.id, title: r.title, issue: 'EMPTY_OBJECT', detail: '{}' }
+      }
+      const requiredKeys = ['ingredient', 'method', 'cuisine', 'flavor', 'price']
+      for (const k of requiredKeys) {
+        if (!(k in parsed)) {
+          return { id: r.id, title: r.title, issue: 'MISSING_KEY', detail: `missing: ${k}` }
+        }
+      }
+      return null
+    })
+    .filter(Boolean)
+}
+
+/** season 值域合规扫描 */
+function scanSeasons(rows) {
+  const validSeasons = new Set(['spring', 'summer', 'autumn', 'winter', 'all'])
+  return rows
+    .filter(r => {
+      if (r.season === null || r.season === undefined || r.season === '') return true
+      return !validSeasons.has(r.season)
+    })
+    .map(r => ({
+      id: r.id,
+      title: r.title,
+      season: r.season === null || r.season === undefined || r.season === '' ? null : r.season,
+      issue: (r.season === null || r.season === undefined || r.season === '') ? 'NULL' : 'INVALID_VALUE',
+    }))
+}
+
+// ══════════════════════════════════════════════════════════
+// 终端输出
+// ══════════════════════════════════════════════════════════
+
+function printHeader() {
+  console.log(`\n${'='.repeat(60)}`)
+  console.log(`  4 维评分覆盖巡检 [${dbName}]`)
+  console.log(`${'='.repeat(60)}`)
+}
+
+function printSubAnalysis(report) {
+  const color = isCi ? { green: '', red: '', yellow: '', reset: '' }
+    : { green: '\x1b[32m', red: '\x1b[31m', yellow: '\x1b[33m', reset: '\x1b[0m' }
+
+  // --- ① coverageMatrix summary ---
+  const cov = report.summary.coverageByDimension
+  console.log(`\n📊 4 维覆盖率 (count≥1)`)
+  console.log(`  口味(taste):       ${cov.taste.covered}/${cov.taste.total} (${r2(cov.taste.ratio * 100)}%)`)
+  console.log(`  难度(difficulty):  ${cov.difficulty.covered}/${cov.difficulty.total} (${r2(cov.difficulty.ratio * 100)}%)`)
+  console.log(`  外观(presentation): ${cov.presentation.covered}/${cov.presentation.total} (${r2(cov.presentation.ratio * 100)}%)`)
+  console.log(`  性价比(value):     ${cov.value.covered}/${cov.value.total} (${r2(cov.value.ratio * 100)}%)`)
+
+  // --- ② orphanDetection ---
+  console.log(`\n🔍 全 0 孤儿食谱: ${report.summary.orphanCount} 道`)
+  if (report.orphanList.length > 0) {
+    for (const o of report.orphanList) {
+      const tags = []
+      if (o.isFeatured) tags.push('主推')
+      if (o.isTop20) tags.push('Top20')
+      const tagStr = tags.length ? ` ${color.yellow}[${tags.join(',')}]${color.reset}` : ''
+      console.log(`  ${color.red}⚠${color.reset} ${o.title} (QS=${o.qualityScore}, views=${o.viewCount}, favs=${o.favoriteCount})${tagStr}`)
+    }
+  }
+
+  // --- ③ dynamicVsStatic ---
+  console.log(`\n📈 qualityScore 偏差 (>${DELTA_THRESHOLD}): ${report.summary.deviationCount} 道`)
+  if (report.dynamicVsStatic.length > 0) {
+    const top = report.dynamicVsStatic.slice(0, 10)
+    for (const d of top) {
+      console.log(`  ${color.yellow}⚠${color.reset} ${d.title}: DB=${d.dbQualityScore} vs 4D=${d.dynamicScore} Δ=${d.delta}`)
+      console.log(`      taste=${d.taste_avg} dif=${d.difficulty_avg} pres=${d.presentation_avg} val=${d.value_avg}`)
+    }
+    if (report.dynamicVsStatic.length > 10) {
+      console.log(`  ... 共 ${report.dynamicVsStatic.length} 道，详见 JSON 报告`)
+    }
+  }
+
+  // --- ④ duplicateScan ---
+  console.log(`\n🔄 疑似重复组: ${report.summary.duplicateGroupCount} 组`)
+  if (report.duplicateGroups.length > 0) {
+    for (const g of report.duplicateGroups) {
+      const alg = g.algorithm === 'bigramJaccard' ? '中文Jaccard' : '英文Dice'
+      console.log(`  ${color.yellow}⚠${color.reset} 相似度=${g.similarity} (${alg}), ${g.recipes.length} 道:`)
+      for (const r of g.recipes) {
+        console.log(`    ${r.recommended ? '⭐' : '  '} ${r.title} by ${r.author} (views=${r.viewCount}, favs=${r.favoriteCount})`)
+      }
+    }
+  }
+
+  // --- ⑤ seasonDistribution ---
+  const sd = report.seasonDistribution
+  console.log(`\n🌤 季节分布 (all占比=${r2(sd.all.ratio * 100)}%)`)
+  console.log(`  spring=${sd.spring.count} summer=${sd.summer.count} autumn=${sd.autumn.count} winter=${sd.winter.count} all=${sd.all.count} null=${sd.nullSeason.count}`)
+  if (sd.allRatioExceedsThreshold) {
+    console.log(`  ${color.yellow}⚠ all占比超过 ${r2(sd.threshold * 100)}% 阈值，建议部分归类到具体季节${color.reset}`)
+  }
+
+  // --- ⑥ topNHealthCheck ---
+  console.log(`\n🏆 Top 20 排行榜 4 维完整性`)
+  const failCount = report.topNHealth.filter(t => !t.allDimensionsOk).length
+  if (failCount === 0) {
+    console.log(`  ${color.green}✅ 全部通过${color.reset}`)
+  } else {
+    console.log(`  ${color.red}❌ ${failCount} 道不完整${color.reset}`)
+    for (const t of report.topNHealth.filter(t => !t.allDimensionsOk)) {
+      console.log(`  #${t.rank} ${t.title}: 缺失 [${t.missingFields.join(', ')}]`)
+    }
+  }
+
+  // --- categoryTagsAlerts ---
+  if (report.categoryTagsAlerts.length > 0) {
+    console.log(`\n🏷 categoryTags 格式告警: ${report.categoryTagsAlerts.length} 条`)
+    for (const a of report.categoryTagsAlerts.slice(0, 5)) {
+      console.log(`  ${color.red}❌${color.reset} ${a.title}: ${a.issue} (${a.detail})`)
+    }
+    if (report.categoryTagsAlerts.length > 5) {
+      console.log(`  ... 共 ${report.categoryTagsAlerts.length} 条，详见 JSON 报告`)
+    }
+  }
+
+  // --- seasonAlerts ---
+  if (report.seasonAlerts.length > 0) {
+    console.log(`\n📅 season 值域告警: ${report.seasonAlerts.length} 条`)
+    for (const a of report.seasonAlerts.slice(0, 5)) {
+      const val = a.season === null ? 'NULL' : `"${a.season}"`
+      console.log(`  ${color.red}❌${color.reset} ${a.title}: ${a.issue} (${val})`)
+    }
+    if (report.seasonAlerts.length > 5) {
+      console.log(`  ... 共 ${report.seasonAlerts.length} 条，详见 JSON 报告`)
+    }
+  }
+
+  // --- 汇总 ---
+  const s = report.summary
+  const statusIcon = s.overallStatus === 'PASS' ? `${color.green}✅ PASS${color.reset}`
+    : s.overallStatus === 'WARN' ? `${color.yellow}⚠ WARN${color.reset}`
+    : `${color.red}❌ FAIL${color.reset}`
+  console.log(`\n${'='.repeat(60)}`)
+  console.log(`  综合判定: ${statusIcon}`)
+  console.log(`  报告路径: backend/scripts/reports/T-2026-0612-003-coverage.json`)
+  console.log(`${'='.repeat(60)}\n`)
+}
+
+// ══════════════════════════════════════════════════════════
+// 主流程
+// ══════════════════════════════════════════════════════════
+
+async function main() {
+  const seq = getSeq()
+  await seq.authenticate()
+  if (!isJson) printHeader()
+
+  // --explain 预检
+  if (isExplain) {
+    const explainSql = `
+      SELECT
+        r.id, r.title, r.qualityScore, r.favoriteCount, r.viewCount,
+        r.commentCount, r.coverImage, r.category, r.season, r.categoryTags,
+        r.author, r.createdAt, r.isFeatured,
+        COALESCE(SUM(CASE WHEN c.taste IS NOT NULL AND c.taste > 0 THEN 1 ELSE 0 END), 0) AS taste_cnt,
+        COALESCE(ROUND(AVG(c.taste), 2), 0) AS taste_avg,
+        COALESCE(SUM(CASE WHEN c.difficulty IS NOT NULL AND c.difficulty > 0 THEN 1 ELSE 0 END), 0) AS difficulty_cnt,
+        COALESCE(ROUND(AVG(c.difficulty), 2), 0) AS difficulty_avg,
+        COALESCE(SUM(CASE WHEN c.presentation IS NOT NULL AND c.presentation > 0 THEN 1 ELSE 0 END), 0) AS presentation_cnt,
+        COALESCE(ROUND(AVG(c.presentation), 2), 0) AS presentation_avg,
+        COALESCE(SUM(CASE WHEN c.value IS NOT NULL AND c.value > 0 THEN 1 ELSE 0 END), 0) AS value_cnt,
+        COALESCE(ROUND(AVG(c.value), 2), 0) AS value_avg
+      FROM recipes r
+      LEFT JOIN comments c ON c.recipeId = r.id
+      GROUP BY r.id
+    `
+    const dialect = seq.getDialect()
+    if (dialect === 'mysql') {
+      console.log('\n--- EXPLAIN 预检 ---')
+      const explainRows = await seq.query(`EXPLAIN ${explainSql}`, {
+        type: Sequelize.QueryTypes.SELECT,
+      })
+      // MySQL returns plan as nested JSON in 'EXPLAIN' column; print for review
+      console.log(JSON.stringify(explainRows, null, 2))
+    } else {
+      const explainRows = await seq.query(`EXPLAIN QUERY PLAN ${explainSql}`, {
+        type: Sequelize.QueryTypes.SELECT,
+      })
+      console.log('\n--- EXPLAIN QUERY PLAN (SQLite) ---')
+      for (const row of explainRows) {
+        console.log(`${row.id}|${row.parent}|${row.detail}`)
+      }
+    }
+    await seq.close()
+    return
+  }
+
+  // --- 核心查询：单次 LEFT JOIN 聚合 ---
+  const coreSql = `
+    SELECT
+      r.id, r.title, r.qualityScore, r.favoriteCount, r.viewCount,
+      r.commentCount, r.coverImage, r.category, r.season, r.categoryTags,
+      r.author, r.createdAt, r.isFeatured,
+      COALESCE(SUM(CASE WHEN c.taste IS NOT NULL AND c.taste > 0 THEN 1 ELSE 0 END), 0) AS taste_cnt,
+      COALESCE(ROUND(AVG(c.taste), 2), 0) AS taste_avg,
+      COALESCE(SUM(CASE WHEN c.difficulty IS NOT NULL AND c.difficulty > 0 THEN 1 ELSE 0 END), 0) AS difficulty_cnt,
+      COALESCE(ROUND(AVG(c.difficulty), 2), 0) AS difficulty_avg,
+      COALESCE(SUM(CASE WHEN c.presentation IS NOT NULL AND c.presentation > 0 THEN 1 ELSE 0 END), 0) AS presentation_cnt,
+      COALESCE(ROUND(AVG(c.presentation), 2), 0) AS presentation_avg,
+      COALESCE(SUM(CASE WHEN c.value IS NOT NULL AND c.value > 0 THEN 1 ELSE 0 END), 0) AS value_cnt,
+      COALESCE(ROUND(AVG(c.value), 2), 0) AS value_avg
+    FROM recipes r
+    LEFT JOIN comments c ON c.recipeId = r.id
+    GROUP BY r.id
+    ORDER BY r.title
+  `
+
+  const coreRows = await seq.query(coreSql, { type: Sequelize.QueryTypes.SELECT })
+  const totalRecipes = coreRows.length
+
+  // --- 预计算：Top 20 ID 集合（供 orphanDetection 标注） ---
+  const top20Ids = new Set(
+    coreRows
+      .sort((a, b) => toFloat(b.qualityScore) - toFloat(a.qualityScore))
+      .slice(0, 20)
+      .map(r => r.id)
+  )
+
+  // --- 子分析 ①: coverageMatrix ---
+  const coverageMatrix = buildCoverageMatrix(coreRows)
+
+  // --- 子分析 ②: orphanDetection ---
+  const orphanList = detectOrphans(coreRows, top20Ids)
+
+  // --- 子分析 ③: dynamicVsStatic ---
+  const dynamicVsStatic = computeDeviations(coreRows)
+
+  // --- 子分析 ④: duplicateScan ---
+  const duplicateGroups = findDuplicates(coreRows)
+
+  // --- 子分析 ⑤: seasonDistribution (独立查询，字段简单) ---
+  const seasonRows = await seq.query(
+    'SELECT season FROM recipes',
+    { type: Sequelize.QueryTypes.SELECT }
+  )
+  const seasonDistribution = computeSeasonDistribution(seasonRows)
+
+  // --- 子分析 ⑥: topNHealthCheck ---
+  const topNHealth = computeTopNHealth(coreRows, 20)
+
+  // --- categoryTags 扫描 ---
+  const catRows = await seq.query(
+    'SELECT id, title, categoryTags FROM recipes',
+    { type: Sequelize.QueryTypes.SELECT }
+  )
+  const categoryTagsAlerts = scanCategoryTags(catRows)
+
+  // --- season 值域扫描 ---
+  const sRows = await seq.query(
+    'SELECT id, title, season FROM recipes',
+    { type: Sequelize.QueryTypes.SELECT }
+  )
+  const seasonAlerts = scanSeasons(sRows)
+
+  // --- 汇总统计 ---
+  const coverageRows = coreRows.map(r => ({
+    taste_cnt: toInt(r.taste_cnt), difficulty_cnt: toInt(r.difficulty_cnt),
+    presentation_cnt: toInt(r.presentation_cnt), value_cnt: toInt(r.value_cnt),
+  }))
+
+  const summary = {
+    coverageByDimension: {
+      taste: {
+        covered: coverageRows.filter(r => r.taste_cnt > 0).length,
+        total: totalRecipes,
+        ratio: r2(coverageRows.filter(r => r.taste_cnt > 0).length / totalRecipes),
+      },
+      difficulty: {
+        covered: coverageRows.filter(r => r.difficulty_cnt > 0).length,
+        total: totalRecipes,
+        ratio: r2(coverageRows.filter(r => r.difficulty_cnt > 0).length / totalRecipes),
+      },
+      presentation: {
+        covered: coverageRows.filter(r => r.presentation_cnt > 0).length,
+        total: totalRecipes,
+        ratio: r2(coverageRows.filter(r => r.presentation_cnt > 0).length / totalRecipes),
+      },
+      value: {
+        covered: coverageRows.filter(r => r.value_cnt > 0).length,
+        total: totalRecipes,
+        ratio: r2(coverageRows.filter(r => r.value_cnt > 0).length / totalRecipes),
+      },
+    },
+    orphanCount: orphanList.length,
+    deviationCount: dynamicVsStatic.length,
+    duplicateGroupCount: duplicateGroups.length,
+    topNHealthFailCount: topNHealth.filter(t => !t.allDimensionsOk).length,
+    categoryTagsAlertCount: categoryTagsAlerts.length,
+    seasonAlertCount: seasonAlerts.length,
+    overallStatus: orphanList.length > 0 || topNHealth.filter(t => !t.allDimensionsOk).length > 0
+      ? 'FAIL'
+      : (dynamicVsStatic.length > 0 || duplicateGroups.length > 0 ||
+         categoryTagsAlerts.length > 0 || seasonAlerts.length > 0)
+        ? 'WARN'
+        : 'PASS',
+  }
+
+  // 获取总评论数（meta 字段）
+  const [commentCountRow] = await seq.query(
+    'SELECT COUNT(*) AS cnt FROM comments',
+    { type: Sequelize.QueryTypes.SELECT }
+  )
+
+  // --- 组装报告 ---
+  const report = {
+    meta: {
+      taskId: 'T-2026-0612-003',
+      generatedAt: new Date().toISOString(),
+      recipeCount: totalRecipes,
+      totalComments: toInt(commentCountRow.cnt),
+      dbDialect: seq.getDialect(),
+      dbName,
+      fixMode: false,
+    },
+    coverageMatrix,
+    orphanList,
+    dynamicVsStatic,
+    duplicateGroups,
+    seasonDistribution,
+    topNHealth,
+    categoryTagsAlerts,
+    seasonAlerts,
+    summary,
+  }
+
+  // --- 输出 ---
+  if (isJson) {
+    console.log(JSON.stringify(report, null, 2))
+  } else {
+    printSubAnalysis(report)
+  }
+
+  // --- 写入 JSON 报告 ---
+  const reportsDir = path.join(__dirname, 'reports')
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true })
+  }
+  const reportPath = path.join(reportsDir, 'T-2026-0612-003-coverage.json')
+  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf-8')
+  if (!isJson) {
+    console.log(`📄 报告已写入: ${reportPath}`)
+  }
+
+  await seq.close()
+}
+
+// ── 执行（仅直接运行，require 不触发）──
+if (require.main === module) {
+  main().catch(e => {
+    console.error('巡检脚本错误:', e.message)
+    process.exit(1)
+  })
+}
+
+// ── 导出 ──
+module.exports = { check4DimensionalCoverage }
