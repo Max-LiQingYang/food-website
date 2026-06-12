@@ -124,7 +124,11 @@ const CollectionComments: React.FC<Props> = ({ collectionId, isPublic, ownerId }
           <div key={comment.id} className="comment-item">
             <div className="comment-avatar">
               {comment.user?.avatar ? (
-                <img src={comment.user.avatar} alt={comment.user.nickname || ''} />
+                <img
+                  src={comment.user.avatar}
+                  alt={comment.user.nickname || ''}
+                  loading="lazy"
+                />
               ) : (
                 <span className="comment-avatar-fallback">
                   {(comment.user?.nickname || comment.user?.username || '?')[0]}

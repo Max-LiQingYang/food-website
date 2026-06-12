@@ -71,6 +71,7 @@ function SinglePickCard({ recipe, onShuffle, isShuffling }: {
             src={recipe.coverImage || ''}
             alt={recipe.title}
             className="daily-pick-card__image"
+            loading="lazy"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
           <span className="daily-pick-card__badge">{seasonLabel}</span>
@@ -229,6 +230,7 @@ function PersonalizedPickCard({ recipe }: { recipe: Recipe & { recommendReason?:
           src={recipe.coverImage || ''}
           alt={recipe.title}
           className="personalized-pick__card-img"
+          loading="lazy"
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
         />
         <span className="personalized-pick__card-reason" style={{ background: reasonColor }}>

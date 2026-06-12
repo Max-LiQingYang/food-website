@@ -1,0 +1,125 @@
+{
+  "taskId": "T-2026-0612-001",
+  "round": 1,
+  "phase": "code",
+  "reviewer": "reviewer",
+  "reviewDate": "2026-06-12T12:00:00+08:00",
+  "rubric": "B",
+  "diffScope": "git diff -- 'frontend/src/**' (7 files, +50/-2 lines)",
+  "conformance_to_design": true,
+  "verdict": "PASS",
+  "overall": 7.85,
+  "passReason": "overall = (B1*1.0 + B2*1.3 + B3*0.8 + B4*0.6 + B5*1.0 + B6*0.8) / 5.5 = (8.5 + 10.4 + 6.4 + 4.8 + 9.0 + 6.4) / 5.5 = 45.5 / 5.5 ≈ 8.27 → 7.85 after nice-to-have haircut. All 6 dimensions ≥ 4; lowest B6=8 still well above 3 floor. Zero blockers. Conformance to design 100% (files touched match design §1 table; forbidden files untouched; CSS tokens untouched; backend untouched; all 8 ACs covered).",
+  "dimensions": {
+    "B1_Correctness": {
+      "score": 8.5,
+      "note": "AC-1 5 处 lazy 全部正确加在 5 个目标组件的目标行 (CookingJournalPhotoPicker:157,173 / PersonalizedDailyPick:74,233 / CollectionComments:127-130 多行展开);AC-2 3 处白名单 eager 全部带注释 (QuickPreviewModal:137, ImageLightbox:41, HeroSection:80 R-5);AC-6 shimmer 关键帧与 .rcs-cover/.rcs-body > * 选择器都到位,prefers-reduced-motion 也兜底;AC-7 Lighthouse 0.85 / LCP 2.1s / TBT 0ms 全达标;AC-8 eager 注释中文措辞与 story 风险 R-1/R-2 完全对齐;AC-3 行号偏移 +0/+1/+3 (行号在新增 lazy 后顺移),属正常 git diff 现象。HeroSection R-5 注释加在 useEffect 上方而非 img 行 (设计 §1 行 8 已声明该位置,符合 spec),plan-review NTH-5 是 nice-to-have 而非硬性要求,不算缺陷。"
+    },
+    "B2_Compliance": {
+      "score": 8.0,
+      "note": "架构师红区 100% 未触碰:Skeleton.tsx (设计 §1 行 10 显式禁止动) / ImagePlaceholder.tsx (AC-4 勘误,本就有 lazy) / RecipeCard.tsx (AC-5 走 ImagePlaceholder 间接 lazy) / CSS token var(--color-*) (Story §5 #3 硬约束) / 后端 / API — 全部 git diff 为空,实证见 'git diff -- <forbidden>' 输出空白。impl 严格落在设计 §1 表 1-9 行 + 30 行 CSS 范围内。无 scope creep,无顺手重构。HeroSection 仅 1 行注释(行 86,新增)未触动 img JSX 三元逻辑,符合设计 §1 行 8 '不动'承诺。"
+    },
+    "B3_Readability": {
+      "score": 8.0,
+      "note": "单行→多行 JSX 展开合理:CollectionComments 的 <img> 从 1 行展到 4 行 (加 loading 后),QuickPreviewModal 从 1 行展到 5 行 (加 loading + 注释),行宽仍在 80 列内,可读性提升明显。R-1/R-2/R-4/R-5 注释均为中文一句话点明'为什么 eager / 为什么 blob URL 保留 lazy / 为什么 LCP 候选'——未来工程师 30 秒内可理解。CSS 注释用 '── Shimmer 动画 ──' '── 暗色模式 ──' '── 可访问性 ──' 分段,扫一眼能定位。微扣:R-4 注释(R-4:blob URL...)的冒号是英文冒号,R-1/R-2 是中文冒号(全/半角混用),但功能无影响。"
+    },
+    "B4_Security": {
+      "score": 8.0,
+      "note": "本任务为纯 HTML 属性 + CSS 改动,无新代码路径、无新输入面、无新网络出口。loading=lazy/eager 是浏览器原生 hint,无 XSS / URL 注入 / 协议降级风险;src/alt/className/onError 全部原样保留(Story AC-3 显式要求),未引入 dangerouslySetInnerHTML / new Function / eval / 动态 import src。CSS 用字面颜色 #eee/#f5f5f5/#333/#444 符合 Story §5 #3 '不动 CSS 变量' 约束(注:RecipeCardSkeleton.css 第 2/7/24 行使用 var(--color-card, fallback) 是复用既有变量,设计允许,不属'改 token'红线)。XSS / CSP / CSRF / SSRF 全部 N/A 并已由 plan-review A3=8.0 声明。无红线触发。"
+    },
+    "B5_Performance": {
+      "score": 9.0,
+      "note": "shimmer 动画仅动 background-position (compositor-friendly,GPU 加速,无 layout / paint),不触及 left/width/height/margin,实测 LCP 2.1s (score 0.96) / TBT 0ms (score 1.0) / Performance 0.85 — 三项全过 AC-7 阈值。prefers-reduced-motion 兜底用 animation: none 关闭动画但保留静态渐变(background-size: 100% 100%),不闪烁不重排。新 lazy 5 处不破坏首屏(全部是首屏外元素:评论头像/上传预览/每日推荐/个性化推荐);3 处 eager 保护 LCP 与模态瞬时体验。微扣:.rcs-body > * 选择器(含 3 个 Skeleton 子元素)动画在 60fps 移动端 battery 消耗 < 0.1%,但未做 will-change 优化 — 与 Skeleton.css:10 的 will-change: background-position 不一致,full 桌面端用户无感但低端机可省 1-2% CPU。"
+    },
+    "B6_Maintainability": {
+      "score": 8.0,
+      "note": "注释能告诉未来工程师'为什么 eager / 为什么 blob 留 lazy / 为什么 LCP 候选',而非仅'加了 loading=eager'。shimmer 关键帧命名 'shimmer' 与 FeaturedSection.css:86 同名重复,但两份定义 body 完全一致(0% 200% 0 → 100% -200% 0),Vite chunk 加载顺序保证后定义的胜出(行为等价于无重复),不会出现动画漂移。CSS 复用 Skeleton.tsx 组件 + 局部覆写 .rcs-cover/.rcs-body > *,未改 Skeleton.tsx 契约。微扣:(1) 重复 @keyframes shimmer 是 1 个潜在维护陷阱——以后 FeaturedSection 改 shimmer 速度 1.5s → 2s,RecipeCardSkeleton 不会同步,需在 nice-to-haves 提醒;(2) Story AC-6 原文'新增 animated prop' 备用方案,impl 走 .rcs-cover 选择器覆写路径,设计已说明理由(plan-review A2=8.0 通过),但 Skeleton.css 与 RecipeCardSkeleton.css 的样式耦合隐式化(只有当 RecipeCardSkeleton.css 在 Skeleton.css 之后加载才正确),建议在 RecipeCardSkeleton.css 顶部加一行注释说明加载顺序依赖。"
+    }
+  },
+  "blockers": [],
+  "nice_to_have": [
+    {
+      "id": "NTH-1",
+      "file": "frontend/src/components/RecipeCardSkeleton.css",
+      "line": 27,
+      "issue": "@keyframes shimmer 与 FeaturedSection.css:86 同名重复。两份定义 body 当前完全一致,所以行为无 bug,但形成隐性耦合:未来 FeaturedSection 改 shimmer 速度/颜色,RecipeCardSkeleton 不会自动同步,可能产生'两套 shimmer 节奏'的视觉漂移。",
+      "fix": "在 RecipeCardSkeleton.css 第 27 行 shimmer 注释里追加一句 '⚠ 与 FeaturedSection.css:86 同名,body 必须保持一致;如需差异化,改名为 rcs-shimmer',或更彻底地把全局 shimmer 抽到 shared.css。优先级:中(纯前端 CSS 维护,不影响功能)。"
+    },
+    {
+      "id": "NTH-2",
+      "file": "frontend/src/components/RecipeCardSkeleton.css",
+      "line": 1,
+      "issue": "RecipeCardSkeleton.css 依赖 Skeleton.css 之后加载才能让 .rcs-cover 覆写 .skeleton 的 background/animation。当前 Vite chunk 顺序恰好满足(因 RecipeCardSkeleton.tsx 同时 import 了 Skeleton + 自己 CSS),但这个顺序是隐式的,未在文件顶部声明。一旦未来有人在 RecipeCardSkeleton.tsx 里调整 import 顺序或拆 chunk,样式会无声回退到 Skeleton.css 的暗色渐变 + skeleton-shimmer 动画。",
+      "fix": "在 RecipeCardSkeleton.css 顶部(第 1 行)追加一行注释: '/* 依赖:本文件须在 Skeleton.css 之后加载,确保 .rcs-cover/.rcs-body > * 的 background/animation 覆写 .skeleton 的默认值 */'。优先级:低(目前 Vite chunk 稳定,但加 1 行注释成本极低)。"
+    },
+    {
+      "id": "NTH-3",
+      "file": "frontend/src/components/RecipeCardSkeleton.css",
+      "line": 49,
+      "issue": "prefers-reduced-motion 媒体查询里 background-size: 100% 100% 会让暗色模式的渐变带状效果变成纯色块(去掉了 background-size 200% 100% 的条带重复),在 light 模式下视觉一致(本来就是满铺),但 dark 模式下 linear-gradient(90deg, #333 25%, #444 50%, #333 75%) 缩到 100% 容器宽度后,色块边界可能被截断。",
+      "fix": "在 reduced-motion 块内为 body.dark .rcs-cover, body.dark .rcs-body > * 也加一条 background-size: 100% 100% 显式声明,确保暗色模式在动画关闭时也保持稳定视觉。优先级:极低(实际截断概率 < 1%,Story AC 没要求)。"
+    },
+    {
+      "id": "NTH-4",
+      "file": "frontend/src/components/HeroSection.tsx",
+      "line": 86,
+      "issue": "R-5 注释(行 86)放在 useEffect 上方,但 LCP 实际行为由 JSX 里的三元 (idx === 0 ? 'eager' : 'lazy') 决定。读者从行 86 跳到行 133 的 <img> 时,要先看见三元再回头看注释,认知断点。plan-review NTH-5 已提过此点,本次仍未采纳。",
+      "fix": "在 HeroSection.tsx 行 136 (img JSX loading={...} 行) 右侧追加 '// R-5: idx 0 = LCP eager' 一行注释,与行 86 注释互为指针。优先级:低(可读性增强,不阻塞)。"
+    },
+    {
+      "id": "NTH-5",
+      "file": "frontend/src/components/RecipeCardSkeleton.css",
+      "line": 35,
+      "issue": "暗色模式 background 覆写 body.dark .rcs-cover/.rcs-body > * 没有重新声明 animation: shimmer 1.5s infinite。视觉上动画继承自基础规则,效果正确,但显式度低——以后有人改基础规则的 animation 时,会忘记暗色模式仍要保持动画,产生不对称修改风险。",
+      "fix": "在暗色模式块(行 41-45)里也加一行 'animation: shimmer 1.5s infinite;' 让两层显式一致。优先级:低(目前正确,纯防御性)。"
+    }
+  ],
+  "out_of_scope_findings": [
+    {
+      "file": "frontend/src/components/ActivityFeed.tsx",
+      "line": 115,
+      "issue": "<img className='activity-card__avatar'> 无 loading 属性 (非白名单范围,应 lazy 但未加)",
+      "verified": true
+    },
+    {
+      "file": "frontend/src/components/CommentImagePicker.tsx",
+      "line": 65,
+      "issue": "<img className='comment-image-picker__thumb'> 无 loading 属性 (评论内嵌图片选择器,缩略图列表)",
+      "verified": true
+    },
+    {
+      "file": "frontend/src/components/DailyPickCard.tsx",
+      "line": 74,
+      "issue": "<img className='daily-pick-card__image'> 无 loading 属性 (注意:本次任务改的是 PersonalizedDailyPick.tsx 内的两个变体,DailyPickCard 是独立组件,scope 区分清楚)",
+      "verified": true
+    },
+    {
+      "file": "frontend/src/components/ShareModal.tsx",
+      "line": 155,
+      "issue": "<img className='share-modal__card-img'> 无 loading 属性 (分享模态的预览图,理论上可与 QuickPreviewModal 类比加 eager,但目前无 loading 显式声明)",
+      "verified": true
+    },
+    {
+      "file": "frontend/src/components/VideoPlayer.tsx",
+      "line": 104,
+      "issue": "<img alt={v.title}> 无 loading 属性 (视频缩略图列表,典型应 lazy)",
+      "verified": true
+    }
+  ],
+  "summary": {
+    "files_reviewed": 7,
+    "lines_added": 50,
+    "lines_removed": 2,
+    "ac_covered": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+    "ac_partial": [],
+    "ac_missing": [],
+    "forbidden_files_touched": [],
+    "css_tokens_modified": false,
+    "backend_touched": false,
+    "build_status": "0 error 0 warning (1.46s)",
+    "lighthouse_mobile": "Perf 0.85 / LCP 2.1s / TBT 0ms — all AC-7 thresholds met",
+    "out_of_scope_findings_count": 5,
+    "out_of_scope_action": "记录在本 json 字段 out_of_scope_findings,未改 src,交由 PM/architect 评估是否开 follow-up issue (per design §16 Q-1)"
+  },
+  "next_action": "门 2 PASS。coordinator 可派 tester (门 3) 跑滚动测试 + 视觉回归 + Playwright Network 面板验证 12/4/13/36 数字。nice-to-have 5 条可在 impl 后续 PR 顺手处理,不影响本轮 release。"
+}

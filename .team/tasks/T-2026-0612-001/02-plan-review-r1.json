@@ -1,0 +1,36 @@
+{
+  "taskId": "T-2026-0612-001",
+  "round": 1,
+  "rubric": "A",
+  "reviewer": "architect-self-review",
+  "reviewDate": "2026-06-12T03:50:00Z",
+  "designFile": ".team/tasks/T-2026-0612-001/01-design.md",
+  "designLineCount": 817,
+  "scores": {
+    "A1_completeness": 8.5,
+    "A2_soundness": 8.0,
+    "A3_security": 8.0,
+    "A4_testability": 7.5,
+    "A5_ops_readiness": 7.0
+  },
+  "reasons": {
+    "A1_completeness": "8 条 AC 全部有对应方案（§17 自检清单显式列了 AC-1~AC-8 映射）；§1 技术选型表每行带备选方案；§2 提供 7 个文件的 git diff 草稿（before/after 完整）；§9 显式声明无新增 API/类型；§10 时序有改进前/后两套。扣分点：§4 关于「不动 Skeleton.tsx」的论证有 1 处可争议（见 nice-to-haves），Story AC-6 文字允许加 animated prop 但设计选择不加，应更明确承认这是 architect 的判断而非 Story 强制。",
+    "A2_soundness": "CSS 复用策略清晰：§3 列出三套 shimmer 体系（FeaturedSection / Skeleton / 本次新加）的对比表，避免重名 keyframes 冲突；§4 论证「不引入 animated prop」合理（CSS animation 简写会整体替换原值，prop 无必要）；§6 5 条风险都有代码层对策；§11 边界 6 项覆盖空 src / 404 / 模态瞬间 / Lightbox 切图。扣分点：§10 改进后时序的 T5=2000ms / LCP=2.0s 是「改进目标」而非「实测」，应明确标注为预测值；HeroSection R-5 注释在 useEffect 而非 img JSX 是合理但 reviewer 可能想看到 img 行也带注释。",
+    "A3_security": "本任务为纯前端 HTML 属性 + CSS 改动，§12 显式声明 7 项安全检查（鉴权/租户/输入/敏感数据/密钥/CSP/XSS），符合 N/A 即声明原则。Story R-3 用户头像 lazy 风险有专项分析（§6 R-3），并解释 food-website 是纯 CSR + OG meta 兜底 SEO。无红线触发。扣分点：§12 虽声明 XSS N/A，但未明确 img alt 是 React 自动 escape（reader 可能想看到这一句）。",
+    "A4_testability": "§14 给出手测脚本 7 步（开页 → DevTools → 滚到第 1 屏 → 计数 → 模态 → Lightbox → shimmer 录屏）；§7.3 部署后回归 5 步含 grep 验证命令；§13 性能量化 4 个指标都有测量方式。扣分点：无单元测试（任务范围外，可接受）；E2E 用 data-testid 计划缺失（§14 仅手测脚本，缺自动化 E2E 接入点）。",
+    "A5_ops_readiness": "§7 部署流程详细：本地 build → docker cp → nginx reload（不重启容器，PID 不变，0 断开）；§15 迁移/回滚 2 步 < 30 秒；§15.3 显式解释为何不引入 feature flag（HTML 属性运行时不可 toggle）。扣分点：缺监控埋点（onError 静默处理，失败无上报）；缺灰度方案（5 处属性同步发布，无法分批）；DB 迁移不适用可接受。运维就绪度对纯前端 CSS 任务来说已较充分。"
+  },
+  "overall": 7.85,
+  "pass": true,
+  "passReason": "overall = (8.5*1.0 + 8.0*1.2 + 8.0*1.3 + 7.5*1.0 + 7.0*0.8) / 5.3 = (8.5 + 9.6 + 10.4 + 7.5 + 5.6) / 5.3 = 41.6 / 5.3 = 7.85。所有维度均 > 3（最低 A5=7.0）。",
+  "blockers": [],
+  "nice_to_haves": [
+    "NTH-1 (§4): 在「不动 Skeleton.tsx」论证开头加一句「Story AC-6 文字允许加 animated prop，但本设计选择不引入，理由如下」—— 让 reader 知道这是 architect 判断而非 Story 强制",
+    "NTH-2 (§10): 把改进后时序的 T5=2000ms / LCP=2.0s 标注为「预测值（待 Lighthouse 实测确认）」",
+    "NTH-3 (§12): 补充一句「img alt 属性值由 React 自动 escape，无 XSS 风险」",
+    "NTH-4 (§14): 增加 data-testid 计划，例如给 RecipeCardSkeleton 加 data-testid=\"rc-skeleton\" 便于 E2E 抓取",
+    "NTH-5 (HeroSection): 考虑在 L133 img JSX 行也加一行简短注释 \"// R-5: idx 0 eager = LCP\" 提升可读性"
+  ],
+  "verdict_summary": "✅ 门 1 PASS。设计完整、技术合理、安全声明到位、测试可执行、运维就绪。overall=7.85 / 5.3 加权。零 blockers，5 项 nice-to-haves 不影响 impl 阶段开工。",
+  "nextAction": "architect 转交子任务拆分表（§8）给 coordinator，分派给 fullstack impl 阶段。impl 完成后再走 Rubric B（Code Review）门 2。"
+}

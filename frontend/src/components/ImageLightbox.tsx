@@ -38,10 +38,12 @@ export default function ImageLightbox({ images, currentIndex, onClose, onPrev, o
         </button>
       )}
 
+      {/* 显式 eager:Lightbox 已打开,currentIndex 已经是用户正在看的图,lazy 会导致翻页/打开瞬间空白(R-2) */}
       <img
         className="image-lightbox__img"
         src={images[currentIndex]}
         alt="预览大图"
+        loading="eager"
         onClick={e => e.stopPropagation()}
       />
 

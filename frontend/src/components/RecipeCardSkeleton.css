@@ -23,3 +23,33 @@
 body.dark .recipe-card-skeleton {
   background: var(--color-card, #1e1e32);
 }
+
+/* ── Shimmer 动画(参考 FeaturedSection.css:77-92,颜色用字面值,不动 token) ── */
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.rcs-cover,
+.rcs-body > * {
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+body.dark .rcs-cover,
+body.dark .rcs-body > * {
+  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
+  background-size: 200% 100%;
+}
+
+/* ── 可访问性:尊重用户的「减少动态效果」偏好 ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .rcs-cover,
+  .rcs-body > * {
+    animation: none;
+    background-size: 100% 100%;
+  }
+}

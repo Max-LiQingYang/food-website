@@ -83,6 +83,7 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
   }, [goNext])
 
   // Preload first image with high priority; rest lazy via <img loading="lazy">
+  // R-5:首张 eager + fetchPriority=high 是 LCP 元素候选;其余 lazy 节省首屏外带宽
   useEffect(() => {
     if (items.length === 0) return
     const firstImg = new Image()

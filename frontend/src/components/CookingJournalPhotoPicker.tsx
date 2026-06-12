@@ -154,6 +154,7 @@ export default function CookingJournalPhotoPicker({
               src={url}
               alt={`照片 ${i + 1}`}
               className="cooking-journal-photo-picker__thumb"
+              loading="lazy"
             />
             <button
               type="button"
@@ -169,10 +170,12 @@ export default function CookingJournalPhotoPicker({
         {/* Uploading items with progress */}
         {uploading.map(item => (
           <div key={item.id} className="cooking-journal-photo-picker__item cooking-journal-photo-picker__item--uploading">
+            {/* R-4:blob URL (URL.createObjectURL) 不消耗网络带宽,但保留 lazy 行为一致 */}
             <img
               src={item.preview}
               alt="上传中"
               className="cooking-journal-photo-picker__thumb"
+              loading="lazy"
             />
             <div className="cooking-journal-photo-picker__progress">
               <div

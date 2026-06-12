@@ -134,7 +134,13 @@ export default function QuickPreviewModal({ recipe, onClose }: QuickPreviewModal
         {/* Cover image */}
         <div className="preview-modal__cover">
           {recipe.coverImage ? (
-            <img src={recipe.coverImage} alt={recipe.title} className="preview-modal__cover-img" />
+            // 显式 eager:模态打开时用户已经看到这张封面,lazy 会导致开模态瞬间白底(R-1)
+            <img
+              src={recipe.coverImage}
+              alt={recipe.title}
+              className="preview-modal__cover-img"
+              loading="eager"
+            />
           ) : (
             <div className="preview-modal__cover-placeholder">🍽️</div>
           )}
