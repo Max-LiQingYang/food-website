@@ -81,6 +81,16 @@ function TopRow({ item, rank, isMedal }: { item: RatingHistoryItem; rank: number
 
 export default function RatingTopList({ topHigh, topLow }: RatingTopListProps) {
   const [activeTab, setActiveTab] = useState<Tab>('high')
+  const [switching, setSwitching] = useState(false)
+
+  const handleTabChange = (tab: Tab) => {
+    if (tab === activeTab) return
+    setSwitching(true)
+    setTimeout(() => {
+      setActiveTab(tab)
+      setSwitching(false)
+    }, 150)
+  }
 
   const items = activeTab === 'high' ? topHigh : topLow
 
@@ -94,7 +104,7 @@ export default function RatingTopList({ topHigh, topLow }: RatingTopListProps) {
         <div className="rhm-top__tabs" role="tablist" aria-label="高/低分榜">
           <button
             className={`rhm-top__tab${activeTab === 'high' ? ' rhm-top__tab--active' : ''}`}
-            onClick={() => setActiveTab('high')}
+            onClick={() => handleTabChange('high')}
             role="tab"
             aria-selected={activeTab === 'high'}
           >
@@ -102,7 +112,7 @@ export default function RatingTopList({ topHigh, topLow }: RatingTopListProps) {
           </button>
           <button
             className={`rhm-top__tab${activeTab === 'low' ? ' rhm-top__tab--active' : ''}`}
-            onClick={() => setActiveTab('low')}
+            onClick={() => handleTabChange('low')}
             role="tab"
             aria-selected={activeTab === 'low'}
           >
@@ -116,7 +126,7 @@ export default function RatingTopList({ topHigh, topLow }: RatingTopListProps) {
           {activeTab === 'high' ? '暂无高分评分' : '暂无低分评分'}
         </div>
       ) : (
-        <div className="rhm-top__list">
+        <div className={`rhm-top__list${switching ? ' is-switching' : ''}`}>
           {items.map((item, idx) => (
             <TopRow
               key={item.commentId}

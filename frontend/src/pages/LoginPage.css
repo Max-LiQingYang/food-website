@@ -160,15 +160,56 @@
   }
 }
 
-/* ── LoginPage 暗色覆写 ── */
-body.dark .login-tab.active {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+/* ── LoginPage 暗色覆写 (iter#135 P1 增强) ── */
+body.dark .login-page {
+  background: var(--color-bg, #1a1a1a);
 }
 
 body.dark .login-card {
+  background: var(--color-card, #222);
   box-shadow: var(--shadow-md);
 }
 
+body.dark .login-tabs {
+  background: var(--color-primary-bg, #2e1a14);
+}
+
+body.dark .login-tab.active {
+  background: var(--color-card, #222);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+body.dark .login-card__title {
+  color: var(--color-text, #e0e0e0);
+}
+
+body.dark .login-card__subtitle {
+  color: var(--color-text-muted, #888);
+}
+
+body.dark .form-group label {
+  color: var(--color-text, #e0e0e0);
+}
+
+body.dark .form-group input {
+  background: var(--color-bg-secondary, #2a2520);
+  border-color: var(--color-border);
+  color: var(--color-text, #e0e0e0);
+}
+
 body.dark .form-group input:focus {
+  border-color: var(--color-primary-light, #f0946e);
   box-shadow: 0 0 0 3px rgba(232, 102, 62, 0.25);
+}
+
+body.dark .form-group input::placeholder {
+  color: var(--color-text-muted, #888);
+}
+
+body.dark .login-card__footer {
+  color: var(--color-text-muted, #888);
+}
+
+body.dark .login-link-btn:hover {
+  color: var(--color-primary-light, #f0946e);
 }

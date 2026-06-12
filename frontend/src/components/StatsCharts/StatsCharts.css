@@ -41,6 +41,10 @@
   transition: all 0.2s ease;
 }
 
+.stats-charts__range-btn:hover {
+  color: var(--color-text);
+}
+
 .stats-charts__range-btn--active {
   background: var(--color-primary);
   color: #fff;
@@ -65,6 +69,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.stats-charts__tab:hover {
+  color: var(--color-text);
 }
 
 .stats-charts__tab--active {
@@ -109,6 +117,54 @@
 
 .stats-charts__empty p {
   font-size: 14px;
+}
+
+/* ── 暗色模式覆写 (iter#135 P0) ── */
+body.dark .stats-charts {
+  background: var(--color-card);
+  box-shadow: var(--shadow-sm);
+}
+
+body.dark .stats-charts__title {
+  color: var(--color-text);
+}
+
+body.dark .stats-charts__ranges {
+  background: var(--color-bg);
+}
+
+body.dark .stats-charts__range-btn {
+  color: var(--color-text-secondary);
+}
+
+body.dark .stats-charts__range-btn:hover {
+  color: var(--color-text);
+}
+
+body.dark .stats-charts__tab {
+  color: var(--color-text-secondary);
+}
+
+body.dark .stats-charts__tab:hover {
+  color: var(--color-text);
+}
+
+body.dark .stats-charts__tab--active {
+  color: var(--color-primary);
+}
+
+body.dark .stats-charts__empty {
+  color: var(--color-text-muted);
+}
+
+/* ── 焦点可见样式 (iter#135 P0 a11y) ── */
+.stats-charts__range-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.stats-charts__tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* responsive */

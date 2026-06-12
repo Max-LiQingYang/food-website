@@ -3,6 +3,7 @@
  * 迭代 #134：用户个人评分历史可视化
  * 设计基线：UI §0 既有 token；不引入新 token（变量定义在 global.css）
  * 容器基线参考 StatsCharts / AchievementsPanel
+ * 迭代 #135：UI/UX 抛光 — body.dark 覆写补全 + 断点对齐 + focus-visible + 微交互
  * ============================================================ */
 
 /* ─── 容器基线 ────────────────────────────────────────────── */
@@ -322,8 +323,8 @@ body.dark .rhm-trend__ranges {
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: 12px;
-  padding: 4px 10px;
+  font-size: 13px;
+  padding: 4px 12px;
   border-radius: 6px;
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease-out-soft),
@@ -420,7 +421,7 @@ body.dark .rhm-dist__chart {
 
 .rhm-top__tabs {
   display: flex;
-  gap: 4px;
+  gap: 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -430,7 +431,7 @@ body.dark .rhm-dist__chart {
   color: var(--color-text-secondary);
   font-size: 14px;
   font-weight: 500;
-  padding: 8px 16px;
+  padding: 10px 20px;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
@@ -452,6 +453,11 @@ body.dark .rhm-dist__chart {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition: opacity 150ms var(--ease-out-soft);
+}
+
+.rhm-top__list.is-switching {
+  opacity: 0;
 }
 
 .rhm-top__row {
@@ -630,6 +636,14 @@ body.dark .rhm-history__sort {
 body.dark .rhm-history__row {
   border-color: var(--color-border);
 }
+
+/* 列表行交错淡入 stagger (iter#135) */
+.rhm-history__row:nth-child(1) { animation-delay: 0ms; }
+.rhm-history__row:nth-child(2) { animation-delay: 30ms; }
+.rhm-history__row:nth-child(3) { animation-delay: 60ms; }
+.rhm-history__row:nth-child(4) { animation-delay: 90ms; }
+.rhm-history__row:nth-child(5) { animation-delay: 120ms; }
+.rhm-history__row:nth-child(n+6) { animation-delay: 150ms; }
 
 .rhm-history__cover {
   width: 80px;
@@ -909,6 +923,79 @@ body.dark .rhm-history__more {
   cursor: pointer;
 }
 
+/* ─── 暗色模式覆写补全 (iter#135 P0-5) ──────────────────── */
+body.dark .rhm-dim-avg__card { border-color: var(--color-border); }
+body.dark .rhm-dim-avg__label { color: var(--color-text-secondary); }
+body.dark .rhm-dim-avg__warning { color: var(--color-warning); }
+body.dark .rhm-dim-avg__count { color: var(--color-text-muted); }
+body.dark .rhm-trend__range-btn { color: var(--color-text-secondary); }
+body.dark .rhm-trend__range-btn:hover { color: var(--color-text); }
+body.dark .rhm-trend__legend-item { color: var(--color-text-secondary); }
+body.dark .rhm-top__tab { color: var(--color-text-secondary); }
+body.dark .rhm-top__tab:hover { color: var(--color-text); }
+body.dark .rhm-top__tab--active { color: var(--color-primary); }
+body.dark .rhm-top__score { color: var(--color-primary); }
+body.dark .rhm-top__empty { color: var(--color-text-muted); }
+body.dark .rhm-dist__title { color: var(--color-text-secondary); }
+body.dark .rhm-history__title { color: var(--color-text); }
+body.dark .rhm-history__preview { color: var(--color-text-muted); }
+body.dark .rhm-history__time { color: var(--color-text-muted); }
+body.dark .rhm-history__end { color: var(--color-text-muted); }
+body.dark .rhm-history__retry { color: var(--color-warning); }
+body.dark .rhm-history__retry-btn { color: var(--color-warning); }
+body.dark .rhm-privacy { color: var(--color-text-secondary); }
+body.dark .rhm-privacy__switch { background: var(--color-border); }
+body.dark .rhm-privacy__switch--on { background: var(--color-primary); }
+body.dark .rhm-privacy__switch-knob { background: #f0f0f0; }
+body.dark .rhm-empty__title { color: var(--color-text); }
+body.dark .rhm-empty__desc { color: var(--color-text-secondary); }
+body.dark .rhm-empty__cta--secondary { color: var(--color-primary); border-color: var(--color-primary); }
+body.dark .rhm-error { color: var(--color-warning); }
+body.dark .rhm-error__icon { color: var(--color-warning); }
+body.dark .rhm-error__msg { color: var(--color-text-secondary); }
+body.dark .rhm-error__btn { background: var(--color-bg-secondary); border-color: var(--color-warning); color: var(--color-warning); }
+body.dark .rhm-radar__tooltip { background: var(--color-card); border-color: var(--color-border); }
+body.dark .rhm-trend__warning { background: var(--color-card); }
+body.dark .rhm-dim-avg__card:hover { box-shadow: var(--shadow-md); }
+
+/* ─── 焦点可见样式 (iter#135 P0-4 a11y) ────────────────── */
+.rhm-trend__range-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-top__tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-privacy__switch:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-empty__cta:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-error__btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-history__more:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-history__retry-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-history__sort:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.rhm-dim-avg__card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* ─── 列表项淡入动画 ─────────────────────────────────────── */
 @keyframes rhm-fade-in {
   from {
@@ -921,8 +1008,8 @@ body.dark .rhm-history__more {
   }
 }
 
-/* ─── 响应式 ──────────────────────────────────────────────── */
-@media (max-width: 1023px) {
+/* ─── 响应式 (iter#135: 断点对齐 768/480) ────────────────── */
+@media (max-width: 768px) {
   .rhm-dim-avg {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
@@ -938,7 +1025,7 @@ body.dark .rhm-history__more {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 480px) {
   .rhm-module {
     padding: 16px;
   }

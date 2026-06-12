@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { putUserRatingPrivacy } from '../../api'
+import { useToast } from '../../context/ToastContext'
 
 interface RatingPrivacyToggleProps {
   ratingsHistoryPublic: boolean
@@ -11,6 +12,7 @@ export default function RatingPrivacyToggle({ ratingsHistoryPublic, onChange }: 
   // 乐观更新：本地状态领先于服务端
   const [optimistic, setOptimistic] = useState<boolean | null>(null)
   const current = optimistic !== null ? optimistic : ratingsHistoryPublic
+  const toast = useToast()
 
   const handleToggle = async () => {
     if (busy) return
@@ -31,8 +33,7 @@ export default function RatingPrivacyToggle({ ratingsHistoryPublic, onChange }: 
       console.error('[RatingPrivacyToggle] toggle failed', err)
       // 回滚
       setOptimistic(null)
-      // 简单提示（避免引入 toast 依赖）
-      alert('切换失败，请重试')
+      toast.error('切换失败，请重试')
     } finally {
       setBusy(false)
       setOptimistic(null)

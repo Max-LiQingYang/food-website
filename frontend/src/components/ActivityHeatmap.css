@@ -3,7 +3,7 @@
 }
 
 .activity-heatmap__title {
-  font-size: 16px;
+  font-size: 18px;          /* iter#135 P0-6: 16 → 18，与 Rating/Achievements/Stats 三个兄弟模块对齐 */
   font-weight: 600;
   color: var(--color-text, #333);
   margin: 0 0 12px;
@@ -55,31 +55,6 @@
 
 .activity-heatmap__cell--5 {
   background: #1b5e20;
-}
-
-.dark .activity-heatmap__cell--0 {
-  background: #333;
-  opacity: 0.4;
-}
-
-.dark .activity-heatmap__cell--1 {
-  background: #1b5e20;
-}
-
-.dark .activity-heatmap__cell--2 {
-  background: #2e7d32;
-}
-
-.dark .activity-heatmap__cell--3 {
-  background: #388e3c;
-}
-
-.dark .activity-heatmap__cell--4 {
-  background: #43a047;
-}
-
-.dark .activity-heatmap__cell--5 {
-  background: #66bb6a;
 }
 
 .activity-heatmap__tooltip {

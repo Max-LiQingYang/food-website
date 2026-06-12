@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import {
   LineChart,
   Line,
@@ -40,16 +39,6 @@ const DIM_LABELS = {
 }
 
 export default function RatingTrendChart({ trend, range, onRangeChange }: RatingTrendChartProps) {
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    const check = () => setIsDark(document.body.classList.contains('dark'))
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
-
   // 数据点 < 3 → 显示占位
   if (!trend.points || trend.points.length < 3) {
     return (
@@ -77,8 +66,10 @@ export default function RatingTrendChart({ trend, range, onRangeChange }: Rating
     )
   }
 
-  const gridColor = isDark ? '#374151' : '#e5e7eb'
-  const textColor = isDark ? '#9ca3af' : '#6b7280'
+  // 使用 CSS 变量字符串（recharts 会塞到 SVG <path stroke=...>，浏览器原生解析）
+  // 主题切换瞬时生效，无 MutationObserver 闪烁
+  const gridColor = 'var(--color-border, #e8e0d8)'
+  const textColor = 'var(--color-text-secondary, #666)'
 
   return (
     <div className="rhm-trend">

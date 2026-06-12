@@ -1,5 +1,6 @@
 /* ================================================================
    FeedPage — 社交动态流
+   iter#135: P1 card hover 一致性增强
    ================================================================ */
 
 /* ── 页面容器 ── */
@@ -54,15 +55,17 @@
   display: flex;
   gap: 12px;
   padding: 16px;
-  background: var(--color-card-bg, #fff);
+  background: var(--color-card, #fff);
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  transition: box-shadow 0.2s, transform 0.15s;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
+  transition:
+    box-shadow var(--duration-normal) var(--ease-out-soft),
+    transform var(--duration-fast) var(--ease-out-soft);
 }
 
 .feed-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 /* ── 头像 ── */
@@ -315,12 +318,12 @@
    暗色模式
    ============================================================ */
 body.dark .feed-card {
-  background: #1e1e1e;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  background: var(--color-card, #1e1e1e);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.3));
 }
 
 body.dark .feed-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0,0,0,0.5));
 }
 
 body.dark .feed-card__avatar-fallback {
