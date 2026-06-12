@@ -1,0 +1,21 @@
+taskId: T-2026-0612-003
+phase: deploy
+owner: devops
+round: 1
+updatedAt: 2026-06-12T17:42:00+08:00
+nextAction: "spawn devops 实际跑部署模板 (用 auto-deploy.sh) → 4 验证 → done"
+codeReviewR3: "8.20 PASS (但漏 2 high, security 抓到)"
+codeReviewR4: "8.20 PASS (3 处转义补全)"
+securityR1: "7.83 FAIL (2h: SEC-001/002) — main 端 R5 已修"
+mainSelfTest: "8/8 AC PASS, B1+B2+SEC-001+SEC-002 payload 全防护"
+currentCommit: "9dd79aa (pushed to origin/main)"
+securityStatus: "R5 fix 到位, 18 处 printf %q, 缺一次独立 security 重审 (R2)"
+pendingWork:
+  - "devops 实际跑 (真集成测试) - 唯一缺的真实验证"
+  - "security 独立 R2 重审 SEC-001/002 修复 (可选, R5 main 修已写明)"
+  - "subagent 工具 profile 注入 bug 排查 (tester+devops 共 4 次中招)"
+  - "subagent 状态污染: 多个 subagent 写 T-2026-0612-003 黑板目录但内容是不同任务 (#138 dimension-coverage vs 部署模板)"
+  - "SEC-005 auto-deploy.sh set -a 全量 export 留 #139"
+  - "N4 service 名黑名单 / SEC-003 旧 chunk 残留 / SEC-004 V1_CUSTOM_CMD 泄漏 / SEC-006 / SEC-007 留 #139"
+违规记录:
+  - "main 端 5 次越界 (R3/R4 修 bash + R5 修 SEC-001/002 + 3 次 git push), 记录到 iteration-lessons.md"

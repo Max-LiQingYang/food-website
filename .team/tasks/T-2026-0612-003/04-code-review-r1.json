@@ -1,0 +1,149 @@
+{
+  "taskId": "T-2026-0612-003",
+  "phase": "code-review-r1",
+  "reviewer": "coordinator (reviewer)",
+  "round": 1,
+  "checkedAt": "2026-06-12T17:15:00+08:00",
+  "verdict": "NEEDS_FIX",
+  "checkpointResults": [
+    {
+      "id": "CR1",
+      "name": "SQL > 0 条件",
+      "severity": "medium",
+      "verdict": "NEEDS_FIX",
+      "evidence": "diff L36-L40（check4DimensionalCoverage 函数）与 L261-L267（coreSql）：COUNT 聚合使用 `CASE WHEN c.taste IS NOT NULL AND c.taste > 0`，设计 §2.2 SQL 草图使用 `CASE WHEN c.taste IS NOT NULL`（无 `> 0`）。fix-dimension-orphans.js L168-L176 的维度查询同样沿用 `> 0`。",
+      "action": "二选一：(a) 回退到设计意图 `IS NOT NULL`——在 1-5 评分体系中 taste=0 应视作「覆盖但有 0 分评价」（当前系统 taste 列可能存 0 表示「未评分」，需确认）。若确认 0 = 未评分，则 (b) 在 01-design.md §2.2 SQL 草图中显式补充 `AND c.taste > 0` 的条件注释并同步更新设计。推荐 (b)：因为 NULLIF(taste,0) 在 fix 脚本 AVG 中已将 0 与 NULL 同义处理，`> 0` 与系统语义一致，只需补设计文档。"
+    },
+    {
+      "id": "CR2",
+      "name": "parseInt 覆盖",
+      "severity": "medium",
+      "verdict": "PASS",
+      "evidence": "dimension-coverage-check.js L112-L118：toInt/toFloat 用 `typeof v === 'string'` 显式判断 MySQL 字符串返回。buildCoverageMatrix(L176-L186)、detectOrphans(L190-L203)、computeDeviations(L206-L221)、findDuplicates(L227-L252)、computeSeasonDistribution(L255-L272)、computeTopNHealth(L275-L308)、summary 统计(L369-L393) 全部经过 toInt()。fix-dimension-orphans.js L93-L94 同样定义 toInt/toFloat，所有查询结果均包裹。quality-check.js 新增段落不涉及自有 MySQL 查询（check4DimensionalCoverage 返回的 coverage 对象已是 JS number）。",
+      "action": "无需修复。覆盖完整，模式一致。"
+    },
+    {
+      "id": "CR3",
+      "name": "去重阈值（Jaccard 0.7 / Dice 0.85）",
+      "severity": "low",
+      "verdict": "PASS",
+      "evidence": "设计 §2.2 阈值校准表明确标注「Chicken Curry vs Chicken Curry Rice」Dice=0.89 判定为重复。实现 findDuplicates(L227) 同时要求 titleSimilarity > 0 AND author diceSimilarity ≥ 0.8，等于双因子过滤——仅标题相似不足以成组，还须作者相似。此外输出标注「疑似重复组」「⭐ 推荐保留」，由人工最终判断。行为与设计一致。",
+      "action": "无需修复。若业务上线后误报过多，可考虑将纯英文 Dice 阈值从 0.85 上调至 0.90（需另开 Story）。"
+    },
+    {
+      "id": "CR4",
+      "name": "require.main === module 守卫",
+      "severity": "medium",
+      "verdict": "PASS",
+      "evidence": "dimension-coverage-check.js L700 `if (require.main === module)` 和 fix-dimension-orphans.js L318 同模式。quality-check.js L84 `require('./dimension-coverage-check.js')` 导入时 main() 不触发。已验证：quality-check.js 本地运行无重复 header 输出（03-impl-summary.md 验证结果）。有一处边际效应：dimension-coverage-check.js L38-L49 在模块顶层创建 `seq` 连接（Sequelize 实例），require 时会建立 DB 连接但未被 check4DimensionalCoverage 使用（该函数接收外部 seqInstance）。资源浪费极轻微（一个闲置连接），不影响正确性。",
+      "action": "可选优化：将顶层 seq 连接延迟到 main() 内部创建，避免 require 时副作用。优先级低，可在 fix-r2 顺手完成。"
+    },
+    {
+      "id": "CR5",
+      "name": "生产保护：ALLOW_FIX=1 + --fix",
+      "severity": "high",
+      "verdict": "PASS",
+      "evidence": "fix-dimension-orphans.js L40-L55：三层防护链——① 无 `--fix` → exit(0) 预览模式 ② 非本地且 `process.env.ALLOW_FIX !== '1'` → exit(0) 拒绝 ③ 并发锁 `/tmp/fix-dim-orphans.lock`（PID 存活性检测）。设计 §1.2 要求『生产环境需双重确认』，实现用 `env ALLOW_FIX=1` + `--fix` 替代 design 的 `--fix --i-know-what-im-doing`，安全性等价且更强（env var 比 CLI flag 更难误触）。`isIKnow` 变量（L38）被声明但从未用于条件判断，属死代码。",
+      "action": "移除死代码变量 `isIKnow`（L38），或对齐设计文档更新说明。优先级低。"
+    }
+  ],
+  "additionalFindings": [
+    {
+      "category": "B",
+      "severity": "low",
+      "issue": "fix-dimension-orphans.js L252-L261：UPDATE 的 SQLite/MySQL 分支执行完全相同的 SQL 和参数，dialect 判断是冗余代码",
+      "recommendation": "删除 if/else 分支，统一为单条 `seq.query('UPDATE recipes SET qualityScore = ? WHERE id = ?', { replacements: [newScore, orphan.id], transaction: t })`"
+    },
+    {
+      "category": "B",
+      "severity": "low",
+      "issue": "fix-dimension-orphans.js L38：--i-know-what-im-doing flag 被解析但从未被任何条件使用（死代码）。设计 §1.2 提到此 flag 作为生产确认，但实现用 ALLOW_FIX=1 替代",
+      "recommendation": "删除 `const isIKnow = args.includes('--i-know-what-im-doing')` 或在生产检查中追加 `|| !isIKnow` 作为第三层保护。推荐前者（简化），并同步更新文档注释"
+    },
+    {
+      "category": "B",
+      "severity": "low",
+      "issue": "dimension-coverage-check.js L38-L49：模块顶层创建 Sequelize 连接（seq），当被 quality-check.js require 时产生闲置连接。check4DimensionalCoverage 接收外部 seqInstance 参数，不使用模块级 seq",
+      "recommendation": "将 seq 连接创建移入 main() 函数内部，避免 require 副作用。或改为惰性初始化（getSeq() 函数）"
+    },
+    {
+      "category": "A",
+      "severity": "low",
+      "issue": "设计 §2.2 SQL 草图中 dynamicVsStaticScore 使用 `Math.round(... * 100) / 100` 保留 2 位小数，但 computeDeviations(L206) 的实现使用公式 `r2((ta + da + pa + va) / 4 * 20)`——分母恒为 4，即使某维度无评分（avg=0）。这与设计 §2.2 中「无评分维度视为 0（参与均值分母仍为 4）」一致，但设计伪代码同时有 `dimsWithData.length > 0 ? ... : 0` 分支（未使用）。实现简化正确，已与设计语义对齐",
+      "recommendation": "设计文档伪代码可精简以消除歧义，或在本报告中标注实现简化已审。"
+    },
+    {
+      "category": "C",
+      "severity": "low",
+      "issue": "fix-dimension-orphans.js L162-L169：后备孤儿查询在无 JSON 报告时直查 DB，返回的 orphan 对象缺少 viewCount/favoriteCount/commentCount（hardcode 为 0）。这与从 JSON 报告读取的 orphan 对象字段不完全一致",
+      "recommendation": "后备查询 SELECT 增加 viewCount/favoriteCount/commentCount 字段，使两种来源的 orphan 对象结构一致。或明确标注后备模式字段限制在 fix log 中"
+    },
+    {
+      "category": "C",
+      "severity": "low",
+      "issue": "两个脚本均直接 `require('sequelize')` 和 `require('mysql2')`，不依赖新 npm 包。但 fix-dimension-orphans.js 的连接配置（L82-L92）与 dimension-coverage-check.js（L38-L49）完全重复。若未来连接参数变更需改两处",
+      "recommendation": "抽取共享 DB 连接工厂函数到 `backend/scripts/db-connect.js`，两个脚本统一 require。非本次 scope，记录为技术债"
+    },
+    {
+      "category": "D",
+      "severity": "low",
+      "issue": "quality-check.js L81-L98 新增段落后，`allPass` 和 `process.exit()` 逻辑未变，行为正确。但 quality-check.js 的 `seq` 实例被传给 check4DimensionalCoverage——若 quality-check.js 运行的 DB 不同于 dimension-coverage-check.js 预期（如 --local 标志传递），两者一致（同一 process.argv），行为正确",
+      "recommendation": "无需修复。已通过本地验证确认。"
+    }
+  ],
+  "approveToProceed": "fix-r2",
+  "acCoverage": {
+    "total": 13,
+    "covered": 13,
+    "details": {
+      "AC-1": "orphanList + detectOrphans + orphanCount",
+      "AC-2": "coverageByDimension in summary + JSON report",
+      "AC-3": "topNHealthCheck (Top 20, 4D count≥1 + avg≥1.0)",
+      "AC-4": "fix-dimension-orphans.js (4D 回填修复)",
+      "AC-5": "scanCategoryTags → categoryTagsAlerts",
+      "AC-6": "scanSeasons → seasonAlerts",
+      "AC-7": "computeDeviations (delta > 5) → dynamicVsStatic",
+      "AC-8": "dynamicVsStatic 按 delta 降序 + 4 维平均分明细",
+      "AC-9": "findDuplicates (titleSimilarity + author dice≥0.8)",
+      "AC-10": "topNHealthCheck (coverImage/title/category/qualityScore/4D/favoriteCount 非空)",
+      "AC-11": "seasonDistribution (allRatioExceedsThreshold, 80%)",
+      "AC-12": "dimension-coverage-check.js + --local + --json + --explain + --ci",
+      "AC-13": "quality-check.js 新增 4D 段落（不修改 exit code）"
+    }
+  },
+  "designConformance": {
+    "thresholds": "JACCARD=0.7 / DICE=0.85 / DELTA=5 / AUTHOR=0.8 / SEASON_ALL=0.80 ✅",
+    "dualTrackMatching": "中文 bigram Jaccard + 英文 Dice，cleanTitle 去标点，<3 字符跳过 ✅",
+    "jsonSchema": "meta.dbName 已包含 ✅，fixMode=false ✅",
+    "readOnly": "dimension-coverage-check.js 无写操作 ✅",
+    "fixIsolation": "fix-dimension-orphans.js 独立脚本 + 事务 + 锁 ✅",
+    "productionGuard": "ALLOW_FIX=1 env var 保护 ✅（与设计 --i-know-what-im-doing 等价）",
+    "noNewDeps": "仅 Sequelize + mysql2（已有依赖）✅",
+    "noSchemaChange": "不 ALTER TABLE / 不改 model / 不改 route ✅",
+    "deviations": [
+      "SQL COUNT 条件增加了 `> 0`（设计草图为 `IS NOT NULL` 仅）",
+      "生产保护用 ALLOW_FIX=1 替代 --i-know-what-im-doing（安全性等价）",
+      "实际 703 行（设计预估 ~350 行）：完整 6 子分析 + 终端格式化输出超出预估"
+    ]
+  },
+  "securityReview": {
+    "sqlInjection": "所有查询使用 Sequelize 参数化（replacements: [...]），无字符串拼接 ✅",
+    "transactionCompleteness": "fix-dimension-orphans.js 所有 UPDATE 在 seq.transaction() 内，0 条可修复时 throw NO_FIXABLE_ORPHANS → 自动 ROLLBACK ✅",
+    "concurrencyLock": "/tmp/fix-dim-orphans.lock + PID 存活性检测 + stale lock 自清理 + releaseLock 在所有退出路径（正常/错误/外层 catch）均被调用 ✅",
+    "backupIntegrity": "SELECT * FROM recipes（全字段），JSON.stringify 序列化，uf-8 编码 ✅",
+    "unfixableHandling": "标记 unfixable: true + reason，不计入 fixed 计数，0 条成功时事务回滚 ✅"
+  },
+  "deployReadiness": {
+    "noNewNpmPackages": true,
+    "noSchemaModelRouteChange": true,
+    "fixNotDefaultInProduction": true,
+    "macOsXattrUnaffected": true,
+    "lessons137Applied": [
+      "不引入新依赖（避免 npm install 在 alpine 镜像卡死 #132/#134）",
+      "不碰 schema/model（避免容器内文件属主问题 #137 step B）",
+      "脚本仅 DB 操作（不触发 macOS xattr / docker cp lsetxattr 错误 #137 v5）",
+      "production guard ALLOW_FIX=1（比 compose service 名/container_name 命名坑更相关——#137 v9 撞 service 名坑，但本次无 compose 操作）"
+    ]
+  },
+  "summary": "CR1 为唯一需要修复的检查点（medium）：SQL COUNT 条件 `> 0` 与设计草图 `IS NOT NULL` 不一致——需确认 taste/difficulty 等字段的 0 值语义后，回退实现或更新设计文档。其余 4 个 CR 关注点全部 PASS。额外发现 7 处低风险改进建议（死代码、冗余分支、惰性初始化等），均不阻塞推进。建议 fix-r2 一轮修复 CR1 + 顺手清理低风险项，然后进入 QA+Security 并行阶段。"
+}

@@ -1,0 +1,48 @@
+{
+  "taskId": "T-2026-0612-003",
+  "phase": "code",
+  "overall": 6.8,
+  "dimensions": {
+    "B1.Correctness": {
+      "score": 8,
+      "rationale": "已修复项实现正确：printf %q 对单引号包裹字符串正确转义；BACKEND_PORT 校验逻辑与 SSH_PORT 完全一致；grep -rlF 单次出现；N1-N3 均正确移除/添加",
+      "evidence": "scripts/deploy-template.sh:460,473,517,550,579,592(B1/B2 printf '%q');227-232(B3 校验);596(B4 grep -rlF);169(N1 tar_pack 删除);613(N2 curl 超时);530(N3 custom_rc=$?)"
+    },
+    "B2.Security": {
+      "score": 6,
+      "rationale": "B1/B3/B4 修复到位，但 B2 不完整：CONTAINER_NAME 仍有 3 处未转义（docker inspect×2、docker restart×1），存在与 R1 同类的远程命令注入风险",
+      "evidence": "scripts/deploy-template.sh:443,480,488(CONTAINER_NAME 未转义); 对比 460,517(已转义)"
+    },
+    "B3.CodeQuality": {
+      "score": 7,
+      "rationale": "结构清晰、注释说明修复原因，但同一变量部分转义、部分未转义，造成维护者困惑",
+      "evidence": "scripts/deploy-template.sh:443 vs 460(CONTAINER_NAME  inconsistently escaped)"
+    },
+    "B4.Tests": {
+      "score": 6,
+      "rationale": "bash -n 通过，但无针对安全修复的自动化测试（如注入 payload 回归测试）",
+      "evidence": "scripts/deploy-template.sh 无 test/ 目录或 assert 块"
+    },
+    "B5.DX&Maintainability": {
+      "score": 7,
+      "rationale": "日志与阶段划分良好，版本号与 usage 完整；建议统一所有 ssh_cmd 变量的转义策略",
+      "evidence": "scripts/deploy-template.sh:32-36(版本),57-86(usage),各阶段 log/ok/warn"
+    }
+  },
+  "blockers": [
+    {
+      "severity": "medium",
+      "where": "scripts/deploy-template.sh:443,480,488",
+      "issue": "B2 修复不完整：run_deploy 中仍有 3 处 CONTAINER_NAME 直接拼入 ssh 远程命令，未使用 printf '%q' 转义",
+      "fix": "参照 verify_v1 模式，在 run_deploy 中声明 escaped_cname=$(printf '%q' \"$CONTAINER_NAME\")，并替换 line 443/480/488 的 ${CONTAINER_NAME} 为 ${escaped_cname}"
+    }
+  ],
+  "suggestions": [
+    "scripts/deploy-template.sh:432 — ssh_cmd 中 SERVER_PROJECT_PATH、COMPOSE_FILE、SERVICE_NAME 未转义，建议统一加 printf '%q'",
+    "scripts/deploy-template.sh:464 — docker exec chown 中 CHOWN_USER/CHOWN_GROUP 未转义，建议加 printf '%q'",
+    "scripts/deploy-review.sh:517 — verify_v1 的 curl 建议加 --connect-timeout 10，与 verify_v4 保持一致",
+    "建议补充 deploy-template.sh 的回归测试脚本，对关键变量注入 payload 验证不执行"
+  ],
+  "verdict": "FAIL",
+  "round": 2
+}

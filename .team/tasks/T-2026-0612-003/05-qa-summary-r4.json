@@ -1,0 +1,58 @@
+{
+  "reportId": "05-qa-report-r4",
+  "taskId": "T-2026-0612-003",
+  "phase": "RE_TEST",
+  "createdAt": "2026-06-12T09:25:00.000Z",
+  "previousReport": "05-qa-report.md",
+  "previousResult": "7/9 PASS, 2 FAIL (T3, T4)",
+  "environment": {
+    "dbDialect": "sqlite",
+    "recipeCount": 3,
+    "commentCount": 1
+  },
+  "results": {
+    "T1": { "name": "--local 6 子分析", "status": "PASS", "regression": false },
+    "T2": { "name": "--json 纯 JSON", "status": "PASS", "regression": false },
+    "T3": { "name": "--explain 模式", "status": "PASS", "regression": false, "previousStatus": "FAIL", "fix": "explainSql 不含 EXPLAIN 前缀" },
+    "T4": { "name": "quality-check.js", "status": "PASS", "regression": false, "previousStatus": "FAIL", "fix": "ratingCount → commentCount" },
+    "T5": { "name": "无 --fix 拒绝", "status": "PASS", "regression": false },
+    "T6": { "name": "--fix 完整流程", "status": "PASS", "regression": false },
+    "T7": { "name": "并发锁", "status": "PASS", "regression": false },
+    "T8": { "name": "事务回滚", "status": "PASS", "regression": false, "note": "不回归复测" },
+    "T9": { "name": "JSON schema", "status": "PASS", "regression": false, "note": "不回归复测" },
+    "T10": { "name": "S5-M1 fallback", "status": "PASS", "regression": false, "note": "新增测试", "fix": "移除 food_password fallback → ''" }
+  },
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "previouslyFailedFixed": ["T3", "T4"],
+    "newTestPassed": ["T10"],
+    "regressions": 0
+  },
+  "decision": "APPROVE",
+  "nextPhase": "deploy",
+  "fixConfirmations": [
+    {
+      "bug": "Bug-1: EXPLAIN 前缀重复",
+      "file": "backend/scripts/dimension-coverage-check.js",
+      "line": 529,
+      "fix": "explainSql 不含 EXPLAIN 前缀，mysql 分支补 EXPLAIN",
+      "verified": true
+    },
+    {
+      "bug": "Bug-2: ratingCount 列不存在",
+      "file": "backend/scripts/quality-check.js",
+      "line": 47,
+      "fix": "ratingCount → commentCount",
+      "verified": true
+    },
+    {
+      "bug": "S5-M1: food_password fallback",
+      "file": "backend/scripts/fix-dimension-orphans.js",
+      "line": 86,
+      "fix": "移除 'food_password' fallback → ''",
+      "verified": true
+    }
+  ]
+}

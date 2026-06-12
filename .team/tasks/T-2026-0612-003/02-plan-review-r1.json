@@ -1,0 +1,111 @@
+{
+  "taskId": "T-2026-0612-003",
+  "phase": "plan-review-r1",
+  "reviewer": "coordinator (reviewer)",
+  "checkedAt": "2026-06-12T16:45:00+08:00",
+  "verdict": "NEEDS_FIX",
+  "checkpointResults": [
+    {
+      "id": "CP1",
+      "name": "SQL 聚合方案正确性",
+      "verdict": "PASS",
+      "evidence": "design §2.2 coverageMatrix SQL：单次 LEFT JOIN + GROUP BY r.id，8 个 COALESCE(SUM/AVG) 聚合。索引 `idx_comment_recipeId` 在 backend/models/comment.js:117 已定义（name: 'idx_comment_recipeId', fields: ['recipeId']），EXPLAIN 预检设计在 §5 R1 通过 `--explain` flag 覆盖。94 行 recipes × ~696 comments 规模下，type=ALL on recipes + type=ref on comments，预期 < 500ms。",
+      "action": "小修：design §2.2 文本写「单个 LEFT JOIN + 8 个 CASE WHEN」，但实际 SQL 使用 COALESCE(SUM(CASE WHEN...)) 聚合。建议统一术语为「8 个 COALESCE 聚合表达式」，避免实现时困惑。另建议 §5 R1 补充：`COUNT` 返回值在 MySQL raw query 中可能是字符串（#127 经验），需显式 `parseInt` 转换所有 cnt 字段。"
+    },
+    {
+      "id": "CP2",
+      "name": "JSON report schema 覆盖全部 13 AC",
+      "verdict": "PASS",
+      "evidence": "逐一对照 story AC-1~AC-13 与 design §3 report schema：
+AC-1 → orphanList（含 isFeatured/isTop20）✓
+AC-2 → coverageMatrix + summary.coverageByDimension ✓
+AC-3 → topNHealth（Top 20，含 allDimensionsOk）✓
+AC-4 → fixLog（含 dimensionsRestored）✓
+AC-5 → categoryTagsAlerts ✓
+AC-6 → seasonAlerts ✓
+AC-7 → dynamicVsStatic（delta > 5 过滤）✓
+AC-8 → dynamicVsStatic（delta 降序 + 4 维明细）✓
+AC-9 → duplicateGroups（含 recommended 字段）✓
+AC-10 → topNHealth.missingFields（coverImage/title/category 等）✓
+AC-11 → seasonDistribution（含 allRatioExceedsThreshold）✓
+AC-12 → meta.dbDialect + meta.fixMode（捕获 --local 模式）✓
+AC-13 → quality-check.js 增强不在本 report schema 中（正确，它是独立脚本输出），§1.3/§6.2 单独覆盖 ✓
+唯一缺口：report schema 的 summary.overallStatus 逻辑（PASS=orphan=0 AND topNHealthFail=0）未考虑 categoryTagsAlerts/seasonAlerts/duplicateGroups 非空但对数据完整性无伤的场景——当前设计正确（这些归入 WARN），无需修改。",
+      "action": "可选增强：meta 段增加 `dbName: string` 字段（如 '生产 MariaDB' / '本地 SQLite'），与 quality-check.js 现有输出风格对齐，便于历史报告对比时一眼识别数据源。"
+    },
+    {
+      "id": "CP3",
+      "name": "中文模糊匹配算法 Dice Coefficient 选择",
+      "verdict": "NEEDS_FIX",
+      "evidence": "design §2.2 duplicateScan：Dice Coefficient + 字符级 2-gram + title 阈值 0.85 + author 阈值 0.8（联合 AND 条件）。算法选择本身合理（Dice 对 2-gram 交并比敏感，适合中文），但阈值 0.85 在中文 bigram 场景下过于严格。典型 case：'红烧排骨' vs '红烧排骨面' → bigrams 分别为 {红烧,烧排,排骨} vs {红烧,烧排,排骨,骨面} → dice = (2×3)/(3+4) = 0.857，刚好擦过阈值。更多短标题（3-4 字）的 near-duplicate 会被误判为不重复。此外，`toLowerCase().replace(/\\s+/g, '')` 对中文无效（无害但冗余），且未处理全角/半角括号、书名号等标点差异。",
+      "action": "1) 将 title 阈值从 0.85 下调至 0.70-0.75，或改用 Levenshtein 比率 (1 - levDist/maxLen) 配合阈值 0.80，对短标题更友好。2) 增加预处理：去除标点符号（全角/半角括号、书名号、逗号等）后再做 bigram。3) 建议在 design §2.2 末尾加一段「阈值校准说明」：列出 3-5 个典型中文食谱标题对及其 Dice 值，证明所选阈值在真重复 vs 假重复之间合理区分。4) 移除无实际效果的 `toLowerCase()` 调用或替换为对标点有实际作用的 normalize 步骤。"
+    },
+    {
+      "id": "CP4",
+      "name": "修复隔离三层保护完备性",
+      "verdict": "NEEDS_FIX",
+      "evidence": "design §1.2 三层保护：① 默认只读（无 flag 不写 DB）② --dry-run 预览 ③ --fix + 备份 + 日志。设计声称完备，但发现 3 个缺口：
+(1) **修复入口歧义**：§1.2 说 dimension-coverage-check.js 的 --fix 负责修复，§4.1 又列出 fix-dimension-orphans.js 为独立可选脚本。两处未说明优先级/互斥/推荐路径，实现时可能做了两套修复逻辑。
+(2) **无事务包装**：§1.2 第三条描述「所有 UPDATE 记录写入修复日志」，但未提及 BEGIN/COMMIT 事务。如果 94 道食谱中第 47 道 UPDATE 失败，前 46 道已提交 → 部分修复状态。
+(3) **并发风险**：两处均未提及「防止多个 --fix 实例同时运行」。生产环境可能有人重复执行脚本，导致双重 UPDATE 和备份覆盖。",
+      "action": "1) 明确决策：dimension-coverage-check.js --fix 是唯一修复入口；fix-dimension-orphans.js 从 §4.1 移除或标注为「已废弃/由 --fix 替代」。2) §1.2 增加：所有 UPDATE 包裹在单个 Sequelize transaction 中，任一步骤失败自动 ROLLBACK。3) §1.2 增加：脚本启动时检查 `reports/.fix-lock` 锁文件（PID + 时间戳），若存在且进程仍 alive → 拒绝执行并提示。4) 备份路径 `reports/pre-fix-backup-{timestamp}.json` — 需确认 reports/ 目录不存在时脚本自动 mkdir（实现级，但 design 应提及）。"
+    },
+    {
+      "id": "CP5",
+      "name": "quality-check.js exit code 隔离策略",
+      "verdict": "NEEDS_FIX",
+      "evidence": "design §1.3：「check4DimensionalCoverage 仅做统计输出……不影响 exit code」。但 §6.2 实现签名 `async function check4DimensionalCoverage(seq)` 未包含 try-catch 边界。现有 quality-check.js 的 `main().catch(e => { console.error(e.message); process.exit(1) })` 会在任何未捕获异常时强制 exit(1)。若 check4DimensionalCoverage 内部 DB 查询超时或连接中断 → 抛出异常 → 整个脚本 exit(1)，即使 8 个现有检查全部通过。这直接违背 AC-13「不影响 exit code」。",
+      "action": "1) §6.2 函数签名改为 `async function check4DimensionalCoverage(seq)`，内部包裹 try-catch，捕获所有异常后 console.warn 输出告警并 return（不 throw）。2) §1.3 增加：「异常处理：若 4 维查询因 DB 连接/超时失败，函数捕获异常后输出 `⚠ 4 维评分覆盖统计跳过（DB 错误）` 并继续，不改 allPass，不改变 exit code。」3) 可选更强隔离：将 check4DimensionalCoverage 的调用放在 main() 的最末尾（allPass 判断之后、process.exit 之前），即使它意外 throw 也不影响已有检查结果——但这与当前 §1.3 的插入位置（before allPass）冲突，建议在 design 中明确最终选择。"
+    }
+  ],
+  "additionalFindings": [
+    {
+      "severity": "high",
+      "issue": "check4DimensionalCoverage 无异常边界（同 CP5 的技术面）",
+      "recommendation": "在 design §6.2 显式标注：`check4DimensionalCoverage` 实现必须用 try-catch 包裹全部 DB 操作，失败仅 log 告警，绝不 throw。实现阶段 reviewer 需验证此点。"
+    },
+    {
+      "severity": "medium",
+      "issue": "--fix 缺少生产环境保护机制",
+      "recommendation": "design §1.2 缺少对 --fix 在生产环境的确认保护。建议：当检测到非 --local 模式且 --fix 传入时，脚本应输出红色警告「⚠ 即将修改生产数据库」并要求用户输入 'yes' 确认或传入 --force 标志（如 `--fix --force`）才真正执行。防止误操作。"
+    },
+    {
+      "severity": "medium",
+      "issue": "部署流程未引用 #137 关键教训：docker cp + chown + compose service 名",
+      "recommendation": "design §5（风险方案）和 §1（实现策略）未提及部署时需注意的 3 个坑：① compose service 名是 `backend` 但 container_name 是 `food-backend`，`docker compose up -d backend` vs `docker exec food-backend` 不可互换（#137 v9 教训）；② 新脚本文件 docker cp 进 baked-in 镜像后需 `chown nodeapp:nodejs`（#137 核心教训）；③ macOS tar 带 xattr 需 `COPYFILE_DISABLE=1` 处理（如使用 tar 传输而非 docker cp）。建议在 design 新增 §8「部署注意事项」或 §5 R6「部署兼容性」引用这些经验。"
+    },
+    {
+      "severity": "medium",
+      "issue": "quality-check.js 对 dimension-coverage-check.js 的代码依赖未定义",
+      "recommendation": "design §6.2 说 `check4DimensionalCoverage` 「复用 dimension-coverage-check.js 的核心 SQL（或 require 导入）」。但 quality-check.js 是独立脚本，require 另一个脚本会造成紧耦合（dimension-coverage-check.js 改名/移动 → quality-check.js 崩溃）。建议在 design 明确：quality-check.js 的 `check4DimensionalCoverage` 应**内联**核心 SQL（约 25 行），或提取共享模块 `lib/coverage-query.js` 供两方 require。避免跨脚本硬依赖。"
+    },
+    {
+      "severity": "low",
+      "issue": "report schema 缺少 dbName 字段",
+      "recommendation": "同 CP2 action：meta 段增加 `dbName` 字段（'生产 MariaDB' / '本地 SQLite'），与现有 quality-check.js 的「生产 MariaDB」「本地 SQLite」输出风格一致，便于多份历史报告对比时一眼识别来源。"
+    },
+    {
+      "severity": "low",
+      "issue": "动态分公式与 AC-7 描述有细微偏差",
+      "recommendation": "AC-7 说 `dynamicScore = (tasteAvg + difficultyAvg + presentationAvg + valueAvg) / 4 * 20`（无评分维度视为 0）。design §2.2 JS 代码用 `Math.round((sum)/4 * 20 * 10) / 10` 额外做了一次 round-to-1-decimal，但 AC-7 未指定精度。这个偏差不影响正确性，但建议在 design §2.2 公式注释中说明「保留 1 位小数以与 qualityScore 精度对齐」。"
+    }
+  ],
+  "approveToProceed": "design → design 修订（r2）",
+  "summary": {
+    "totalCheckpoints": 5,
+    "passCount": 2,
+    "needsFixCount": 3,
+    "blockerCount": 0,
+    "additionalFindingsBySeverity": { "high": 1, "medium": 3, "low": 2 },
+    "nextPhase": "design 修订 (r2)",
+    "revisionTargets": [
+      "§2.2 duplicateScan：下调 Dice 阈值 0.85→0.70-0.75 + 增加标点预处理 + 阈值校准说明",
+      "§1.2 + §4.1：消除 fix-dimension-orphans.js 歧义 + 增加事务包装 + 并发锁",
+      "§1.3 + §6.2：check4DimensionalCoverage 增加 try-catch 异常边界",
+      "§1.2：--fix 增加生产环境确认保护（--force 或交互确认）",
+      "新增 §8：部署注意事项（compose service 名 vs container_name + docker cp + chown + xattr）",
+      "§6.2：明确 quality-check.js 不 require dimension-coverage-check.js（内联 SQL 或共享模块）"
+    ],
+    "comments": "无 BLOCKER，3 个 NEEDS_FIX 均为设计级缺陷（非架构错误），预计 architect 1 轮修订可解决。建议 r2 通过后即可进入 impl 阶段。"
+  }
+}
