@@ -1,0 +1,668 @@
+diff --git a/.team/tasks/T-2026-0612-001/99-status.yaml b/.team/tasks/T-2026-0612-001/99-status.yaml
+index af93c4b..c139dec 100644
+--- a/.team/tasks/T-2026-0612-001/99-status.yaml
++++ b/.team/tasks/T-2026-0612-001/99-status.yaml
+@@ -1,9 +1,9 @@
+ taskId: T-2026-0612-001
+-phase: deploy
+-owner: devops
++phase: done
++owner: coordinator
+ round: 1
+-updatedAt: 2026-06-12T04:09:30Z
+-nextAction: "spawn devops 子专家：git commit (7 src + .team/ + docs/perf/) → push → 服务器 pull → build → 容器清理+cp 108 assets → nginx reload → 5 路径 200 → P0 验证"
++updatedAt: 2026-06-12T04:18:00Z
++nextAction: "dev-pipeline 全流程闭环。retro 阶段：写 lessons + metrics"
+ designFile: ".team/tasks/T-2026-0612-001/01-design.md"
+ designLineCount: 817
+ planReviewFile: ".team/tasks/T-2026-0612-001/02-plan-review-r1.json"
+@@ -24,3 +24,7 @@ qaAll8ACPass: true
+ securityAuditFile: ".team/tasks/T-2026-0612-001/06-security-audit.json"
+ securityVerdict: "PASS"
+ securityCriticalHigh: 0
++deployReportFile: "docs/iterations/iter136-lazy-shimmer/DEPLOY-report.md"
++deployVerdict: "SUCCESS"
++deployPublicVerification: "5/5 200 · 2 CSS shimmer · 3 JS lazy"
++firstPass: true
+diff --git a/backend/routes/compare.js b/backend/routes/compare.js
+index d7060b6..2d481cb 100644
+--- a/backend/routes/compare.js
++++ b/backend/routes/compare.js
+@@ -8,7 +8,7 @@
+  */
+ 
+ const express = require('express')
+-const { Recipe } = require('../models')
++const { Recipe, Comment } = require('../models')
+ 
+ const router = express.Router()
+ 
+@@ -63,6 +63,15 @@ router.post('/', async (req, res) => {
+       })
+     }
+ 
++    // 批量查询 Comment 4 维字段
++    const comments = await Comment.findAll({
++      where: { recipeId: recipeIds },
++      attributes: ['recipeId', 'taste', 'difficulty', 'presentation', 'value']
++    })
++
++    // 内存聚合 dimensionAverages
++    const dimAverages = aggregateDimensionAverages(comments, recipeIds)
++
+     // 构建对比数据
+     const compareData = recipes.map(r => {
+       const d = r.toJSON()
+@@ -85,6 +94,12 @@ router.post('/', async (req, res) => {
+         favoriteCount: d.favoriteCount,
+         commentCount: d.commentCount,
+         viewCount: d.viewCount,
++        dimensionAverages: dimAverages[d.id] || {
++          taste: { average: 0, count: 0 },
++          difficulty: { average: 0, count: 0 },
++          presentation: { average: 0, count: 0 },
++          value: { average: 0, count: 0 }
++        }
+       }
+     })
+ 
+@@ -142,4 +157,46 @@ router.post('/', async (req, res) => {
+   }
+ })
+ 
+-module.exports = router
+\ No newline at end of file
++/**
++ * 批量聚合评论 4 维评分 → dimensionAverages
++ * @param {Array} comments - Comment 实例数组，每条含 { recipeId, taste, difficulty, presentation, value }
++ * @param {string[]} recipeIds - 目标食谱 ID 列表
++ * @returns {Object} { [recipeId]: { taste: {average,count}, difficulty: {average,count}, presentation: {average,count}, value: {average,count} } }
++ */
++function aggregateDimensionAverages(comments, recipeIds) {
++  const accum = {}
++  for (const id of recipeIds) {
++    accum[id] = {
++      taste: { sum: 0, count: 0 },
++      difficulty: { sum: 0, count: 0 },
++      presentation: { sum: 0, count: 0 },
++      value: { sum: 0, count: 0 }
++    }
++  }
++
++  for (const c of comments) {
++    const rid = String(c.recipeId)
++    if (!accum[rid]) continue
++    for (const dim of ['taste', 'difficulty', 'presentation', 'value']) {
++      if (c[dim] != null) {
++        accum[rid][dim].sum += c[dim]
++        accum[rid][dim].count += 1
++      }
++    }
++  }
++
++  const result = {}
++  for (const id of recipeIds) {
++    result[id] = {}
++    for (const dim of ['taste', 'difficulty', 'presentation', 'value']) {
++      const { sum, count } = accum[id][dim]
++      result[id][dim] = {
++        average: count > 0 ? Math.round((sum / count) * 10) / 10 : 0,
++        count
++      }
++    }
++  }
++  return result
++}
++
++module.exports = { router, aggregateDimensionAverages }
+\ No newline at end of file
+diff --git a/backend/tests/compare.test.js b/backend/tests/compare.test.js
+index 39f9232..4f270be 100644
+--- a/backend/tests/compare.test.js
++++ b/backend/tests/compare.test.js
+@@ -1,16 +1,83 @@
+ 'use strict'
+ 
+-const compareModule = require('../routes/compare')
++const { aggregateDimensionAverages } = require('../routes/compare')
+ 
+ describe('Compare Route Module', () => {
+   it('导出 router 对象', () => {
++    const compareModule = require('../routes/compare')
+     expect(compareModule).toBeDefined()
+-    expect(typeof compareModule).toBe('function')
++    expect(typeof compareModule.router).toBe('function')
+   })
+ 
+   it('router 有 post 处理函数', () => {
+-    const routes = compareModule.stack || []
+-    const postRoutes = routes.filter((r: any) => r.route && r.route.path === '/' && r.route.methods.post)
++    const compareModule = require('../routes/compare')
++    const routes = compareModule.router.stack || []
++    const postRoutes = routes.filter((r) => r.route && r.route.path === '/' && r.route.methods.post)
+     expect(postRoutes.length).toBe(1)
+   })
+-})
+\ No newline at end of file
++
++  it('导出 aggregateDimensionAverages 纯函数', () => {
++    expect(typeof aggregateDimensionAverages).toBe('function')
++  })
++})
++
++describe('aggregateDimensionAverages', () => {
++  it('正确聚合多个食谱的维度评分', () => {
++    const comments = [
++      { recipeId: 'r1', taste: 4, difficulty: 2, presentation: 3, value: 5 },
++      { recipeId: 'r1', taste: 5, difficulty: 3, presentation: 4, value: 4 },
++      { recipeId: 'r2', taste: 3, difficulty: 4, presentation: 5, value: 3 },
++    ]
++    const result = aggregateDimensionAverages(comments, ['r1', 'r2'])
++
++    // r1: taste=(4+5)/2=4.5, difficulty=(2+3)/2=2.5, presentation=(3+4)/2=3.5, value=(5+4)/2=4.5
++    expect(result.r1.taste).toEqual({ average: 4.5, count: 2 })
++    expect(result.r1.difficulty).toEqual({ average: 2.5, count: 2 })
++    expect(result.r1.presentation).toEqual({ average: 3.5, count: 2 })
++    expect(result.r1.value).toEqual({ average: 4.5, count: 2 })
++
++    // r2: only 1 comment
++    expect(result.r2.taste).toEqual({ average: 3, count: 1 })
++    expect(result.r2.difficulty).toEqual({ average: 4, count: 1 })
++  })
++
++  it('无评分时返回 {average:0, count:0}', () => {
++    const result = aggregateDimensionAverages([], ['r1'])
++    expect(result.r1.taste).toEqual({ average: 0, count: 0 })
++    expect(result.r1.difficulty).toEqual({ average: 0, count: 0 })
++    expect(result.r1.presentation).toEqual({ average: 0, count: 0 })
++    expect(result.r1.value).toEqual({ average: 0, count: 0 })
++  })
++
++  it('部分维度为 NULL 时仅计算非 NULL 维度', () => {
++    const comments = [
++      { recipeId: 'r1', taste: 5, difficulty: null, presentation: null, value: 3 },
++    ]
++    const result = aggregateDimensionAverages(comments, ['r1'])
++    expect(result.r1.taste).toEqual({ average: 5, count: 1 })
++    expect(result.r1.difficulty).toEqual({ average: 0, count: 0 })
++    expect(result.r1.presentation).toEqual({ average: 0, count: 0 })
++    expect(result.r1.value).toEqual({ average: 3, count: 1 })
++  })
++
++  it('忽略不在 recipeIds 列表中的评论', () => {
++    const comments = [
++      { recipeId: 'r1', taste: 4, difficulty: 2, presentation: 3, value: 5 },
++      { recipeId: 'r3', taste: 1, difficulty: 1, presentation: 1, value: 1 }, // r3 not in list
++    ]
++    const result = aggregateDimensionAverages(comments, ['r1'])
++    expect(result.r1.taste).toEqual({ average: 4, count: 1 })
++    expect(result).not.toHaveProperty('r3')
++  })
++
++  it('保留 1 位小数精度', () => {
++    // (4+5+4)/3 = 4.333... → 4.3
++    const comments = [
++      { recipeId: 'r1', taste: 4, difficulty: null, presentation: null, value: null },
++      { recipeId: 'r1', taste: 5, difficulty: null, presentation: null, value: null },
++      { recipeId: 'r1', taste: 4, difficulty: null, presentation: null, value: null },
++    ]
++    const result = aggregateDimensionAverages(comments, ['r1'])
++    expect(result.r1.taste).toEqual({ average: 4.3, count: 3 })
++  })
++})
+diff --git a/frontend/src/api.ts b/frontend/src/api.ts
+index 57b5997..e4daa0f 100644
+--- a/frontend/src/api.ts
++++ b/frontend/src/api.ts
+@@ -844,6 +844,12 @@ export interface CompareRecipe {
+   favoriteCount: number
+   commentCount: number
+   viewCount: number
++  dimensionAverages: {
++    taste: DimensionAverage
++    difficulty: DimensionAverage
++    presentation: DimensionAverage
++    value: DimensionAverage
++  }
+ }
+ 
+ export interface CompareSummary {
+diff --git a/frontend/src/pages/ComparePage.css b/frontend/src/pages/ComparePage.css
+index 8fc66cb..20399fc 100644
+--- a/frontend/src/pages/ComparePage.css
++++ b/frontend/src/pages/ComparePage.css
+@@ -270,7 +270,91 @@
+   gap: 6px;
+ }
+ 
+-/* Responsive */
++/* ═══════════════════════════════════════════
++   4 维评分雷达图 section
++   ═══════════════════════════════════════════ */
++
++.cmp-radar-section {
++  background: var(--color-card, #fff);
++  border-radius: var(--radius-md, 12px);
++  padding: 20px;
++  margin-bottom: 20px;
++  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,.06));
++}
++
++.cmp-radar-title {
++  font-size: 16px;
++  font-weight: 600;
++  margin: 0 0 16px;
++  color: var(--color-text, #1a1a1a);
++}
++
++/* 雷达图网格：2 列或 3 列 */
++.cmp-radar-grid {
++  display: grid;
++  gap: 20px;
++}
++
++.cmp-radar-grid--2 {
++  grid-template-columns: 1fr 1fr;
++}
++
++.cmp-radar-grid--3 {
++  grid-template-columns: 1fr 1fr 1fr;
++}
++
++/* 单个雷达图卡片 */
++.cmp-radar-card {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  padding: 16px;
++  border-radius: 10px;
++  background: var(--color-bg, #fafaf8);
++}
++
++.cmp-radar-card--0 { background: #fff8f5; }
++.cmp-radar-card--1 { background: #f5faf5; }
++.cmp-radar-card--2 { background: #f5f8ff; }
++
++.cmp-radar-card-title {
++  font-size: 14px;
++  font-weight: 600;
++  margin: 0 0 12px;
++  text-align: center;
++}
++
++/* 维度数值摘要 */
++.cmp-dim-summary {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 6px 16px;
++  margin-top: 12px;
++  width: 100%;
++  max-width: 220px;
++}
++
++.cmp-dim-item {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  font-size: 12px;
++}
++
++.cmp-dim-label {
++  color: var(--color-text-secondary, #666);
++  font-weight: 500;
++}
++
++.cmp-dim-value {
++  color: var(--color-text, #333);
++  font-weight: 600;
++}
++
++/* ═══════════════════════════════════════════
++   Responsive: ≤600px 单列
++   ═══════════════════════════════════════════ */
++
+ @media (max-width: 600px) {
+   .cmp-page { padding: 16px 12px 32px; }
+   .cmp-title { font-size: 20px; }
+@@ -278,9 +362,25 @@
+   .cmp-table th, .cmp-table td { padding: 8px 10px; font-size: 13px; }
+   .cmp-th-value { min-width: 130px; }
+   .cmp-nutrition-grid { grid-template-columns: 1fr; }
++
++  .cmp-radar-grid--2,
++  .cmp-radar-grid--3 {
++    grid-template-columns: 1fr;
++  }
++
++  .cmp-radar-card {
++    padding: 12px;
++  }
++
++  .cmp-dim-summary {
++    max-width: 160px;
++  }
+ }
+ 
+-/* Dark mode */
++/* ═══════════════════════════════════════════
++   Dark mode
++   ═══════════════════════════════════════════ */
++
+ body.dark .cmp-th-label {
+   background: #2a2118;
+ }
+@@ -413,4 +513,30 @@ body.dark .cmp-common {
+ 
+ body.dark .cmp-common h3 {
+   color: var(--color-text, #e0e0ee);
+-}
+\ No newline at end of file
++}
++
++/* ── Dark mode: 雷达图 section ── */
++
++body.dark .cmp-radar-section {
++  background: var(--color-card, #1e1e32);
++}
++
++body.dark .cmp-radar-title {
++  color: var(--color-text, #e0e0ee);
++}
++
++body.dark .cmp-radar-card {
++  background: var(--color-bg-secondary, #1a1a2e);
++}
++
++body.dark .cmp-radar-card--0 { background: #2a1a14; }
++body.dark .cmp-radar-card--1 { background: #142a14; }
++body.dark .cmp-radar-card--2 { background: #141e2a; }
++
++body.dark .cmp-dim-label {
++  color: var(--color-text-secondary, #9898b0);
++}
++
++body.dark .cmp-dim-value {
++  color: var(--color-text, #e0e0ee);
++}
+diff --git a/frontend/src/pages/ComparePage.test.tsx b/frontend/src/pages/ComparePage.test.tsx
+index 56c2ebb..836cbb9 100644
+--- a/frontend/src/pages/ComparePage.test.tsx
++++ b/frontend/src/pages/ComparePage.test.tsx
+@@ -16,10 +16,54 @@ vi.mock('../context/AuthContext', () => ({
+   useAuth: () => ({ isAuthenticated: true, user: { id: 1, username: 'test' } }),
+ }))
+ 
++vi.mock('../components/DimensionRadar', () => ({
++  default: () => <div data-testid="dimension-radar">DimensionRadar</div>,
++}))
++
+ const mockCompareResult = {
+   recipes: [
+-    { id: 1, title: '番茄炒蛋', category: 'chinese', difficulty: 'easy', servings: 2, cookTime: '15', avgRating: 4.5, favoriteCount: 12, commentCount: 5, viewCount: 200, qualityLabel: '热门', ingredients: [{ name: '番茄', amount: 2, unit: '个' }, { name: '鸡蛋', amount: 3, unit: '个' }], nutrition: { calories: { value: 200, unit: 'kcal' }, protein: { value: 12, unit: 'g' }, carbs: { value: 8, unit: 'g' }, fat: { value: 15, unit: 'g' } } },
+-    { id: 2, title: '麻婆豆腐', category: 'chinese', difficulty: 'medium', servings: 3, cookTime: '20', avgRating: 4.2, favoriteCount: 8, commentCount: 3, viewCount: 150, qualityLabel: '高分', ingredients: [{ name: '豆腐', amount: 1, unit: '块' }, { name: '猪肉末', amount: 100, unit: 'g' }], nutrition: { calories: { value: 350, unit: 'kcal' }, protein: { value: 20, unit: 'g' }, carbs: { value: 10, unit: 'g' }, fat: { value: 25, unit: 'g' } } },
++    {
++      id: 1,
++      title: '番茄炒蛋',
++      category: 'chinese',
++      difficulty: 'easy',
++      servings: 2,
++      cookTime: '15',
++      avgRating: 4.5,
++      favoriteCount: 12,
++      commentCount: 5,
++      viewCount: 200,
++      qualityLabel: '热门',
++      ingredients: [{ name: '番茄', amount: 2, unit: '个' }, { name: '鸡蛋', amount: 3, unit: '个' }],
++      nutrition: { calories: { value: 200, unit: 'kcal' }, protein: { value: 12, unit: 'g' }, carbs: { value: 8, unit: 'g' }, fat: { value: 15, unit: 'g' } },
++      dimensionAverages: {
++        taste: { average: 4.2, count: 5 },
++        difficulty: { average: 2.8, count: 5 },
++        presentation: { average: 3.5, count: 4 },
++        value: { average: 4.0, count: 3 }
++      }
++    },
++    {
++      id: 2,
++      title: '麻婆豆腐',
++      category: 'chinese',
++      difficulty: 'medium',
++      servings: 3,
++      cookTime: '20',
++      avgRating: 4.2,
++      favoriteCount: 8,
++      commentCount: 3,
++      viewCount: 150,
++      qualityLabel: '高分',
++      ingredients: [{ name: '豆腐', amount: 1, unit: '块' }, { name: '猪肉末', amount: 100, unit: 'g' }],
++      nutrition: { calories: { value: 350, unit: 'kcal' }, protein: { value: 20, unit: 'g' }, carbs: { value: 10, unit: 'g' }, fat: { value: 25, unit: 'g' } },
++      dimensionAverages: {
++        taste: { average: 3.8, count: 3 },
++        difficulty: { average: 3.5, count: 3 },
++        presentation: { average: 4.0, count: 2 },
++        value: { average: 3.2, count: 3 }
++      }
++    },
+   ],
+   summary: {
+     commonIngredients: [],
+@@ -71,8 +115,8 @@ describe('ComparePage', () => {
+ 
+     await waitFor(() => {
+       expect(compareRecipes).toHaveBeenCalledWith(['1', '2'])
+-      expect(screen.getByText('番茄炒蛋')).toBeTruthy()
+-      expect(screen.getByText('麻婆豆腐')).toBeTruthy()
++      expect(screen.getAllByText('番茄炒蛋').length).toBeGreaterThan(0)
++      expect(screen.getAllByText('麻婆豆腐').length).toBeGreaterThan(0)
+     })
+   })
+ 
+@@ -115,4 +159,78 @@ describe('ComparePage', () => {
+       expect(screen.getByText(/网络错误/i)).toBeTruthy()
+     })
+   })
+-})
+\ No newline at end of file
++
++  it('渲染 4 维雷达图区域', async () => {
++    vi.mocked(compareRecipes).mockResolvedValue(mockCompareResult)
++
++    renderPage()
++    const textarea = screen.getByPlaceholderText(/例如/i) as HTMLTextAreaElement
++    const btn = screen.getByText(/开始对比/i)
++
++    textarea.value = '1\n2'
++    fireEvent.change(textarea, { target: { value: '1\n2' } })
++    fireEvent.click(btn)
++
++    await waitFor(() => {
++      // 雷达图 section 标题
++      expect(screen.getByText(/4 维评分对比/i)).toBeTruthy()
++    }, { timeout: 3000 })
++
++    // 维度标签（可能出现在多个位置：表格行和摘要）
++    expect(screen.getAllByText('口味').length).toBeGreaterThan(0)
++    expect(screen.getAllByText('卖相').length).toBeGreaterThan(0)
++    expect(screen.getAllByText('性价比').length).toBeGreaterThan(0)
++    // DimensionRadar 组件渲染
++    const radars = screen.getAllByTestId('dimension-radar')
++    expect(radars.length).toBe(2)
++  })
++
++  it('无维度数据时不渲染雷达图 section', async () => {
++    const noDimResult = {
++      ...mockCompareResult,
++      recipes: mockCompareResult.recipes.map(r => ({
++        ...r,
++        dimensionAverages: {
++          taste: { average: 0, count: 0 },
++          difficulty: { average: 0, count: 0 },
++          presentation: { average: 0, count: 0 },
++          value: { average: 0, count: 0 }
++        }
++      }))
++    }
++    vi.mocked(compareRecipes).mockResolvedValue(noDimResult)
++
++    renderPage()
++    const textarea = screen.getByPlaceholderText(/例如/i) as HTMLTextAreaElement
++    const btn = screen.getByText(/开始对比/i)
++
++    textarea.value = '1\n2'
++    fireEvent.change(textarea, { target: { value: '1\n2' } })
++    fireEvent.click(btn)
++
++    await waitFor(() => {
++      expect(screen.getByText('番茄炒蛋')).toBeTruthy()
++    })
++
++    // 雷达图 section 不应出现
++    expect(screen.queryByText(/4 维评分对比/i)).toBeNull()
++  })
++
++  it('对比表格显示维度数值行', async () => {
++    vi.mocked(compareRecipes).mockResolvedValue(mockCompareResult)
++
++    renderPage()
++    const textarea = screen.getByPlaceholderText(/例如/i) as HTMLTextAreaElement
++    const btn = screen.getByText(/开始对比/i)
++
++    textarea.value = '1\n2'
++    fireEvent.change(textarea, { target: { value: '1\n2' } })
++    fireEvent.click(btn)
++
++    await waitFor(() => {
++      // 表格中应出现 formatDimValue 格式的文本
++      expect(screen.getByText('4.2 分 (5人评)')).toBeTruthy()
++      expect(screen.getByText('3.8 分 (3人评)')).toBeTruthy()
++    })
++  })
++})
+diff --git a/frontend/src/pages/ComparePage.tsx b/frontend/src/pages/ComparePage.tsx
+index e3e60a4..de2e0ca 100644
+--- a/frontend/src/pages/ComparePage.tsx
++++ b/frontend/src/pages/ComparePage.tsx
+@@ -1,8 +1,25 @@
+ import { useState, useEffect, useMemo } from 'react'
+ import { Link, useSearchParams } from 'react-router-dom'
+ import { compareRecipes, type CompareResult, type CompareRecipe } from '../api'
++import DimensionRadar from '../components/DimensionRadar'
+ import './ComparePage.css'
+ 
++// 维度中文标签（自维护，避免跨模块耦合）
++const DIMENSION_LABELS: Record<string, string> = {
++  taste: '口味',
++  difficulty: '难度',
++  presentation: '卖相',
++  value: '性价比'
++}
++
++const DIMENSION_ORDER = ['taste', 'difficulty', 'presentation', 'value'] as const
++
++/** 格式化维度值用于表格展示（N1: 统一函数名 formatDimValue） */
++function formatDimValue(dim?: { average: number; count: number }): string {
++  if (!dim || dim.count === 0) return '-'
++  return `${dim.average.toFixed(1)} 分 (${dim.count}人评)`
++}
++
+ export default function ComparePage() {
+   const [searchParams] = useSearchParams()
+   const initialIds = searchParams.get('ids')?.split(',').filter(Boolean) || []
+@@ -11,12 +28,22 @@ export default function ComparePage() {
+   const [loading, setLoading] = useState(false)
+   const [error, setError] = useState('')
+ 
++  // SUB-7: 响应式 isMobile 检测
++  const [isMobile, setIsMobile] = useState(false)
++
+   useEffect(() => {
+     if (initialIds.length >= 2) {
+       doCompare(initialIds)
+     }
+   }, [])
+ 
++  useEffect(() => {
++    const check = () => setIsMobile(window.innerWidth <= 600)
++    check()
++    window.addEventListener('resize', check)
++    return () => window.removeEventListener('resize', check)
++  }, [])
++
+   const doCompare = async (ids: string[]) => {
+     if (ids.length < 2) {
+       setError('请至少选择 2 个食谱进行对比')
+@@ -58,6 +85,11 @@ export default function ComparePage() {
+       { label: '份量', values: r.map(d => `${d.servings || '-'} 人份`) },
+       { label: '烹饪时间', values: r.map(d => d.cookTime || '-') },
+       { label: '评分', values: r.map(d => d.avgRating ? `${d.avgRating.toFixed(1)} ⭐` : '-') },
++      // SUB-6: 4 维评分行
++      { label: '口味', values: r.map(d => formatDimValue(d.dimensionAverages?.taste)) },
++      { label: '难度评分', values: r.map(d => formatDimValue(d.dimensionAverages?.difficulty)) },
++      { label: '卖相', values: r.map(d => formatDimValue(d.dimensionAverages?.presentation)) },
++      { label: '性价比', values: r.map(d => formatDimValue(d.dimensionAverages?.value)) },
+       { label: '收藏数', values: r.map(d => `${d.favoriteCount ?? 0}`) },
+       { label: '评论数', values: r.map(d => `${d.commentCount ?? 0}`) },
+       { label: '浏览数', values: r.map(d => `${d.viewCount ?? 0}`) },
+@@ -84,6 +116,12 @@ export default function ComparePage() {
+     )
+   }
+ 
++  // SUB-5: 判断是否有维度数据用于雷达图条件渲染
++  const hasDimData = result?.recipes?.some(r =>
++    r.dimensionAverages &&
++    Object.values(r.dimensionAverages).some(d => d.count > 0)
++  )
++
+   return (
+     <div className="cmp-page">
+       <h1 className="cmp-title">食谱对比</h1>
+@@ -124,6 +162,43 @@ export default function ComparePage() {
+             </div>
+           </div>
+ 
++          {/* SUB-5: 4 维评分对比雷达图 */}
++          {hasDimData && (
++            <div className="cmp-radar-section">
++              <h2 className="cmp-radar-title">📊 4 维评分对比</h2>
++              <div className={`cmp-radar-grid cmp-radar-grid--${result.recipes.length}`}>
++                {result.recipes.map((r, i) => (
++                  <div key={r.id} className={`cmp-radar-card cmp-radar-card--${i}`}>
++                    <h3 className="cmp-radar-card-title">
++                      <Link to={`/recipe/${r.id}`} className="cmp-link">{r.title}</Link>
++                    </h3>
++                    <DimensionRadar
++                      data={r.dimensionAverages}
++                      multiColor
++                      size={isMobile ? 'sm' : 'md'}
++                    />
++                    {/* 维度数值摘要 */}
++                    <div className="cmp-dim-summary">
++                      {DIMENSION_ORDER.map(dim => {
++                        const d = r.dimensionAverages?.[dim]
++                        return (
++                          <div key={dim} className="cmp-dim-item">
++                            <span className="cmp-dim-label">{DIMENSION_LABELS[dim]}</span>
++                            <span className="cmp-dim-value">
++                              {d && d.count > 0
++                                ? `${d.average.toFixed(1)} (${d.count}人)`
++                                : '-'}
++                            </span>
++                          </div>
++                        )
++                      })}
++                    </div>
++                  </div>
++                ))}
++              </div>
++            </div>
++          )}
++
+           {/* Comparison Table */}
+           <div className="cmp-table-wrapper">
+             <table className="cmp-table">
+@@ -192,4 +267,4 @@ export default function ComparePage() {
+       )}
+     </div>
+   )
+-}
+\ No newline at end of file
++}

@@ -844,6 +844,12 @@ export interface CompareRecipe {
   favoriteCount: number
   commentCount: number
   viewCount: number
+  dimensionAverages: {
+    taste: DimensionAverage
+    difficulty: DimensionAverage
+    presentation: DimensionAverage
+    value: DimensionAverage
+  }
 }
 
 export interface CompareSummary {

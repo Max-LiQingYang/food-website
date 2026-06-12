@@ -1,7 +1,24 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { compareRecipes, type CompareResult, type CompareRecipe } from '../api'
+import DimensionRadar from '../components/DimensionRadar'
 import './ComparePage.css'
+
+// 维度中文标签（自维护，避免跨模块耦合）
+const DIMENSION_LABELS: Record<string, string> = {
+  taste: '口味',
+  difficulty: '难度',
+  presentation: '卖相',
+  value: '性价比'
+}
+
+const DIMENSION_ORDER = ['taste', 'difficulty', 'presentation', 'value'] as const
+
+/** 格式化维度值用于表格展示（N1: 统一函数名 formatDimValue） */
+function formatDimValue(dim?: { average: number; count: number }): string {
+  if (!dim || dim.count === 0) return '-'
+  return `${dim.average.toFixed(1)} 分 (${dim.count}人评)`
+}
 
 export default function ComparePage() {
   const [searchParams] = useSearchParams()
@@ -11,10 +28,20 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // SUB-7: 响应式 isMobile 检测
+  const [isMobile, setIsMobile] = useState(false)
+
   useEffect(() => {
     if (initialIds.length >= 2) {
       doCompare(initialIds)
     }
+  }, [])
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 600)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
   }, [])
 
   const doCompare = async (ids: string[]) => {
@@ -58,6 +85,11 @@ export default function ComparePage() {
       { label: '份量', values: r.map(d => `${d.servings || '-'} 人份`) },
       { label: '烹饪时间', values: r.map(d => d.cookTime || '-') },
       { label: '评分', values: r.map(d => d.avgRating ? `${d.avgRating.toFixed(1)} ⭐` : '-') },
+      // SUB-6: 4 维评分行
+      { label: '口味', values: r.map(d => formatDimValue(d.dimensionAverages?.taste)) },
+      { label: '难度评分', values: r.map(d => formatDimValue(d.dimensionAverages?.difficulty)) },
+      { label: '卖相', values: r.map(d => formatDimValue(d.dimensionAverages?.presentation)) },
+      { label: '性价比', values: r.map(d => formatDimValue(d.dimensionAverages?.value)) },
       { label: '收藏数', values: r.map(d => `${d.favoriteCount ?? 0}`) },
       { label: '评论数', values: r.map(d => `${d.commentCount ?? 0}`) },
       { label: '浏览数', values: r.map(d => `${d.viewCount ?? 0}`) },
@@ -83,6 +115,12 @@ export default function ComparePage() {
       </div>
     )
   }
+
+  // SUB-5: 判断是否有维度数据用于雷达图条件渲染
+  const hasDimData = result?.recipes?.some(r =>
+    r.dimensionAverages &&
+    Object.values(r.dimensionAverages).some(d => d.count > 0)
+  )
 
   return (
     <div className="cmp-page">
@@ -123,6 +161,43 @@ export default function ComparePage() {
               </span>
             </div>
           </div>
+
+          {/* SUB-5: 4 维评分对比雷达图 */}
+          {hasDimData && (
+            <div className="cmp-radar-section">
+              <h2 className="cmp-radar-title">📊 4 维评分对比</h2>
+              <div className={`cmp-radar-grid cmp-radar-grid--${result.recipes.length}`}>
+                {result.recipes.map((r, i) => (
+                  <div key={r.id} className={`cmp-radar-card cmp-radar-card--${i}`}>
+                    <h3 className="cmp-radar-card-title">
+                      <Link to={`/recipe/${r.id}`} className="cmp-link">{r.title}</Link>
+                    </h3>
+                    <DimensionRadar
+                      data={r.dimensionAverages}
+                      multiColor
+                      size={isMobile ? 'sm' : 'md'}
+                    />
+                    {/* 维度数值摘要 */}
+                    <div className="cmp-dim-summary">
+                      {DIMENSION_ORDER.map(dim => {
+                        const d = r.dimensionAverages?.[dim]
+                        return (
+                          <div key={dim} className="cmp-dim-item">
+                            <span className="cmp-dim-label">{DIMENSION_LABELS[dim]}</span>
+                            <span className="cmp-dim-value">
+                              {d && d.count > 0
+                                ? `${d.average.toFixed(1)} (${d.count}人)`
+                                : '-'}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Comparison Table */}
           <div className="cmp-table-wrapper">

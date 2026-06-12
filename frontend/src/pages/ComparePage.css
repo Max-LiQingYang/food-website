@@ -270,7 +270,91 @@
   gap: 6px;
 }
 
-/* Responsive */
+/* ═══════════════════════════════════════════
+   4 维评分雷达图 section
+   ═══════════════════════════════════════════ */
+
+.cmp-radar-section {
+  background: var(--color-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,.06));
+}
+
+.cmp-radar-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  color: var(--color-text, #1a1a1a);
+}
+
+/* 雷达图网格：2 列或 3 列 */
+.cmp-radar-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.cmp-radar-grid--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.cmp-radar-grid--3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* 单个雷达图卡片 */
+.cmp-radar-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--color-bg, #fafaf8);
+}
+
+.cmp-radar-card--0 { background: #fff8f5; }
+.cmp-radar-card--1 { background: #f5faf5; }
+.cmp-radar-card--2 { background: #f5f8ff; }
+
+.cmp-radar-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+/* 维度数值摘要 */
+.cmp-dim-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 220px;
+}
+
+.cmp-dim-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.cmp-dim-label {
+  color: var(--color-text-secondary, #666);
+  font-weight: 500;
+}
+
+.cmp-dim-value {
+  color: var(--color-text, #333);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════
+   Responsive: ≤600px 单列
+   ═══════════════════════════════════════════ */
+
 @media (max-width: 600px) {
   .cmp-page { padding: 16px 12px 32px; }
   .cmp-title { font-size: 20px; }
@@ -278,9 +362,25 @@
   .cmp-table th, .cmp-table td { padding: 8px 10px; font-size: 13px; }
   .cmp-th-value { min-width: 130px; }
   .cmp-nutrition-grid { grid-template-columns: 1fr; }
+
+  .cmp-radar-grid--2,
+  .cmp-radar-grid--3 {
+    grid-template-columns: 1fr;
+  }
+
+  .cmp-radar-card {
+    padding: 12px;
+  }
+
+  .cmp-dim-summary {
+    max-width: 160px;
+  }
 }
 
-/* Dark mode */
+/* ═══════════════════════════════════════════
+   Dark mode
+   ═══════════════════════════════════════════ */
+
 body.dark .cmp-th-label {
   background: #2a2118;
 }
@@ -412,5 +512,31 @@ body.dark .cmp-common {
 }
 
 body.dark .cmp-common h3 {
+  color: var(--color-text, #e0e0ee);
+}
+
+/* ── Dark mode: 雷达图 section ── */
+
+body.dark .cmp-radar-section {
+  background: var(--color-card, #1e1e32);
+}
+
+body.dark .cmp-radar-title {
+  color: var(--color-text, #e0e0ee);
+}
+
+body.dark .cmp-radar-card {
+  background: var(--color-bg-secondary, #1a1a2e);
+}
+
+body.dark .cmp-radar-card--0 { background: #2a1a14; }
+body.dark .cmp-radar-card--1 { background: #142a14; }
+body.dark .cmp-radar-card--2 { background: #141e2a; }
+
+body.dark .cmp-dim-label {
+  color: var(--color-text-secondary, #9898b0);
+}
+
+body.dark .cmp-dim-value {
   color: var(--color-text, #e0e0ee);
 }

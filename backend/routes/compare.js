@@ -8,7 +8,7 @@
  */
 
 const express = require('express')
-const { Recipe } = require('../models')
+const { Recipe, Comment } = require('../models')
 
 const router = express.Router()
 
@@ -63,6 +63,15 @@ router.post('/', async (req, res) => {
       })
     }
 
+    // 批量查询 Comment 4 维字段
+    const comments = await Comment.findAll({
+      where: { recipeId: recipeIds },
+      attributes: ['recipeId', 'taste', 'difficulty', 'presentation', 'value']
+    })
+
+    // 内存聚合 dimensionAverages
+    const dimAverages = aggregateDimensionAverages(comments, recipeIds)
+
     // 构建对比数据
     const compareData = recipes.map(r => {
       const d = r.toJSON()
@@ -85,6 +94,12 @@ router.post('/', async (req, res) => {
         favoriteCount: d.favoriteCount,
         commentCount: d.commentCount,
         viewCount: d.viewCount,
+        dimensionAverages: dimAverages[d.id] || {
+          taste: { average: 0, count: 0 },
+          difficulty: { average: 0, count: 0 },
+          presentation: { average: 0, count: 0 },
+          value: { average: 0, count: 0 }
+        }
       }
     })
 
@@ -142,4 +157,46 @@ router.post('/', async (req, res) => {
   }
 })
 
-module.exports = router
+/**
+ * 批量聚合评论 4 维评分 → dimensionAverages
+ * @param {Array} comments - Comment 实例数组，每条含 { recipeId, taste, difficulty, presentation, value }
+ * @param {string[]} recipeIds - 目标食谱 ID 列表
+ * @returns {Object} { [recipeId]: { taste: {average,count}, difficulty: {average,count}, presentation: {average,count}, value: {average,count} } }
+ */
+function aggregateDimensionAverages(comments, recipeIds) {
+  const accum = {}
+  for (const id of recipeIds) {
+    accum[id] = {
+      taste: { sum: 0, count: 0 },
+      difficulty: { sum: 0, count: 0 },
+      presentation: { sum: 0, count: 0 },
+      value: { sum: 0, count: 0 }
+    }
+  }
+
+  for (const c of comments) {
+    const rid = String(c.recipeId)
+    if (!accum[rid]) continue
+    for (const dim of ['taste', 'difficulty', 'presentation', 'value']) {
+      if (c[dim] != null) {
+        accum[rid][dim].sum += c[dim]
+        accum[rid][dim].count += 1
+      }
+    }
+  }
+
+  const result = {}
+  for (const id of recipeIds) {
+    result[id] = {}
+    for (const dim of ['taste', 'difficulty', 'presentation', 'value']) {
+      const { sum, count } = accum[id][dim]
+      result[id][dim] = {
+        average: count > 0 ? Math.round((sum / count) * 10) / 10 : 0,
+        count
+      }
+    }
+  }
+  return result
+}
+
+module.exports = { router, aggregateDimensionAverages }
