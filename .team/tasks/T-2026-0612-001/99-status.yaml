@@ -1,9 +1,9 @@
 taskId: T-2026-0612-001
-phase: done
-owner: coordinator
+phase: deploy
+owner: devops
 round: 1
-updatedAt: 2026-06-12T04:18:00Z
-nextAction: "dev-pipeline 全流程闭环。retro 阶段：写 lessons + metrics"
+updatedAt: 2026-06-12T04:09:30Z
+nextAction: "spawn devops 子专家：git commit (7 src + .team/ + docs/perf/) → push → 服务器 pull → build → 容器清理+cp 108 assets → nginx reload → 5 路径 200 → P0 验证"
 designFile: ".team/tasks/T-2026-0612-001/01-design.md"
 designLineCount: 817
 planReviewFile: ".team/tasks/T-2026-0612-001/02-plan-review-r1.json"
@@ -24,7 +24,3 @@ qaAll8ACPass: true
 securityAuditFile: ".team/tasks/T-2026-0612-001/06-security-audit.json"
 securityVerdict: "PASS"
 securityCriticalHigh: 0
-deployReportFile: "docs/iterations/iter136-lazy-shimmer/DEPLOY-report.md"
-deployVerdict: "SUCCESS"
-deployPublicVerification: "5/5 200 · 2 CSS shimmer · 3 JS lazy"
-firstPass: true

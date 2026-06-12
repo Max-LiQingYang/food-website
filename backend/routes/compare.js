@@ -199,4 +199,5 @@ function aggregateDimensionAverages(comments, recipeIds) {
   return result
 }
 
-module.exports = { router, aggregateDimensionAverages }
+module.exports = router
+module.exports.aggregateDimensionAverages = aggregateDimensionAverages

@@ -1,17 +1,16 @@
 'use strict'
 
-const { aggregateDimensionAverages } = require('../routes/compare')
+const compareRouter = require('../routes/compare')
+const aggregateDimensionAverages = compareRouter.aggregateDimensionAverages
 
 describe('Compare Route Module', () => {
   it('导出 router 对象', () => {
-    const compareModule = require('../routes/compare')
-    expect(compareModule).toBeDefined()
-    expect(typeof compareModule.router).toBe('function')
+    expect(typeof compareRouter).toBe('function')
+    expect(compareRouter.stack.length > 0).toBe(true)
   })
 
   it('router 有 post 处理函数', () => {
-    const compareModule = require('../routes/compare')
-    const routes = compareModule.router.stack || []
+    const routes = compareRouter.stack || []
     const postRoutes = routes.filter((r) => r.route && r.route.path === '/' && r.route.methods.post)
     expect(postRoutes.length).toBe(1)
   })
