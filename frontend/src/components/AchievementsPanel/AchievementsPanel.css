@@ -263,8 +263,8 @@ body.dark .achievement-grid__item--unlocked {
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .achievement-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);  /* iter#135: 合并 360 断点，遵循 768/480 铁律 */
   }
 }
