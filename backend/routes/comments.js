@@ -21,11 +21,31 @@ const auth = require('../middleware/auth')
 const { createActivity } = require('../utils/activity')
 const { createNotification } = require('../utils/notificationHelper')
 const { checkAllAchievements } = require('../utils/achievementChecker')
+const cache = require('../utils/cache')
 
 const router = express.Router()
 
 /** 四维评分字段名 */
 const DIMENSION_FIELDS = ['taste', 'difficulty', 'presentation', 'value']
+
+/**
+ * 失效该用户所有 rating 缓存（迭代 #134，ARCH §1.7.3）
+ * 在 POST/PUT/DELETE 评分后调用，避免数据陈旧
+ * 同时失效 site:dimAverages（全站平均可能受影响）
+ */
+function invalidateRatingCaches(userId) {
+  if (!userId) return
+  let sumCount = cache.delByPrefix('rating:summary:' + userId)
+  let topCount = cache.delByPrefix('rating:top:' + userId)
+  // 私有偏好缓存（如有）也清除
+  let privCount = cache.del('rating:privacy:' + userId)
+  // 全站平均
+  cache.del('site:dimAverages')
+  if (sumCount + topCount + privCount > 0) {
+    console.log('[cache] Invalidated rating caches for userId=' + userId +
+      ' (summary=' + sumCount + ', top=' + topCount + ', privacy=' + privCount + ')')
+  }
+}
 
 function resJSON(code, message, data) {
   return { code, message, data }
@@ -366,6 +386,9 @@ router.post('/recipes/:recipeId/comments', auth, async (req, res) => {
       })
     })
 
+    // 迭代 #134：失效评分历史缓存（同步调用，30s 内可见）
+    invalidateRatingCaches(req.userId)
+
     return res.status(201).json(resJSON(0, 'ok', result))
   } catch (err) {
     console.error('[POST /recipes/:recipeId/comments] Error:', err)
@@ -523,6 +546,9 @@ router.delete('/comments/:id', auth, async (req, res) => {
     if (recipe && recipe.commentCount > 0) {
       await recipe.decrement('commentCount', { by: 1 })
     }
+
+    // 迭代 #134：失效评分历史缓存
+    invalidateRatingCaches(req.userId)
 
     return res.status(200).json(resJSON(0, 'ok', null))
   } catch (err) {

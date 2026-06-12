@@ -223,6 +223,18 @@ body {
   --action-menu-item-min-height: 44px;
   --action-menu-kebab-bg:       rgba(255,255,255,0.85);
   --action-menu-kebab-color:    #666;
+
+  /* === 迭代 #134：用户评分历史模块专用变量（UI §7.1） === */
+  --color-dim-taste: #e8663e;          /* 4 维色卡：口味（与主色一致） */
+  --color-dim-difficulty: #52c41a;     /* 4 维色卡：难度 */
+  --color-dim-presentation: #1890ff;  /* 4 维色卡：卖相 */
+  --color-dim-value: #faad14;          /* 4 维色卡：性价比 */
+  --color-delta-positive: #e8663e;     /* delta ▲ 正差（与主色一致） */
+  --color-delta-negative: #999999;     /* delta ▼ 负差（中性灰，不用红） */
+  --color-delta-zero: #999999;         /* delta = 0 中性灰 */
+  --color-sample-warning-bg: #fff7e6;  /* "样本较少" 提示条背景 */
+  --color-sample-warning-text: #ad6800;/* "样本较少" 提示条文字 */
+  --color-gate-bg: #f5f0eb;           /* 三个占位（Empty/Privacy/Login）背景 */
 }
 
 /* ── 暗色模式 ── */
@@ -243,6 +255,18 @@ body.dark {
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* === 迭代 #134 暗色 === */
+  --color-dim-taste: #f59e6e;
+  --color-dim-difficulty: #7ed957;
+  --color-dim-presentation: #5ab0ff;
+  --color-dim-value: #ffc857;
+  --color-delta-positive: #f0946e;
+  --color-delta-negative: #888888;
+  --color-delta-zero: #888888;
+  --color-sample-warning-bg: #3a2e1a;
+  --color-sample-warning-text: #ffc857;
+  --color-gate-bg: #2a2520;
 
   /* === 夏季主题暗色 === */
   --color-summer-light: rgba(0, 180, 216, 0.18);

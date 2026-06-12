@@ -128,6 +128,15 @@ module.exports = (sequelize, DataTypes) => {
         {
           name: 'idx_comment_parentId',
           fields: ['parentId']
+        },
+        // 迭代 #134：评分历史模块专用索引（ARCH §4.1）
+        {
+          name: 'idx_comment_userId_rating',
+          fields: ['userId', 'rating']
+        },
+        {
+          name: 'idx_comment_userId_recipeId_createdAt',
+          fields: ['userId', 'recipeId', 'createdAt']
         }
       ]
     }

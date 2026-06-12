@@ -5,7 +5,8 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Tooltip
 } from 'recharts'
 
 /** 单维度平均数据 */
@@ -19,6 +20,18 @@ interface DimensionRadarProps {
   data: Record<string, DimensionValue> | null | undefined
   /** 雷达图尺寸 */
   size?: 'sm' | 'md' | 'lg'
+  /**
+   * 多色模式：迭代 #134 扩展（ARCH §7 风险表第 7 条）。
+   * true → 每个维度用对应色卡（--color-dim-*），分别画 4 条 Radar 叠加
+   * false（默认）→ 保留原有单色行为，向后兼容
+   */
+  multiColor?: boolean
+  /**
+   * 自定义 Tooltip 格式化函数（迭代 #134 扩展）
+   * 入参：(value, name, props) 同 Recharts Tooltip formatter
+   * 缺省：默认显示 "维度名 X.X 分"
+   */
+  tooltipFormatter?: (value: number, name: string, props: any) => [string, string]
 }
 
 /** 维度中文映射 */
@@ -35,7 +48,20 @@ const DIMENSION_ORDER = ['taste', 'difficulty', 'presentation', 'value']
 /** 尺寸 → 容器宽高映射 */
 const SIZE_MAP: Record<string, number> = { sm: 160, md: 220, lg: 300 }
 
-export default function DimensionRadar({ data, size = 'md' }: DimensionRadarProps) {
+/** 4 维色卡（暗色 + 浅色双值） */
+const DIM_COLORS = {
+  taste: { light: '#e8663e', dark: '#f59e6e' },
+  difficulty: { light: '#52c41a', dark: '#7ed957' },
+  presentation: { light: '#1890ff', dark: '#5ab0ff' },
+  value: { light: '#faad14', dark: '#ffc857' }
+}
+
+export default function DimensionRadar({
+  data,
+  size = 'md',
+  multiColor = false,
+  tooltipFormatter
+}: DimensionRadarProps) {
   const [isDark, setIsDark] = useState(false)
 
   // 空值守卫 — review #3 P0
@@ -48,6 +74,7 @@ export default function DimensionRadar({ data, size = 'md' }: DimensionRadarProp
     .filter(dim => data[dim] && data[dim].count > 0)
     .map(dim => ({
       dimension: DIMENSION_LABELS[dim] || dim,
+      dimKey: dim,
       value: data[dim].average,
       count: data[dim].count,
       fullMark: 5
@@ -104,14 +131,47 @@ export default function DimensionRadar({ data, size = 'md' }: DimensionRadarProp
             tick={false}
             axisLine={false}
           />
-          <Radar
-            name="平均分"
-            dataKey="value"
-            stroke={accentColor}
-            fill={accentColor}
-            fillOpacity={fillOpacity}
-            strokeWidth={2}
-          />
+          {multiColor ? (
+            // 多色模式：每个维度画一条独立 Radar
+            DIMENSION_ORDER.filter(dim => data[dim] && data[dim].count > 0).map(dim => {
+              const colors = DIM_COLORS[dim as keyof typeof DIM_COLORS]
+              const stroke = isDark ? colors.dark : colors.light
+              return (
+                <Radar
+                  key={dim}
+                  name={DIMENSION_LABELS[dim] || dim}
+                  dataKey={(entry: any) => entry.dimKey === dim ? entry.value : 0}
+                  stroke={stroke}
+                  fill={stroke}
+                  fillOpacity={fillOpacity * 0.6}
+                  strokeWidth={1.5}
+                  isAnimationActive={false}
+                />
+              )
+            })
+          ) : (
+            // 兼容模式：单色 Radar
+            <Radar
+              name="平均分"
+              dataKey="value"
+              stroke={accentColor}
+              fill={accentColor}
+              fillOpacity={fillOpacity}
+              strokeWidth={2}
+            />
+          )}
+          {tooltipFormatter && (
+            <Tooltip
+              formatter={tooltipFormatter}
+              contentStyle={{
+                background: 'var(--color-card)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '8px',
+                fontSize: '12px',
+                boxShadow: 'var(--shadow-md)'
+              }}
+            />
+          )}
         </RadarChart>
       </ResponsiveContainer>
     </div>

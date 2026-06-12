@@ -11,6 +11,8 @@ import {
   getAuthorInfo,
   getUserForks,
   getCookedRecipes,
+  getUserRatingPrivacy,
+  putUserRatingPrivacy,
   type Recipe,
   type UserStats,
   type Collection,
@@ -29,6 +31,7 @@ import './UserProfilePage.css'
 import PageSkeleton from '../components/PageSkeleton'
 import StatsCharts from '../components/StatsCharts/StatsCharts'
 import AchievementsPanel from '../components/AchievementsPanel/AchievementsPanel'
+import RatingHistoryModule from '../components/RatingHistoryModule'
 
 type TabType = 'recipes' | 'favorites' | 'collections' | 'cooked'
 type TabTypeWithHistory = TabType | 'history' | 'forks'
@@ -199,7 +202,10 @@ export default function UserProfilePage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [activeTab, setActiveTab] = useState<TabTypeWithHistory>('recipes')
   const [isOwnProfile, setIsOwnProfile] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [achievements, setAchievements] = useState<AchievementItem[]>([])
+  // 迭代 #134：评分历史隐私设置（默认公开）
+  const [ratingsHistoryPublic, setRatingsHistoryPublic] = useState(true)
   const [authorLevel, setAuthorLevel] = useState<AuthorLevelInfo | null>(null)
   const [selectedAchievement, setSelectedAchievement] = useState<AchievementItem | null>(null)
 
@@ -250,9 +256,25 @@ export default function UserProfilePage() {
         const user = JSON.parse(stored)
         setIsOwnProfile(user.id === id)
       }
+      setIsLoggedIn(!!localStorage.getItem('token'))
     } catch {
       // ignore
     }
+  }, [id])
+
+  // 迭代 #134：加载评分历史隐私设置
+  useEffect(() => {
+    if (!id) return
+    getUserRatingPrivacy(id)
+      .then(res => {
+        if (res && typeof res.ratingsHistoryPublic === 'boolean') {
+          setRatingsHistoryPublic(res.ratingsHistoryPublic)
+        }
+      })
+      .catch(err => {
+        // 默认公开，失败不影响主流程
+        console.warn('[UserProfilePage] failed to load rating privacy', err)
+      })
   }, [id])
 
   // Load profile + stats + achievements
@@ -559,6 +581,17 @@ export default function UserProfilePage() {
 
       {/* 烹饪热力图 */}
       {id && <ActivityHeatmap userId={id} />}
+
+      {/* 迭代 #134：用户个人评分历史可视化模块（UI §1.1 插入点：ActivityHeatmap 之后、AchievementsPanel 之前） */}
+      {id && (
+        <RatingHistoryModule
+          userId={id}
+          isOwner={isOwnProfile}
+          privacyPublic={ratingsHistoryPublic}
+          isLoggedIn={isLoggedIn}
+          onPrivacyChange={(next) => setRatingsHistoryPublic(next)}
+        />
+      )}
 
       {/* 成就面板 */}
       <AchievementsPanel userId={id!} />

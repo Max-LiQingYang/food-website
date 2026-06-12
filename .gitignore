@@ -63,3 +63,6 @@ service-account.json
 # WorkBuddy workspace
 .workbuddy/
 backend/database.sqlite-journal
+
+# QClaw agent runtime artifacts
+.qclaw/

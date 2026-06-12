@@ -49,6 +49,9 @@ router.use('/categories', categoriesRoutes)
 // 评论路由必须在食谱路由之前，确保 /recipes/:recipeId/comments 不被 /recipes/:id 拦截
 router.use('/', commentRoutes)
 
+// 迭代 #134：全站评论维度统计（API-5）
+router.use('/comments', require('./commentGlobalStats'))
+
 // 食谱对比（无需认证，必须在 recipeRoutes 之前避免 /:id 拦截 /compare）
 router.use('/recipes/compare', compareRoutes)
 
@@ -63,6 +66,9 @@ router.use('/users', userRoutes)
 
 // 用户关注路由（部分需认证，在 routes/follows.js 中按需使用 auth 中间件）
 router.use('/users', followRoutes)
+
+// 迭代 #134：用户个人评分历史（summary/history/top/privacy）
+router.use('/users', require('./userRatings'))
 
 // 动态流
 router.use('/feed', auth, feedRoutes)

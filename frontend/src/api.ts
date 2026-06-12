@@ -2590,3 +2590,146 @@ export interface RelatedTag {
 export async function getRelatedTags(tag: string, limit = 10): Promise<RelatedTag[]> {
   return apiClient.get('/tags/related', { params: { tag, limit } }).then(r => r.data?.data?.related || [])
 }
+
+// ─────────────────────────────────────────────────────────────────
+// 迭代 #134：用户个人评分历史（Rating History）
+// 后端对应文档：backend/routes/userRatings.js + commentGlobalStats.js
+// ARCH §1.1：4 个端点 + 1 个依赖（global-stats）
+// ─────────────────────────────────────────────────────────────────
+
+/** 单维度平均分（含全站对比） */
+export interface RatingDimensionAverage {
+  average: number
+  count: number
+  siteAverage: number
+  delta: number
+}
+
+/** 4 维平均分聚合 */
+export type RatingDimensionAverages = Record<'taste' | 'difficulty' | 'presentation' | 'value', RatingDimensionAverage>
+
+/** 单维度分布（key 字符串 '1' ~ '5'） */
+export type RatingDistributionBucket = Record<'1' | '2' | '3' | '4' | '5', number>
+export type RatingDistribution = Record<'taste' | 'difficulty' | 'presentation' | 'value', RatingDistributionBucket>
+
+/** 趋势图单点（按月聚合） */
+export interface RatingTrendPoint {
+  period: string // YYYY-MM
+  taste: number | null
+  difficulty: number | null
+  presentation: number | null
+  value: number | null
+  count: number
+}
+
+/** 评分历史单条 */
+export interface RatingHistoryItem {
+  commentId: number
+  recipeId: string
+  recipeTitle: string
+  recipeCoverUrl: string | null
+  ratings: {
+    taste: number | null
+    difficulty: number | null
+    presentation: number | null
+    value: number | null
+    overall: number | null
+  }
+  commentText: string
+  createdAt: string
+}
+
+/** 评分历史分页响应 */
+export interface RatingHistoryResponse {
+  userId: string
+  total: number
+  page: number
+  pageSize: number
+  items: RatingHistoryItem[]
+}
+
+/** 用户评分聚合统计响应 */
+export interface RatingSummary {
+  userId: string
+  timeRange: string
+  totalRatings: number
+  validDimensionRatings: number
+  dimensionAverages: RatingDimensionAverages
+  distribution: RatingDistribution
+  trend: { interval: 'month'; points: RatingTrendPoint[] }
+}
+
+/** 评分隐私设置 */
+export interface RatingPrivacy {
+  userId: string
+  ratingsHistoryPublic: boolean
+}
+
+/** 全站维度统计 */
+export interface GlobalRatingStats {
+  dimAverages: Record<'taste' | 'difficulty' | 'presentation' | 'value', { average: number; count: number }>
+  totalRatings: number
+  validDimensionRatings: number
+  computedAt: string
+}
+
+/** GET /api/users/:userId/ratings/summary */
+export async function getUserRatingSummary(
+  userId: string,
+  timeRange: 'all' | '30d' | '90d' | '1y' = 'all'
+): Promise<RatingSummary> {
+  return apiClient
+    .get(`/users/${userId}/ratings/summary`, { params: { timeRange } })
+    .then(r => r.data?.data ?? r.data)
+}
+
+/** GET /api/users/:userId/ratings/history */
+export async function getUserRatingHistory(
+  userId: string,
+  params: {
+    page?: number
+    pageSize?: number
+    sort?: 'time_desc' | 'rating_desc' | 'rating_asc'
+    timeRange?: 'all' | '30d' | '90d' | '1y'
+    dimension?: 'overall' | 'taste' | 'difficulty' | 'presentation' | 'value'
+  } = {}
+): Promise<RatingHistoryResponse> {
+  return apiClient
+    .get(`/users/${userId}/ratings/history`, { params })
+    .then(r => r.data?.data ?? r.data)
+}
+
+/** GET /api/users/:userId/ratings/top?type=high|low */
+export async function getUserRatingTop(
+  userId: string,
+  type: 'high' | 'low' = 'high',
+  limit = 5
+): Promise<{ userId: string; type: 'high' | 'low'; items: RatingHistoryItem[] }> {
+  return apiClient
+    .get(`/users/${userId}/ratings/top`, { params: { type, limit } })
+    .then(r => r.data?.data ?? r.data)
+}
+
+/** GET /api/users/:userId/ratings/privacy */
+export async function getUserRatingPrivacy(userId: string): Promise<RatingPrivacy> {
+  return apiClient
+    .get(`/users/${userId}/ratings/privacy`)
+    .then(r => r.data?.data ?? r.data)
+}
+
+/** PUT /api/users/:userId/ratings/privacy */
+export async function putUserRatingPrivacy(
+  userId: string,
+  ratingsHistoryPublic: boolean
+): Promise<RatingPrivacy> {
+  return apiClient
+    .put(`/users/${userId}/ratings/privacy`, { ratingsHistoryPublic })
+    .then(r => r.data?.data ?? r.data)
+}
+
+/** GET /api/comments/global-stats — 全站维度平均（前端不常直连，主要供 summary 内联） */
+export async function getCommentGlobalStats(): Promise<GlobalRatingStats> {
+  return apiClient
+    .get('/comments/global-stats')
+    .then(r => r.data?.data ?? r.data)
+}
