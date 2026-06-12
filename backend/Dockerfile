@@ -14,7 +14,8 @@ WORKDIR /app
 
 # 先复制 package.json，再安装依赖（利用 Docker 缓存层）
 COPY package.json package-lock.json* ./
-RUN npm install --omit=dev --legacy-peer-deps && \
+# --ignore-scripts：跳过 sqlite3 / node-gyp 等 native build（生产用 MySQL，不需要 sqlite3 原生绑定）
+RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts && \
     chown -R nodeapp:nodejs /app
 
 # 复制源码
