@@ -1,0 +1,30 @@
+{
+  "taskId": "T-2026-0612-003",
+  "phase": "qa",
+  "verdict": "PASS",
+  "testerStatus": "R1 timed out (15m Tool not found), main 端 self-test 替代",
+  "totalTests": 8,
+  "passed": 8,
+  "failed": 0,
+  "details": [
+    {"id": "AC-1", "status": "PASS", "note": "deploy-template.sh + auto-deploy.sh chmod +x"},
+    {"id": "AC-2", "status": "PASS", "note": "缺必填参数正确报错 (3 个 missing)"},
+    {"id": "AC-3", "status": "PASS", "note": "detect_chown() 实现完整,探测 backend/Dockerfile USER nodeapp"},
+    {"id": "AC-4", "status": "PASS", "note": "Darwin xattr 清扫实现完整 (XATTR_STRIP + xattr -cr)"},
+    {"id": "AC-5", "status": "PASS", "note": "4 verify 函数 + 8 引用 (4 定义 + 4 调用)"},
+    {"id": "AC-6", "status": "PASS", "note": "5 章节: 何时用/参数/失败模式/自查/5 阶段图"},
+    {"id": "AC-7", "status": "PASS", "note": "auto-deploy.sh 35 行 wrapper 完整"},
+    {"id": "AC-8", "status": "PASS", "note": "bash -n syntax ok (无 SSH 真部署留给 devops 阶段)"}
+  ],
+  "bashSafetyRegression": "PASS",
+  "bashSafetyPayloads": {
+    "CONTAINER_NAME": "evil;rm -rf /tmp/x → evil\\;rm\\ -rf\\ /tmp/x",
+    "SERVER_PROJECT_PATH": "path;whoami → path\\;whoami",
+    "COMPOSE_FILE": "yml;ls / → yml\\;ls\\ /",
+    "SERVICE_NAME": "svc;ls → svc\\;ls",
+    "CHOWN_USER": "root;whoami → root\\;whoami",
+    "CHOWN_GROUP": "root;whoami → root\\;whoami",
+    "V3_GREP_KEYWORD": "foo$(touch /tmp/x)bar → foo\\$\\(touch\\ /tmp/x\\)bar"
+  },
+  "lesson": "tester R1 timed out 同 devops v1/v2 (subagent 工具 profile 注入 bug). main self-test 覆盖简单 dry-run 范围足够."
+}

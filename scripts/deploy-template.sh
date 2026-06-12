@@ -427,17 +427,25 @@ run_deploy() {
   # set +e: 单步失败不退出，verify 会暴露问题
   set +e
 
-  # ── 4.1 compose up service ──
-  log "docker compose up ${SERVICE_NAME}..."
-  ssh_cmd "cd ${SERVER_PROJECT_PATH} && \
-    (docker compose -f ${COMPOSE_FILE} up -d --force-recreate --no-deps ${SERVICE_NAME} 2>&1 || \
-     docker-compose -f ${COMPOSE_FILE} up -d --force-recreate --no-deps ${SERVICE_NAME} 2>&1)" \
-    || warn "compose up failed (continuing — verify will catch issues)"
-
-  # B2 修复: 全程用一次转义后的容器名,避免重复
-  local escaped_cname_deploy escaped_nginx_deploy
+  # SEC-001 修复: compose up 块所有变量 printf '%q' 转义
+  # SEC-002 修复: chown 块 CHOWN_USER/CHOWN_GROUP printf '%q' 转义
+  # B2 修复: 容器名 / nginx 容器名 printf '%q' 转义
+  local escaped_srv escaped_compose escaped_svc escaped_cname_deploy escaped_nginx_deploy
+  local escaped_chown_user escaped_chown_group
+  escaped_srv=$(printf '%q' "$SERVER_PROJECT_PATH")
+  escaped_compose=$(printf '%q' "$COMPOSE_FILE")
+  escaped_svc=$(printf '%q' "$SERVICE_NAME")
   escaped_cname_deploy=$(printf '%q' "$CONTAINER_NAME")
   escaped_nginx_deploy=$(printf '%q' "$NGINX_CONTAINER")
+  escaped_chown_user=$(printf '%q' "$CHOWN_USER")
+  escaped_chown_group=$(printf '%q' "$CHOWN_GROUP")
+
+  # ── 4.1 compose up service ──
+  log "docker compose up ${SERVICE_NAME}..."
+  ssh_cmd "cd ${escaped_srv} && \
+    (docker compose -f ${escaped_compose} up -d --force-recreate --no-deps ${escaped_svc} 2>&1 || \
+     docker-compose -f ${escaped_compose} up -d --force-recreate --no-deps ${escaped_svc} 2>&1)" \
+    || warn "compose up failed (continuing — verify will catch issues)"
 
   # ── 4.2 wait for container healthy ──
   log "waiting for ${CONTAINER_NAME} to be healthy..."
@@ -465,7 +473,7 @@ run_deploy() {
 
   # ── 4.4 chown 修复权限 ──
   log "chown ${CHOWN_USER}:${CHOWN_GROUP} /app/..."
-  ssh_cmd "docker exec ${escaped_cname_deploy} chown -R ${CHOWN_USER}:${CHOWN_GROUP} /app/ 2>&1" \
+  ssh_cmd "docker exec ${escaped_cname_deploy} chown -R ${escaped_chown_user}:${escaped_chown_group} /app/ 2>&1" \
     || warn "chown failed — baked image files may be inaccessible"
 
   # ── 4.5 docker cp 前端（如果有）──
