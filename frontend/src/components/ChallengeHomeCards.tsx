@@ -17,7 +17,7 @@ export default function ChallengeHomeCards() {
 
   useEffect(() => {
     getChallenges({ status: 'active', pageSize: 10 })
-      .then(r => setChallenges(r.list))
+      .then(r => setChallenges(r.data.list))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])

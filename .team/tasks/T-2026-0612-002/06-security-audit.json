@@ -1,0 +1,44 @@
+{
+  "taskId": "T-2026-0612-002",
+  "verdict": "PASS",
+  "overall": 9.5,
+  "criticalHigh": 0,
+  "medium": 0,
+  "low": 1,
+  "dimensions": {
+    "S1_injection": 10,
+    "S2_data_exposure": 10,
+    "S3_dos": 9,
+    "S4_xss": 10,
+    "S5_csrf": 9,
+    "S6_dependencies": 10
+  },
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "low",
+      "title": "recipeIds 数组元素类型未校验（非 string 元素可能让 ORM 行为不可预期）",
+      "detail": "compare.js L21-31 仅校验 recipeIds 是数组且长度在 [2,3]，未对元素做 string/UUID 类型校验。理论上攻击者可发送 { recipeIds: [1, 2, { sqlInjection: \"' OR 1=1 --\" }] }，Sequelize 仍会参数化绑定（不会注入），但非 string 元素可能让 `aggregateDimensionAverages` 的 `String(c.recipeId)` 在某些边界产生意外 key。建议增加 `recipeIds.every(id => typeof id === 'string' && id.length > 0 && id.length <= 36)`。",
+      "fix": "在 400 校验后追加：if (!recipeIds.every(id => typeof id === 'string' && /^[0-9a-fA-F-]{1,36}$/.test(id))) return res.status(400).json({ code: 400, message: 'recipeIds 元素必须为合法 UUID 字符串' })"
+    }
+  ],
+  "checked": [
+    "S1_injection: Recipe.findAll({ where: { id: recipeIds } }) 与 Comment.findAll({ where: { recipeId: recipeIds } }) 均走 Sequelize 参数化绑定（IN 子句），无字符串拼接；lru-cache 之外的查询无 raw SQL；本次新增 aggregateDimensionAverages 是纯 JS reduce，不接触 SQL",
+    "S2_data_exposure: 返回字段仅含 recipeId/taste/difficulty/presentation/value 的 {average, count} 聚合；不返回 userId/content/likesCount/imageUrls/isFeatured 等任何 PII 字段；compareData 主表 SELECT 用 COMPARE_ATTRIBUTES 白名单（不含 userId/email/phone）；与 T-001 CompareResult 字段对齐",
+    "S2_data_exposure: compare 路由显式公开（routes/index.js L55-56 注释 '无需认证'），未挂载 auth 中间件；不属于回归降级",
+    "S3_dos: N 上限 3（recipeIds.length > 3 返 400）；M 上限未在 Comment.findAll 加 LIMIT，但 idx_comment_recipeId 索引已存在（models/comment.js 注释 L20 + 索引定义），按 recipeId IN 3 项查询走索引范围扫描，单食谱评论 1k 内单次 < 50ms；内存 reduce O(N×M) 在 3×1000=3000 元素量级可忽略",
+    "S3_dos: 全局 rate-limit 在 app.js L40-55 启用，POST 200/15min（默认），足以挡住恶意高频调用；helmet 已挂载",
+    "S4_xss: ComparePage.tsx 与 DimensionRadar.tsx 全文件搜索 dangerouslySetInnerHTML / innerHTML = 0 命中；所有用户可见文本走 JSX {expr}（React 自动转义）；formatDimValue 返回纯字符串 `${dim.average.toFixed(1)} 分 (${dim.count}人评)`，average 与 count 为后端 Number，无注入面；r.title 经 <Link>{r.title}</Link> 渲染（已有 T-001 行为，本任务无变更）",
+    "S4_xss: RadarChart 的 data 数组中 dimension 字段是固定 DIMENSION_LABELS 中文标签（无用户输入），value 是 number，Recharts 不会渲染为 HTML",
+    "S5_csrf: 全站认证走 JWT (Authorization: Bearer) 而非 cookie（middleware/auth.js），CSRF 攻击要求浏览器自动携带 cookie 凭据，本架构天然免疫；compare 路由为公开 POST（无需鉴权），CSRF 概念不适用；未引入任何 cookie-based session",
+    "S6_dependencies: git diff 371ab33..e6112a0 --name-only 仅命中 6 个文件（4 实现 + 2 测试 + 0 manifest），package.json 与 package-lock.json 未变；新增/升级依赖 = 0",
+    "parseJSONField 安全：仅作用于服务端已存储的 nutrition/ingredients/steps 字段（MariaDB JSON 列），不接触用户输入，无原型链污染或 SQL 注入面",
+    "helmet/cors/rate-limit/compression 在 app.js L18-55 已正确挂载，本任务未绕过任何中间件"
+  ],
+  "recommendations": [
+    "在 compare.js 增加 recipeIds 元素 UUID 格式校验（见 F-1 fix），将类型校验从长度扩展到内容格式",
+    "可选：Comment.findAll 加 limit（如 5000）作为深度防御，防止某道热门菜积累百万评论时极端情况下内存压力",
+    "可选：aggregateDimensionAverages 的累加器初始化可在 recipeIds 包含重复元素时去重（当前实现幂等，无安全影响）",
+    "建议在 dev-pipeline 添加自动 SAST 工具（eslint-plugin-security / Semgrep），下次任务实现期即可发现 F-1 这类浅层校验缺失"
+  ]
+}

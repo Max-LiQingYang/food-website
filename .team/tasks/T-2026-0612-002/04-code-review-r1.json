@@ -1,0 +1,39 @@
+{
+  "taskId": "T-2026-0612-002",
+  "round": 1,
+  "verdict": "FAIL",
+  "overall": 7.5,
+  "dimensions": {
+    "B1_completeness": 5,
+    "B2_quality": 8,
+    "B3_reuse": 9,
+    "B4_testability": 8,
+    "B5_deploy_safety": 8,
+    "B6_conformance": 7
+  },
+  "redZone": {
+    "allClear": false,
+    "violations": [
+      "AC-1 虽在代码层面实现 dimensionAverages 字段，但 compare.js 导出对象变更导致 /recipes/compare 端点实际失效，AC 在运行时不成立"
+    ]
+  },
+  "blockers": [
+    {
+      "id": "B1",
+      "title": "compare.js 导出对象破坏路由挂载",
+      "detail": "module.exports 由 router 改为 { router, aggregateDimensionAverages }，但 backend/routes/index.js 仍执行 router.use('/recipes/compare', compareRoutes)，Express 的 use() 接收到对象而非函数/Router，导致 /recipes/compare 端点无法处理请求，AC-1 在运行时失效。",
+      "fix": "在 compare.js 末尾恢复 module.exports = router，并追加 module.exports.aggregateDimensionAverages = aggregateDimensionAverages；同步将 compare.test.js 中的 require 回退为直接解构 require('../routes/compare').aggregateDimensionAverages 或保持原样。"
+    }
+  ],
+  "nits": [
+    {
+      "id": "N1",
+      "title": "DIMENSION_LABELS 类型可收紧为 Record<typeof DIMENSION_ORDER[number], string>"
+    },
+    {
+      "id": "N2",
+      "title": ".team/tasks/T-2026-0612-001/99-status.yaml 被意外修改，建议避免跨任务文件变更"
+    }
+  ],
+  "nextAction": "fix-and-resubmit"
+}

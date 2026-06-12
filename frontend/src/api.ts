@@ -1363,12 +1363,19 @@ export interface ChallengeRanking {
   description?: string
 }
 
+/** 通用 API 响应包装 */
+export interface ApiResponse<T> {
+  code: number
+  data: T
+  message?: string
+}
+
 /**
  * 获取挑战列表
  * GET /api/challenges
  */
-export function getChallenges(params?: { status?: string; page?: number; pageSize?: number }): Promise<{ list: Challenge[]; total: number }> {
-  return apiClient.get('/challenges', { params }).then(r => r.data?.data || { list: [], total: 0 })
+export function getChallenges(params?: { status?: string; page?: number; pageSize?: number }): Promise<ApiResponse<{ list: Challenge[]; total: number; page: number; pageSize: number }>> {
+  return apiClient.get('/challenges', { params })
 }
 
 /**
@@ -1383,8 +1390,8 @@ export function getChallenge(id: string): Promise<Challenge> {
  * 获取挑战投稿列表
  * GET /api/challenges/:id/submissions
  */
-export function getChallengeSubmissions(challengeId: string, params?: { page?: number; pageSize?: number }): Promise<{ list: ChallengeSubmission[]; total: number }> {
-  return apiClient.get(`/challenges/${challengeId}/submissions`, { params }).then(r => r.data?.data || { list: [], total: 0 })
+export function getChallengeSubmissions(challengeId: string, params?: { page?: number; pageSize?: number }): Promise<ApiResponse<{ list: ChallengeSubmission[]; total: number; page: number; pageSize: number }>> {
+  return apiClient.get(`/challenges/${challengeId}/submissions`, { params })
 }
 
 /**
@@ -1407,16 +1414,16 @@ export function voteChallenge(challengeId: string, submissionId: string): Promis
  * 获取排行榜
  * GET /api/challenges/:id/ranking
  */
-export function getChallengeRanking(challengeId: string): Promise<{ list: ChallengeRanking[]; total: number }> {
-  return apiClient.get(`/challenges/${challengeId}/ranking`).then(r => r.data?.data || { list: [], total: 0 })
+export function getChallengeRanking(challengeId: string): Promise<ApiResponse<{ list: ChallengeRanking[]; total: number; page: number; pageSize: number }>> {
+  return apiClient.get(`/challenges/${challengeId}/ranking`)
 }
 
 /**
  * 获取我的投稿
  * GET /api/my-submissions
  */
-export function getMySubmissions(): Promise<{ list: any[]; total: number }> {
-  return apiClient.get('/my-submissions').then(r => r.data?.data || { list: [], total: 0 })
+export function getMySubmissions(): Promise<ApiResponse<{ list: any[]; total: number; page: number; pageSize: number }>> {
+  return apiClient.get('/my-submissions')
 }
 
 // ─────────────────────────────────────────────────────────────────

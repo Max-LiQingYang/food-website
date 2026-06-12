@@ -1,7 +1,15 @@
 taskId: T-2026-0612-002
-phase: impl
-owner: fullstack
-round: 1
-updatedAt: 2026-06-12T14:02:00+08:00
-nextAction: "main spawn fullstack 按 01-design.md SUB-1~10 实现 + 落 03-impl.diff"
-planReview: "R1 PASS overall=8.50 redZone=true / A1=9 A2=8.5 A3=7.5 A4=9 A5=8 A6=9 / 3 nit N1~N3 无 blocker"
+phase: DONE
+owner: devops
+round: 10
+updatedAt: 2026-06-12T15:53:00+08:00
+status: "✅ 4/4 验证全过，公网 dimensionAverages 字段返回真实数据 (taste 3.6/5, difficulty 3.8/6, presentation 3.8/5, value 3.6/5)"
+publicChunk: "ComparePage-DfKEWcCt.js"
+commits: "1ead770 → f3a3f90 → e6112a0 (origin/main 已同步)"
+verifyResults:
+  backend: "code 0 + dimAvgs 含 4 维 {average, count}"
+  chunkPresent: "DfKEWcCt.js + .css 在 nginx html/assets"
+  fieldInChunk: "dimensionAverages matches: 2"
+  compareRoute: "/compare 200"
+retro: "tracker.md (iter#137 entry) + lessons.md (#137 部署10次教训) + iteration-lessons.md 待合并"
+nextAction: "等用户验收"

@@ -13,7 +13,7 @@ export default function ChallengesPage() {
 
   useEffect(() => {
     getChallenges({ status: filter || undefined })
-      .then(r => setChallenges(r.list))
+      .then(r => setChallenges(r.data.list))
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [filter])

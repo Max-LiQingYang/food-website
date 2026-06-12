@@ -1,0 +1,201 @@
+# T-2026-0613-001 - /challenges 渲染 bug 修复
+# 修改文件：5 个
+# 1. frontend/src/pages/ChallengesPage.tsx:15
+# 2. frontend/src/components/ChallengeHomeCards.tsx:19
+# 3. frontend/src/pages/ChallengeDetailPage.tsx:22,37
+# 4. frontend/src/api.ts:1363-1422
+# 5. frontend/src/pages/ChallengeDetailPage.test.tsx:21-117
+
+diff --git a/frontend/src/api.ts b/frontend/src/api.ts
+index e4daa0f..11f7003 100644
+--- a/frontend/src/api.ts
++++ b/frontend/src/api.ts
+@@ -1363,12 +1363,19 @@ export interface ChallengeRanking {
+   description?: string
+ }
+ 
++/** 通用 API 响应包装 */
++export interface ApiResponse&lt;T&gt; {
++  code: number
++  data: T
++  message?: string
++}
++
+ /**
+  * 获取挑战列表
+  * GET /api/challenges
+  */
+-export function getChallenges(params?: { status?: string; page?: number; pageSize?: number }): Promise&lt;{ list: Challenge[]; total: number }&gt; {
+-  return apiClient.get('/challenges', { params }).then(r =&gt; r.data?.data || { list: [], total: 0 })
++export function getChallenges(params?: { status?: string; page?: number; pageSize?: number }): Promise&lt;ApiResponse&lt;{ list: Challenge[]; total: number; page: number; pageSize: number }&gt;&gt; {
++  return apiClient.get('/challenges', { params })
+ }
+ 
+ /**
+@@ -1383,8 +1390,8 @@ export function getChallenge(id: string): Promise&lt;Challenge&gt; {
+  * 获取挑战投稿列表
+  * GET /api/challenges/:id/submissions
+  */
+-export function getChallengeSubmissions(challengeId: string, params?: { page?: number; pageSize?: number }): Promise&lt;{ list: ChallengeSubmission[]; total: number }&gt; {
+-  return apiClient.get(`/challenges/${challengeId}/submissions`, { params }).then(r =&gt; r.data?.data || { list: [], total: 0 })
++export function getChallengeSubmissions(challengeId: string, params?: { page?: number; pageSize?: number }): Promise&lt;ApiResponse&lt;{ list: ChallengeSubmission[]; total: number; page: number; pageSize: number }&gt;&gt; {
++  return apiClient.get(`/challenges/${challengeId}/submissions`, { params })
+ }
+ 
+ /**
+@@ -1407,16 +1414,16 @@ export function voteChallenge(challengeId: string, submissionId: string): Promis
+  * 获取排行榜
+  * GET /api/challenges/:id/ranking
+  */
+-export function getChallengeRanking(challengeId: string): Promise&lt;{ list: ChallengeRanking[]; total: number }&gt; {
+-  return apiClient.get(`/challenges/${challengeId}/ranking`).then(r =&gt; r.data?.data || { list: [], total: 0 })
++export function getChallengeRanking(challengeId: string): Promise&lt;ApiResponse&lt;{ list: ChallengeRanking[]; total: number; page: number; pageSize: number }&gt;&gt; {
++  return apiClient.get(`/challenges/${challengeId}/ranking`)
+ }
+ 
+ /**
+  * 获取我的投稿
+  * GET /api/my-submissions
+  */
+-export function getMySubmissions(): Promise&lt;{ list: any[]; total: number }&gt; {
+-  return apiClient.get('/my-submissions').then(r =&gt; r.data?.data || { list: [], total: 0 })
++export function getMySubmissions(): Promise&lt;ApiResponse&lt;{ list: any[]; total: number; page: number; pageSize: number }&gt;&gt; {
++  return apiClient.get('/my-submissions')
+ }
+ 
+ // ─────────────────────────────────────────────────────────────────
+diff --git a/frontend/src/components/ChallengeHomeCards.tsx b/frontend/src/components/ChallengeHomeCards.tsx
+index 362bec7..538921a 100644
+--- a/frontend/src/components/ChallengeHomeCards.tsx
++++ b/frontend/src/components/ChallengeHomeCards.tsx
+@@ -17,7 +17,7 @@ export default function ChallengeHomeCards() {
+ 
+   useEffect(() =&gt; {
+     getChallenges({ status: 'active', pageSize: 10 })
+-      .then(r =&gt; setChallenges(r.list))
++      .then(r =&gt; setChallenges(r.data.list))
+       .catch(() =&gt; {})
+       .finally(() =&gt; setLoading(false))
+   }, [])
+diff --git a/frontend/src/pages/ChallengeDetailPage.test.tsx b/frontend/src/pages/ChallengeDetailPage.test.tsx
+index ebbaa23..84c51eb 100644
+--- a/frontend/src/pages/ChallengeDetailPage.test.tsx
++++ b/frontend/src/pages/ChallengeDetailPage.test.tsx
+@@ -21,34 +21,44 @@ const mockChallenge = {
+ }
+ 
+ const mockSubmissions = {
+-  list: [
+-    {
+-      id: 's1', challengeId: '1', recipeId: 'r1', userId: 'u1',
+-      voteCount: 3, description: '我的投稿',
+-      recipe: { id: 'r1', title: '凉拌黄瓜', coverImage: '', description: '清凉爽口' },
+-      submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
+-    },
+-    {
+-      id: 's2', challengeId: '1', recipeId: 'r2', userId: 'u2',
+-      voteCount: 1, description: '',
+-      recipe: { id: 'r2', title: '夏日水果沙拉', coverImage: '' },
+-      submitter: { id: 'u2', username: 'cook2', nickname: '' },
+-    },
+-  ],
+-  total: 2,
++  code: 0,
++  data: {
++    list: [
++      {
++        id: 's1', challengeId: '1', recipeId: 'r1', userId: 'u1',
++        voteCount: 3, description: '我的投稿',
++        recipe: { id: 'r1', title: '凉拌黄瓜', coverImage: '', description: '清凉爽口' },
++        submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
++      },
++      {
++        id: 's2', challengeId: '1', recipeId: 'r2', userId: 'u2',
++        voteCount: 1, description: '',
++        recipe: { id: 'r2', title: '夏日水果沙拉', coverImage: '' },
++        submitter: { id: 'u2', username: 'cook2', nickname: '' },
++      },
++    ],
++    total: 2,
++    page: 1,
++    pageSize: 10,
++  },
+ }
+ 
+ const mockRanking = {
+-  list: [
+-    { id: 's1', rank: 1, recipeId: 'r1', voteCount: 3,
+-      recipe: { id: 'r1', title: '凉拌黄瓜' },
+-      submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
+-    },
+-    { id: 's2', rank: 2, recipeId: 'r2', voteCount: 1,
+-      recipe: { id: 'r2', title: '夏日水果沙拉' },
+-    },
+-  ],
+-  total: 2,
++  code: 0,
++  data: {
++    list: [
++      { id: 's1', rank: 1, recipeId: 'r1', voteCount: 3,
++        recipe: { id: 'r1', title: '凉拌黄瓜' },
++        submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
++      },
++      { id: 's2', rank: 2, recipeId: 'r2', voteCount: 1,
++        recipe: { id: 'r2', title: '夏日水果沙拉' },
++      },
++    ],
++    total: 2,
++    page: 1,
++    pageSize: 10,
++  },
+ }
+ 
+ function renderDetail(id = '1') {
+@@ -104,7 +114,7 @@ describe('ChallengeDetailPage', () =&gt; {
+   })
+ 
+   it('投票按钮可点击', async () =&gt; {
+-    ;(voteChallenge as any).mockResolvedValue({ message: '投票成功' })
++    ;(voteChallenge as any).mockResolvedValue({ code: 0, data: { message: '投票成功' } })
+     ;(getChallengeSubmissions as any).mockResolvedValue(mockSubmissions)
+     ;(getChallengeRanking as any).mockResolvedValue(mockRanking)
+     renderDetail()
+diff --git a/frontend/src/pages/ChallengeDetailPage.tsx b/frontend/src/pages/ChallengeDetailPage.tsx
+index afdada8..d1adbc8 100644
+--- a/frontend/src/pages/ChallengeDetailPage.tsx
++++ b/frontend/src/pages/ChallengeDetailPage.tsx
+@@ -22,8 +22,8 @@ export default function ChallengeDetailPage() {
+       getChallengeRanking(id),
+     ]).then(([c, subs, rank]) =&gt; {
+       setChallenge(c)
+-      setSubmissions(subs.list)
+-      setRankings(rank.list)
++      setSubmissions(subs.data.list)
++      setRankings(rank.data.list)
+     }).catch(console.error).finally(() =&gt; setLoading(false))
+   }, [id])
+ 
+@@ -37,8 +37,8 @@ export default function ChallengeDetailPage() {
+         getChallengeSubmissions(id),
+         getChallengeRanking(id),
+       ])
+-      setSubmissions(subs.list)
+-      setRankings(rank.list)
++      setSubmissions(subs.data.list)
++      setRankings(rank.data.list)
+     } catch (e: any) {
+       alert(e.message || '投票失败')
+     } finally { setVoting(false) }
+diff --git a/frontend/src/pages/ChallengesPage.tsx b/frontend/src/pages/ChallengesPage.tsx
+index f5d3027..28836e1 100644
+--- a/frontend/src/pages/ChallengesPage.tsx
++++ b/frontend/src/pages/ChallengesPage.tsx
+@@ -13,7 +13,7 @@ export default function ChallengesPage() {
+ 
+   useEffect(() =&gt; {
+     getChallenges({ status: filter || undefined })
+-      .then(r =&gt; setChallenges(r.list))
++      .then(r =&gt; setChallenges(r.data.list))
+       .catch(console.error)
+       .finally(() =&gt; setLoading(false))
+   }, [filter])

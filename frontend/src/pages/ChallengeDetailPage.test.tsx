@@ -21,34 +21,44 @@ const mockChallenge = {
 }
 
 const mockSubmissions = {
-  list: [
-    {
-      id: 's1', challengeId: '1', recipeId: 'r1', userId: 'u1',
-      voteCount: 3, description: '我的投稿',
-      recipe: { id: 'r1', title: '凉拌黄瓜', coverImage: '', description: '清凉爽口' },
-      submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
-    },
-    {
-      id: 's2', challengeId: '1', recipeId: 'r2', userId: 'u2',
-      voteCount: 1, description: '',
-      recipe: { id: 'r2', title: '夏日水果沙拉', coverImage: '' },
-      submitter: { id: 'u2', username: 'cook2', nickname: '' },
-    },
-  ],
-  total: 2,
+  code: 0,
+  data: {
+    list: [
+      {
+        id: 's1', challengeId: '1', recipeId: 'r1', userId: 'u1',
+        voteCount: 3, description: '我的投稿',
+        recipe: { id: 'r1', title: '凉拌黄瓜', coverImage: '', description: '清凉爽口' },
+        submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
+      },
+      {
+        id: 's2', challengeId: '1', recipeId: 'r2', userId: 'u2',
+        voteCount: 1, description: '',
+        recipe: { id: 'r2', title: '夏日水果沙拉', coverImage: '' },
+        submitter: { id: 'u2', username: 'cook2', nickname: '' },
+      },
+    ],
+    total: 2,
+    page: 1,
+    pageSize: 10,
+  },
 }
 
 const mockRanking = {
-  list: [
-    { id: 's1', rank: 1, recipeId: 'r1', voteCount: 3,
-      recipe: { id: 'r1', title: '凉拌黄瓜' },
-      submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
-    },
-    { id: 's2', rank: 2, recipeId: 'r2', voteCount: 1,
-      recipe: { id: 'r2', title: '夏日水果沙拉' },
-    },
-  ],
-  total: 2,
+  code: 0,
+  data: {
+    list: [
+      { id: 's1', rank: 1, recipeId: 'r1', voteCount: 3,
+        recipe: { id: 'r1', title: '凉拌黄瓜' },
+        submitter: { id: 'u1', username: 'chef1', nickname: '大厨1' },
+      },
+      { id: 's2', rank: 2, recipeId: 'r2', voteCount: 1,
+        recipe: { id: 'r2', title: '夏日水果沙拉' },
+      },
+    ],
+    total: 2,
+    page: 1,
+    pageSize: 10,
+  },
 }
 
 function renderDetail(id = '1') {
@@ -104,7 +114,7 @@ describe('ChallengeDetailPage', () => {
   })
 
   it('投票按钮可点击', async () => {
-    ;(voteChallenge as any).mockResolvedValue({ message: '投票成功' })
+    ;(voteChallenge as any).mockResolvedValue({ code: 0, data: { message: '投票成功' } })
     ;(getChallengeSubmissions as any).mockResolvedValue(mockSubmissions)
     ;(getChallengeRanking as any).mockResolvedValue(mockRanking)
     renderDetail()

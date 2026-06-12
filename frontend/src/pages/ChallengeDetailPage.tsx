@@ -22,8 +22,8 @@ export default function ChallengeDetailPage() {
       getChallengeRanking(id),
     ]).then(([c, subs, rank]) => {
       setChallenge(c)
-      setSubmissions(subs.list)
-      setRankings(rank.list)
+      setSubmissions(subs.data.list)
+      setRankings(rank.data.list)
     }).catch(console.error).finally(() => setLoading(false))
   }, [id])
 
@@ -37,8 +37,8 @@ export default function ChallengeDetailPage() {
         getChallengeSubmissions(id),
         getChallengeRanking(id),
       ])
-      setSubmissions(subs.list)
-      setRankings(rank.list)
+      setSubmissions(subs.data.list)
+      setRankings(rank.data.list)
     } catch (e: any) {
       alert(e.message || '投票失败')
     } finally { setVoting(false) }

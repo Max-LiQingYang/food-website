@@ -1,0 +1,116 @@
+# T-2026-0613-001 状态黑板
+# 任务类型: bugfix (P0) — **范围已收窄（SCOPE-REV）**
+# 触发: 2026-06-13 每日巡检 3 项问题
+# 状态更新: 由 main（管家）维护，所有子专家只读 + 写阶段产物
+# ⚠️ 2026-06-13 04:55 修正：WorkBuddy 已确认 F1/F3 为误报，仅 F2(/challenges 渲染)需验证
+
+task_id: T-2026-0613-001
+title: /challenges 页面渲染验证（范围已收窄）
+type: bugfix
+priority: P0
+created_at: 2026-06-13 01:55
+updated_at: 2026-06-13 04:58 GMT+8
+owner: main (qclaw 管家)
+phase: SCOPE-REV
+scope: reduced
+scope_note: |
+  3 项原报告复核后范围收窄：
+  - F1 /api/users/me 404 → **关闭（误报）**。真接口是 /api/auth/me
+    后端: backend/routes/auth.js:151 router.get("/me", auth, ...)
+    前端: frontend/src/api.ts:223 实际调 apiClient.get("/auth/me")
+    这是后端契约设计：自己看自己走 /api/auth/me，看别人走 /api/users/:id
+  - F2 /challenges 显示"暂无挑战活动" → **唯一需验证项**
+    API 返 5 条 status=active 数据（200 OK），HTML 是 SPA shell
+    需 tester 用 Playwright 等 hydrate 完成后抓真实 DOM + 截图
+  - F3 login 429 → **关闭（误报）**，5 连测 200
+source_report:
+  - /Users/max_yang/.qclaw/workspace/reports/巡检报告-2026-06-13.md
+  - /Users/max_yang/.qclaw/workspace/reports/验收报告-2026-06-13.md
+  - /Users/max_yang/.qclaw/workspace/2026-06-13-0455_T-2026-0613-001_dispatch.md
+
+# ─────────── 阶段状态 ───────────
+stages:
+  00_story: in_progress      # product 重评中（仅 /challenges）
+  01_design: pending          # 仅 F2 真实 bug 时介入
+  02_plan_review: pending
+  03_impl: pending            # 仅 F2 真实 bug 时介入
+  04_code_review: pending
+  05_qa: pending              # tester Playwright /challenges 必跑
+  06_security: skipped        # 无安全/限流变更
+  07_deploy: pending          # devops 复用 scripts/deploy-template.sh
+  08_done: pending
+
+current_stage: 00_story
+blocked_reason: null
+
+# ─────────── Main 预诊断（写于派发 story 前）───────────
+preflight_diagnosis:
+  timestamp: 2026-06-13 04:58 GMT+8
+  by: main
+  site_health_curl:
+    "/": 200
+    "/api/health": 200
+    "/api/recipes": 200
+    "/api/auth/me": 200        # 真接口，带 token
+    "/api/users/me": 404       # 不存在（前端无人调，关闭）
+    "/api/challenges": 200     # 5 条数据 status=active
+  static_html_grep:
+    challenges_html: 0 匹配 "暂无挑战活动"  # SPA shell
+  findings:
+    - id: F1
+      name: "/api/users/me 404"
+      reality: 误报（无前端调用方）。真接口 = /api/auth/me
+      status: closed
+    - id: F2
+      name: "/challenges 显示暂无挑战活动"
+      reality: 需 UI 验证
+      decision_needed_by: product + tester
+    - id: F3
+      name: "POST /api/auth/login 429"
+      reality: 误报（5 连测 200）
+      status: closed
+  pipeline_scope_decision:
+    decision: 范围收窄到 /challenges 单点验证
+    if_F2_real_bug:
+      - 00-story (product) 重新评估
+      - 01-design (architect) 仅 F2 真 bug 时
+      - 03-impl (fullstack) 仅 F2 真 bug 时
+      - 05-qa (tester) Playwright 验证 /challenges 必跑
+      - 07-deploy (devops) 复用 scripts/deploy-template.sh（#138 沉淀）
+    if_F2_false_alarm:
+      - 走 hotfix 收尾，生成 R0 报告：巡检误报 3/3
+    skip:
+      - 06-security（无安全/限流变更）
+      - 01-design / 03-impl（若 F2 非 bug 则跳过）
+
+# ─────────── 子专家产物占位 ───────────
+artifacts:
+  00_story_md: null
+  01_design_md: null
+  02_plan_review_r1_json: null
+  03_impl_diff: null
+  04_code_review_r1_json: null
+  05_qa_report_md: null
+  06_security_audit_json: null
+  07_deploy_report_md: null
+
+# ─────────── 经验文件引用 ───────────
+lessons_refs:
+  - ~/.qclaw/workspace/iterations/2026/W24/lessons.md  # #137/#138 部署教训
+  - ~/.qclaw/workspace/iterations/2026/W24/tracker.md  # 流程参考
+  - ~/Projects/food-website/.team/tasks/T-2026-0612-003/  # 部署模板升级
+  - ~/Projects/food-website/scripts/deploy-template.sh  # 复用
+
+# ─────────── Main 越界监控 ───────────
+main_overrides: []  # 必须保持空。出现即违规
+
+# ─────────── 部署前自检（devops 必须）───────────
+pre_deploy_checklist:
+  - compose service 名 vs container_name 区分（#138 教训）
+  - 后端 image baked-in → 写文件后 chown nodeapp:nodejs
+  - macOS tar 推源码 → xattr -cr 或 COPYFILE_DISABLE=1
+  - subagent model 兜底 doubao-seed-2.0-pro
+post_deploy_must_curl:
+  - /api/health → 200
+  - /api/challenges → 200
+  - /challenges → 200

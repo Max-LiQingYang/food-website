@@ -1,31 +1,5 @@
-diff --git a/.team/tasks/T-2026-0612-001/99-status.yaml b/.team/tasks/T-2026-0612-001/99-status.yaml
-index af93c4b..c139dec 100644
---- a/.team/tasks/T-2026-0612-001/99-status.yaml
-+++ b/.team/tasks/T-2026-0612-001/99-status.yaml
-@@ -1,9 +1,9 @@
- taskId: T-2026-0612-001
--phase: deploy
--owner: devops
-+phase: done
-+owner: coordinator
- round: 1
--updatedAt: 2026-06-12T04:09:30Z
--nextAction: "spawn devops 子专家：git commit (7 src + .team/ + docs/perf/) → push → 服务器 pull → build → 容器清理+cp 108 assets → nginx reload → 5 路径 200 → P0 验证"
-+updatedAt: 2026-06-12T04:18:00Z
-+nextAction: "dev-pipeline 全流程闭环。retro 阶段：写 lessons + metrics"
- designFile: ".team/tasks/T-2026-0612-001/01-design.md"
- designLineCount: 817
- planReviewFile: ".team/tasks/T-2026-0612-001/02-plan-review-r1.json"
-@@ -24,3 +24,7 @@ qaAll8ACPass: true
- securityAuditFile: ".team/tasks/T-2026-0612-001/06-security-audit.json"
- securityVerdict: "PASS"
- securityCriticalHigh: 0
-+deployReportFile: "docs/iterations/iter136-lazy-shimmer/DEPLOY-report.md"
-+deployVerdict: "SUCCESS"
-+deployPublicVerification: "5/5 200 · 2 CSS shimmer · 3 JS lazy"
-+firstPass: true
 diff --git a/backend/routes/compare.js b/backend/routes/compare.js
-index d7060b6..2d481cb 100644
+index d7060b6..409f13a 100644
 --- a/backend/routes/compare.js
 +++ b/backend/routes/compare.js
 @@ -8,7 +8,7 @@
@@ -66,7 +40,7 @@ index d7060b6..2d481cb 100644
        }
      })
  
-@@ -142,4 +157,46 @@ router.post('/', async (req, res) => {
+@@ -142,4 +157,47 @@ router.post('/', async (req, res) => {
    }
  })
  
@@ -114,31 +88,32 @@ index d7060b6..2d481cb 100644
 +  return result
 +}
 +
-+module.exports = { router, aggregateDimensionAverages }
++module.exports = router
++module.exports.aggregateDimensionAverages = aggregateDimensionAverages
 \ No newline at end of file
 diff --git a/backend/tests/compare.test.js b/backend/tests/compare.test.js
-index 39f9232..4f270be 100644
+index 39f9232..9d4a94f 100644
 --- a/backend/tests/compare.test.js
 +++ b/backend/tests/compare.test.js
-@@ -1,16 +1,83 @@
+@@ -1,16 +1,82 @@
  'use strict'
  
 -const compareModule = require('../routes/compare')
-+const { aggregateDimensionAverages } = require('../routes/compare')
++const compareRouter = require('../routes/compare')
++const aggregateDimensionAverages = compareRouter.aggregateDimensionAverages
  
  describe('Compare Route Module', () => {
    it('导出 router 对象', () => {
-+    const compareModule = require('../routes/compare')
-     expect(compareModule).toBeDefined()
+-    expect(compareModule).toBeDefined()
 -    expect(typeof compareModule).toBe('function')
-+    expect(typeof compareModule.router).toBe('function')
++    expect(typeof compareRouter).toBe('function')
++    expect(compareRouter.stack.length > 0).toBe(true)
    })
  
    it('router 有 post 处理函数', () => {
 -    const routes = compareModule.stack || []
 -    const postRoutes = routes.filter((r: any) => r.route && r.route.path === '/' && r.route.methods.post)
-+    const compareModule = require('../routes/compare')
-+    const routes = compareModule.router.stack || []
++    const routes = compareRouter.stack || []
 +    const postRoutes = routes.filter((r) => r.route && r.route.path === '/' && r.route.methods.post)
      expect(postRoutes.length).toBe(1)
    })
