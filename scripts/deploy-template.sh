@@ -169,16 +169,7 @@ tar_create() {
   fi
 }
 
-# tar 辅助函数：根据 OS 自动添加 COPYFILE_DISABLE + --no-xattrs
-tar_pack() {
-  local dest="$1"; shift
-  local src_dir="$1"; shift
-  if $XATTR_STRIP; then
-    COPYFILE_DISABLE=1 tar --no-xattrs -cf "$dest" -C "$src_dir" "$@" 2>/dev/null
-  else
-    tar -cf "$dest" -C "$src_dir" "$@" 2>/dev/null
-  fi
-}
+# tar 辅助函数已合并到 tar_create（dead code 删除，N1 修复）
 
 # ══════════════════════════════════════════════════════════════
 # §2  PREFLIGHT 阶段
@@ -219,9 +210,13 @@ validate_params() {
     return 1
   fi
 
-  # 端口范围
+  # 端口范围（B3 修复: BACKEND_PORT 同样校验）
   if [[ ! "$SSH_PORT" =~ ^[0-9]+$ ]] || [[ "$SSH_PORT" -lt 1 ]] || [[ "$SSH_PORT" -gt 65535 ]]; then
     fail "invalid SSH_PORT: ${SSH_PORT}"
+    return 1
+  fi
+  if [[ ! "$BACKEND_PORT" =~ ^[0-9]+$ ]] || [[ "$BACKEND_PORT" -lt 1 ]] || [[ "$BACKEND_PORT" -gt 65535 ]]; then
+    fail "invalid BACKEND_PORT: ${BACKEND_PORT}"
     return 1
   fi
 
@@ -459,19 +454,24 @@ run_deploy() {
   fi
 
   # ── 4.3 docker cp 覆盖容器内文件 ──
+  # B2 修复: CONTAINER_NAME printf '%q' 转义
   log "docker cp backend overlay → ${CONTAINER_NAME}..."
-  ssh_cmd "docker cp /tmp/backend-overlay/. ${CONTAINER_NAME}:/app/ 2>&1" \
+  local escaped_cname_deploy
+  escaped_cname_deploy=$(printf '%q' "$CONTAINER_NAME")
+  ssh_cmd "docker cp /tmp/backend-overlay/. ${escaped_cname_deploy}:/app/ 2>&1" \
     || warn "docker cp backend failed"
 
   # ── 4.4 chown 修复权限 ──
   log "chown ${CHOWN_USER}:${CHOWN_GROUP} /app/..."
-  ssh_cmd "docker exec ${CONTAINER_NAME} chown -R ${CHOWN_USER}:${CHOWN_GROUP} /app/ 2>&1" \
+  ssh_cmd "docker exec ${escaped_cname_deploy} chown -R ${CHOWN_USER}:${CHOWN_GROUP} /app/ 2>&1" \
     || warn "chown failed — baked image files may be inaccessible"
 
   # ── 4.5 docker cp 前端（如果有）──
   if ssh_cmd "test -d /tmp/frontend-overlay" 2>/dev/null; then
     log "docker cp frontend overlay → ${NGINX_CONTAINER}..."
-    ssh_cmd "docker cp /tmp/frontend-overlay/. ${NGINX_CONTAINER}:${NGINX_HTML_PATH}/ 2>&1" \
+    local escaped_nginx_deploy
+    escaped_nginx_deploy=$(printf '%q' "$NGINX_CONTAINER")
+    ssh_cmd "docker cp /tmp/frontend-overlay/. ${escaped_nginx_deploy}:${NGINX_HTML_PATH}/ 2>&1" \
       || warn "docker cp frontend failed"
   fi
 
@@ -511,8 +511,11 @@ verify_v1() {
   log "=== verify 1: backend health check ==="
 
   # 通用健康检查: docker exec curl → 200 即 PASS
-  local v1_exit
-  v1_exit=$(ssh_cmd "docker exec ${CONTAINER_NAME} curl -sf -o /dev/null -w '%{http_code}' http://localhost:${BACKEND_PORT}${V1_HEALTH_PATH} 2>&1" 2>/dev/null | tail -1)
+  # B2 修复: CONTAINER_NAME 用 printf '%q' 转义防远程命令注入
+  local cname_v1 escaped_cname_v1 v1_exit
+  cname_v1="${CONTAINER_NAME}"
+  escaped_cname_v1=$(printf '%q' "$cname_v1")
+  v1_exit=$(ssh_cmd "docker exec ${escaped_cname_v1} curl -sf -o /dev/null -w '%{http_code}' http://localhost:${BACKEND_PORT}${V1_HEALTH_PATH} 2>&1" 2>/dev/null | tail -1)
 
   if [[ "$v1_exit" == "200" ]]; then
     V1_RESULT="PASS"
@@ -525,9 +528,10 @@ verify_v1() {
   # 可选: V1_CUSTOM_CMD 钩子（项目专属深度验证）
   if [[ -n "${V1_CUSTOM_CMD}" ]]; then
     log "V1 CUSTOM: running custom validation..."
-    local custom_out
+    local custom_out custom_rc
     custom_out=$(ssh_cmd "${V1_CUSTOM_CMD}" 2>&1) || true
-    if [[ $? -eq 0 ]] && echo "$custom_out" | grep -qi 'PASS\|OK\|0'; then
+    custom_rc=$?  # N3 修复: 真实记录 rc,不再因 || true 必为 0
+    if [[ $custom_rc -eq 0 ]] && echo "$custom_out" | grep -qi 'PASS\|OK\|0'; then
       ok "V1 CUSTOM: passed"
     else
       warn "V1 CUSTOM: result — $custom_out"
@@ -541,8 +545,10 @@ verify_v2() {
   echo ""
   log "=== verify 2: chunk in nginx ==="
 
-  local chunk_list
-  chunk_list=$(ssh_cmd "docker exec ${NGINX_CONTAINER} ls ${NGINX_HTML_PATH}/assets/${V2_CHUNK_PATTERN} 2>&1" 2>/dev/null)
+  # B2 修复: NGINX_CONTAINER 用 printf '%q' 转义防远程命令注入
+  local escaped_nginx_cname chunk_list
+  escaped_nginx_cname=$(printf '%q' "$NGINX_CONTAINER")
+  chunk_list=$(ssh_cmd "docker exec ${escaped_nginx_cname} ls ${NGINX_HTML_PATH}/assets/${V2_CHUNK_PATTERN} 2>&1" 2>/dev/null)
 
   if [[ -z "$chunk_list" ]] || echo "$chunk_list" | grep -qi 'No such\|cannot\|error'; then
     V2_RESULT="FAIL"
@@ -568,8 +574,10 @@ verify_v3() {
   fi
 
   # 一次性获取所有 chunk 文件列表
-  local chunks
-  chunks=$(ssh_cmd "docker exec ${NGINX_CONTAINER} find ${NGINX_HTML_PATH}/assets/ -name '*.js' -type f 2>&1" 2>/dev/null)
+  # B2 修复: NGINX_CONTAINER printf '%q' 转义
+  local escaped_nginx_cname chunks
+  escaped_nginx_cname=$(printf '%q' "$NGINX_CONTAINER")
+  chunks=$(ssh_cmd "docker exec ${escaped_nginx_cname} find ${NGINX_HTML_PATH}/assets/ -name '*.js' -type f 2>&1" 2>/dev/null)
 
   if [[ -z "$chunks" ]] || echo "$chunks" | grep -qi 'No such\|cannot\|error'; then
     V3_RESULT="FAIL"
@@ -578,8 +586,11 @@ verify_v3() {
   fi
 
   # 单次 SSH 合并 grep 全部 chunk
-  local grep_result
-  grep_result=$(ssh_cmd "docker exec ${NGINX_CONTAINER} sh -c 'grep -rl \"${V3_GREP_KEYWORD}\" ${NGINX_HTML_PATH}/assets/*.js 2>/dev/null || echo NO_MATCH'" 2>/dev/null)
+  # B1 修复: V3_GREP_KEYWORD printf '%q' 转义防本地命令注入 + 单引号包裹延迟到远程展开
+  # B4 修复: grep -rl 改 -rlF 固定字符串模式
+  local escaped_kw grep_result
+  escaped_kw=$(printf '%q' "$V3_GREP_KEYWORD")
+  grep_result=$(ssh_cmd "docker exec ${escaped_nginx_cname} sh -c 'grep -rlF ${escaped_kw} ${NGINX_HTML_PATH}/assets/*.js 2>/dev/null || echo NO_MATCH'" 2>/dev/null)
 
   if echo "$grep_result" | grep -q 'NO_MATCH'; then
     V3_RESULT="FAIL"
@@ -597,8 +608,9 @@ verify_v4() {
   echo ""
   log "=== verify 4: route 200 ==="
 
+  # N2 修复: curl 加 --connect-timeout / --max-time 防公网不可达无限挂起
   local http_code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" "http://${DOMAIN}${V4_ROUTE_PATH}" 2>/dev/null || echo "000")
+  http_code=$(curl -s --connect-timeout 10 --max-time 30 -o /dev/null -w "%{http_code}" "http://${DOMAIN}${V4_ROUTE_PATH}" 2>/dev/null || echo "000")
 
   if [[ "$http_code" == "200" ]]; then
     V4_RESULT="PASS"
