@@ -152,7 +152,7 @@ export default function ShareModal({
               {/* 分享卡片预览 */}
               <div className="share-modal__card" ref={cardRef}>
                 {recipeImage && (
-                  <img src={recipeImage} alt={recipeTitle} className="share-modal__card-img" />
+                  <img src={recipeImage} alt={recipeTitle} className="share-modal__card-img" loading="lazy" />
                 )}
                 <div className="share-modal__card-content">
                   <h4 className="share-modal__card-title">{recipeTitle}</h4>

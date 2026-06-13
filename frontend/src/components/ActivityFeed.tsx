@@ -112,7 +112,7 @@ function ActivityCard({ item }: { item: ActivityItem }) {
       {/* Avatar + Type Badge */}
       <div className="activity-card__avatar-wrap">
         {item.user?.avatar ? (
-          <img className="activity-card__avatar" src={item.user.avatar} alt="" />
+          <img className="activity-card__avatar" src={item.user.avatar} alt="" loading="lazy" />
         ) : (
           <div className="activity-card__avatar-placeholder">{getAvatarLetter(item.user)}</div>
         )}

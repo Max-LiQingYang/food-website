@@ -101,7 +101,7 @@ export default function VideoPlayer({ recipeId }: Props) {
             <button key={v.id}
               className={`thumb-btn ${i === currentIndex ? 'active' : ''}`}
               onClick={() => setCurrentIndex(i)}>
-              {v.coverImage ? <img src={v.coverImage} alt={v.title || ''} /> : <span>🎬</span>}
+              {v.coverImage ? <img src={v.coverImage} alt={v.title || ''} loading="lazy" /> : <span>🎬</span>}
             </button>
           ))}
         </div>
