@@ -75,6 +75,7 @@ export default function DailyPickCard() {
             src={recipe.coverImage || ''}
             alt={recipe.title}
             className="daily-pick-card__image"
+            loading="lazy"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
           <span className="daily-pick-card__badge">{seasonLabel}</span>

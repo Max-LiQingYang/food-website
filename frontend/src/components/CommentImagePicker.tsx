@@ -62,7 +62,7 @@ export default function CommentImagePicker({ images, onChange, maxCount = 3, max
       <div className="comment-image-picker__previews">
         {previews.map((url, i) => (
           <div key={i} className="comment-image-picker__item">
-            <img src={url} alt={`图片 ${i + 1}`} className="comment-image-picker__thumb" />
+            <img src={url} alt={`图片 ${i + 1}`} className="comment-image-picker__thumb" loading="lazy" />
             <button
               type="button"
               className="comment-image-picker__remove"
