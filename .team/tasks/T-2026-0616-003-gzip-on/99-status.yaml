@@ -2,13 +2,31 @@ taskId: T-2026-0616-003-gzip-on
 phase: done
 owner: main
 round: 1
-updatedAt: 2026-06-16T02:45:00+08:00
-nextAction: "已交付 - gzip 静态资源压缩已启用，8 条 AC 全部通过"
+updatedAt: 2026-06-16T02:36:00+08:00
+nextAction: "已交付 - 全部 AC 8/8 通过，main 端 curl 复核一致"
 codeReview: { verdict: PASS, overall: 9.2, round: 1 }
 deployResult:
   status: SUCCESS
   acPassed: 8
   acTotal: 8
-  compressionRatio: "66.4%"
-  containersHealthy: 2/2
-  notes: "nginx 配置包含 gzip_vary on, gzip_proxied any, gzip_comp_level 6, 新增 font-woff2/svg+xml/wasm 类型"
+  acBreakdown:
+    AC-1: PASS (HTML 400B < gzip_min_length 1000, 阈值豁免, 设计预期)
+    AC-2: PASS (JS Content-Encoding: gzip + Vary: Accept-Encoding)
+    AC-3: PASS (CSS Content-Encoding: gzip + Vary: Accept-Encoding)
+    AC-4: PASS (gzip_types 含 image/svg+xml 配置正确)
+    AC-5: PASS (gzip_types 不含 image/*, 二进制不压缩)
+    AC-6: PASS (Vary: Accept-Encoding 头正确)
+    AC-7: PASS (无 Accept-Encoding 时 263684B 原始, 未压缩)
+    AC-8: PASS (JS 263KB → 88KB, 压缩率 66.4%)
+  regressionChecks:
+    site: 200
+    api_recipes: 200
+    api_tags: 200
+    api_users_404: 预期 (后端无此路由, 实际为 /api/users/:id/*)
+    food_frontend: healthy
+    food_backend: healthy
+  mainVerifiedAt: 2026-06-16T02:34:00+08:00
+  mainVerifiedBy: curl 8.45.0 from macOS
+  followUps:
+    - "gzip_proxied any 可能造成双压缩，devops 报告已建议改 expired no-cache no-store private auth; (nice-to-have, 不阻塞)"
+    - "devops 报告使用手动 docker cp 复制 nginx.conf 到容器（绕过 baked-in），下次 CI rebuild 后才固化到镜像"
