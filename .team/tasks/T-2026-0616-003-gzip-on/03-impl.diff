@@ -1,0 +1,31 @@
+diff --git a/frontend/Dockerfile b/frontend/Dockerfile
+index 9b37b2f..c2d1378 100644
+--- a/frontend/Dockerfile
++++ b/frontend/Dockerfile
+@@ -34,6 +34,9 @@ COPY --from=builder /app/dist /usr/share/nginx/html
+ # 复制自定义 Nginx 配置（SPA 路由 + API 反向代理）
+ COPY nginx.conf /etc/nginx/conf.d/default.conf
+ 
++# Build-time sanity check: validate nginx config syntax
++RUN nginx -t
++
+ # 健康检查
+ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+   CMD wget -qO- http://127.0.0.1/health || exit 1
+diff --git a/frontend/nginx.conf b/frontend/nginx.conf
+index 94112be..255ebd1 100644
+--- a/frontend/nginx.conf
++++ b/frontend/nginx.conf
+@@ -4,8 +4,11 @@
+ 
+ # 压缩
+ gzip on;
+-gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
++gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/font-woff2 image/svg+xml application/wasm;
+ gzip_min_length 1000;
++gzip_vary on;
++gzip_proxied any;
++gzip_comp_level 6;
+ 
+ # 上游后端（docker-compose service name）
+ upstream backend {

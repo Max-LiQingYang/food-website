@@ -137,3 +137,9 @@ git log --oneline -5          # 查看最近 commit
 git reset --hard HEAD~1       # 回滚到上一个 commit
 docker compose up -d --force-recreate
 ```
+
+---
+
+## 前端 Nginx Gzip 压缩
+
+前端 nginx 已启用 gzip 静态资源压缩（HTML/JS/CSS/SVG/WOFF2/WASM 等文本类资源），配置见 `frontend/nginx.conf`。Dockerfile 构建阶段会执行 `RUN nginx -t` 做配置语法校验。

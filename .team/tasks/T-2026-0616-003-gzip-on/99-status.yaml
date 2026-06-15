@@ -1,0 +1,7 @@
+taskId: T-2026-0616-003-gzip-on
+phase: deploy
+owner: devops
+round: 1
+updatedAt: 2026-06-16T02:23:00+08:00
+nextAction: "派 devops：git commit+push → CI 重建 frontend 镜像 → 服务器 docker compose pull+up → 8 条 AC curl 验证 → 站点 200 + gzip 头验证"
+codeReview: { verdict: PASS, overall: 9.2, round: 1 }

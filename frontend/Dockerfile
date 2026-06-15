@@ -34,6 +34,9 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # 复制自定义 Nginx 配置（SPA 路由 + API 反向代理）
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Build-time sanity check: validate nginx config syntax
+RUN nginx -t
+
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -qO- http://127.0.0.1/health || exit 1
