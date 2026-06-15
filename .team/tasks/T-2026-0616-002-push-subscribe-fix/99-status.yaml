@@ -1,0 +1,37 @@
+taskId: T-2026-0616-002-push-subscribe-fix
+phase: done
+owner: main
+round: 1
+severity: P0
+updatedAt: 2026-06-16T02:24:00+08:00
+status: completed
+resolution: "P0 部署漂移修复完成。prod frontend 从 28 assets 升到 109 assets，与本地 dist 完全一致。端到端 push 流程 (POST 201, GET 200, DELETE 200, vapid-public-key 200) 全 PASS。"
+artifacts:
+  - "00-story.md (product, 5408 bytes, 7 ACs)"
+  - "01-reinvestigation.md (main, 2186 bytes, P0 升级依据)"
+  - "03-impl.diff (fullstack, 1549 bytes, not-a-bug 误判)"
+  - "04-code-review-r1.json (reviewer, PASS 8.2/10, 0 blockers)"
+  - "05-qa-report.md (tester, 7/7 PASS, AC5 误标)"
+  - "07-deploy.md (devops, 2646 bytes, 5 关验证 PASS)"
+final_verification: |
+  - prod assets: 109 (与本地一致)
+  - POST /api/push/subscription → 201
+  - GET /api/push/subscription/my → 200
+  - DELETE /api/push/subscription/:id → 200
+  - GET /api/vapid-public-key → 200
+  - /settings SPA 路由 → 200
+  - home-cards chunk 包含 /push/subscription + /vapid-public-key 路径
+  - SettingsPage chunk 包含 PushSubscriptionPrompt 组件
+lessons_for_iteration_lessons:
+  - "API curl PASS ≠ 端到端 PASS：bugfix 调查必须前后端同时扫，否则会漏掉前端部署漂移"
+  - "prod bundle 静态资源扫描是 E2E 验证的必要步骤：tester 必须 docker exec + grep 关键字符串"
+  - "巡检改进：从 frontend/src/api.ts 提取实际 endpoint 清单（带 GET/POST/PUT/DELETE），避免凭空构造路径"
+  - "假完成三层防御 1（时长）保命：devops 1m48s < 90s 阈值时 main 必须独立 ssh 验证"
+  - "subagent 越权写黑板状态是反模式：fullstack 写 done 应由 main 独占写权限"
+metrics:
+  total_runtime: 1h29m
+  subagents_spawned: [product, fullstack, reviewer, tester, devops]
+  subagent_rejections: 0
+  reopen_count: 1
+  reopen_reason: "fullstack not-a-bug 漏诊前端部署漂移"
+nextAction: "回调 WorkBuddy + 写 iteration-lessons.md + metrics.jsonl"

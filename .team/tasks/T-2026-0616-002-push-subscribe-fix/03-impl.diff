@@ -1,0 +1,33 @@
+# 03-impl.diff — T-2026-0616-002-push-subscribe-fix
+
+## 结论：无需源码修改
+
+### 根因
+
+**非 bug — 误报（false positive）**
+
+prod `/api/push/subscription` 路由**始终可用且正常工作**。原始巡检报告中的 404 由以下原因导致：
+
+1. **错误路径**：巡检报告测试了 `/api/push/subscribe`（旧路径），该路径从未注册，自然返回 404
+2. **错误方法**：对 `/api/push/subscription` 使用了 `GET` 请求，但该路由仅定义了 `POST /`、`GET /my`、`PUT /:id`、`DELETE /:id`，没有 `GET /` 处理器，因此 `GET /api/push/subscription` 返回 404 是**正确行为**
+
+### 生产环境实际验证结果
+
+| AC | 端点 | 方法 | 结果 |
+|----|------|------|------|
+| AC1 | POST /api/push/subscription | POST + auth | **201** ✅ |
+| AC2 | POST /api/push/subscription | POST 无 auth | **401** ✅ |
+| AC3 | GET /api/push/subscription/my | GET + auth | **200** ✅ |
+| AC4 | GET /api/vapid-public-key | GET | **200** ✅ |
+| 额外 | DELETE /api/push/subscription/:id | DELETE + auth | **200** ✅ |
+
+### 无需改动的原因
+
+- `backend/routes/pushSubscription.js` 已在 prod 容器中
+- `backend/routes/index.js:93` 的 mount `router.use('/push/subscription', require('./pushSubscription'))` 已在 prod 容器中
+- `backend/models/pushSubscription.js` 通过 `models/index.js` 的 `fs.readdirSync` 自动加载
+- 所有 4 个 CRUD 操作（POST/GET/PUT/DELETE）在生产环境中正常工作
+
+### 差异
+
+无源码差异。本任务关闭为"非缺陷"（not-a-bug）。

@@ -3000,3 +3000,129 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 **流程**: 产品专家 PRD → UI 专家 CSS → 全栈专家 TSX → 运维专家部署
 **关键决策**: 全无时 return null 零 DOM 残留；4 套独立色系暗色模式；移动端 ≥32px 触摸目标
 **验收**: 构建 0 warnings，首页 200，bundle 含 ContentBadges
+
+---
+
+## 📋 待处理 / 下一迭代候选（2026-06-14 巡检发现）
+
+> 阶段：2026-06-14 每日巡检
+> 决策：均**不阻塞**当前 T-2026-0613-003 (#141) design 阶段，列为下一迭代候选
+> 完整证据：`~/.qclaw/workspace/reports/验收报告-2026-06-14.md`
+
+### 候选 1 · T-2026-0614-001 · 用户作品墙入口暴露（方向 A · 曝光优化）
+
+- **问题**：`/works/:userId` 路由存在（`router/index.tsx:117`）但**全站零入口** —— 完整功能用户摸不到，等同没开发
+- **影响**：1 个产品价值损失（用户作品墙是 P1 已有功能）
+- **建议动作**：
+  1. `UserProfilePage` 头部 stat 区增加「作品 N 件 →」链接到 `/works/:userId`
+  2. 列表页用户卡片 hover 增加「查看作品」按钮
+  3. 写 1 个 e2e：从我的 → 个人页 → 跳作品墙
+- **工作量**：0.5 天（前端 only）
+- **优先级**：P1（本周内排）
+
+### 候选 2 · T-2026-0614-002 · 移动端 BottomNav 扩展（方向 A · 移动端）
+
+- **问题**：`BottomNav.tsx` 仅 4 tab（首页/搜索/创建/我的），挑战赛/成就/排行榜/活动需走 navbar hamburger，移动端核心运营功能可达性差
+- **影响**：移动端用户体验弱
+- **建议动作**：
+  1. 评估 BottomNav 增加第 5 tab「发现」（收口挑战赛/排行榜/活动）
+  2. 或在「我的」tab 内增加快捷卡片区
+  3. 写 1 个 e2e：375x812 移动端路径测试
+- **工作量**：0.5 天（含交互方案确认）
+- **优先级**：P1（本周内排）
+
+### 候选 3 · T-2026-0614-003 · 巡检基建 · 容器内 puppeteer 截图（方向 A · 巡检基建）
+
+- **问题**：当前 tester 用浏览器自动化截图被 SSRF 安全策略阻断，**完全无法验证视觉/暗色/移动端** —— 是本次巡检最大可信度盲区
+- **影响**：所有视觉类巡检项目均 0 覆盖
+- **建议动作**：
+  1. 方案 A：在内网/容器侧跑 puppeteer 截图本机 dev
+  2. 方案 B：CI 阶段产出截图 artifact（不依赖 sandbox 出网）
+  3. 验收：screenshot 落盘 `~/.qclaw/workspace/reports/screenshots/YYYY-MM-DD/`
+- **工作量**：1 天（infra 配置 + 脚本 + devops 接入）
+- **优先级**：P1（巡检基建，所有视觉问题依赖此修复）
+
+### 候选 4（已并入 #141）· ChallengeHomeCards 接入 + 3 项 P2 体验优化
+
+- 详见 T-2026-0613-003/00-story.md「10. 非阻塞优化」章节
+- 实施时一并处理
+
+---
+
+## 📋 待处理 / 下一迭代候选（2026-06-15 巡检发现）
+
+> 阶段：2026-06-15 每日巡检
+> 决策：均**不阻塞**当前迭代，列为下一迭代候选
+> 完整证据：`~/.qclaw/workspace/reports/验收报告-2026-06-15.md`
+> 备注：本次巡检因 QClaw 网关 env var 缺失导致子 agent 无法 spawn，由 WorkBuddy 直接完成 kimi-webbridge + curl 巡检
+
+### 候选 5 · `/api/tags` 404 补全（方向 C · 内容质量）
+
+- **状态**：✅ 已修复（commit acbd349，2026-06-15 后越界 commit）
+- **验证**：2026-06-16 巡检 `GET /api/tags` 返回 200，111 个标签，字段名正确（tag, count）。
+- **问题**：`/api/tags` 端点 404（与 2026-06-12 巡检一致），前端标签浏览入口可能受影响。
+- **影响**：中。标签是内容发现的重要入口。
+- **建议动作**：无需进一步动作，关闭候选。
+- **工作量**：0 天
+- **优先级**：P2 → 关闭
+
+### 候选 6 · 热搜词空数据策略优化（方向 A · UI/UX）
+
+- **问题**：`/api/recipes/hot-searches` 仅 1 条真实搜索记录，其余 9 条为 fallback 静态词。
+- **影响**：低-中。热门搜索缺乏真实热度信号。
+- **建议动作**：
+  1. 当真实搜索记录 < 5 条时，隐藏"热门搜索"模块；或
+  2. 改为展示"推荐搜索词"（编辑精选）。
+- **工作量**：0.5 天
+- **优先级**：P2
+
+---
+
+## 📋 每日巡检记录（2026-06-16）
+
+> 阶段：2026-06-16 每日巡检
+> 执行：QClaw main 加载 dev-pipeline，编排 tester → product → 汇总
+> 结论：✅ 可发布，无 P0 阻塞
+> 完整证据：
+> - `~/.qclaw/workspace/reports/巡检报告-2026-06-16.md`
+> - `~/.qclaw/workspace/reports/验收报告-2026-06-16.md`
+> - `~/.qclaw/workspace/reports/巡检汇总-2026-06-16.md`
+
+### 已修复/关闭
+
+- **候选 5 `/api/tags` 404**：✅ 已修复（acbd349），2026-06-16 巡检验证通过，返回 111 标签。
+
+### 新增候选 / 待观察
+
+| 编号 | 问题 | 方向 | 优先级 | 状态 |
+|------|------|------|--------|------|
+| #142 | Nginx 静态资源 gzip 压缩配置 | C / 性能 | P2 | backlog，待用户确认后走 dev-pipeline |
+| #143 | #141 前置接口冒烟测试（`/api/recipes/:id/ratings/trends`、`/api/recipes/:id/comments/stats`）| C / 质量 | P2 | 阻塞在 #141，待 architect 解锁后启动 |
+| T-2026-0616-002 | Web Push `/api/push/subscription` 404 修复（前端已有开关， prod 镜像缺路由）| B / 功能 | P1 | 已立项，dev-pipeline 任务目录已创建，待 fullstack 认领 |
+| — | hot-searches 真实数据仅 1/10 | A / UI/UX | P2 | 接受现状，数据积累问题 |
+
+### 关键数据
+
+- 9 个 API 端点：全部 200/401（预期）
+- 5 页面 UI 巡检：首页/搜索/详情/排行榜/用户中心 桌面 + 移动 + 暗色均正常
+- 首页加载：66ms；API 平均响应：54-90ms
+- 食谱总数：84；挑战赛：5；标签：111
+
+### Iter#139 — T-2026-0616-002-push-subscribe-fix (2026-06-16 02:55) ✅ done
+
+**P0 部署漂移**：prod frontend 28 assets vs 本地 109 assets，前端缺 SettingsPage/PushSubscriptionPrompt/SW/PWA。
+
+**根因链**：
+1. 巡检误报三连（路径错 / 方法错 / 未检 frontend bundle）
+2. fullstack 第一轮"not-a-bug"误判（只验后端，未扫 prod bundle）
+3. reviewer PASS 8.2/10 但 AC5 evidence=7
+4. main 静态扫描 + diff prod vs local → 发现真问题 → reopen
+5. devops Option A（本地构建 → docker cp）→ 28→109 assets
+6. main 5 关验证 + 端到端 POST/GET/DELETE 全 PASS
+
+**结果**：✅ 端到端 Web Push 可用（虽然 VAPID 仍是 fallback 公钥，但 API 流程通了）
+
+**关键产物**：
+- 00-story / 01-reinvestigation / 03-impl / 04-review / 05-qa / 07-deploy
+- 99-status.yaml 完整轨迹（story→impl→done(stale)→code→re-investigate→deploy→done）
+- iteration-lessons.md 新增 5 条教训

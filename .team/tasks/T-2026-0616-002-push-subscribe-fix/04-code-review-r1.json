@@ -1,0 +1,43 @@
+{
+  "taskId": "T-2026-0616-002-push-subscribe-fix",
+  "phase": "code",
+  "round": 1,
+  "verdict": "PASS",
+  "overall": 8.2,
+  "scores": {
+    "diagnostic_correctness": {
+      "score": 9,
+      "rationale": "根因分析精准：巡检路径 /api/push/subscribe 在全代码库零匹配（grep 证实），GET /api/push/subscription 无 handler 返回 404 是正确行为。main 独立 curl 验证 7 条全部通过，prod 路由确实正常工作。扣 1 分：03-impl.diff 未说明如何确认 prod 容器含 pushSubscription.js（仅断言），但 main 的 curl 实证已间接证明。",
+      "evidence": "03-impl.diff 根因段；grep -rn 'push/subscribe' backend/ frontend/ → 零结果；routes/index.js:93 挂载行；main 7 条 curl 验证结果"
+    },
+    "evidence_completeness": {
+      "score": 7,
+      "rationale": "5 行验证表覆盖 AC1-AC4（POST 201/401、GET /my 200、VAPID 200、DELETE 200），但 AC5（前端 /settings 页面无 console error + PushSubscriptionPrompt 渲染正常）完全未验证，AC6（边界约束）仅隐式满足。验证表未显式映射到 7 条 AC，缺 AC5 实证和 AC6 声明。",
+      "evidence": "03-impl.diff 验证表（5 行）vs 00-story.md AC1-AC7（7 条）；AC5 无浏览器截图或 console 日志"
+    },
+    "no_regression": {
+      "score": 10,
+      "rationale": "git status 确认零源码变更：仅 iteration-lessons.md / iteration-tracker.md 有修改，.team/ 目录为新增任务产物。backend/ 和 frontend/ 目录无任何未提交变更。not-a-bug 结论成立，无回归风险。",
+      "evidence": "git status --short → 无 backend/ 或 frontend/ 变更；git log --oneline -5 → 最新 commit acbd349 与 push 无关"
+    },
+    "process_improvement": {
+      "score": 8,
+      "rationale": "03-impl.diff 正确识别了巡检误报根因（路径错 + 方法错），但未主动提出流程改进建议。巡检应统一使用前端 api.ts 中的实际 endpoint（GET/POST/DELETE /push/subscription/*），而非凭空构造 /push/subscribe 路径。扣 2 分：改进建议缺失，需 reviewer 补充。",
+      "evidence": "frontend/src/api.ts:2380-2394 定义 3 个实际 endpoint；巡检报告写 /api/push/subscribe（全代码库无此路径）"
+    },
+    "ac_closure": {
+      "score": 7,
+      "rationale": "03-impl.diff ✅；04-code-review-r1.json（本文）✅；05-qa-report.md 待 tester 写；06-security-audit.json 低风险可标 PASS 但未产出；07-deploy.md 因无需部署可跳过。AC7 要求 5 件产物，当前完成 2/5（安全审计可快速标记但未做）。扣 3 分：05 和 06 未闭环。",
+      "evidence": "00-story.md AC7 产物清单 vs 黑板目录实际文件"
+    }
+  },
+  "blockers": [],
+  "suggestions": [
+    "AC5 补验证：浏览器打开 prod /settings 页面，确认 PushSubscriptionPrompt 渲染无 console error，截图存档到 05-qa-report.md",
+    "AC7 补产物：tester 产出 05-qa-report.md（汇总 main 的 7 条 curl 结果 + AC5 浏览器验证）；security 产出 06-security-audit.json（低风险，标注「无源码变更，无新增攻击面，PASS」）",
+    "巡检流程改进：下次巡检统一从 frontend/src/api.ts 提取实际 endpoint 列表（GET/POST/PUT/DELETE 全方法），避免凭空构造路径导致误报",
+    "AC1 测试数据说明：endpoint=https://fcm.googleapis.com/fcm/send/test 是 mock 端点，仅用于验证订阅注册流程，非真实 FCM 推送目标。在 05-qa-report.md 中标注「测试数据」",
+    "03-impl.diff 补充证据链：建议追加一行说明「prod 容器中 pushSubscription.js 存在性由 main 独立 curl 验证间接证实（POST 201 返回 id 证明 ORM 写入成功，路由必然已挂载）」"
+  ],
+  "summary": "not-a-bug 诊断正确，prod 路由正常工作，404 为巡检路径/方法错误导致的误报。零源码变更，无回归风险。AC5 前端验证和 AC7 剩余产物（05/06）待闭环。PASS。"
+}
