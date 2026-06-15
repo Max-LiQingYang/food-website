@@ -1,7 +1,14 @@
 taskId: T-2026-0616-003-gzip-on
-phase: deploy
-owner: devops
+phase: done
+owner: main
 round: 1
-updatedAt: 2026-06-16T02:23:00+08:00
-nextAction: "派 devops：git commit+push → CI 重建 frontend 镜像 → 服务器 docker compose pull+up → 8 条 AC curl 验证 → 站点 200 + gzip 头验证"
+updatedAt: 2026-06-16T02:45:00+08:00
+nextAction: "已交付 - gzip 静态资源压缩已启用，8 条 AC 全部通过"
 codeReview: { verdict: PASS, overall: 9.2, round: 1 }
+deployResult:
+  status: SUCCESS
+  acPassed: 8
+  acTotal: 8
+  compressionRatio: "66.4%"
+  containersHealthy: 2/2
+  notes: "nginx 配置包含 gzip_vary on, gzip_proxied any, gzip_comp_level 6, 新增 font-woff2/svg+xml/wasm 类型"
