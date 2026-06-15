@@ -11,6 +11,96 @@ const { Op } = require('sequelize')
 const { TagSuggestion, Recipe } = require('../models')
 const auth = require('../middleware/auth')
 
+// ── 标签列表（GET /api/tags）──────────────────────────────────────────────
+
+/**
+ * GET /api/tags
+ * 返回所有标签列表，按关联菜谱数降序排序
+ * 
+ * 数据源：从 Recipe.categoryTags JSON 字段中聚合提取
+ * categoryTags 结构: { ingredient: [], method: [], cuisine: [], flavor: [], price: [] }
+ * 每个字段的值可以是字符串或数组格式
+ * 
+ * 响应格式：
+ * {
+ *   code: 0,
+ *   message: 'ok',
+ *   data: [
+ *     { id: '川菜', name: '川菜', recipeCount: 15 },
+ *     { id: '炒', name: '炒', recipeCount: 12 },
+ *     ...
+ *   ]
+ * }
+ */
+router.get('/tags', async (req, res) => {
+  try {
+    // 查询所有食谱的 categoryTags
+    const recipes = await Recipe.findAll({
+      attributes: ['categoryTags'],
+      raw: true,
+    })
+
+    // 统计每个标签出现的次数
+    const tagCountMap = new Map() // tag -> count
+
+    recipes.forEach(recipe => {
+      const rawTags = recipe.categoryTags
+      if (!rawTags) return
+
+      let tagsObj = {}
+      try {
+        tagsObj = typeof rawTags === 'string' ? JSON.parse(rawTags) : rawTags
+      } catch (err) {
+        return // 忽略解析失败的记录
+      }
+
+      if (typeof tagsObj !== 'object' || tagsObj === null) return
+
+      // 提取所有标签值（支持字符串和数组格式）
+      Object.values(tagsObj).forEach(val => {
+        if (!val) return
+        
+        const values = []
+        if (typeof val === 'string') {
+          // 支持逗号分隔的多值格式
+          val.split(',').forEach(v => {
+            const trimmed = v.trim()
+            if (trimmed) values.push(trimmed)
+          })
+        } else if (Array.isArray(val)) {
+          val.forEach(v => {
+            if (typeof v === 'string' && v.trim()) {
+              values.push(v.trim())
+            }
+          })
+        }
+
+        // 累计计数
+        values.forEach(tag => {
+          tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1)
+        })
+      })
+    })
+
+    // 转换为数组并按 count 降序排序
+    const tags = Array.from(tagCountMap.entries())
+      .map(([tag, count]) => ({
+        tag,
+        count,
+      }))
+      .sort((a, b) => b.count - a.count)
+
+    res.json({
+      code: 0,
+      message: 'ok',
+      data: tags,
+    })
+  } catch (err) {
+    console.error('[GET /api/tags] error:', err.message)
+    res.status(500).json({ code: 500, message: '获取标签列表失败' })
+  }
+})
+
 // ── 热门标签 ──────────────────────────────────────────────────────────────
 
 // GET /api/tags/popular — 返回热门标签统计
