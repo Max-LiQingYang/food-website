@@ -499,7 +499,7 @@ router.get('/', async (req, res) => {
   try {
     let page = parseInt(req.query.page, 10) || 1
     let pageSize = parseInt(req.query.pageSize, 10) || 20
-    const { category, categories, userId, exclude, difficulty, maxCookTime, sortBy } = req.query
+    const { category, categories, userId, exclude, difficulty, maxCookTime, sortBy, q } = req.query
 
     if (page < 1) page = 1
     if (pageSize > 100) pageSize = 100
@@ -533,6 +533,17 @@ router.get('/', async (req, res) => {
     const excludeCond = buildExcludeCondition(exclude)
     if (excludeCond) {
       where[Op.and] = excludeCond
+    }
+
+    // 搜索关键词过滤（模糊匹配 title + description + ingredients）
+    if (typeof q === 'string' && q.trim()) {
+      trackSearch(q.trim())
+      const keyword = `%${q.trim()}%`
+      where[Op.or] = [
+        { title: { [Op.like]: keyword } },
+        { description: { [Op.like]: keyword } },
+        { ingredients: { [Op.like]: keyword } },
+      ]
     }
 
     // 排序

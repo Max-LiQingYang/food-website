@@ -120,6 +120,133 @@ describe('GET /api/recipes — 食谱列表', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// GET /api/recipes — q 关键词过滤 (T-2026-0615-007)
+// ─────────────────────────────────────────────────────────────────
+describe('GET /api/recipes — q 关键词过滤', () => {
+  beforeEach(async () => {
+    // 创建含有关键词的测试数据
+    await db.Recipe.create({
+      id: uuidv4(), title: '红烧肉', description: '经典中式红烧肉', category: 'chinese',
+      cookTime: 90, userId: USER_A_ID,
+      ingredients: JSON.stringify([{ name: '五花肉', amount: 500, unit: 'g' }]),
+    })
+    await db.Recipe.create({
+      id: uuidv4(), title: '红烧排骨', description: '家常排骨做法', category: 'chinese',
+      cookTime: 60, userId: USER_A_ID,
+      ingredients: JSON.stringify([{ name: '排骨', amount: 400, unit: 'g' }]),
+    })
+    await db.Recipe.create({
+      id: uuidv4(), title: '宫保鸡丁', description: '川菜经典 chicken', category: 'chinese',
+      cookTime: 25, userId: USER_A_ID,
+      ingredients: JSON.stringify([{ name: '鸡胸肉', amount: 300, unit: 'g' }]),
+    })
+    await db.Recipe.create({
+      id: uuidv4(), title: 'Chicken Salad', description: '轻食沙拉', category: 'western',
+      cookTime: 15, userId: USER_B_ID,
+      ingredients: JSON.stringify([{ name: 'chicken breast', amount: 200, unit: 'g' }]),
+    })
+    await db.Recipe.create({
+      id: uuidv4(), title: '番茄炒蛋', description: '家常菜', category: 'chinese',
+      cookTime: 10, userId: USER_A_ID,
+      ingredients: JSON.stringify([{ name: '番茄', amount: 2, unit: '个' }, { name: '鸡蛋', amount: 3, unit: '个' }]),
+    })
+  })
+
+  // AC-1: q 过滤生效
+  test('q=红烧 应返回标题/描述/食材中含"红烧"的食谱，total < 全部', async () => {
+    const allRes = await request(app).get('/api/recipes')
+    const qRes = await request(app).get('/api/recipes').query({ q: '红烧' })
+
+    expect(qRes.status).toBe(200)
+    expect(qRes.body.code).toBe(0)
+    expect(qRes.body.data.total).toBeLessThan(allRes.body.data.total)
+    expect(qRes.body.data.total).toBeGreaterThan(0)
+  })
+
+  // AC-3: q 缺失兼容
+  test('不传 q 应返回全部食谱', async () => {
+    const res = await request(app).get('/api/recipes')
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.total).toBe(5)
+  })
+
+  // AC-4: q 空字符串兼容
+  test('q 为空字符串应返回全部食谱', async () => {
+    const res = await request(app).get('/api/recipes?q=')
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.total).toBe(5)
+  })
+
+  // AC-5: 无结果不报错
+  test('q=xyzabc123 无匹配应返回 total=0, code=0', async () => {
+    const res = await request(app).get('/api/recipes?q=xyzabc123')
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+    expect(res.body.data.total).toBe(0)
+    expect(res.body.data.list).toEqual([])
+  })
+
+  // AC-6: 英文匹配正常
+  test('q=chicken 应匹配英文标题/描述/食材', async () => {
+    const res = await request(app).get('/api/recipes?q=chicken')
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.total).toBeGreaterThan(0)
+  })
+
+  // AC-7: XSS 防御
+  test('q 含 script 标签不应报错不 XSS', async () => {
+    const res = await request(app).get('/api/recipes?q=<script>alert(1)</script>')
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+    // 确保响应体中不包含未转义的 script 标签
+    const body = JSON.stringify(res.body)
+    expect(body).not.toContain('<script>')
+  })
+
+  // AC-14: SQL 注入安全
+  test('q 含 SQL 注入字符串不应影响数据库', async () => {
+    const res = await request(app).get("/api/recipes?q='; DROP TABLE recipes;--")
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+    // 注入后数据库仍然正常
+    const allRes = await request(app).get('/api/recipes')
+    expect(allRes.body.data.total).toBe(5)
+  })
+
+  // AC-8: q + category AND 共存
+  test('q=红烧&category=chinese 应 AND 共存', async () => {
+    const res = await request(app).get('/api/recipes').query({ q: '红烧', category: 'chinese' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.total).toBeGreaterThan(0)
+    res.body.data.list.forEach(r => expect(r.category).toBe('chinese'))
+  })
+
+  // AC-15: userId + q 共存
+  test('q=红烧&userId=xxx 应 userId 过滤 + q 过滤并存', async () => {
+    const res = await request(app).get('/api/recipes').query({ q: '红烧', userId: USER_A_ID })
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.total).toBeGreaterThan(0)
+    res.body.data.list.forEach(r => expect(r.userId).toBe(USER_A_ID))
+  })
+
+  // q 为数组类型防御
+  test('q 为数组类型不应 TypeError', async () => {
+    const res = await request(app).get('/api/recipes').query({ q: ['红烧', '鸡'] })
+
+    expect(res.status).toBe(200)
+    expect(res.body.code).toBe(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
 // GET /api/recipes/search — 搜索
 // ─────────────────────────────────────────────────────────────────
 describe('GET /api/recipes/search — 搜索食谱', () => {
