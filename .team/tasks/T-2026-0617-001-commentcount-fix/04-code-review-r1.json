@@ -1,0 +1,54 @@
+{
+  "task": "T-2026-0617-001-commentcount-fix",
+  "round": "r1",
+  "reviewer": "reviewer",
+  "commit_reviewed": "be685d6",
+  "verdict": "PASS_WITH_SUGGESTIONS",
+  "score": 7.8,
+  "findings": [
+    {
+      "severity": "SUGGEST",
+      "file": "backend/routes/recipes.js",
+      "line": 2145,
+      "issue": "N+1 COUNT 查询：当 data.commentCount === 0 时，每次 GET /:id 都会执行 Comment.count，即使实际评论数也为 0。对于大量无评论的食谱，这会产生大量不必要的 COUNT 查询（如 1000 个无评论食谱各被访问一次 = 1000 次 COUNT）。",
+      "fix": "在 safety net 前加一层廉价存在性检查：先用 Comment.findOne({ where: { recipeId: id }, attributes: ['id'] }) 判断是否有评论；只有存在时才执行 Comment.count + backfill。这样无评论的食谱只需一次 LIMIT 1 查询，避免全表 COUNT。"
+    },
+    {
+      "severity": "SUGGEST",
+      "file": "frontend/src/pages/RecipeDetailPage.tsx",
+      "line": 851,
+      "issue": "新引入硬编码中文文本 '暂无评分'，现有代码中已存在大量硬编码中文（如 '条评论'、'人份'），虽不构成 BLOCKER，但增加了未来 i18n 抽离的技术债。",
+      "fix": "后续统一迭代中建议将所有 detail-meta 标签文本收拢到常量映射表（如 src/i18n/zh.ts 的 RECIPE_META_LABELS），本次 scope 内可不改动。"
+    },
+    {
+      "severity": "SUGGEST",
+      "file": "frontend/src/pages/RecipeDetailPage.tsx",
+      "line": 851,
+      "issue": "avgRating null 兜底只在 RecipeDetailPage 修复，列表页 / 卡片组件（如 RecipeCard、搜索结果项）中 avgRating 为 null 时仍可能渲染为空白。",
+      "fix": "超出本次 scope（implementation-r1.md 已明确 scope 控制），建议在下一迭代统一处理列表/卡片的 avgRating 兜底，保持全站一致。"
+    },
+    {
+      "severity": "INFO",
+      "file": "backend/routes/recipes.js",
+      "line": 2152,
+      "issue": "setImmediate 异步回填使用了 count 时刻的 actualCount 闭包，若在此期间新增/删除评论，materialized 字段可能被写入过期值（race condition）。",
+      "fix": "当前为 best-effort safety net，且 API 响应已使用实时 count 值，不影响前端展示。如需强一致性，可将 backfill 改为同步执行（在 res.json 之前 await update），或改用 DB 原生表达式计算 count。"
+    },
+    {
+      "severity": "INFO",
+      "file": "backend/routes/recipes.js",
+      "line": 2145,
+      "issue": "setImmediate 回调内部的 try/catch 已覆盖 Recipe.update 失败场景，不会导致 unhandled rejection 或进程崩溃。",
+      "fix": "无需修改，当前错误处理已足够。"
+    }
+  ],
+  "ac_coverage": {
+    "AC-1.1": "met",
+    "AC-1.2": "met",
+    "AC-1.3": "met",
+    "AC-2.1": "miss",
+    "AC-2.2": "miss",
+    "AC-2.3": "met"
+  },
+  "summary": "commit be685d6 正确实现了 commentCount safety net 和前端 fallback，AC-1.1/1.2/1.3 均满足。字段命名一致（全栈 commentCount，无 commentsCount/comment_count 变体）。backend try/catch 完备，GET 不会因 Comment.count 失败而崩溃；setImmediate 异步回填不依赖 HTTP 连接，不会导致 connection 关闭写库失败。主要建议：N+1 COUNT 查询值得优化（SUGGEST），以及 '暂无评分' 等硬编码文本后续统一 i18n（SUGGEST）。无 BLOCKER。"
+}
