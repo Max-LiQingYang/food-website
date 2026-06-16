@@ -946,8 +946,17 @@ body.dark .rhm-history__retry-btn { color: var(--color-warning); }
 body.dark .rhm-privacy { color: var(--color-text-secondary); }
 body.dark .rhm-privacy__switch { background: var(--color-border); }
 body.dark .rhm-privacy__switch--on { background: var(--color-primary); }
-body.dark .rhm-privacy__switch-knob { background: #f0f0f0; }
+body.dark .rhm-privacy__switch-knob { background: var(--color-text, #e0e0ee); }
 body.dark .rhm-empty__title { color: var(--color-text); }
+
+/* T-2026-0616-006 · AC-4 暗色 audit 补块 */
+body.dark .rhm-radar__tooltip-label {
+  color: var(--color-text);
+}
+
+body.dark .rhm-radar__tooltip-value {
+  color: var(--color-text-secondary);
+}
 body.dark .rhm-empty__desc { color: var(--color-text-secondary); }
 body.dark .rhm-empty__cta--secondary { color: var(--color-primary); border-color: var(--color-primary); }
 body.dark .rhm-error { color: var(--color-warning); }

@@ -131,3 +131,18 @@ body.dark .activity-heatmap__legend {
 body.dark .heatmap-loading {
   color: var(--color-text-muted, #686880);
 }
+
+/* T-2026-0616-006 · AC-3 暗色收口补块 */
+body.dark .activity-heatmap__tooltip {
+  background: var(--color-card, #1e1e32);
+  color: var(--color-text, #e0e0ee);
+  border: 1px solid var(--color-border, #2e2e48);
+}
+
+body.dark .activity-heatmap__cell:hover {
+  outline: 1px solid var(--color-primary, #e8663e);
+}
+
+body.dark .activity-heatmap__legend-swatch {
+  border: 1px solid var(--color-border, #2e2e48);
+}

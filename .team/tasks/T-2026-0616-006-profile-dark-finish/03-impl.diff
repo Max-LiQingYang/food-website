@@ -1,0 +1,132 @@
+ .../AchievementsPanel/AchievementsPanel.css        | 43 ++++++++++++++++++++++
+ frontend/src/components/ActivityHeatmap.css        | 15 ++++++++
+ .../RatingHistoryModule/RatingHistoryModule.css    | 11 +++++-
+ .../src/components/StatsCharts/StatsCharts.css     | 14 +++++++
+ 4 files changed, 82 insertions(+), 1 deletion(-)
+
+=== FULL DIFF (4 files) ===
+diff --git a/frontend/src/components/AchievementsPanel/AchievementsPanel.css b/frontend/src/components/AchievementsPanel/AchievementsPanel.css
+index 3eb4eaa..3b7dd07 100644
+--- a/frontend/src/components/AchievementsPanel/AchievementsPanel.css
++++ b/frontend/src/components/AchievementsPanel/AchievementsPanel.css
+@@ -218,6 +218,49 @@ body.dark .achievement-grid__item--unlocked {
+   animation: shimmer 1.6s infinite;
+ }
+ 
++/* T-2026-0616-006 · AC-1 暗色收口补块 */
++body.dark .achievements-panel__title {
++  color: var(--color-text);
++}
++
++body.dark .achievements-panel__highlight {
++  color: var(--color-primary);
++}
++
++body.dark .achievement-pill {
++  border-color: var(--color-border);
++  color: var(--color-text-secondary);
++}
++
++body.dark .achievement-pill:hover {
++  border-color: var(--color-primary);
++}
++
++body.dark .achievement-pill--active {
++  color: var(--pill-color, var(--color-primary));
++  border-color: var(--pill-color, var(--color-primary));
++}
++
++body.dark .achievement-grid__name {
++  color: var(--color-text);
++}
++
++body.dark .achievement-grid__progress-bar {
++  background: var(--color-border);
++}
++
++body.dark .achievement-grid__progress-fill {
++  background: var(--color-primary);
++}
++
++body.dark .achievement-grid__empty {
++  color: var(--color-text-muted);
++}
++
++body.dark .progress-ring__text {
++  color: var(--color-text);
++}
++
+ /* -- Reduced motion -- */
+ @media (prefers-reduced-motion: reduce) {
+   .achievement-grid__item,
+diff --git a/frontend/src/components/ActivityHeatmap.css b/frontend/src/components/ActivityHeatmap.css
+index ed82a3c..1dafc41 100644
+--- a/frontend/src/components/ActivityHeatmap.css
++++ b/frontend/src/components/ActivityHeatmap.css
+@@ -131,3 +131,18 @@ body.dark .activity-heatmap__legend {
+ body.dark .heatmap-loading {
+   color: var(--color-text-muted, #686880);
+ }
++
++/* T-2026-0616-006 · AC-3 暗色收口补块 */
++body.dark .activity-heatmap__tooltip {
++  background: var(--color-card, #1e1e32);
++  color: var(--color-text, #e0e0ee);
++  border: 1px solid var(--color-border, #2e2e48);
++}
++
++body.dark .activity-heatmap__cell:hover {
++  outline: 1px solid var(--color-primary, #e8663e);
++}
++
++body.dark .activity-heatmap__legend-swatch {
++  border: 1px solid var(--color-border, #2e2e48);
++}
+diff --git a/frontend/src/components/RatingHistoryModule/RatingHistoryModule.css b/frontend/src/components/RatingHistoryModule/RatingHistoryModule.css
+index 98b257d..cd52251 100644
+--- a/frontend/src/components/RatingHistoryModule/RatingHistoryModule.css
++++ b/frontend/src/components/RatingHistoryModule/RatingHistoryModule.css
+@@ -946,8 +946,17 @@ body.dark .rhm-history__retry-btn { color: var(--color-warning); }
+ body.dark .rhm-privacy { color: var(--color-text-secondary); }
+ body.dark .rhm-privacy__switch { background: var(--color-border); }
+ body.dark .rhm-privacy__switch--on { background: var(--color-primary); }
+-body.dark .rhm-privacy__switch-knob { background: #f0f0f0; }
++body.dark .rhm-privacy__switch-knob { background: var(--color-text, #e0e0ee); }
+ body.dark .rhm-empty__title { color: var(--color-text); }
++
++/* T-2026-0616-006 · AC-4 暗色 audit 补块 */
++body.dark .rhm-radar__tooltip-label {
++  color: var(--color-text);
++}
++
++body.dark .rhm-radar__tooltip-value {
++  color: var(--color-text-secondary);
++}
+ body.dark .rhm-empty__desc { color: var(--color-text-secondary); }
+ body.dark .rhm-empty__cta--secondary { color: var(--color-primary); border-color: var(--color-primary); }
+ body.dark .rhm-error { color: var(--color-warning); }
+diff --git a/frontend/src/components/StatsCharts/StatsCharts.css b/frontend/src/components/StatsCharts/StatsCharts.css
+index b44344f..2dc8c02 100644
+--- a/frontend/src/components/StatsCharts/StatsCharts.css
++++ b/frontend/src/components/StatsCharts/StatsCharts.css
+@@ -157,6 +157,20 @@ body.dark .stats-charts__empty {
+   color: var(--color-text-muted);
+ }
+ 
++/* T-2026-0616-006 · AC-2 暗色收口补块 */
++body.dark .stats-charts__range-btn--active {
++  background: var(--color-primary);
++  color: #fff;
++}
++
++body.dark .stats-charts__tabs {
++  border-bottom-color: var(--color-border);
++}
++
++body.dark .stats-charts__skeleton-bar {
++  background: linear-gradient(90deg, var(--color-skeleton-from) 25%, var(--color-skeleton-to) 50%, var(--color-skeleton-from) 75%);
++}
++
+ /* ── 焦点可见样式 (iter#135 P0 a11y) ── */
+ .stats-charts__range-btn:focus-visible {
+   outline: 2px solid var(--color-primary);

@@ -157,6 +157,20 @@ body.dark .stats-charts__empty {
   color: var(--color-text-muted);
 }
 
+/* T-2026-0616-006 · AC-2 暗色收口补块 */
+body.dark .stats-charts__range-btn--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+body.dark .stats-charts__tabs {
+  border-bottom-color: var(--color-border);
+}
+
+body.dark .stats-charts__skeleton-bar {
+  background: linear-gradient(90deg, var(--color-skeleton-from) 25%, var(--color-skeleton-to) 50%, var(--color-skeleton-from) 75%);
+}
+
 /* ── 焦点可见样式 (iter#135 P0 a11y) ── */
 .stats-charts__range-btn:focus-visible {
   outline: 2px solid var(--color-primary);

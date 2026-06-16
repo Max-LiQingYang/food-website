@@ -218,6 +218,49 @@ body.dark .achievement-grid__item--unlocked {
   animation: shimmer 1.6s infinite;
 }
 
+/* T-2026-0616-006 · AC-1 暗色收口补块 */
+body.dark .achievements-panel__title {
+  color: var(--color-text);
+}
+
+body.dark .achievements-panel__highlight {
+  color: var(--color-primary);
+}
+
+body.dark .achievement-pill {
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+body.dark .achievement-pill:hover {
+  border-color: var(--color-primary);
+}
+
+body.dark .achievement-pill--active {
+  color: var(--pill-color, var(--color-primary));
+  border-color: var(--pill-color, var(--color-primary));
+}
+
+body.dark .achievement-grid__name {
+  color: var(--color-text);
+}
+
+body.dark .achievement-grid__progress-bar {
+  background: var(--color-border);
+}
+
+body.dark .achievement-grid__progress-fill {
+  background: var(--color-primary);
+}
+
+body.dark .achievement-grid__empty {
+  color: var(--color-text-muted);
+}
+
+body.dark .progress-ring__text {
+  color: var(--color-text);
+}
+
 /* -- Reduced motion -- */
 @media (prefers-reduced-motion: reduce) {
   .achievement-grid__item,
