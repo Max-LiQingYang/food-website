@@ -476,8 +476,9 @@ export default function UserProfilePage() {
 
   return (
     <div className="profile-page">
-      {/* Header */}
+      {/* Header (P-1: hero 渐变 + 段位徽章) */}
       <div className="profile-header">
+        <div className="profile-header__hero" aria-hidden="true" />
         <div className="profile-avatar-wrapper">
           {profile.avatar ? (
             <img src={profile.avatar} alt={displayName} className="profile-avatar-img" />
@@ -492,35 +493,43 @@ export default function UserProfilePage() {
         </div>
         <h1 className="profile-name">{displayName}</h1>
         {profile.nickname && <p className="profile-username">@{profile.username}</p>}
+        {authorLevel && (
+          <span
+            className={`profile-level-chip ${authorLevel.isMaxLevel ? 'profile-level-chip--max' : ''}`}
+            title={authorLevel.isMaxLevel ? '已达满级' : `Lv.${authorLevel.level} ${authorLevel.title}`}
+          >
+            {authorLevel.icon} Lv.{authorLevel.level} {authorLevel.title}
+          </span>
+        )}
         <p className="profile-joined">
           加入于 {new Date(profile.createdAt).toLocaleDateString('zh-CN')}
         </p>
       </div>
 
-      {/* Stats Cards with CountUp */}
+      {/* Stats Cards with CountUp (P-2: 食谱为主项，其余 4 个为次级) */}
       {stats && (
         <div className="profile-stats">
-          <div className="profile-stats__card">
+          <div className="profile-stats__card profile-stats__card--primary">
             <span className="profile-stats__icon">📝</span>
             <span className="profile-stats__value"><AnimatedNumber value={stats.recipeCount ?? 0} /></span>
             <span className="profile-stats__label">食谱</span>
           </div>
-          <div className="profile-stats__card">
+          <div className="profile-stats__card profile-stats__card--secondary">
             <span className="profile-stats__icon">❤️</span>
             <span className="profile-stats__value"><AnimatedNumber value={stats.favoriteCount ?? 0} /></span>
             <span className="profile-stats__label">收藏</span>
           </div>
-          <div className="profile-stats__card">
+          <div className="profile-stats__card profile-stats__card--secondary">
             <span className="profile-stats__icon">💬</span>
             <span className="profile-stats__value"><AnimatedNumber value={stats.commentCount ?? 0} /></span>
             <span className="profile-stats__label">评论</span>
           </div>
-          <div className="profile-stats__card">
+          <div className="profile-stats__card profile-stats__card--secondary">
             <span className="profile-stats__icon">👥</span>
             <span className="profile-stats__value"><AnimatedNumber value={stats.followersCount ?? 0} /></span>
             <span className="profile-stats__label">粉丝</span>
           </div>
-          <div className="profile-stats__card">
+          <div className="profile-stats__card profile-stats__card--secondary">
             <span className="profile-stats__icon">➡️</span>
             <span className="profile-stats__value"><AnimatedNumber value={stats.followingCount ?? 0} /></span>
             <span className="profile-stats__label">关注</span>
@@ -528,11 +537,11 @@ export default function UserProfilePage() {
         </div>
       )}
 
-      {/* 作者等级 */}
+      {/* 作者等级 (P-3: 满级特殊视觉 — 金色边框 + 🏆 渐变进度条) */}
       {authorLevel && (
-        <div className="profile-level">
+        <div className={`profile-level ${authorLevel.isMaxLevel ? 'profile-level--max' : ''}`}>
           <div className="profile-level__header">
-            <span className="profile-level__icon">{authorLevel.icon}</span>
+            <span className="profile-level__icon">{authorLevel.isMaxLevel ? '🏆' : authorLevel.icon}</span>
             <span className="profile-level__title">Lv.{authorLevel.level} {authorLevel.title}</span>
             {!authorLevel.isMaxLevel && (
               <span className="profile-level__next">→ Lv.{authorLevel.level + 1} {authorLevel.nextTitle}</span>
@@ -550,54 +559,82 @@ export default function UserProfilePage() {
             </div>
           )}
           {authorLevel.isMaxLevel && (
-            <div className="profile-level__score">🏆 已达满级！</div>
+            <div className="profile-level__score profile-level__score--max">🏆 已达满级！</div>
           )}
         </div>
       )}
 
-      {/* 成就徽章区 */}
+      {/* 成就徽章区 (P-4: 强化引导 — 显示 N 待解锁 + 主色按钮样式) */}
       {achievements.length > 0 && (
-        <div className="profile-achievements">
-          <div className="profile-achievements__header">
-            <h4 className="profile-achievements__title">🏅 成就</h4>
-            <div className="profile-achievements__stats">
-              已解锁 {achievements.filter(a => a.unlocked).length} / {achievements.length}
+        <section className="profile-section">
+          <div className="profile-section__header">
+            <h3 className="profile-section__title">🏅 成就</h3>
+          </div>
+          <div className="profile-achievements">
+            <div className="profile-achievements__header">
+              <div className="profile-achievements__stats">
+                已解锁 {achievements.filter(a => a.unlocked).length} / {achievements.length}
+                {achievements.filter(a => !a.unlocked).length > 0 && (
+                  <span className="profile-achievements__locked-hint">
+                    {' '}· 还有 {achievements.filter(a => !a.unlocked).length} 个待解锁
+                  </span>
+                )}
+              </div>
+              <Link to="/achievements" className="profile-achievements__view-all">
+                查看全部成就 ›
+              </Link>
             </div>
-            <Link to="/achievements" className="profile-achievements__view-all">
-              查看全部成就 ›
-            </Link>
+            <div className="profile-achievements__list">
+              {achievements.filter(a => a.unlocked).slice(0, 12).map(ach => (
+                <AchievementBadge
+                  key={ach.type}
+                  achievement={ach}
+                  onClick={() => setSelectedAchievement(ach)}
+                />
+              ))}
+            </div>
           </div>
-          <div className="profile-achievements__list">
-            {achievements.filter(a => a.unlocked).slice(0, 12).map(ach => (
-              <AchievementBadge
-                key={ach.type}
-                achievement={ach}
-                onClick={() => setSelectedAchievement(ach)}
-              />
-            ))}
-          </div>
-        </div>
+        </section>
       )}
 
-      {/* 烹饪热力图 */}
-      {id && <ActivityHeatmap userId={id} />}
-
-      {/* 迭代 #134：用户个人评分历史可视化模块（UI §1.1 插入点：ActivityHeatmap 之后、AchievementsPanel 之前） */}
+      {/* 烹饪热力图 (P-6: 包装为 section 加 h3 + 视觉分隔) */}
       {id && (
-        <RatingHistoryModule
-          userId={id}
-          isOwner={isOwnProfile}
-          privacyPublic={ratingsHistoryPublic}
-          isLoggedIn={isLoggedIn}
-          onPrivacyChange={(next) => setRatingsHistoryPublic(next)}
-        />
+        <section className="profile-section">
+          <div className="profile-section__header">
+            <h3 className="profile-section__title">🔥 烹饪足迹</h3>
+          </div>
+          <ActivityHeatmap userId={id} />
+        </section>
+      )}
+
+      {/* 迭代 #134：用户个人评分历史可视化模块 */}
+      {id && (
+        <section className="profile-section">
+          <RatingHistoryModule
+            userId={id}
+            isOwner={isOwnProfile}
+            privacyPublic={ratingsHistoryPublic}
+            isLoggedIn={isLoggedIn}
+            onPrivacyChange={(next) => setRatingsHistoryPublic(next)}
+          />
+        </section>
       )}
 
       {/* 成就面板 */}
-      <AchievementsPanel userId={id!} />
+      <section className="profile-section">
+        <div className="profile-section__header">
+          <h3 className="profile-section__title">🎖️ 成就面板</h3>
+        </div>
+        <AchievementsPanel userId={id!} />
+      </section>
 
       {/* 数据趋势图 */}
-      <StatsCharts userId={id!} />
+      <section className="profile-section">
+        <div className="profile-section__header">
+          <h3 className="profile-section__title">📊 数据趋势</h3>
+        </div>
+        <StatsCharts userId={id!} />
+      </section>
 
       {/* Tabs */}
       <div className="profile-tabs">
