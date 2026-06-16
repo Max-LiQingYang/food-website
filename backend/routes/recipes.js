@@ -2141,6 +2141,27 @@ router.get('/:id', async (req, res) => {
 
     const data = recipe.toJSON()
 
+    // Safety net: recompute commentCount if materialized field is out of sync
+    if (data.commentCount === 0) {
+      try {
+        const { Comment } = require('../models')
+        const actualCount = await Comment.count({ where: { recipeId: id } })
+        if (actualCount > 0) {
+          data.commentCount = actualCount
+          // Backfill materialized field asynchronously (non-blocking)
+          setImmediate(async () => {
+            try {
+              await Recipe.update({ commentCount: actualCount }, { where: { id } })
+            } catch (e) {
+              console.warn('[commentCount backfill] failed:', e.message)
+            }
+          })
+        }
+      } catch (cErr) {
+        console.warn('[commentCount recompute] failed:', cErr.message)
+      }
+    }
+
     // JSON 字段已由 Sequelize getter 自动解析，只需 null 兜底
     if (!Array.isArray(data.ingredients)) {
       data.ingredients = []

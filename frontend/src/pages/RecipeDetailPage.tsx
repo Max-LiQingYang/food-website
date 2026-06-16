@@ -836,6 +836,12 @@ export default function RecipeDetailPage() {
                 {recipe.qualityLabel}
               </span>
             )}
+            {/* 评论数标签 */}
+            {recipe.commentCount != null && recipe.commentCount > 0 && (
+              <span className="detail-tag detail-tag--comments">
+                💬 {recipe.commentCount} 条评论
+              </span>
+            )}
             {/* 评分标签 */}
             {recipe.avgRating != null && recipe.avgRating > 0 ? (
               <span className="detail-tag detail-tag--rating">
@@ -845,11 +851,11 @@ export default function RecipeDetailPage() {
                   <span> ({recipe.ratingCount}人评分)</span>
                 )}
               </span>
-            ) : recipe.avgRating != null ? (
+            ) : (
               <span className="detail-tag detail-tag--unrated">
                 ⭐ 暂无评分
               </span>
-            ) : null}
+            )}
             {/* 浏览量标签 */}
             {recipe.viewCount != null && recipe.viewCount > 0 && (
               <span className="detail-tag detail-tag--views">
