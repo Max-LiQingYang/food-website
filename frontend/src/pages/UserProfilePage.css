@@ -676,6 +676,12 @@ body.dark .profile-tab--active {
   .profile-stats__card {
     padding: 12px 4px;
   }
+  .profile-stats__card--primary {
+    padding: 14px 6px;
+  }
+  .profile-stats__card--primary .profile-stats__value {
+    font-size: 24px;
+  }
   .profile-stats__value {
     font-size: 18px;
   }
@@ -683,9 +689,27 @@ body.dark .profile-tab--active {
     grid-template-columns: 1fr;
     gap: 14px;
   }
+  /* ST-2c: tabs 移动端横向滚动 (P-5) */
+  .profile-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .profile-tabs::-webkit-scrollbar {
+    height: 2px;
+  }
+  .profile-tabs::-webkit-scrollbar-thumb {
+    background: var(--color-border, #e8e0d8);
+    border-radius: 1px;
+  }
+  body.dark .profile-tabs::-webkit-scrollbar-thumb {
+    background: var(--color-border-dark, #333);
+  }
   .profile-tab {
     padding: 10px 14px;
     font-size: 14px;
+    flex-shrink: 0;
   }
 }
 /* ── 数字滚动动画 ── */
