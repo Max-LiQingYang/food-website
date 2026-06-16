@@ -1,0 +1,535 @@
+diff --git a/frontend/src/pages/UserProfilePage.css b/frontend/src/pages/UserProfilePage.css
+index 381f3fc..6ef5e77 100644
+--- a/frontend/src/pages/UserProfilePage.css
++++ b/frontend/src/pages/UserProfilePage.css
+@@ -6,12 +6,77 @@
+   animation: fadeIn 0.3s ease;
+ }
+ 
+-/* ── 个人信息区 ── */
++/* ── 个人信息区 (P-1: hero 渐变 + 段位 chip) ── */
+ .profile-header {
++  position: relative;
+   text-align: center;
+-  padding: 32px 0 24px;
++  padding: 56px 16px 28px;
+   border-bottom: 1px solid var(--color-border, #e8e0d8);
+   margin-bottom: 24px;
++  overflow: hidden;
++  border-radius: var(--radius-lg, 16px);
++  background: var(--color-card, #fff);
++  border: 1px solid var(--color-border, #e8e0d8);
++  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,0.04));
++}
++
++.profile-header__hero {
++  position: absolute;
++  top: 0;
++  left: 0;
++  right: 0;
++  height: 96px;
++  background: linear-gradient(135deg, var(--color-primary-light, #f5a885) 0%, var(--color-primary, #e8663e) 100%);
++  opacity: 0.18;
++  pointer-events: none;
++  z-index: 0;
++}
++
++body.dark .profile-header {
++  background: var(--color-card-dark, #2a2a2a);
++  border-color: var(--color-border-dark, #333);
++  border-bottom-color: var(--color-border-dark, #333);
++}
++
++body.dark .profile-header__hero {
++  opacity: 0.22;
++}
++
++.profile-avatar-wrapper,
++.profile-name,
++.profile-username,
++.profile-joined,
++.profile-level-chip {
++  position: relative;
++  z-index: 1;
++}
++
++.profile-level-chip {
++  display: inline-flex;
++  align-items: center;
++  gap: 4px;
++  margin: 6px 0 8px;
++  padding: 4px 12px;
++  font-size: 12px;
++  font-weight: 500;
++  color: var(--color-primary, #e8663e);
++  background: var(--color-primary-bg, rgba(232, 102, 62, 0.08));
++  border: 1px solid var(--color-primary, #e8663e);
++  border-radius: 99px;
++  line-height: 1.4;
++}
++
++.profile-level-chip--max {
++  color: #fff;
++  background: linear-gradient(135deg, #f5a623 0%, #f7c948 100%);
++  border-color: #f5a623;
++  font-weight: 600;
++}
++
++body.dark .profile-level-chip {
++  color: var(--color-primary, #ff8a5e);
++  background: rgba(232, 102, 62, 0.16);
++  border-color: var(--color-primary, #e8663e);
+ }
+ 
+ .profile-avatar-wrapper {
+@@ -87,7 +152,7 @@ body.dark .profile-avatar-edit {
+   margin: 0;
+ }
+ 
+-/* ── 统计卡片 ── */
++/* ── 统计卡片 (P-2: 食谱为主项，其余 4 个为次级) ── */
+ .profile-stats {
+   display: flex;
+   gap: 12px;
+@@ -112,6 +177,68 @@ body.dark .profile-avatar-edit {
+   box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+ }
+ 
++/* P-2: 食谱卡片为主项 - 1.4x 字号 + 700 weight + 主色边框 */
++.profile-stats__card--primary {
++  padding: 20px 10px;
++  background: linear-gradient(135deg, var(--color-primary-bg, rgba(232, 102, 62, 0.06)) 0%, var(--color-card, #fff) 100%);
++  border-color: var(--color-primary, #e8663e);
++  border-width: 2px;
++}
++
++.profile-stats__card--primary .profile-stats__value {
++  font-size: 32px;
++  font-weight: 700;
++}
++
++.profile-stats__card--primary .profile-stats__icon {
++  font-size: 28px;
++}
++
++.profile-stats__card--primary .profile-stats__label {
++  font-size: 13px;
++  font-weight: 500;
++  color: var(--color-primary, #e8663e);
++}
++
++/* P-2: 其余 4 个为次级 - 字号 1x + 500 weight + 次色文字 */
++.profile-stats__card--secondary .profile-stats__value {
++  font-size: 22px;
++  font-weight: 600;
++  color: var(--color-text, #333);
++}
++
++.profile-stats__card--secondary .profile-stats__icon {
++  font-size: 22px;
++  margin-bottom: 4px;
++}
++
++.profile-stats__card--secondary .profile-stats__label {
++  font-size: 12px;
++  color: var(--color-text-secondary, #888);
++}
++
++body.dark .profile-stats__card--primary {
++  background: linear-gradient(135deg, rgba(232, 102, 62, 0.12) 0%, var(--color-card-dark, #2a2a2a) 100%);
++  border-color: var(--color-primary, #e8663e);
++}
++
++body.dark .profile-stats__card--primary .profile-stats__value {
++  color: var(--color-primary, #ff8a5e);
++}
++
++body.dark .profile-stats__card--primary .profile-stats__label {
++  color: var(--color-primary, #ff8a5e);
++}
++
++body.dark .profile-stats__card--secondary .profile-stats__value {
++  color: var(--color-text-dark, #eee);
++}
++
++body.dark .profile-stats__card--secondary .profile-stats__label {
++  color: var(--color-text-secondary-dark, #aaa);
++}
++
++/* 保留基础 icon / value / label 样式（向后兼容） */
+ .profile-stats__icon {
+   font-size: 24px;
+   margin-bottom: 6px;
+@@ -549,6 +676,12 @@ body.dark .profile-tab--active {
+   .profile-stats__card {
+     padding: 12px 4px;
+   }
++  .profile-stats__card--primary {
++    padding: 14px 6px;
++  }
++  .profile-stats__card--primary .profile-stats__value {
++    font-size: 24px;
++  }
+   .profile-stats__value {
+     font-size: 18px;
+   }
+@@ -556,9 +689,27 @@ body.dark .profile-tab--active {
+     grid-template-columns: 1fr;
+     gap: 14px;
+   }
++  /* ST-2c: tabs 移动端横向滚动 (P-5) */
++  .profile-tabs {
++    overflow-x: auto;
++    flex-wrap: nowrap;
++    -webkit-overflow-scrolling: touch;
++    scrollbar-width: thin;
++  }
++  .profile-tabs::-webkit-scrollbar {
++    height: 2px;
++  }
++  .profile-tabs::-webkit-scrollbar-thumb {
++    background: var(--color-border, #e8e0d8);
++    border-radius: 1px;
++  }
++  body.dark .profile-tabs::-webkit-scrollbar-thumb {
++    background: var(--color-border-dark, #333);
++  }
+   .profile-tab {
+     padding: 10px 14px;
+     font-size: 14px;
++    flex-shrink: 0;
+   }
+ }
+ /* ── 数字滚动动画 ── */
+@@ -566,9 +717,9 @@ body.dark .profile-tab--active {
+   display: inline-block;
+ }
+ 
+-/* ── 成就徽章区 ── */
++/* ── 成就徽章区 (P-4: 强化引导) ── */
+ .profile-achievements {
+-  margin-bottom: 20px;
++  margin-bottom: 4px;
+ }
+ 
+ .profile-achievements__header {
+@@ -591,17 +742,31 @@ body.dark .profile-tab--active {
+   color: var(--color-text-secondary, #888);
+ }
+ 
++.profile-achievements__locked-hint {
++  color: var(--color-text-muted, #aaa);
++  font-size: 12px;
++}
++
+ .profile-achievements__view-all {
+-  font-size: 13px;
+-  color: var(--color-primary, #e8663e);
++  font-size: 14px;
++  color: #fff;
++  background: var(--color-primary, #e8663e);
+   text-decoration: none;
+   margin-left: auto;
+   font-weight: 500;
+-  transition: color 0.2s;
++  padding: 6px 14px;
++  border-radius: 99px;
++  transition: background 0.2s, transform 0.2s;
+ }
+ 
+ .profile-achievements__view-all:hover {
+-  text-decoration: underline;
++  background: var(--color-primary-dark, #d4542e);
++  transform: translateX(2px);
++}
++
++body.dark .profile-achievements__view-all:hover {
++  background: var(--color-primary-light, #f5a885);
++  color: var(--color-card-dark, #2a2a2a);
+ }
+ 
+ body.dark .profile-achievements__title {
+@@ -750,7 +915,7 @@ body.dark .achievement-badge__name {
+   font-size: 11px;
+ }
+ 
+-/* ═══ 迭代#46: 作者等级 ═══ */
++/* ═══ 迭代#46: 作者等级 (P-3: 满级特殊视觉) ═══ */
+ .profile-level {
+   margin: 20px 0;
+   padding: 16px 20px;
+@@ -759,6 +924,41 @@ body.dark .achievement-badge__name {
+   border: 1px solid var(--color-border, #eee);
+ }
+ 
++.profile-level--max {
++  background: linear-gradient(135deg, #fff8e1 0%, #fffbf0 50%, #fff8e1 100%);
++  border: 2px solid #f5a623;
++  position: relative;
++  overflow: hidden;
++}
++
++.profile-level--max::before {
++  content: '';
++  position: absolute;
++  top: 0;
++  left: -100%;
++  width: 100%;
++  height: 100%;
++  background: linear-gradient(90deg, transparent 0%, rgba(245, 166, 35, 0.15) 50%, transparent 100%);
++  animation: levelMaxShimmer 3s ease-in-out infinite;
++  pointer-events: none;
++}
++
++@keyframes levelMaxShimmer {
++  0% { left: -100%; }
++  100% { left: 200%; }
++}
++
++body.dark .profile-level--max {
++  background: linear-gradient(135deg, #3a2a1a 0%, #2a2a1f 50%, #3a2a1a 100%);
++  border-color: #f5a623;
++}
++
++.profile-level__score--max {
++  color: #f5a623;
++  font-weight: 600;
++  font-size: 14px;
++}
++
+ .profile-level__header {
+   display: flex;
+   align-items: center;
+@@ -809,6 +1009,37 @@ body.dark .profile-level__bar-container {
+   background: var(--color-bg-dark, #1a1a1a);
+ }
+ 
++/* ═══ P-6 / P-8: section 视觉分隔 + 标题规范 ═══ */
++.profile-section {
++  margin-top: 32px;
++  margin-bottom: 32px;
++}
++
++.profile-section__header {
++  display: flex;
++  align-items: center;
++  gap: 8px;
++  margin-bottom: 16px;
++  padding-bottom: 12px;
++  border-bottom: 1px solid var(--color-border, #e8e0d8);
++}
++
++.profile-section__title {
++  font-size: 18px;
++  font-weight: 600;
++  color: var(--color-text, #333);
++  margin: 0;
++  letter-spacing: 0.02em;
++}
++
++body.dark .profile-section__header {
++  border-bottom-color: var(--color-border-dark, #333);
++}
++
++body.dark .profile-section__title {
++  color: var(--color-text-dark, #eee);
++}
++
+ /* ── 收藏备注预览（用户主页收藏 Tab 卡片底部） ── */
+ .profile-recipe-wrapper {
+   position: relative;
+diff --git a/frontend/src/pages/UserProfilePage.tsx b/frontend/src/pages/UserProfilePage.tsx
+index 34daf2a..ed837c8 100644
+--- a/frontend/src/pages/UserProfilePage.tsx
++++ b/frontend/src/pages/UserProfilePage.tsx
+@@ -476,8 +476,9 @@ export default function UserProfilePage() {
+ 
+   return (
+     <div className="profile-page">
+-      {/* Header */}
++      {/* Header (P-1: hero 渐变 + 段位徽章) */}
+       <div className="profile-header">
++        <div className="profile-header__hero" aria-hidden="true" />
+         <div className="profile-avatar-wrapper">
+           {profile.avatar ? (
+             <img src={profile.avatar} alt={displayName} className="profile-avatar-img" />
+@@ -492,35 +493,43 @@ export default function UserProfilePage() {
+         </div>
+         <h1 className="profile-name">{displayName}</h1>
+         {profile.nickname && <p className="profile-username">@{profile.username}</p>}
++        {authorLevel && (
++          <span
++            className={`profile-level-chip ${authorLevel.isMaxLevel ? 'profile-level-chip--max' : ''}`}
++            title={authorLevel.isMaxLevel ? '已达满级' : `Lv.${authorLevel.level} ${authorLevel.title}`}
++          >
++            {authorLevel.icon} Lv.{authorLevel.level} {authorLevel.title}
++          </span>
++        )}
+         <p className="profile-joined">
+           加入于 {new Date(profile.createdAt).toLocaleDateString('zh-CN')}
+         </p>
+       </div>
+ 
+-      {/* Stats Cards with CountUp */}
++      {/* Stats Cards with CountUp (P-2: 食谱为主项，其余 4 个为次级) */}
+       {stats && (
+         <div className="profile-stats">
+-          <div className="profile-stats__card">
++          <div className="profile-stats__card profile-stats__card--primary">
+             <span className="profile-stats__icon">📝</span>
+             <span className="profile-stats__value"><AnimatedNumber value={stats.recipeCount ?? 0} /></span>
+             <span className="profile-stats__label">食谱</span>
+           </div>
+-          <div className="profile-stats__card">
++          <div className="profile-stats__card profile-stats__card--secondary">
+             <span className="profile-stats__icon">❤️</span>
+             <span className="profile-stats__value"><AnimatedNumber value={stats.favoriteCount ?? 0} /></span>
+             <span className="profile-stats__label">收藏</span>
+           </div>
+-          <div className="profile-stats__card">
++          <div className="profile-stats__card profile-stats__card--secondary">
+             <span className="profile-stats__icon">💬</span>
+             <span className="profile-stats__value"><AnimatedNumber value={stats.commentCount ?? 0} /></span>
+             <span className="profile-stats__label">评论</span>
+           </div>
+-          <div className="profile-stats__card">
++          <div className="profile-stats__card profile-stats__card--secondary">
+             <span className="profile-stats__icon">👥</span>
+             <span className="profile-stats__value"><AnimatedNumber value={stats.followersCount ?? 0} /></span>
+             <span className="profile-stats__label">粉丝</span>
+           </div>
+-          <div className="profile-stats__card">
++          <div className="profile-stats__card profile-stats__card--secondary">
+             <span className="profile-stats__icon">➡️</span>
+             <span className="profile-stats__value"><AnimatedNumber value={stats.followingCount ?? 0} /></span>
+             <span className="profile-stats__label">关注</span>
+@@ -528,11 +537,11 @@ export default function UserProfilePage() {
+         </div>
+       )}
+ 
+-      {/* 作者等级 */}
++      {/* 作者等级 (P-3: 满级特殊视觉 — 金色边框 + 🏆 渐变进度条) */}
+       {authorLevel && (
+-        <div className="profile-level">
++        <div className={`profile-level ${authorLevel.isMaxLevel ? 'profile-level--max' : ''}`}>
+           <div className="profile-level__header">
+-            <span className="profile-level__icon">{authorLevel.icon}</span>
++            <span className="profile-level__icon">{authorLevel.isMaxLevel ? '🏆' : authorLevel.icon}</span>
+             <span className="profile-level__title">Lv.{authorLevel.level} {authorLevel.title}</span>
+             {!authorLevel.isMaxLevel && (
+               <span className="profile-level__next">→ Lv.{authorLevel.level + 1} {authorLevel.nextTitle}</span>
+@@ -550,54 +559,82 @@ export default function UserProfilePage() {
+             </div>
+           )}
+           {authorLevel.isMaxLevel && (
+-            <div className="profile-level__score">🏆 已达满级！</div>
++            <div className="profile-level__score profile-level__score--max">🏆 已达满级！</div>
+           )}
+         </div>
+       )}
+ 
+-      {/* 成就徽章区 */}
++      {/* 成就徽章区 (P-4: 强化引导 — 显示 N 待解锁 + 主色按钮样式) */}
+       {achievements.length > 0 && (
+-        <div className="profile-achievements">
+-          <div className="profile-achievements__header">
+-            <h4 className="profile-achievements__title">🏅 成就</h4>
+-            <div className="profile-achievements__stats">
+-              已解锁 {achievements.filter(a => a.unlocked).length} / {achievements.length}
+-            </div>
+-            <Link to="/achievements" className="profile-achievements__view-all">
+-              查看全部成就 ›
+-            </Link>
++        <section className="profile-section">
++          <div className="profile-section__header">
++            <h3 className="profile-section__title">🏅 成就</h3>
+           </div>
+-          <div className="profile-achievements__list">
+-            {achievements.filter(a => a.unlocked).slice(0, 12).map(ach => (
+-              <AchievementBadge
+-                key={ach.type}
+-                achievement={ach}
+-                onClick={() => setSelectedAchievement(ach)}
+-              />
+-            ))}
++          <div className="profile-achievements">
++            <div className="profile-achievements__header">
++              <div className="profile-achievements__stats">
++                已解锁 {achievements.filter(a => a.unlocked).length} / {achievements.length}
++                {achievements.filter(a => !a.unlocked).length > 0 && (
++                  <span className="profile-achievements__locked-hint">
++                    {' '}· 还有 {achievements.filter(a => !a.unlocked).length} 个待解锁
++                  </span>
++                )}
++              </div>
++              <Link to="/achievements" className="profile-achievements__view-all">
++                查看全部成就 ›
++              </Link>
++            </div>
++            <div className="profile-achievements__list">
++              {achievements.filter(a => a.unlocked).slice(0, 12).map(ach => (
++                <AchievementBadge
++                  key={ach.type}
++                  achievement={ach}
++                  onClick={() => setSelectedAchievement(ach)}
++                />
++              ))}
++            </div>
+           </div>
+-        </div>
++        </section>
+       )}
+ 
+-      {/* 烹饪热力图 */}
+-      {id && <ActivityHeatmap userId={id} />}
++      {/* 烹饪热力图 (P-6: 包装为 section 加 h3 + 视觉分隔) */}
++      {id && (
++        <section className="profile-section">
++          <div className="profile-section__header">
++            <h3 className="profile-section__title">🔥 烹饪足迹</h3>
++          </div>
++          <ActivityHeatmap userId={id} />
++        </section>
++      )}
+ 
+-      {/* 迭代 #134：用户个人评分历史可视化模块（UI §1.1 插入点：ActivityHeatmap 之后、AchievementsPanel 之前） */}
++      {/* 迭代 #134：用户个人评分历史可视化模块 */}
+       {id && (
+-        <RatingHistoryModule
+-          userId={id}
+-          isOwner={isOwnProfile}
+-          privacyPublic={ratingsHistoryPublic}
+-          isLoggedIn={isLoggedIn}
+-          onPrivacyChange={(next) => setRatingsHistoryPublic(next)}
+-        />
++        <section className="profile-section">
++          <RatingHistoryModule
++            userId={id}
++            isOwner={isOwnProfile}
++            privacyPublic={ratingsHistoryPublic}
++            isLoggedIn={isLoggedIn}
++            onPrivacyChange={(next) => setRatingsHistoryPublic(next)}
++          />
++        </section>
+       )}
+ 
+       {/* 成就面板 */}
+-      <AchievementsPanel userId={id!} />
++      <section className="profile-section">
++        <div className="profile-section__header">
++          <h3 className="profile-section__title">🎖️ 成就面板</h3>
++        </div>
++        <AchievementsPanel userId={id!} />
++      </section>
+ 
+       {/* 数据趋势图 */}
+-      <StatsCharts userId={id!} />
++      <section className="profile-section">
++        <div className="profile-section__header">
++          <h3 className="profile-section__title">📊 数据趋势</h3>
++        </div>
++        <StatsCharts userId={id!} />
++      </section>
+ 
+       {/* Tabs */}
+       <div className="profile-tabs">
