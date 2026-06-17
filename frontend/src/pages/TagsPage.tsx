@@ -4,6 +4,7 @@ import TagCloud from '../components/TagCloud'
 import { logTag } from '../api'
 import './TagsPage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 /* ── Category config ── */
 interface CategoryConfig {
@@ -139,7 +140,7 @@ const TagsPage: React.FC = () => {
     setSelectedTag(tag)
     // scroll to related section after state updates
     setTimeout(() => {
-      document.getElementById('related-tags-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      document.getElementById('related-tags-section')?.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'start' })
     }, 100)
   }, [])
 

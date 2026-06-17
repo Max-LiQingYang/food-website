@@ -10,6 +10,7 @@ import Pagination from './Pagination'
 import DimensionRadar from './DimensionRadar'
 import type { Comment, CommentStats } from '../api'
 import './CommentSection.css'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 interface Props {
   recipeId: string
@@ -415,7 +416,7 @@ export default function CommentSection({ recipeId, onRatingUpdate }: Props) {
           description={stats && stats.ratedCount > 0 ? '分享你的烹饪体验吧！' : '来做第一个品尝并评分的人吧！'}
           variant="compact"
           ctaText={isAuthenticated ? '✍️ 写第一条评论' : undefined}
-          ctaOnClick={isAuthenticated ? () => formRef.current?.scrollIntoView({ behavior: 'smooth' }) : undefined}
+          ctaOnClick={isAuthenticated ? () => formRef.current?.scrollIntoView({ behavior: getMotionSafeScrollBehavior() }) : undefined}
         />
       ) : (
         <div className="comment-list">

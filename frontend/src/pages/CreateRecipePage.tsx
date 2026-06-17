@@ -7,6 +7,7 @@ import ImportFromUrl from '../components/ImportFromUrl'
 import type { CreateRecipeData, ImportedRecipe } from '../api'
 import './CreateRecipePage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 const CATEGORIES = [
   { value: 'chinese', label: '中餐' },
@@ -357,7 +358,7 @@ export default function CreateRecipePage() {
     }
     // 导入成功后滚动到表单区域
     setTimeout(() => {
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      formRef.current?.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'start' })
     }, 500)
     toast.success('已导入食谱数据，请确认后发布')
   }

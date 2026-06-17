@@ -6,6 +6,7 @@ import Pagination from '../components/Pagination'
 import FavoriteNoteModal from '../components/FavoriteNoteModal'
 import './FavoriteList.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 // ── 类型定义 ──────────────────────────────────────────────────────────────────
 
@@ -97,7 +98,7 @@ export default function FavoriteList() {
   function goPage(page: number) {
     fetchList(page)
     setTimeout(() => {
-      listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      listTopRef.current?.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'start' })
     }, 0)
   }
 

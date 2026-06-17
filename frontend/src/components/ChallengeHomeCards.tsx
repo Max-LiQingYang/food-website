@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { getChallenges } from '../api'
 import type { Challenge } from '../api'
 import './ChallengeHomeCards.css'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 export default function ChallengeHomeCards() {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ export default function ChallengeHomeCards() {
   const scroll = (dir: 'left' | 'right') => {
     if (!scrollRef.current) return
     const amount = scrollRef.current.clientWidth * 0.7
-    scrollRef.current.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' })
+    scrollRef.current.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: getMotionSafeScrollBehavior() })
   }
 
   if (loading) return null

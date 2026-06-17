@@ -15,6 +15,7 @@ import { useDeferredMount } from '../hooks/useDeferredMount'
 import type { Recipe } from '../api'
 import './HomePage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 const CATEGORIES = ['全部', '中餐', '西餐', '甜点', '日韩', '其他'] as const
 const PAGE_SIZE = 12
@@ -161,7 +162,7 @@ export default function HomePage() {
 
   const goPage = (newPage: number) => {
     setPage(newPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() })
   }
 
   // Build featured recipes for hero from fetched data

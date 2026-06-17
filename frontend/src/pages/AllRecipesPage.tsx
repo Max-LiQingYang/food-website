@@ -10,6 +10,7 @@ import type { FilterState } from '../components/FilterPanel'
 import type { Recipe } from '../api'
 import './AllRecipesPage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 const PAGE_SIZE = 24
 const VIEW_KEY = 'allRecipesViewMode'
@@ -97,7 +98,7 @@ export default function AllRecipesPage() {
   }, [])
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() })
   }
 
   // ── 视图切换 ──
@@ -188,7 +189,7 @@ export default function AllRecipesPage() {
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages || newPage === page) return
     setPage(newPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() })
   }
 
   const handleReset = () => {

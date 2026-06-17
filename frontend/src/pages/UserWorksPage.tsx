@@ -7,6 +7,7 @@ import type { WorkItem } from '../api'
 import { usePageTitle } from '../hooks/useSEO'
 import './UserWorksPage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 const PAGE_SIZE = 12
 
@@ -126,7 +127,7 @@ export default function UserWorksPage() {
             ))}
           </div>
 
-          <Pagination current={page} total={totalPages} onChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />
+          <Pagination current={page} total={totalPages} onChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() }) }} />
         </>
       )}
 

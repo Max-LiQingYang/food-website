@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 export default function BackToTop() {
   const [visible, setVisible] = useState(false)
 
@@ -11,7 +12,7 @@ export default function BackToTop() {
   }, [])
 
   function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() })
   }
 
   return (

@@ -33,6 +33,7 @@ import CookingTimeBar from '../components/CookingTimeBar'
 import './RecipeDetailPage.css'
 import '../components/PrintView.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 /** 分类中文映射 */
 const CATEGORY_NAMES: Record<string, string> = {
@@ -248,7 +249,7 @@ export default function RecipeDetailPage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() })
 
   // ── 章节导航锚点
   const [activeSection, setActiveSection] = useState<string>('section-ingredients')
@@ -279,7 +280,7 @@ export default function RecipeDetailPage() {
     if (el) {
       const offset = 110
       const top = el.getBoundingClientRect().top + window.scrollY - offset
-      window.scrollTo({ top, behavior: 'smooth' })
+      window.scrollTo({ top, behavior: getMotionSafeScrollBehavior() })
     }
   }
 
@@ -555,12 +556,12 @@ export default function RecipeDetailPage() {
         const newIdx = focusedStepIndex - 1
         setFocusedStepIndex(newIdx)
         setActiveStep(stepList[newIdx].stepNumber)
-        document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)?.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'center' })
       } else if (diff < 0 && focusedStepIndex < stepList.length - 1) {
         const newIdx = focusedStepIndex + 1
         setFocusedStepIndex(newIdx)
         setActiveStep(stepList[newIdx].stepNumber)
-        document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)?.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'center' })
       }
     },
     [stepSwipeStart, stepList, focusedStepIndex]
@@ -572,7 +573,7 @@ export default function RecipeDetailPage() {
       setFocusedStepIndex(newIdx)
       setActiveStep(stepList[newIdx].stepNumber)
       const el = document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (el) el.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'center' })
     }
   }, [focusedStepIndex, stepList])
 
@@ -582,7 +583,7 @@ export default function RecipeDetailPage() {
       setFocusedStepIndex(newIdx)
       setActiveStep(stepList[newIdx].stepNumber)
       const el = document.querySelector(`.detail-step:nth-child(${newIdx + 1})`)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (el) el.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'center' })
     }
   }, [focusedStepIndex, stepList])
 

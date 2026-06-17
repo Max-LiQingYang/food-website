@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import './RecommendPage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 /* ─── 常量 ─── */
 
@@ -96,7 +97,7 @@ export default function RecommendPage() {
         setHistory(loadHistory())
         // 滚动到结果区
         setTimeout(
-          () => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+          () => resultRef.current?.scrollIntoView({ behavior: getMotionSafeScrollBehavior(), block: 'start' }),
           100
         )
       } catch {
