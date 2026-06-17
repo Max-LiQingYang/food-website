@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import type { RatingDimensionAverages } from '../../api'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { DIMENSION_LABELS, DIMENSION_ICONS } from './RatingHistoryModule'
 
 interface RatingDimensionAveragesProps {
@@ -13,11 +14,17 @@ const DIMS: Array<keyof typeof DIMENSION_LABELS> = ['taste', 'difficulty', 'pres
 function CountUp({ value, duration = 500 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0)
   const [started, setStarted] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
   const startTimeRef = useRef<number | null>(null)
   const rafRef = useRef<number | null>(null)
   const ref = useRef<HTMLSpanElement | null>(null)
 
   useEffect(() => {
+    if (prefersReducedMotion || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      setStarted(true)
+      return
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started) {
@@ -29,10 +36,14 @@ function CountUp({ value, duration = 500 }: { value: number; duration?: number }
     )
     if (ref.current) observer.observe(ref.current)
     return () => observer.disconnect()
-  }, [started])
+  }, [started, prefersReducedMotion])
 
   useEffect(() => {
     if (!started) return
+    if (prefersReducedMotion || duration <= 0) {
+      setDisplay(Math.round(value * 10) / 10)
+      return
+    }
     startTimeRef.current = null
     const step = (timestamp: number) => {
       if (startTimeRef.current === null) startTimeRef.current = timestamp
@@ -44,7 +55,7 @@ function CountUp({ value, duration = 500 }: { value: number; duration?: number }
     }
     rafRef.current = requestAnimationFrame(step)
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [value, duration, started])
+  }, [value, duration, started, prefersReducedMotion])
 
   return <span ref={ref}>{display > 0 ? display.toFixed(1) : '—'}</span>
 }

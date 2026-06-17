@@ -32,6 +32,8 @@ import PageSkeleton from '../components/PageSkeleton'
 import StatsCharts from '../components/StatsCharts/StatsCharts'
 import AchievementsPanel from '../components/AchievementsPanel/AchievementsPanel'
 import RatingHistoryModule from '../components/RatingHistoryModule'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
+import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 type TabType = 'recipes' | 'favorites' | 'collections' | 'cooked'
 type TabTypeWithHistory = TabType | 'history' | 'forks'
@@ -40,11 +42,17 @@ type TabTypeWithHistory = TabType | 'history' | 'forks'
 function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0)
   const [started, setStarted] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
   const startTimeRef = useRef<number | null>(null)
   const rafRef = useRef<number | null>(null)
   const ref = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
+    if (prefersReducedMotion || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      setStarted(true)
+      return
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started) {
@@ -56,10 +64,14 @@ function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: 
     )
     if (ref.current) observer.observe(ref.current)
     return () => observer.disconnect()
-  }, [started])
+  }, [started, prefersReducedMotion])
 
   useEffect(() => {
     if (!started) return
+    if (prefersReducedMotion || duration <= 0) {
+      setDisplay(value)
+      return
+    }
     startTimeRef.current = null
     const step = (timestamp: number) => {
       if (startTimeRef.current === null) startTimeRef.current = timestamp
@@ -71,7 +83,7 @@ function AnimatedNumber({ value, duration = 1200 }: { value: number; duration?: 
     }
     rafRef.current = requestAnimationFrame(step)
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [value, duration, started])
+  }, [value, duration, started, prefersReducedMotion])
 
   return <span ref={ref} className="countup-value">{display}</span>
 }
@@ -771,7 +783,7 @@ export default function UserProfilePage() {
                     </div>
                   ))}
                 </div>
-                <Pagination current={cur.page} total={Math.ceil(cur.total / pageSize)} onChange={(p) => { cur.setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />
+                <Pagination current={cur.page} total={Math.ceil(cur.total / pageSize)} onChange={(p) => { cur.setPage(p); window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() }) }} />
               </>
             )}
           </>

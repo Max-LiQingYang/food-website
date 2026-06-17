@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 /**
  * 自动为页面上所有 .list-stagger 容器注册 IntersectionObserver
@@ -6,9 +7,11 @@ import { useEffect } from 'react';
  * 视口外时移除（重新进入会重放）
  */
 export function useStaggerReveal() {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   useEffect(() => {
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      // 降级：直接显示
+    if (typeof window === 'undefined' || prefersReducedMotion || !('IntersectionObserver' in window)) {
+      // 降级：直接显示，不注册 observer。
       document.querySelectorAll('.list-stagger').forEach((el) => el.classList.add('is-visible'));
       return;
     }
@@ -43,5 +46,5 @@ export function useStaggerReveal() {
       observer.disconnect();
       mo.disconnect();
     };
-  }, []);
+  }, [prefersReducedMotion]);
 }

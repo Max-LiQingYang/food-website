@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
 /**
  * 数字滚动动画 Hook — 从 0 动画到目标值
@@ -9,6 +10,7 @@ import { useState, useEffect, useRef } from 'react'
 export function useCountUp(target: number, duration = 1200, startOnMount = true) {
   const [value, setValue] = useState(0)
   const [started, setStarted] = useState(startOnMount)
+  const prefersReducedMotion = usePrefersReducedMotion()
   const startTimeRef = useRef<number | null>(null)
   const rafRef = useRef<number | null>(null)
 
@@ -16,6 +18,10 @@ export function useCountUp(target: number, duration = 1200, startOnMount = true)
 
   useEffect(() => {
     if (!started) return
+    if (prefersReducedMotion || duration <= 0) {
+      setValue(target)
+      return
+    }
     startTimeRef.current = null
 
     const step = (timestamp: number) => {
@@ -38,7 +44,7 @@ export function useCountUp(target: number, duration = 1200, startOnMount = true)
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [target, duration, started])
+  }, [target, duration, started, prefersReducedMotion])
 
   return { value, start }
 }

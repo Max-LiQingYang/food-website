@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getProxiedImageUrl } from '../utils/imageProxy'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import './HeroSection.css'
 
 interface HeroRecipe {
@@ -65,6 +66,7 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
   const items = recipes && recipes.length >= 3 ? recipes : FALLBACK_RECIPES
   const [current, setCurrent] = useState(0)
   const [imagesLoaded, setImagesLoaded] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
   const navigate = useNavigate()
 
   const seasonCfg = useMemo(() => getSeasonConfig(), [])
@@ -78,9 +80,10 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
   }, [items.length])
 
   useEffect(() => {
+    if (prefersReducedMotion) return
     const timer = setInterval(goNext, 5000)
     return () => clearInterval(timer)
-  }, [goNext])
+  }, [goNext, prefersReducedMotion])
 
   // Preload first image with high priority; rest lazy via <img loading="lazy">
   // R-5:首张 eager + fetchPriority=high 是 LCP 元素候选;其余 lazy 节省首屏外带宽
@@ -122,7 +125,7 @@ export default function HeroSection({ recipes }: HeroSectionProps) {
         style={{
           transform: `translateX(-${current * 100}%)`,
           opacity: imagesLoaded ? 1 : 0,
-          transition: imagesLoaded ? 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.4s ease' : 'none',
+          transition: imagesLoaded && !prefersReducedMotion ? 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.4s ease' : 'none',
         }}
       >
         {items.map((recipe, idx) => (
