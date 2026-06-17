@@ -15,8 +15,21 @@
   border: 1px solid var(--color-border, #eee);
 }
 
+/* ── T-2026-0617-002 S1: 暗色暖黑+暗色星级+移动端元同行 ── */
 body.dark .recipe-card {
-  border-color: var(--color-border-dark, #333);
+  background: #1a1410;
+  border-color: #3a2e26;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+body.dark .recipe-card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  border-color: var(--color-primary-light, #f0946e);
+}
+body.dark .recipe-card__stat--rating {
+  color: #FFB84D !important;
+}
+.recipe-card__stat--rating {
+  font-size: 14px;
 }
 
 @keyframes cardFadeIn {
@@ -801,4 +814,54 @@ body.dark .recipe-card__content-badge--video   { background: rgba(232, 102, 62, 
 @media (max-width: 480px) {
   .recipe-card__content-badge { padding: 4px 8px; font-size: 11px; }
   .recipe-card__content-badges { gap: 4px; }
+}
+
+/* ===================================================================
+   T-2026-0617-002 · 视觉深化追加 (S1 移动端 / S2 收藏3态)
+   - S1 移动端元同行（360px 不溢出）
+   - S2 .recipe-card__fav hover/active/favorited 三态
+   - class-scoped 颜色变量 / 零 :root 污染
+   =================================================================== */
+@media (max-width: 480px) {
+  .recipe-card__meta { flex-direction: row; flex-wrap: nowrap; overflow: hidden; }
+  .recipe-card__title { -webkit-line-clamp: 2; }
+}
+
+.recipe-card__fav {
+  transition:
+    opacity var(--transition-normal, 0.3s ease),
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.recipe-card__fav:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+.recipe-card__fav:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 1);
+}
+
+.recipe-card__fav.is-favorited {
+  background: rgba(232, 102, 62, 0.12);
+  animation: heartBounce 0.45s ease;
+}
+
+body.dark .recipe-card__fav {
+  background: rgba(40, 30, 24, 0.85);
+  color: #f5e8dc;
+}
+
+body.dark .recipe-card__fav:hover {
+  background: rgba(60, 45, 36, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark .recipe-card__fav.is-favorited {
+  background: rgba(232, 102, 62, 0.22);
+  color: #f0946e;
 }

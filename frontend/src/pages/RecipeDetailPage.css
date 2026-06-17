@@ -2712,3 +2712,94 @@ body.dark .section-nav__btn--active {
    End iter124
    =================================================================== */
 
+/* ===================================================================
+   T-2026-0617-002 · RecipeDetailPage 视觉深化 (S3 三件套 + S4 暗色)
+   - S3 .detail-meta__triad 并排（rating→comment→view），权重左>右
+   - S4 暗色背景/标题/收藏 + 1440 max-width + 收藏 transition ≤300ms
+   - class-scoped / 零 :root 污染 / 复用现有 heartBounce keyframe
+   =================================================================== */
+.detail-meta__triad {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detail-meta__triad > .detail-tag {
+  font-size: 13px;
+  padding: 5px 14px;
+  font-weight: 500;
+}
+
+/* 权重左>右：评分最深（信任锚） > 评论（互动） > 浏览（热度，13→12 略轻） */
+.detail-meta__triad > .detail-tag--rating {
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.detail-meta__triad > .detail-tag--comments {
+  background: #fff3ed;
+  color: #c94f2a;
+  font-weight: 500;
+}
+
+.detail-meta__triad > .detail-tag--views {
+  background: #e0f2fe;
+  color: #075985;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ── S4 暗色覆盖 ── */
+body.dark .detail-meta__triad > .detail-tag--rating {
+  background: #3a2a1a;
+  color: #fde68a;
+}
+
+body.dark .detail-meta__triad > .detail-tag--comments {
+  background: #2e1a14;
+  color: #f5a885;
+}
+
+body.dark .detail-meta__triad > .detail-tag--views {
+  background: #0c2a3e;
+  color: #bae6fd;
+}
+
+body.dark .detail-header,
+body.dark .detail-cover {
+  background: #1a1410;
+}
+
+body.dark .detail-title {
+  color: #f5e8dc;
+}
+
+/* 收藏按钮 transition ≤300ms（覆盖默认 all 0.25s 已合规） */
+.detail-fav-btn,
+.fab-btn {
+  transition: all 0.25s ease;
+}
+
+/* 1440+ max-width 居中 */
+@media (min-width: 1440px) {
+  .detail-container {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* 360px / iPhone SE：三件套同行不折行，字号略缩 */
+@media (max-width: 480px) {
+  .detail-meta__triad {
+    flex-wrap: nowrap;
+    max-width: 100%;
+  }
+  .detail-meta__triad > .detail-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
+
