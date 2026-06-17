@@ -4,6 +4,7 @@ import App from './App'
 import { ToastProvider } from './context/ToastContext'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { MotionPreferenceProvider } from './context/MotionPreferenceContext'
 
 // ── Service Worker 注册 ──
 if ('serviceWorker' in navigator) {
@@ -33,11 +34,13 @@ const root = createRoot(document.getElementById('root')!)
 root.render(
   <React.StrictMode>
     <ThemeProvider>
-      <AuthProvider>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
-      </AuthProvider>
+      <MotionPreferenceProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </AuthProvider>
+      </MotionPreferenceProvider>
     </ThemeProvider>
   </React.StrictMode>
 )
