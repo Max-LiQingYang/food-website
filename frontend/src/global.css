@@ -1,7 +1,13 @@
 /* 全局基础样式（从 App.vue 迁移）
    iter#135: 补全 --color-bg-secondary light 模式定义 (P0-2) */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 * {
@@ -70,11 +76,12 @@ body {
   --hero-gradient-soft: linear-gradient(180deg, rgba(202, 240, 248, 0) 0%, rgba(0, 119, 182, 0.08) 100%);
   --ease-out-soft: cubic-bezier(0.21, 1.02, 0.73, 1);
   --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-fast: 0.2s;
-  --duration-normal: 0.3s;
-  --duration-slow: 0.5s;
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
+  --motion-duration-scale: 1;
+  --duration-fast: calc(var(--motion-duration-scale) * 0.2s);
+  --duration-normal: calc(var(--motion-duration-scale) * 0.3s);
+  --duration-slow: calc(var(--motion-duration-scale) * 0.5s);
+  --transition-fast: calc(var(--motion-duration-scale) * 0.2s) ease;
+  --transition-normal: calc(var(--motion-duration-scale) * 0.3s) ease;
   --font-size-title: 24px;
   --font-size-body: 16px;
   --font-size-small: 14px;
@@ -302,22 +309,24 @@ body.dark .qclaw-toast__close:hover { background: rgba(255, 255, 255, 0.35); }
 }
 
 /* ── View Transitions API ── */
-@supports (view-transition-name: none) {
-  .home-page, .search-page, .detail-page, .login-page, .favorite-list,
-  .create-page, .recommend-page, .user-profile-page, .collections-page,
-  .coll-detail-page, .shop-page {
-    view-transition-name: page-content;
+@media (prefers-reduced-motion: no-preference) {
+  @supports (view-transition-name: none) {
+    .home-page, .search-page, .detail-page, .login-page, .favorite-list,
+    .create-page, .recommend-page, .user-profile-page, .collections-page,
+    .coll-detail-page, .shop-page {
+      view-transition-name: page-content;
+    }
+    ::view-transition-old(page-content) {
+      animation: 0.15s cubic-bezier(0.4, 0, 1, 1) both vt-fade-out, 0.15s cubic-bezier(0.4, 0, 1, 1) both vt-slide-up-out;
+    }
+    ::view-transition-new(page-content) {
+      animation: 0.25s cubic-bezier(0, 0, 0.2, 1) both vt-fade-in, 0.25s cubic-bezier(0, 0, 0.2, 1) both vt-slide-down-in;
+    }
+    @keyframes vt-fade-out    { to { opacity: 0; } }
+    @keyframes vt-fade-in     { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes vt-slide-up-out { to { transform: translateY(-8px); } }
+    @keyframes vt-slide-down-in { from { transform: translateY(8px); } to { transform: translateY(0); } }
   }
-  ::view-transition-old(page-content) {
-    animation: 0.15s cubic-bezier(0.4, 0, 1, 1) both vt-fade-out, 0.15s cubic-bezier(0.4, 0, 1, 1) both vt-slide-up-out;
-  }
-  ::view-transition-new(page-content) {
-    animation: 0.25s cubic-bezier(0, 0, 0.2, 1) both vt-fade-in, 0.25s cubic-bezier(0, 0, 0.2, 1) both vt-slide-down-in;
-  }
-  @keyframes vt-fade-out    { to { opacity: 0; } }
-  @keyframes vt-fade-in     { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes vt-slide-up-out { to { transform: translateY(-8px); } }
-  @keyframes vt-slide-down-in { from { transform: translateY(8px); } to { transform: translateY(0); } }
 }
 
 /* ── 按钮涟漪 ── */
@@ -698,4 +707,19 @@ body.dark .hero-parallax__content { z-index: 2; }
 }
 @media (prefers-reduced-motion: reduce) {
   .home-hero__bubble, [class*="bubble"] { animation: none !important; }
+}
+
+/* 第三方与遗留动效兜底：项目内优先使用 --motion-duration-scale，!important 仅用于不可控样式覆盖。 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

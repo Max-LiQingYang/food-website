@@ -402,8 +402,14 @@
   overflow-x: auto;
   gap: 8px;
   padding: 4px 0 8px;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .related-tags-list {
+    scroll-behavior: smooth;
+  }
 }
 
 .related-tags-list::-webkit-scrollbar {

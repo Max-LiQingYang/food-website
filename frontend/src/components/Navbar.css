@@ -65,9 +65,9 @@
   text-decoration: none;
   border-radius: var(--radius-md, 10px);
   transition:
-    background 0.2s,
-    color 0.2s,
-    outline-color 0.2s;
+    background var(--duration-fast),
+    color var(--duration-fast),
+    outline-color var(--duration-fast);
   display: inline-block;
   min-height: 44px;
   line-height: 32px;
@@ -112,7 +112,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color var(--duration-fast);
   min-height: 44px;
   display: flex;
   align-items: center;
@@ -144,7 +144,7 @@
   font-size: 14px;
   cursor: pointer;
   border: none;
-  transition: all 0.2s;
+  transition: all var(--duration-fast);
   min-height: 34px;
   display: inline-flex;
   align-items: center;
@@ -195,7 +195,7 @@
   border-radius: 50%;
   font-size: 18px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--duration-fast);
   min-height: 36px;
 }
 
@@ -224,7 +224,7 @@
   min-width: 44px;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: background-color var(--duration-fast);
 }
 
 .navbar__hamburger:hover {
@@ -242,7 +242,7 @@
   height: 2.5px;
   background: var(--color-text, #333);
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
   transform-origin: center;
 }
 
@@ -374,7 +374,7 @@
   border: none;
   border-radius: var(--radius-md, 10px);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background var(--duration-fast), color var(--duration-fast);
   white-space: nowrap;
   min-height: 44px;
   line-height: 32px;
@@ -402,7 +402,7 @@
   box-shadow: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.12));
   padding: 8px;
   z-index: 200;
-  animation: navbar-dropdown-in 0.2s cubic-bezier(0.21, 1.02, 0.73, 1);
+  animation: navbar-dropdown-in var(--duration-fast) cubic-bezier(0.21, 1.02, 0.73, 1);
 }
 
 @keyframes navbar-dropdown-in {
@@ -423,7 +423,7 @@
   color: var(--color-text, #333);
   text-decoration: none;
   border-radius: var(--radius-md, 10px);
-  transition: background 0.15s, color 0.15s;
+  transition: background calc(var(--motion-duration-scale) * 0.15s), color calc(var(--motion-duration-scale) * 0.15s);
   min-height: 38px;
   line-height: 18px;
 }
