@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import NotificationBell from './NotificationBell'
 import './Navbar.css'
 
@@ -12,6 +12,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const moreRef = useRef<HTMLLIElement>(null)
+  const menuRef = useRef<HTMLUListElement>(null)
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
 
   const displayName = user?.nickname || user?.username || ''
 
@@ -20,7 +22,7 @@ export default function Navbar() {
     setMoreOpen(false)
   }
 
-  // Close "更多" dropdown on outside click
+  // 关闭"更多"下拉菜单（外部点击）
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
@@ -31,7 +33,69 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  // Primary links — always visible on desktop
+  // 汉堡菜单键盘可访问性
+  const handleMenuKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!menuOpen) return
+
+    // Esc 关闭菜单
+    if (e.key === 'Escape') {
+      setMenuOpen(false)
+      hamburgerRef.current?.focus()
+      return
+    }
+
+    // Tab 循环聚焦
+    if (e.key === 'Tab' && menuRef.current) {
+      const focusableElements = menuRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusableElements.length === 0) return
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault()
+        lastElement.focus()
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault()
+        firstElement.focus()
+      }
+    }
+  }, [menuOpen])
+
+  // 汉堡菜单打开/关闭时的焦点管理
+  useEffect(() => {
+    if (menuOpen) {
+      document.addEventListener('keydown', handleMenuKeyDown)
+      // 焦点移到菜单的第一个可聚焦元素
+      setTimeout(() => {
+        const firstFocusable = menuRef.current?.querySelector<HTMLElement>(
+          'a[href], button, [tabindex]:not([tabindex="-1"])'
+        )
+        firstFocusable?.focus()
+      }, 100)
+      // 禁止页面滚动
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.removeEventListener('keydown', handleMenuKeyDown)
+      // 恢复滚动
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleMenuKeyDown)
+      document.body.style.overflow = ''
+    }
+  }, [menuOpen, handleMenuKeyDown])
+
+  // 遮罩点击关闭菜单
+  const handleOverlayClick = () => {
+    setMenuOpen(false)
+    hamburgerRef.current?.focus()
+  }
+
+  // Primary links — 桌面端始终显示
   const primaryLinks = [
     { to: '/', label: '首页' },
     { to: '/recipes', label: '📋 全部食谱' },
@@ -40,7 +104,7 @@ export default function Navbar() {
     { to: '/favorites', label: '我的收藏' },
   ]
 
-  // Secondary links — shown in "更多" dropdown
+  // Secondary links — "更多"下拉菜单中显示
   const secondaryLinks = [
     { to: '/challenges', label: '🏆 挑战赛' },
     { to: '/tools', label: '🔪 工具库' },
@@ -64,9 +128,10 @@ export default function Navbar() {
         </Link>
 
         <button
+          ref={hamburgerRef}
           className={`navbar__hamburger ${menuOpen ? 'open' : ''}`}
           onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="菜单"
+          aria-label={menuOpen ? '关闭菜单' : '打开菜单'}
           aria-expanded={menuOpen}
           aria-controls="navbar-menu"
         >
@@ -75,21 +140,28 @@ export default function Navbar() {
           <span />
         </button>
 
-        {/* Desktop links */}
+        {/* 导航链接 */}
         <ul
+          ref={menuRef}
           className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}
           id="navbar-menu"
           role="menubar"
         >
           {primaryLinks.map(link => (
             <li key={link.to} role="none">
-              <Link to={link.to} className="navbar__link" onClick={handleNavClick} role="menuitem">
+              <Link
+                to={link.to}
+                className="navbar__link"
+                onClick={handleNavClick}
+                role="menuitem"
+                tabIndex={menuOpen ? 0 : -1}
+              >
                 {link.label}
               </Link>
             </li>
           ))}
 
-          {/* "更多" dropdown */}
+          {/* "更多"下拉菜单（仅桌面端） */}
           <li className="navbar__more" ref={moreRef} role="none">
             <button
               className={`navbar__more-btn ${moreOpen ? 'is-open' : ''}`}
@@ -128,7 +200,7 @@ export default function Navbar() {
             )}
           </li>
 
-          {/* Mobile-only: secondary links in hamburger menu */}
+          {/* 移动端：汉堡菜单中的二级链接 */}
           {menuOpen && (
             <li className="navbar__mobile-secondary" role="none">
               <div className="navbar__mobile-secondary-label">更多功能</div>
@@ -169,6 +241,7 @@ export default function Navbar() {
                 className="navbar__link navbar__link--create"
                 onClick={handleNavClick}
                 role="menuitem"
+                tabIndex={menuOpen ? 0 : -1}
               >
                 发布食谱
               </Link>
@@ -210,7 +283,14 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      {menuOpen && <div className="navbar__overlay" onClick={() => setMenuOpen(false)} role="presentation" />}
+      {menuOpen && (
+        <div
+          className="navbar__overlay"
+          onClick={handleOverlayClick}
+          role="presentation"
+          aria-hidden="true"
+        />
+      )}
     </nav>
   )
 }

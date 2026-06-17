@@ -19,6 +19,9 @@ body {
   --color-primary-light: #f0946e;
   --color-primary-dark: #c94f2a;
   --color-primary-bg: #fff3ed;
+  --color-accent-warm: #FFB84D;
+  --color-accent-warm-bg: rgba(255, 184, 77, 0.1);
+  --color-accent-warm-hover: rgba(255, 184, 77, 0.15);
   --color-accent: #ff8c42;
   --color-accent-light: #ffb380;
   --color-bg: #fdf8f4;
@@ -99,6 +102,9 @@ body.dark {
   --color-bg: #12121e;
   --color-bg-secondary: #1a1a2e;
   --color-card: #1e1e32;
+  --color-accent-warm: rgba(255, 184, 77, 0.9);
+  --color-accent-warm-bg: rgba(255, 184, 77, 0.15);
+  --color-card-warm: #1a1410;
   --color-text: #e0e0ee;
   --color-text-secondary: #9898b0;
   --color-text-muted: #686880;

@@ -11,8 +11,14 @@ export default function Footer() {
         <div className="footer__section">
           <h3 className="footer__brand">🍳 美食食谱</h3>
           <p className="footer__desc">
-            发现、收藏、分享你的美食创作。从家常小炒到精致甜点，汇聚万千风味。
+            发现、收藏、分享你的美食创作。从家常小炒到精致甜点，汇聚万千风味，让每一餐都充满惊喜。
           </p>
+          <div className="footer__social">
+            <a href="#" className="footer__social-link" aria-label="微博">📱</a>
+            <a href="#" className="footer__social-link" aria-label="微信">💬</a>
+            <a href="#" className="footer__social-link" aria-label="小红书">📖</a>
+            <a href="#" className="footer__social-link" aria-label="GitHub">🐙</a>
+          </div>
         </div>
 
         {/* Quick Links */}
@@ -33,6 +39,7 @@ export default function Footer() {
             <li><Link to="/search">搜索食谱</Link></li>
             <li><Link to="/tags">标签云</Link></li>
             <li><Link to="/ingredient-search">食材搜索</Link></li>
+            <li><Link to="/tools">厨房工具</Link></li>
           </ul>
         </div>
 
