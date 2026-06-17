@@ -1,0 +1,70 @@
+taskId: T-2026-0617-004-motion-preference
+title: prefers-reduced-motion 全站优雅降级（a11y 增强）
+type: ui-optimization
+direction: A
+priority: P2
+status: in_progress
+phase: review_gate_2
+owner: fullstack
+baseCommit: 9eaed49
+candidate: 005-TaskID-5
+chainId: LOOP-2026-0615-002
+chainRound: 4
+sop:
+  - 3    # PRD/story 编写
+  - 11   # a11y/可访问性评审
+  - 27   # CSS 动效降级规范
+  - 32   # 暗色模式兼容检查
+  - 36   # 跨页面一致性检查
+  - 43   # 浏览器动画 API 审计
+  - 44   # reduced-motion 媒体查询
+  - 45   # 终局复核（构建+多端点 curl）
+createdAt: 2026-06-17T05:12:00+08:00
+updatedAt: 2026-06-17T13:45:00+08:00
+verdict: pass
+outputPath: frontend@bd634ab
+phases:
+  story:
+    owner: product
+    status: done
+    spawnedAt: 2026-06-17T05:12:00+08:00
+    outputPath: 00-story.md
+    completedAt: 2026-06-17T05:16:00+08:00
+  architecture:
+    owner: architect
+    status: done
+    spawnedAt: 2026-06-17T05:16:30+08:00
+    outputPath: 10-architecture.md
+    completedAt: 2026-06-17T05:22:00+08:00
+  review_gate_1:
+    owner: reviewer
+    status: done
+    spawnedAt: 2026-06-17T05:25:00+08:00
+    outputPath: 20-review-gate-1.md
+    completedAt: 2026-06-17T05:26:00+08:00
+  implementation:
+    owner: fullstack
+    status: done
+    spawnedAt: 2026-06-17T05:30:00+08:00
+    completedAt: 2026-06-17T13:45:00+08:00
+    outputPath: frontend@bd634ab
+    commits:
+      - 230ce7c
+      - e779c69
+      - 85972d3
+      - 9505955
+      - bd634ab
+  review_gate_2:
+    owner: reviewer
+    status: pending
+  test_security:
+    owner: tester
+    status: pending
+  ops:
+    owner: devops
+    status: pending
+notes:
+  - P0-1 fixed: html/TagsPage scroll-behavior reduce fallback to auto, no-preference keeps smooth.
+  - P0-2 fixed: App.tsx focusin scrollIntoView uses motion-safe behavior.
+  - 7 revise suggestions covered in implementation; PR5 includes index.html preseed script and global important fallback note.
+  - Local validation: npm run build passed.
