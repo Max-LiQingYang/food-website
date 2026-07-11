@@ -33,7 +33,8 @@ module.exports = (sequelize, DataTypes) => {
       meals: {
         type: DataTypes.TEXT,
         defaultValue: '[]',
-        comment: 'JSON 数组: [{day:0-6, mealType, recipeId, recipeTitle, recipeImage}]'
+        comment: 'JSON 数组: [{day:0-6, mealType, recipeId, recipeTitle, recipeImage}]',
+        field: 'mealData'
       }
     },
     {
