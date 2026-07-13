@@ -1,14 +1,21 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   RecipeCardSkeleton — 01-design.md §3.4 骨架屏
+   统一使用 color-bg-surface 作为骨架色
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .recipe-card-skeleton {
-  background: var(--color-card, #fff);
-  border-radius: var(--radius-md, 10px);
+  background: var(--color-bg-elevated, var(--color-card, #fff));
+  border-radius: var(--surface-radius-card, 16px);
   overflow: hidden;
-  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0, 0, 0, 0.06));
+  box-shadow: var(--surface-elevation-1, 0 2px 8px rgba(0, 0, 0, 0.08));
   pointer-events: none;
+  border: 1px solid var(--color-border-subtle, #E0E0E0);
 }
 
 .rcs-cover {
   aspect-ratio: 4 / 3;
   border-radius: 0;
+  background: var(--color-bg-surface, #F5F5F5);
 }
 
 .rcs-body {
@@ -18,38 +25,44 @@
   gap: 10px;
 }
 
-/* ── 暗色模式 ── */
-
-body.dark .recipe-card-skeleton {
-  background: var(--color-card, #1e1e32);
+.rcs-body > * {
+  background: var(--color-bg-surface, #F5F5F5);
+  border-radius: 4px;
 }
 
-/* ── Shimmer 动画(参考 FeaturedSection.css:77-92,颜色用字面值,不动 token) ── */
-
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+/* ── 脉冲动效（reduced-motion 时禁用） ── */
+@keyframes skeleton-pulse {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 1.0; }
+  100% { opacity: 0.4; }
 }
 
 .rcs-cover,
 .rcs-body > * {
-  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
-
-body.dark .rcs-cover,
-body.dark .rcs-body > * {
-  background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
-  background-size: 200% 100%;
-}
-
-/* ── 可访问性:尊重用户的「减少动态效果」偏好 ── */
 
 @media (prefers-reduced-motion: reduce) {
   .rcs-cover,
   .rcs-body > * {
     animation: none;
-    background-size: 100% 100%;
+    opacity: 0.6;
   }
+}
+
+/* ── 暗色模式 ── */
+body.dark .recipe-card-skeleton {
+  background: var(--color-bg-elevated, #1E1E1E);
+}
+
+body.dark .rcs-cover,
+body.dark .rcs-body > * {
+  background: var(--color-bg-surface, #2A2A2A);
+}
+
+/* ── 低端设备：静态骨架 ── */
+body.low-end .rcs-cover,
+body.low-end .rcs-body > * {
+  animation: none;
+  opacity: 0.6;
 }

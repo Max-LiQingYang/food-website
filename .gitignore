@@ -66,3 +66,6 @@ backend/database.sqlite-journal
 
 # QClaw agent runtime artifacts
 .qclaw/
+.team/
+blackboard/
+test-results/

@@ -90,17 +90,15 @@ export default function DimensionRadar({
     )
   }
 
-  // 监听暗色模式（同时检测 body.dark class 和 documentElement data-theme 属性，向后兼容）
+  // 监听暗色模式（仅通过 body.dark class — §8 铁律）
   useEffect(() => {
     const check = () => {
       const bodyDark = document.body.classList.contains('dark')
-      const themeAttr = document.documentElement.getAttribute('data-theme') === 'dark'
-      setIsDark(bodyDark || themeAttr)
+      setIsDark(bodyDark)
     }
     check()
     const observer = new MutationObserver(check)
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     return () => observer.disconnect()
   }, [])
 

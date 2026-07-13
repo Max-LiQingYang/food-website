@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { generateColorFromString } from '../utils/imageColor'
 import { getProxiedImageUrl } from '../utils/imageProxy'
+import ImageFailPlaceholder from './ImageFailPlaceholder'
 
 interface ImagePlaceholderProps {
   src: string
@@ -45,27 +46,14 @@ export default function ImagePlaceholder({
 
   if (error) {
     return (
-      <div
+      <ImageFailPlaceholder
+        title={fallbackText}
         className={className}
-        style={{
-          ...style,
-          background: 'linear-gradient(135deg, var(--color-primary-bg, #fff3ed) 0%, #f8e8e0 100%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '6px',
-          fontSize: '48px',
-          color: 'rgba(0,0,0,0.15)',
+        onRetry={() => {
+          setError(false)
+          setLoaded(false)
         }}
-      >
-        <span style={{ fontSize: '48px', lineHeight: 1 }}>🍽️</span>
-        {fallbackText && (
-          <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.25)', maxWidth: '90%', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {fallbackText}
-          </span>
-        )}
-      </div>
+      />
     )
   }
 

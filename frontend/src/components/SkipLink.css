@@ -1,27 +1,28 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SkipLink 样式 — 01-design.md §6.3
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .skip-link {
   position: absolute;
-  top: -100%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: -100px;
+  left: 0;
   z-index: 9999;
-  padding: 8px 16px;
-  background: var(--color-primary, #e8663e);
+  padding: 12px 24px;
+  background: #FF6B35;
   color: #fff;
   font-size: 14px;
   font-weight: 600;
-  border-radius: 0 0 8px 8px;
   text-decoration: none;
   transition: top 0.15s ease;
 }
 
-.skip-link:focus {
+.skip-link:focus-visible {
   top: 0;
-  outline: 2px solid #fff;
+  outline: 3px solid #FF6B35;
   outline-offset: 2px;
 }
 
 body.dark .skip-link {
-  background: var(--color-card, #1e1e32);
-  color: var(--color-text, #e0e0ee);
-  border-color: var(--color-primary, #e8663e);
+  background: #FF8C5A;
+  color: #121212;
 }

@@ -329,6 +329,22 @@ body.dark .qclaw-toast__close:hover { background: rgba(255, 255, 255, 0.35); }
   }
 }
 
+/* ── §6.2 Focus Visible 全局样式 ── */
+:focus-visible {
+  outline: 3px solid #FF6B35;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── §6.7 prefers-reduced-motion 全局 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ── 按钮涟漪 ── */
 .btn-ripple { position: relative; overflow: hidden; }
 .btn-ripple::after {

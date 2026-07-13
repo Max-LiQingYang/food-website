@@ -1,18 +1,18 @@
 .recipe-card {
-  background: var(--color-card, #fff);
-  border-radius: var(--radius-md, 12px);
+  background: var(--color-bg-elevated, var(--color-card, #fff));
+  border-radius: var(--surface-radius-card, 16px);
   overflow: hidden;
-  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.08));
+  box-shadow: var(--surface-elevation-1, 0 2px 8px rgba(0, 0, 0, 0.08));
   cursor: pointer;
   transition:
-    transform var(--transition-normal, 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)),
-    box-shadow var(--transition-normal, 0.3s ease),
-    border-color var(--transition-normal, 0.3s ease);
+    transform var(--motion-duration-normal, 250ms) var(--motion-easing-default, ease),
+    box-shadow var(--motion-duration-normal, 250ms) var(--motion-easing-default, ease),
+    border-color var(--motion-duration-fast, 150ms) var(--motion-easing-default, ease);
   position: relative;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  animation: cardFadeIn calc(var(--motion-duration-scale) * 0.4s) ease both;
-  border: 1px solid var(--color-border, #eee);
+  animation: cardFadeIn var(--motion-duration-slow, 400ms) var(--motion-easing-default, ease) both;
+  border: 1px solid var(--color-border-subtle, #E0E0E0);
 }
 
 /* ── T-2026-0617-002 S1: 暗色暖黑+暗色星级+移动端元同行 ── */
@@ -44,13 +44,20 @@ body.dark .recipe-card__stat--rating {
 }
 
 .recipe-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.15));
-  border-color: var(--color-primary-light, #f0a080);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--surface-elevation-2, 0 4px 16px rgba(0, 0, 0, 0.12));
+  border-color: var(--color-accent-primary, #FF6B35);
 }
 
 .recipe-card:hover .recipe-card__cover {
-  border-bottom: 2px solid var(--color-primary, #E8663E);
+  border-bottom: 2px solid var(--color-accent-primary, #FF6B35);
+}
+
+/* ── §3.1 reduced-motion: 悬停仅阴影变化，无位移 ── */
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card:hover {
+    transform: none;
+  }
 }
 
 /* 悬浮预览覆盖层 */
@@ -119,7 +126,7 @@ body.dark .recipe-card__stat--rating {
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: var(--color-bg-secondary, #f5f0eb);
+  background: var(--color-bg-surface, #F5F5F5);
 }
 
 .recipe-card__cover img,

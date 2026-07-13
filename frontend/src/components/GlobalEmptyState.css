@@ -1,0 +1,95 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   GlobalEmptyState 样式 — 01-design.md §5.2
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.global-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: var(--spacing-xl, 32px) var(--spacing-md, 16px);
+  text-align: center;
+}
+
+.global-empty-state__icon {
+  font-size: 120px;
+  line-height: 1;
+  margin-bottom: var(--spacing-md, 16px);
+  color: var(--color-text-tertiary, #999);
+  opacity: 0.6;
+}
+
+.global-empty-state__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1A1A1A);
+  margin: 0 0 var(--spacing-sm, 8px);
+  line-height: 1.5;
+}
+
+.global-empty-state__desc {
+  font-size: 14px;
+  color: var(--color-text-secondary, #666);
+  margin: 0 0 var(--spacing-lg, 24px);
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.global-empty-state__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-accent-primary, #FF6B35);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--motion-duration-fast, 150ms) var(--motion-easing-default, ease),
+              transform var(--motion-duration-fast, 150ms) var(--motion-easing-default, ease);
+  font-family: inherit;
+}
+
+.global-empty-state__action:hover:not(:disabled) {
+  background: var(--color-accent-hover, #E55A2B);
+  transform: translateY(-1px);
+}
+
+.global-empty-state__action:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.global-empty-state__action--disabled,
+.global-empty-state__action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ── 暗色模式 ── */
+body.dark .global-empty-state__title {
+  color: var(--color-text-primary, #FFFFFF);
+}
+
+body.dark .global-empty-state__desc {
+  color: var(--color-text-secondary, #B3B3B3);
+}
+
+/* ── 低端设备 ── */
+body.low-end .global-empty-state__action:hover {
+  transform: none;
+}
+
+/* ── reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .global-empty-state__action {
+    transition: none;
+  }
+  .global-empty-state__action:hover {
+    transform: none;
+  }
+}

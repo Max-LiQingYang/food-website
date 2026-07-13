@@ -4,6 +4,7 @@ import { getRecipes, getHotSearches } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import FilterPanel from '../components/FilterPanel'
+import GlobalEmptyState from '../components/GlobalEmptyState'
 import { usePageTitle, useMetaTags } from '../hooks/useSEO'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import type { FilterState } from '../components/FilterPanel'
@@ -67,6 +68,10 @@ export default function AllRecipesPage() {
   const [allRecipes, setAllRecipes] = useState<Recipe[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  // ── J-003: network-error/load-fail counter 走页面 state（生命周期 = 页） ──
+  const [errorType, setErrorType] = useState<'network-error' | 'load-fail' | null>(null)
+  const [pageRetryCount, setPageRetryCount] = useState(0)
+  const MAX_PAGE_RETRIES = 3
   const [filters, setFilters] = useState<FilterState>({
     difficulty: initialDifficulty,
     maxCookTime: initialMaxCookTime,
@@ -132,6 +137,7 @@ export default function AllRecipesPage() {
   // ── 数据获取 ──
   const fetchRecipes = useCallback(async (cat: string, pg: number, f: FilterState, tag: string) => {
     setLoading(true)
+    setErrorType(null)
     try {
       const params: Record<string, any> = { page: pg, pageSize: PAGE_SIZE }
       if (cat) params.category = cat
@@ -144,9 +150,15 @@ export default function AllRecipesPage() {
       const data = res.data || res
       setAllRecipes(data.list || [])
       setTotal(data.total || 0)
-    } catch {
+    } catch (err: any) {
       setAllRecipes([])
       setTotal(0)
+      // J-003: 区分 network-error vs load-fail
+      if (err?.message?.includes('Network') || err?.code === 'ERR_NETWORK' || !navigator.onLine) {
+        setErrorType('network-error')
+      } else {
+        setErrorType('load-fail')
+      }
     } finally {
       setLoading(false)
     }
@@ -191,6 +203,12 @@ export default function AllRecipesPage() {
     setPage(newPage)
     window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() })
   }
+
+  const handleRetry = useCallback(() => {
+    if (pageRetryCount >= MAX_PAGE_RETRIES) return
+    setPageRetryCount(prev => prev + 1)
+    fetchRecipes(category, page, filters, activeTag)
+  }, [pageRetryCount, fetchRecipes, category, page, filters, activeTag])
 
   const handleReset = () => {
     setCategory('')
@@ -352,11 +370,17 @@ export default function AllRecipesPage() {
       {/* ── 食谱网格/列表 ── */}
       {loading ? (
         <PageSkeleton type="list" />
+      ) : errorType ? (
+        <GlobalEmptyState
+          variant={errorType}
+          onAction={pageRetryCount < MAX_PAGE_RETRIES ? handleRetry : undefined}
+        />
       ) : allRecipes.length === 0 ? (
         <div className="all-recipes-page__empty">
-          <span className="all-recipes-page__empty-icon">🔍</span>
-          <p>没有找到匹配的食谱</p>
-          <p className="all-recipes-page__empty-hint">换个分类、标签或筛选条件试试</p>
+          <GlobalEmptyState
+            variant="empty"
+            onAction={() => window.location.href = '/feed'}
+          />
           <button className="all-recipes-page__reset-btn" onClick={handleReset}>
             重置筛选
           </button>

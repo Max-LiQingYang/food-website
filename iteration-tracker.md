@@ -3126,3 +3126,39 @@ Playwright 巡检发现 7 个 Unsplash 图片被浏览器 ORB 拦截（`net::ERR
 - 00-story / 01-reinvestigation / 03-impl / 04-review / 05-qa / 07-deploy
 - 99-status.yaml 完整轨迹（story→impl→done(stale)→code→re-investigate→deploy→done）
 - iteration-lessons.md 新增 5 条教训
+
+### Iter#147 — T-2026-0617-002-recipe-card-detail-deepen (2026-06-17 10:38) ✅ done
+
+**目标**：RecipeCard + RecipeDetailPage 视觉深化（食欲感 + 信息密度）
+
+**结果**：
+- 8 阶段全 PASS：product → architect → reviewer r1 PASS 7.94 → fullstack → reviewer r1 PASS 8.62 → tester 8/8 → security 0c/0h → devops SUCCESS
+- 门 1+2 一轮过（firstPass=true）
+- 改 3 文件：RecipeCard.css +65 / RecipeDetailPage.css +91 / RecipeDetailPage.tsx ±55
+- commit `2e3a00d` 已部署，HEAD 稳定 1h+
+- 异常 1：服务器有 T-2026-0617-001 hot-patch（绕过 git），devops 现场 `git checkout` 修复
+- 异常 2：`#FFB84D` 字面 grep 0 hits 是 Vite minifier 转小写 `#ffb84d`，CSS 等价不视为失败
+
+### Iter#148 — T-2026-0617-003-navbar-footer-visual-unity (2026-06-17 10:58) ✅ done
+
+**目标**：Navbar/Footer 视觉统一（食欲感+暖色 accent #FFB84D，亮/暗色一致）
+
+**结果**：
+- chainId=LOOP-2026-0615-002 round=3
+- 8 阶段全 PASS：planReview 8.8 / codeReview 8.8 / qa 6/6 / security 0c/0h / devops SUCCESS
+- 改 920 行：Navbar/Footer 视觉统一（main 亲自落盘）
+- commit `9eaed49` 已部署，HEAD 稳定 2h+
+- 异常 1：fullstack 假完成 trap（写代码 ≠ 完成 diff 落盘，main 亲自补救）
+- 异常 2：product 子代理路径错误（写到 ~/.qclaw/workspace/product/ 而非黑板位置，main mv 修正）
+- 异常 3：部署前 hot-patch 清理（T-002 教训复用有效）
+
+### Iter#149 — T-2026-0617-004-motion-preference (2026-06-17 13:13) 🚀 in-flight (story)
+
+**目标**：prefers-reduced-motion 全站优雅降级（a11y 增强）
+
+**状态**：
+- chainId=LOOP-2026-0615-002 round=4
+- 99-status.yaml (1431B, phase=story, owner=product, baseCommit=9eaed49, candidate=005-TaskID-5, sop=[3,11,27,32,36,43,44,45])
+- 00-story.md (13811B, product v1 已完成，含 WCAG 2.1 SC 2.2.2/2.3.3 合规审计)
+- 派发 1 次 abort（main 连续 read 多个 5KB+ 文件触发 prompt-error） + rescue v1 974B 极简 prompt 30s 内成功
+- main session `b00eafab-bbbd-431a-b377-13cc5aba1322` abort + product v1 session `1b3c0b8d-cb4f-4366-a113-e6602434334e` 启动

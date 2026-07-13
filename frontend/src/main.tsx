@@ -1,10 +1,14 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import SkipLink from './components/SkipLink'
 import { ToastProvider } from './context/ToastContext'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { MotionPreferenceProvider } from './context/MotionPreferenceContext'
+import { DeviceTierProvider } from './context/DeviceTierContext'
+import { ParticleProvider } from './context/ParticleContext'
+import './styles/tokens.css'
 
 // ── Service Worker 注册 ──
 if ('serviceWorker' in navigator) {
@@ -33,13 +37,18 @@ if ('serviceWorker' in navigator) {
 const root = createRoot(document.getElementById('root')!)
 root.render(
   <React.StrictMode>
+    <SkipLink />
     <ThemeProvider>
       <MotionPreferenceProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </AuthProvider>
+        <DeviceTierProvider>
+          <ParticleProvider>
+            <AuthProvider>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </AuthProvider>
+          </ParticleProvider>
+        </DeviceTierProvider>
       </MotionPreferenceProvider>
     </ThemeProvider>
   </React.StrictMode>

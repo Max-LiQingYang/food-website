@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getActivityFeed, getUserStats, FeedActivityItem } from '../api'
 import Skeleton from '../components/Skeleton'
+import GlobalEmptyState from '../components/GlobalEmptyState'
+import { useDeviceTier } from '../context/DeviceTierContext'
 import './FeedPage.css'
 
 // ── 活动类型配置 ──
@@ -42,7 +44,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 // ── 单个动态卡片 ──
-function FeedCard({ item }: { item: FeedActivityItem }) {
+function FeedCard({ item, isVisible }: { item: FeedActivityItem; isVisible?: boolean }) {
   const config = ACTIVITY_CONFIG[item.type] || { icon: '📌', action: '动态', color: '#888' }
   const user = item.user
   const recipe = item.recipeInfo
@@ -62,7 +64,7 @@ function FeedCard({ item }: { item: FeedActivityItem }) {
     : (extra?.recipeId as string) || null
 
   return (
-    <article className="feed-card">
+    <article className={`feed-card${isVisible ? ' feed-card--visible' : ''}`} data-feed-id={String(item.id)}>
       <div className="feed-card__avatar">
         {user?.avatar ? (
           <img src={user.avatar} alt={user.nickname || user.username} className="feed-card__avatar-img" />
@@ -146,10 +148,47 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // ── J-003: network-error/load-fail counter 走页面 state（生命周期 = 页） ──
+  const [feedRetryCount, setFeedRetryCount] = useState(0)
+  const MAX_FEED_RETRIES = 3
 
   // 统计
   const [followingCount, setFollowingCount] = useState<number | null>(null)
   const [followersCount, setFollowersCount] = useState<number | null>(null)
+
+  // ── §4.2 卡片错峰动效 (J-005) ──
+  const { isLowEnd } = useDeviceTier()
+  const listRef = useRef<HTMLDivElement>(null)
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set())
+
+  // IntersectionObserver: 进入视口时 index % 4 * 50ms 延迟，单批上限 8 张
+  useEffect(() => {
+    if (isLowEnd || items.length === 0) return
+    const cards = listRef.current?.querySelectorAll('.feed-card')
+    if (!cards || cards.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let batchCount = 0
+        entries.forEach((entry, idx) => {
+          if (entry.isIntersecting && batchCount < 8) {
+            const id = entry.target.getAttribute('data-feed-id')
+            if (id) {
+              const delay = (idx % 4) * 50
+              setTimeout(() => {
+                setVisibleCards(prev => new Set([...prev, id]))
+              }, delay)
+              batchCount++
+            }
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+
+    cards.forEach(card => observer.observe(card))
+    return () => observer.disconnect()
+  }, [items, isLowEnd])
 
   const pageSize = 20
 
@@ -236,14 +275,22 @@ export default function FeedPage() {
 
   // 错误
   if (error) {
+    const isNetworkError = error.includes('Network') || error.includes('网络') || !navigator.onLine
     return (
       <div className="feed-page">
         <div className="feed-page__header">
           <h1 className="feed-page__title">好友动态</h1>
         </div>
-        <div className="feed-page__empty">
-          <p className="feed-page__empty-desc">{error}</p>
-        </div>
+        <GlobalEmptyState
+          variant={isNetworkError ? 'network-error' : 'load-fail'}
+          onAction={feedRetryCount < MAX_FEED_RETRIES ? () => {
+            setFeedRetryCount(prev => prev + 1)
+            setError(null)
+            setLoading(true)
+            // Re-trigger fetch via page reload
+            window.location.reload()
+          } : undefined}
+        />
       </div>
     )
   }
@@ -320,9 +367,9 @@ export default function FeedPage() {
       </div>
 
       {/* 动态列表 */}
-      <div className="feed-page__list">
+      <div className="feed-page__list" ref={listRef}>
         {items.map(item => (
-          <FeedCard key={item.id} item={item} />
+          <FeedCard key={item.id} item={item} isVisible={visibleCards.has(String(item.id))} />
         ))}
       </div>
 
