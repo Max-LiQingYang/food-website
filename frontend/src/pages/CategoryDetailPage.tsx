@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { CATEGORIES, getCategoryInfo } from '../constants/categories'
 import { getRecipes, getCategoryStats, type CategoryStat } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import './CategoryDetailPage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import EmptyState from '../components/EmptyState'
+import ErrorState from '../components/ErrorState'
 
 const PAGE_SIZE = 12
 
@@ -242,23 +244,27 @@ export default function CategoryDetailPage() {
       {loading && recipes.length === 0 ? (
         <PageSkeleton type="list" />
       ) : error ? (
-        <div className="category-detail__empty">
-          <span className="category-detail__empty-icon">⚠️</span>
-          <p>{error}</p>
-          <button className="category-detail__back-btn" onClick={() => navigate('/')}>返回首页</button>
-        </div>
+        <ErrorState
+          errorCode="ERR_CATEGORY_500"
+          onRetry={() => fetchPage(1)}
+        />
       ) : recipes.length === 0 ? (
-        <div className="category-detail__empty">
-          <span className="category-detail__empty-icon">🍽️</span>
-          <p>该分类暂无匹配食谱</p>
-          <button className="category-detail__back-btn" onClick={() => navigate('/')}>返回首页</button>
-        </div>
+        <EmptyState
+          variant="no-filter"
+          title="该分类暂无匹配食谱"
+          description="试试调整筛选条件或浏览其他分类"
+          ctaText="清除筛选"
+          ctaAction={() => {
+            setDifficulty('')
+            setSortBy('default')
+          }}
+        />
       ) : (
         <>
-          <div className={`category-detail__grid ${viewMode === 'list' ? 'category-detail__grid--list' : ''}`}>
-            {recipes.map(r => (
-              <RecipeCard key={r.id} recipe={r} />
-            ))}
+          <div className={`category-detail__grid ${viewMode === 'list' ? 'category-detail__grid--list' : ''} recipe-grid`}>
+            {useMemo(() => (
+              recipes.map(r => <RecipeCard key={r.id} recipe={r} />)
+            ), [recipes])}
           </div>
 
           {recipes.length < total && (

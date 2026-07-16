@@ -725,6 +725,63 @@ body.dark .hero-parallax__content { z-index: 2; }
   .home-hero__bubble, [class*="bubble"] { animation: none !important; }
 }
 
+/* ── 响应式卡片网格 ──────────────────────────────────── */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 16px;
+}
+
+/* Mobile S (<480px) - 1 column + increased card padding */
+@media (max-width: 479px) {
+  .recipe-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .recipe-grid .recipe-card {
+    padding: 20px;
+  }
+}
+
+/* Mobile L (480px - 768px) - 2 columns */
+@media (min-width: 480px) and (max-width: 767px) {
+  .recipe-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Tablet (768px - 1024px) - 3 columns */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .recipe-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Desktop (≥1024px) - preserve existing grid layout, no changes applied */
+
+/* ── 跳过链接 Skip Link ──────────────────────────────────── */
+a[href="#"][aria-label="跳到主要内容"] {
+  position: absolute;
+  top: -1000px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 12px 24px;
+  z-index: 1000;
+  transition: top 0.3s;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a[href="#"][aria-label="跳到主要内容"]:focus {
+  top: 0;
+  outline: 2px solid white;
+  outline-offset: -2px;
+}
+
 /* 第三方与遗留动效兜底：项目内优先使用 --motion-duration-scale，!important 仅用于不可控样式覆盖。 */
 @media (prefers-reduced-motion: reduce) {
   html {

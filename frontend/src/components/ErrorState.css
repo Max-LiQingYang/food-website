@@ -1,0 +1,169 @@
+/* ── ErrorState 错误状态组件 ─────────────────────────────── */
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  animation: empty-fade-in 0.3s ease-out;
+}
+
+@keyframes empty-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Icon */
+.error-state__icon {
+  font-size: 80px;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+/* Title */
+.error-state__title {
+  font-size: var(--typography-title, 18px);
+  font-weight: 600;
+  color: var(--color-text, #1A1A1A);
+  margin: 0 0 8px;
+}
+
+/* Description */
+.error-state__desc {
+  font-size: var(--typography-body, 14px);
+  line-height: 1.6;
+  color: var(--color-text-secondary, #666666);
+  margin: 0 auto 24px;
+  max-width: 360px;
+}
+
+/* CTA Button */
+.error-state__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 32px;
+  min-height: 44px;
+  border-radius: var(--radius-md, 8px);
+  border: none;
+  background: var(--color-error, #ff4d4f);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  width: 100%;
+  max-width: 200px;
+}
+
+.error-state__cta:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+}
+
+.error-state__cta:active {
+  transform: scale(0.97);
+}
+
+/* Error Code */
+.error-state__code {
+  margin-top: 24px;
+  font-size: var(--typography-caption, 12px);
+  color: var(--color-text-tertiary, #999999);
+  font-family: 'SF Mono', Monaco, monospace;
+  padding: 4px 12px;
+  background: var(--color-bg-surface, #F5F5F5);
+  border-radius: var(--radius-sm, 4px);
+}
+
+/* ── Hot Tags ──────────────────────────────── */
+.error-state__hot-label {
+  font-size: 13px;
+  color: var(--color-text-secondary, #666);
+  margin: 0 0 12px;
+}
+
+.error-state__hot-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.error-state__hot-tag {
+  padding: 8px 16px;
+  min-height: 44px;
+  border-radius: 22px;
+  background: var(--color-bg-surface, #F5F5F5);
+  border: 1px solid var(--color-border, #E0E0E0);
+  color: var(--color-text, #333);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.error-state__hot-tag:hover {
+  background: var(--color-error, #ff4d4f);
+  color: #fff;
+  border-color: var(--color-error, #ff4d4f);
+}
+
+/* ── Mobile S (<480px) ──────────────────────────────── */
+@media (max-width: 479px) {
+  .error-state {
+    padding: 48px 16px;
+  }
+
+  .error-state__icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .error-state__cta {
+    width: 100%;
+    max-width: none;
+  }
+
+  .error-state__hot-tag {
+    min-height: 40px;
+    padding: 8px 14px;
+  }
+}
+
+/* ── Tablet (768-1024px) ──────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .error-state__cta {
+    max-width: 160px;
+  }
+}
+
+/* ── Dark Mode ──────────────────────────────── */
+body.dark .error-state__title {
+  color: var(--color-text, #FFFFFF);
+}
+
+body.dark .error-state__desc {
+  color: var(--color-text-secondary, #B3B3B3);
+}
+
+body.dark .error-state__code {
+  background: var(--color-bg-surface, #2A2A2A);
+  color: var(--color-text-tertiary, #808080);
+}
+
+body.dark .error-state__hot-tag {
+  background: var(--color-bg-surface, #2A2A2A);
+  border-color: var(--color-border, #333333);
+  color: var(--color-text, #ddd);
+}
+
+body.dark .error-state__hot-tag:hover {
+  background: var(--color-error, #ff4d4f);
+  color: #fff;
+  border-color: var(--color-error, #ff4d4f);
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import type React from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getRecipes, getFeaturedRecipes } from '../api'
@@ -15,6 +15,8 @@ import { useDeferredMount } from '../hooks/useDeferredMount'
 import type { Recipe } from '../api'
 import './HomePage.css'
 import PageSkeleton from '../components/PageSkeleton'
+import EmptyState from '../components/EmptyState'
+import ErrorState from '../components/ErrorState'
 import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
 
 const CATEGORIES = ['全部', '中餐', '西餐', '甜点', '日韩', '其他'] as const
@@ -68,6 +70,7 @@ export default function HomePage() {
   const [featuredRecipes, setFeaturedRecipes] = useState<HeroRecipe[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const [searchInput, setSearchInput] = useState('')
   const [filters, setFilters] = useState<FilterState>({
     difficulty: initialDifficulty,
@@ -98,6 +101,7 @@ export default function HomePage() {
     abortRef.current = controller
 
     setLoading(true)
+    setError(null)
     const params: Record<string, any> = { page, pageSize: PAGE_SIZE }
     if (category !== '全部') params.category = category
     if (filters.sortBy) params.sortBy = filters.sortBy
@@ -113,6 +117,7 @@ export default function HomePage() {
       setTotal(data.total || 0)
     } catch (err: any) {
       if (err?.name === 'CanceledError' || controller.signal.aborted) return
+      setError(err)
       setRecipes([])
       setTotal(0)
     } finally {
@@ -230,11 +235,14 @@ export default function HomePage() {
         ))}
       </div>
 
+      {/* ── 跳过链接目标 ── */}
+      <a id="main-content" href="#" style={{ position: 'absolute', top: '-1000px' }} aria-label="跳到主要内容">跳到主要内容</a>
+
       {/* ── 筛选面板 ── */}
       <FilterPanel filters={filters} onChange={setFilters} />
 
       {/* ── 食谱主网格 ── */}
-      <section className="home-section">
+      <section className="home-section" aria-busy={loading}>
         {!showFullLayout && (
           <h2 className="home-section__title">
             <span className="home-section__icon">🔍</span>
@@ -246,18 +254,29 @@ export default function HomePage() {
           <PageSkeleton type="home" />
         )}
 
-        {!loading && recipes.length > 0 && (
-          <div className="home-grid list-stagger">
-            {recipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
+        {!loading && error && (
+          <ErrorState
+            errorCode="ERR_HOME_500"
+            onRetry={fetchRecipes}
+          />
+        )}
+
+        {!loading && !error && recipes.length > 0 && (
+          <div className="home-grid list-stagger recipe-grid">
+            {useMemo(() => (
+              recipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)
+            ), [recipes])}
           </div>
         )}
 
-        {!loading && recipes.length === 0 && (
-          <div className="home-empty">
-            <div className="home-empty__icon">🍳</div>
-            <p className="home-empty__text">暂无食谱</p>
-            <p className="home-empty__hint">试试其它筛选条件~</p>
-          </div>
+        {!loading && !error && recipes.length === 0 && (
+          <EmptyState
+            variant="no-data"
+            title="暂无推荐食谱"
+            description="浏览分类发现更多美食"
+            ctaText="浏览分类"
+            ctaLink="/categories"
+          />
         )}
       </section>
 

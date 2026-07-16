@@ -5,6 +5,7 @@ import { searchRecipes, getHotSearches, getRecipes } from '../api'
 import RecipeCard from '../components/RecipeCard'
 import SearchAutocomplete from '../components/SearchAutocomplete'
 import EmptyState from '../components/EmptyState'
+import ErrorState from '../components/ErrorState'
 import { highlightText } from '../utils/highlightText'
 import { useToast } from '../context/ToastContext'
 import { CATEGORIES as CATEGORIES_SHARED } from '../constants/categories'
@@ -97,6 +98,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<Recipe[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
   const toast = useToast()
 
   /** 多选分类 */
@@ -153,6 +155,7 @@ export default function SearchPage() {
     if (filterDifficulty) params.difficulty = filterDifficulty
     if (filterSortBy) params.sortBy = filterSortBy
 
+    setError(null)
     searchRecipes(params)
       .then((res: any) => {
         const list = res.data?.list || res.list || []
@@ -164,7 +167,8 @@ export default function SearchPage() {
           toast.info('没有找到相关食谱，试试其他关键词或调整筛选条件')
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        setError(err)
         setResults([])
         setTotal(0)
       })
@@ -688,58 +692,68 @@ export default function SearchPage() {
         <PageSkeleton type="list" />
       )}
 
+      {/* 错误状态 */}
+      {!loading && error && (
+        <ErrorState
+          errorCode="ERR_SEARCH_500"
+          onRetry={() => handleSearchSubmit(q)}
+        />
+      )}
+
       {/* A1: 结果列表 — 网格 / 列表 */}
-      {!loading && hasResults && (
-        <div className={`search-grid ${view === 'list' ? 'search-grid--list' : 'search-grid--grid'}`}>
-          {view === 'grid' ? (
-            results.map(recipe => (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                highlightQuery={q}
-              />
-            ))
-          ) : (
-            results.map(recipe => (
-              <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="search-list-item">
-                <div className="search-list-item__thumb">
-                  <img src={recipe.coverImage} alt="" loading="lazy" />
-                </div>
-                <div className="search-list-item__body">
-                  <h3
-                    className="search-list-item__title"
-                    dangerouslySetInnerHTML={{ __html: highlightText(recipe.title, q) }}
-                  />
-                  <p className="search-list-item__desc">
-                    {recipe.description || recipe.story || '点击查看详细做法'}
-                  </p>
-                  <div className="search-list-item__meta">
-                    <span>⏱ {recipe.cookTime || '-'} 分钟</span>
-                    <span className="dot">·</span>
-                    <span>👤 {recipe.author || '匿名'}</span>
-                    {recipe.avgRating ? (
-                      <>
-                        <span className="dot">·</span>
-                        <span>⭐ {recipe.avgRating.toFixed(1)}</span>
-                      </>
-                    ) : null}
+      {!loading && !error && hasResults && (
+        <div className={`search-grid ${view === 'list' ? 'search-grid--list' : 'search-grid--grid'} recipe-grid`}>
+          {useMemo(() => (
+            view === 'grid' ? (
+              results.map(recipe => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  highlightQuery={q}
+                />
+              ))
+            ) : (
+              results.map(recipe => (
+                <Link to={`/recipe/${recipe.id}`} key={recipe.id} className="search-list-item">
+                  <div className="search-list-item__thumb">
+                    <img src={recipe.coverImage} alt="" loading="lazy" />
                   </div>
-                </div>
-                <div className="search-list-item__action" aria-hidden="true">›</div>
-              </Link>
-            ))
-          )}
+                  <div className="search-list-item__body">
+                    <h3
+                      className="search-list-item__title"
+                      dangerouslySetInnerHTML={{ __html: highlightText(recipe.title, q) }}
+                    />
+                    <p className="search-list-item__desc">
+                      {recipe.description || recipe.story || '点击查看详细做法'}
+                    </p>
+                    <div className="search-list-item__meta">
+                      <span>⏱ {recipe.cookTime || '-'} 分钟</span>
+                      <span className="dot">·</span>
+                      <span>👤 {recipe.author || '匿名'}</span>
+                      {recipe.avgRating ? (
+                        <>
+                          <span className="dot">·</span>
+                          <span>⭐ {recipe.avgRating.toFixed(1)}</span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="search-list-item__action" aria-hidden="true">›</div>
+                </Link>
+              ))
+            )
+          ), [results, view, q])}
         </div>
       )}
 
       {/* A3: 空结果趣味引导 + 随机推荐 */}
-      {!loading && q && !hasResults && (
+      {!loading && !error && q && !hasResults && (
         <>
           <EmptyState
+            variant="no-search"
             icon="🔍"
             title="没有找到相关食谱"
             description="试试调整关键词或筛选条件"
-            variant="search"
             hotTags={(hotSearches.length > 0 ? hotSearches.slice(0, 8) : [
               { text: '番茄炒蛋' }, { text: '红烧肉' }, { text: '蛋糕' }, { text: '牛肉' }
             ]).map(item => ({

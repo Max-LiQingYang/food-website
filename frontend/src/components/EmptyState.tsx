@@ -7,6 +7,8 @@ interface HotTag {
 }
 
 interface Props {
+  /** 变体类型 */
+  variant: 'no-data' | 'no-search' | 'error' | 'no-filter' | 'default' | 'compact' | 'search'
   /** Emoji or icon string */
   icon?: string
   /** 主标题 */
@@ -18,15 +20,13 @@ interface Props {
   /** 按钮链接（优先于 onClick） */
   ctaLink?: string
   /** 按钮回调 */
-  ctaOnClick?: () => void
+  ctaAction?: () => void
   /** 次要按钮文字 */
   ctaSecondaryText?: string
   /** 次要按钮链接 */
   ctaSecondaryLink?: string
   /** 次要按钮回调 */
   ctaSecondaryOnClick?: () => void
-  /** 变体：default / compact / search */
-  variant?: 'default' | 'compact' | 'search'
   /** 搜索无结果时的热搜标签 */
   hotTags?: HotTag[]
   /** 额外 className */
@@ -37,19 +37,23 @@ const variantIcons: Record<string, string> = {
   default: '📋',
   compact: '📝',
   search: '🔍',
+  'no-data': '🍴',
+  'no-search': '🔍',
+  'no-filter': '📭',
+  error: '⚠️',
 }
 
 export default function EmptyState({
+  variant = 'default',
   icon,
   title,
   description,
   ctaText,
   ctaLink,
-  ctaOnClick,
+  ctaAction,
   ctaSecondaryText,
   ctaSecondaryLink,
   ctaSecondaryOnClick,
-  variant = 'default',
   hotTags,
   className = '',
 }: Props) {
@@ -58,7 +62,7 @@ export default function EmptyState({
 
   const handleCtaClick = () => {
     if (ctaLink) navigate(ctaLink)
-    else ctaOnClick?.()
+    else ctaAction?.()
   }
 
   const handleSecondaryClick = () => {
@@ -66,8 +70,15 @@ export default function EmptyState({
     else ctaSecondaryOnClick?.()
   }
 
+  // Map new variants to existing CSS classes
+  const cssVariant = variant === 'no-data' ? 'default' 
+    : variant === 'no-search' ? 'search' 
+    : variant === 'no-filter' ? 'default'
+    : variant === 'error' ? 'default'
+    : variant
+
   return (
-    <div className={`empty-state empty-state--${variant} ${className}`} role="status">
+    <div className={`empty-state empty-state--${cssVariant} ${className}`} role="status" aria-live="polite">
       <div className="empty-state__icon">{displayIcon}</div>
 
       {title && <h3 className="empty-state__title">{title}</h3>}
