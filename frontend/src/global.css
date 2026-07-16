@@ -98,6 +98,14 @@ body {
   --color-dim-presentation: #1890ff;
   --color-dim-value: #faad14;
   --color-delta-positive: #e8663e;
+  --color-offline-bg: #6b7280;
+  --color-offline-text: #ffffff;
+  --color-slow-bg: #f59e0b;
+  --color-slow-text: #ffffff;
+  --color-offline-bg-dark: #374151;
+  --color-offline-text-dark: #f3f4f6;
+  --color-slow-bg-dark: #fbbf24;
+  --color-slow-text-dark: #1f2937;
   --color-delta-negative: #999999;
   --color-delta-zero: #999999;
   --color-sample-warning-bg: #fff7e6;

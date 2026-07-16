@@ -140,8 +140,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.92);
@@ -2536,9 +2536,114 @@ body.dark .step-progress__check {
   .back-to-top {
     bottom: 140px;
     right: 16px;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     font-size: 18px;
+  }
+}
+
+/* ===== 移动端 mini 章节导航（sticky） ===== */
+.section-nav-mini {
+  position: sticky;
+  top: 56px;
+  z-index: 45;
+  margin: 0;
+  padding: 10px 0;
+  background: color-mix(in srgb, var(--color-bg, #fdf8f4) 95%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border, #e8e0d8);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.section-nav-mini::-webkit-scrollbar {
+  display: none;
+}
+
+.section-nav-mini__list {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px;
+  margin: 0;
+  list-style: none;
+}
+
+.section-nav-mini__item {
+  flex-shrink: 0;
+}
+
+.section-nav-mini__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border, #e8e0d8);
+  border-radius: 20px;
+  background: var(--color-card, #fff);
+  font-size: 13px;
+  color: var(--color-text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.section-nav-mini__icon {
+  font-size: 14px;
+}
+
+.section-nav-mini__btn:hover {
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary, #e8663e);
+  background: var(--color-primary-bg, #fff3ed);
+}
+
+.section-nav-mini__btn:active {
+  transform: scale(0.96);
+}
+
+.section-nav-mini__btn--active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+  font-weight: 500;
+}
+
+.section-nav-mini__btn--active:hover {
+  background: var(--color-primary-dark, #c94f2a);
+  color: #fff;
+}
+
+/* 暗色模式 */
+body.dark .section-nav-mini {
+  background: color-mix(in srgb, #1a1410 95%, transparent);
+  border-bottom-color: #332a23;
+}
+
+body.dark .section-nav-mini__btn {
+  background: #2a2018;
+  border-color: #3d3026;
+  color: #b8a898;
+}
+
+body.dark .section-nav-mini__btn:hover {
+  background: #3d2b1f;
+  border-color: var(--color-primary, #e8663e);
+  color: var(--color-primary-light, #f0946e);
+}
+
+body.dark .section-nav-mini__btn--active {
+  background: var(--color-primary, #e8663e);
+  color: #fff;
+  border-color: var(--color-primary, #e8663e);
+}
+
+/* 桌面端隐藏 mini nav */
+@media (min-width: 768px) {
+  .section-nav-mini {
+    display: none;
   }
 }
 

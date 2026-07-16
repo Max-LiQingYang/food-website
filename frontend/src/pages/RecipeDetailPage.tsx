@@ -120,6 +120,60 @@ export default function RecipeDetailPage() {
   const [favoriteNote, setFavoriteNote] = useState('')
   const [noteModalVisible, setNoteModalVisible] = useState(false)
 
+  // ═══ 长内容折叠状态 ═══
+  const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set())
+  const [expandedIngredients, setExpandedIngredients] = useState<Set<number>>(new Set())
+  const [expandedNutrition, setExpandedNutrition] = useState(false)
+
+  const toggleStepExpand = (index: number) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
+
+  const toggleIngredientExpand = (index: number) => {
+    setExpandedIngredients(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
+
+  const toggleNutritionExpand = () => {
+    setExpandedNutrition(prev => !prev)
+  }
+
+  // 内容折叠渲染函数
+  const renderCollapsibleContent = (content: string, isExpanded: boolean, onToggle: () => void) => {
+    if (content.length <= 200) return <>{content}</>
+    return (
+      <>
+        {isExpanded ? content : `${content.slice(0, 100)}...`}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggle()
+          }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--color-primary, #e8663e)',
+            cursor: 'pointer',
+            fontSize: '13px',
+            padding: '0 4px',
+            fontWeight: 500
+          }}
+        >
+          {isExpanded ? '收起' : '展开'}
+        </button>
+      </>
+    )
+  }
+
   // ═══ Iter#99: "我做过"标记 ──
   const [isCooked, setIsCooked] = useState(false)
   const [cookCount, setCookCount] = useState(0)
@@ -244,12 +298,23 @@ export default function RecipeDetailPage() {
   const [showBackToTop, setShowBackToTop] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setShowBackToTop(window.scrollY > 500)
+    const handleScroll = () => setShowBackToTop(window.scrollY > 300)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: getMotionSafeScrollBehavior() })
+
+  // ── 键盘 Esc 触发返回顶部
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showBackToTop) {
+        scrollToTop()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showBackToTop])
 
   // ── 章节导航锚点
   const [activeSection, setActiveSection] = useState<string>('section-ingredients')
@@ -652,6 +717,25 @@ export default function RecipeDetailPage() {
           ← 返回
         </button>
 
+        {/* ── 章节快速导航（移动端 sticky）── */}
+        <nav className="section-nav-mini" aria-label="章节导航">
+          <ul className="section-nav-mini__list">
+            {SECTIONS.map(s => (
+              <li key={s.id} className="section-nav-mini__item">
+                <button
+                  type="button"
+                  className={`section-nav-mini__btn ${activeSection === s.id ? 'section-nav-mini__btn--active' : ''}`}
+                  onClick={() => scrollToSection(s.id)}
+                  aria-current={activeSection === s.id ? 'location' : undefined}
+                >
+                  <span className="section-nav-mini__icon">{s.icon}</span>
+                  <span className="section-nav-mini__label">{s.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         {/* 封面图 - 点击打开灯箱 */}
         <div
           className="detail-cover"
@@ -1053,7 +1137,13 @@ export default function RecipeDetailPage() {
                     </div>
                     <div className="step-number">{step.stepNumber}</div>
                     <div className="step-body">
-                      <p className="step-content">{step.content}</p>
+                      <p className="step-content">
+                        {renderCollapsibleContent(
+                          step.content || '',
+                          expandedSteps.has(index),
+                          () => toggleStepExpand(index)
+                        )}
+                      </p>
                       <StepTimer stepNumber={step.stepNumber} stepContent={step.content} />
                       {/* 语音播报按钮 */}
                       {speechSupported && (

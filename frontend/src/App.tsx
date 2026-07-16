@@ -3,18 +3,26 @@ import { useStaggerReveal } from './hooks/useStaggerReveal'
 import { useParallax } from './hooks/useParallax'
 import { useEffect } from 'react'
 import { getMotionSafeScrollBehavior } from './context/MotionPreferenceContext'
+import useOnlineStatus from './hooks/useOnlineStatus'
+import OfflineBanner from './components/OfflineBanner'
 import './global.css'
 
 export default function App() {
   useStaggerReveal()
   useParallax()
+  const { status } = useOnlineStatus()
 
   useEffect(() => {
     document.body.classList.add('has-bottom-nav')
     return () => document.body.classList.remove('has-bottom-nav')
   }, [])
 
-  return <Router />
+  return (
+    <>
+      <OfflineBanner status={status} />
+      <Router />
+    </>
+  )
 }
 
 // ── 移动端输入框 focus 防键盘遮挡 ──

@@ -5,32 +5,47 @@
  */
 
 import axios, { AxiosError } from 'axios'
+import { markSlowRequest } from './hooks/useOnlineStatus'
 
 // 创建 axios 实例
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
-  timeout: 10000,
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// 请求拦截器：自动附加 Token
-apiClient.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  error => Promise.reject(error)
-)
+// 注意：请求拦截器已合并到响应拦截器上方（包含 _startTime 记录）
 
-// 响应拦截器：统一错误处理
+// 响应拦截器：统一错误处理 + 重试机制
 apiClient.interceptors.response.use(
-  response => response.data,
-  (error: AxiosError<{ message?: string }>) => {
+  response => {
+    // 标记请求时长超过 3 秒为慢请求
+    const config = response.config as any
+    if (config && config._startTime) {
+      const duration = Date.now() - config._startTime
+      if (duration > 3000) {
+        markSlowRequest()
+      }
+    }
+    return response.data
+  },
+  async (error: AxiosError<{ message?: string }>) => {
+    const config = error.config as any
+
+    // 只对 GET 请求进行重试
+    if (config && config.method?.toLowerCase() === 'get') {
+      config._retryCount = config._retryCount || 0
+
+      if (config._retryCount < 1) {
+        config._retryCount++
+        // 等待 1 秒后重试
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        return apiClient(config)
+      }
+    }
+
     let message: string
 
     if (!error.response) {
@@ -49,6 +64,22 @@ apiClient.interceptors.response.use(
     return Promise.reject(new Error(message))
   }
 )
+
+// 请求拦截器：记录开始时间
+apiClient.interceptors.request.use(
+  config => {
+    (config as any)._startTime = Date.now()
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  error => Promise.reject(error)
+)
+
+// 移除原来的请求拦截器（避免重复）
+// 注意：上面已经合并了 token 添加功能
 
 // ─────────────────────────────────────────────────────────────────
 // 类型定义
