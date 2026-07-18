@@ -22,9 +22,22 @@ export default function BottomNav() {
         className={({ isActive }) =>
           `bottom-nav__item ${isActive ? 'bottom-nav__item--active' : ''}`
         }
+        aria-label="首页"
       >
         <span className="bottom-nav__icon" aria-hidden="true">🏠</span>
         <span className="bottom-nav__label">首页</span>
+      </NavLink>
+
+      {/* AC3: 收藏 第 2 位 */}
+      <NavLink
+        to="/favorites"
+        className={({ isActive }) =>
+          `bottom-nav__item ${isActive ? 'bottom-nav__item--active' : ''}`
+        }
+        aria-label="收藏"
+      >
+        <span className="bottom-nav__icon" aria-hidden="true">❤️</span>
+        <span className="bottom-nav__label">收藏</span>
       </NavLink>
 
       <NavLink
@@ -32,6 +45,7 @@ export default function BottomNav() {
         className={({ isActive }) =>
           `bottom-nav__item ${isActive ? 'bottom-nav__item--active' : ''}`
         }
+        aria-label="搜索"
       >
         <span className="bottom-nav__icon" aria-hidden="true">🔍</span>
         <span className="bottom-nav__label">搜索</span>
@@ -54,6 +68,7 @@ export default function BottomNav() {
         className={({ isActive }) =>
           `bottom-nav__item ${isActive ? 'bottom-nav__item--active' : ''}`
         }
+        aria-label="我的"
       >
         <span className="bottom-nav__icon" aria-hidden="true">👤</span>
         <span className="bottom-nav__label">我的</span>

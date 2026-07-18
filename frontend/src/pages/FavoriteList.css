@@ -465,3 +465,23 @@ body.dark .note-preview__text {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* AC5: Meal plan status badge */
+.recipe-card__meal-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px;
+  background: #E3F2FD;
+  color: #1565C0;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+body.dark .recipe-card__meal-plan-badge {
+  background: rgba(33, 150, 243, 0.15);
+  color: #64B5F6;
+}

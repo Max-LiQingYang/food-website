@@ -13,6 +13,47 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  min-height: 44px;
+}
+
+.atsl-btn:focus-visible {
+  outline: 3px solid #FFD54F;
+  outline-offset: 2px;
+}
+
+/* AC1: floating-action-bar shopping list button */
+.fab-btn--shopping-list {
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  min-height: 44px;
+}
+
+.fab-btn--meal-plan {
+  background: #2196F3;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  min-height: 44px;
+}
+
+.fab-btn--meal-plan:disabled,
+.fab-btn--shopping-list:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fab-btn--meal-plan:focus-visible,
+.fab-btn--shopping-list:focus-visible {
+  outline: 3px solid #FFD54F;
+  outline-offset: 2px;
 }
 
 .atsl-btn:hover:not(:disabled) {

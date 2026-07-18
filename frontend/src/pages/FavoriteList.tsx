@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getFavoriteList, removeFavorite } from '../api'
+import { getFavoriteList, removeFavorite, getMealPlans } from '../api'
 import EmptyState from '../components/EmptyState'
 import Pagination from '../components/Pagination'
 import FavoriteNoteModal from '../components/FavoriteNoteModal'
 import './FavoriteList.css'
 import PageSkeleton from '../components/PageSkeleton'
 import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
+import { useCrossFlowToast } from '../components/CrossFlowToast'
 
 // ── 类型定义 ──────────────────────────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ function formatDate(isoString?: string): string {
 export default function FavoriteList() {
   const navigate = useNavigate()
   const listTopRef = useRef<HTMLDivElement>(null)
+  const crossFlowToast = useCrossFlowToast()
 
   const [loading, setLoading] = useState(false)
   const [list, setList] = useState<FavoriteItem[]>([])
@@ -58,6 +60,8 @@ export default function FavoriteList() {
     pageSize: 12,
     total: 0,
   })
+  // AC5: meal plan recipe IDs for cross-reference
+  const [mealPlanRecipeIds, setMealPlanRecipeIds] = useState<Set<string>>(new Set())
 
   // 备注弹窗状态
   const [noteModalVisible, setNoteModalVisible] = useState(false)
@@ -78,8 +82,34 @@ export default function FavoriteList() {
     }
   }
 
+  // AC5: Fetch current week's meal plans and cross-reference with favorites
+  async function fetchMealPlanStatus() {
+    try {
+      const now = new Date()
+      const day = now.getDay()
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1)
+      now.setDate(diff)
+      const weekStart = now.toISOString().slice(0, 10)
+      const plans = await getMealPlans(weekStart)
+      const recipeIds = new Set<string>()
+      if (plans && plans.length > 0) {
+        for (const plan of plans) {
+          if (plan.meals) {
+            for (const meal of plan.meals) {
+              if (meal.recipeId) recipeIds.add(meal.recipeId)
+            }
+          }
+        }
+      }
+      setMealPlanRecipeIds(recipeIds)
+    } catch {
+      // Silent fail - meal plan status is optional enhancement
+    }
+  }
+
   useEffect(() => {
     fetchList()
+    fetchMealPlanStatus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -178,6 +208,15 @@ export default function FavoriteList() {
                 <h3 className="recipe-card__title">{item.recipe.title}</h3>
                 <p className="recipe-card__author">👨🍳 {item.recipe.author || '未知作者'}</p>
                 <p className="recipe-card__date">收藏于 {formatDate(item.createdAt)}</p>
+                {/* AC5: meal plan status badge */}
+                {mealPlanRecipeIds.has(item.recipe.id) && (
+                  <span
+                    className="recipe-card__meal-plan-badge"
+                    aria-label="已加入餐单"
+                  >
+                    ✓ 已加入餐单
+                  </span>
+                )}
               </div>
               {/* 备注预览 */}
               {item.note && (

@@ -12,6 +12,7 @@ import KeyboardShortcutsProvider from '../components/KeyboardShortcuts'
 import WelcomeTour from '../components/WelcomeTour'
 import PageSkeleton from '../components/PageSkeleton'
 import Footer from '../components/Footer'
+import { CrossFlowToastProvider } from '../components/CrossFlowToast'
 import '../components/PageTransition.css'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
@@ -78,7 +79,9 @@ function Layout() {
         <main id="main-content">
           <Suspense fallback={<Fallback />}>
             <ErrorBoundary>
-              <Outlet />
+              <CrossFlowToastProvider>
+                <Outlet />
+              </CrossFlowToastProvider>
             </ErrorBoundary>
           </Suspense>
         </main>

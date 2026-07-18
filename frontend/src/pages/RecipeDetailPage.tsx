@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { getRecipeById, deleteRecipe } from '../api'
+import { getRecipeById, deleteRecipe, addRecipeToMealPlan } from '../api'
 import { addFavorite, removeFavorite, getFavoriteStatus } from '../api'
 import { getAuthorInfo, getCookStatus, cookRecipe, uncookRecipe } from '../api'
 import type { AuthorLevelInfo } from '../api'
@@ -34,6 +34,7 @@ import './RecipeDetailPage.css'
 import '../components/PrintView.css'
 import PageSkeleton from '../components/PageSkeleton'
 import { getMotionSafeScrollBehavior } from '../context/MotionPreferenceContext'
+import CrossFlowToast, { useCrossFlowToast } from '../components/CrossFlowToast'
 
 /** 分类中文映射 */
 const CATEGORY_NAMES: Record<string, string> = {
@@ -102,6 +103,8 @@ export default function RecipeDetailPage() {
   const navigate = useNavigate()
   const toast = useToast()
   const { isAuthenticated, user } = useAuth()
+  const crossFlowToast = useCrossFlowToast()
+  const [addingToMealPlan, setAddingToMealPlan] = useState(false)
 
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -494,7 +497,12 @@ export default function RecipeDetailPage() {
         toast.success('已取消收藏')
       } else {
         await addFavorite(id)
-        toast.success('已收藏')
+        crossFlowToast.show({
+          type: 'success',
+          message: '已收藏',
+          actionText: '查看餐单',
+          actionPath: '/meal-planner',
+        })
       }
     } catch (err: any) {
       // Revert on failure
@@ -1413,6 +1421,43 @@ export default function RecipeDetailPage() {
 
         <AddToCollectionDropdown recipeId={id} label="📁" />
 
+        {/* AC1: 加入餐单 + 购物清单 CTA */}
+        <button
+          className="fab-btn fab-btn--meal-plan"
+          onClick={async () => {
+            if (!isAuthenticated) { navigate('/login'); return }
+            if (!id) return
+            setAddingToMealPlan(true)
+            try {
+              const today = new Date().toISOString().slice(0, 10)
+              await addRecipeToMealPlan({ recipeId: id, date: today, mealType: 'dinner' })
+              crossFlowToast.show({
+                type: 'success',
+                message: '已加入本周餐单',
+                actionText: '查看餐单',
+                actionPath: '/meal-planner',
+              })
+            } catch (err: any) {
+              toast.error(err?.message || '加入餐单失败')
+            } finally {
+              setAddingToMealPlan(false)
+            }
+          }}
+          disabled={addingToMealPlan}
+          title="加入餐单"
+          aria-label="加入餐单"
+          style={{ minHeight: '44px' }}
+        >
+          <span className="fab-btn__icon">{addingToMealPlan ? '⋯' : '📅'}</span>
+          <span>{addingToMealPlan ? '加入中...' : '加入餐单'}</span>
+        </button>
+        {id && (
+          <AddToShoppingListButton
+            recipeId={id}
+            label="🛒 购物清单"
+            className="fab-btn fab-btn--shopping-list"
+          />
+        )}
         <button className="fab-btn" onClick={handleShare} title="分享食谱">
           <span className="fab-btn__icon">📤</span>
           <span>分享</span>

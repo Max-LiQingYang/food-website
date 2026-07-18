@@ -4,6 +4,7 @@ import { getMealPlans, createMealPlan, updateMealPlan, deleteMealPlan, generateS
 import { searchRecipes } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import { useCrossFlowToast } from '../components/CrossFlowToast'
 import EmptyState from '../components/EmptyState'
 import type { MealPlanMeal } from '../api'
 import './MealPlannerPage.css'
@@ -41,6 +42,7 @@ function formatDate(weekStart: string, dayOffset: number): string {
 export default function MealPlannerPage() {
   const { isAuthenticated } = useAuth()
   const { showToast } = useToast()
+  const crossFlowToast = useCrossFlowToast()
   const navigate = useNavigate()
 
   const [mealPlan, setMealPlan] = useState<MealPlanMeal[]>([])
@@ -192,7 +194,7 @@ export default function MealPlannerPage() {
     }
   }
 
-  // 生成购物清单
+  // AC2: 生成购物清单 - sticky button + cross-flow toast
   const handleGenerateShoppingList = async () => {
     if (!planId) {
       showToast('请先保存餐单', 'warning')
@@ -200,7 +202,12 @@ export default function MealPlannerPage() {
     }
     try {
       await generateShoppingListFromMealPlan(planId)
-      showToast('购物清单已生成，请查看购物清单页面', 'success')
+      crossFlowToast.show({
+        type: 'success',
+        message: '购物清单已生成',
+        actionText: '查看购物清单',
+        actionPath: '/shopping-list',
+      })
     } catch {
       showToast('生成购物清单失败', 'error')
     }
@@ -236,6 +243,18 @@ export default function MealPlannerPage() {
 
   return (
     <div className="meal-planner">
+      {/* AC2: sticky 生成购物清单 bar - mobile visible */}
+      <div className="meal-planner__sticky-bar">
+        <button
+          className="meal-planner__sticky-generate-btn"
+          onClick={handleGenerateShoppingList}
+          disabled={!planId}
+          aria-label="生成购物清单"
+          style={{ minHeight: '44px' }}
+        >
+          🛒 生成购物清单
+        </button>
+      </div>
       <div className="meal-planner__header">
         <h1 className="meal-planner__title">📅 每周餐单计划</h1>
         <div className="meal-planner__actions">
